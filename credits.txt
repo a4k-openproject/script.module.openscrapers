@@ -1,0 +1,18 @@
+This is a new Project to try and unify MultiScraper forks scrapers all into one pack. This is based on projects from those listed below. I respect everything they've done for the scene and they all deserve their credit for their work in whatever capacity they have contributed. I thank everyone and i hope that everyone can help the community have a unified scraper pack, with no more drama :)
+
+- Lambda
+- TKNorris
+- Mr.Blamo
+- Nixgates
+- I-A-C
+- WilsonMagic
+- 13Clowns
+- Eggman
+- Jor-El
+- Maud'Dib
+- Jewbmx
+- Team Supremacy
+- and any others i may have missed!
+
+Note: Any scraper with credit removed is at the request of the dev that made it, all credit was left intact
+Based On: Civitas Scrapers/LambdaScrapers
