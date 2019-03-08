@@ -36,7 +36,7 @@ def toggleAll(setting, open_id=None, sourceList=None):
 
 
 
-if mode == "LambdaSettings":
+if mode == "OpenscrapersSettings":
     control.openSettings('0.0', 'script.module.openscrapers')
 
 if mode == "ScraperChoice":

@@ -2,7 +2,7 @@
 <settings>
     <category label="Providers">
         <setting type="sep" />
-        <setting id="module.provider" label="Choose Module Scraper" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=ScraperChoice)" default=" openscrapers" />
+        <setting id="module.provider" label="Choose Module Scraper" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=ScraperChoice)" default="Openscrapers" />
         <setting type="sep" />
         <setting label="Lambda Scrapers Default Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=Defaults&amp;setting=true&amp;open_id='1.2')"/>
         <setting label="Disable All Providers" type="action" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAll&amp;setting=false&amp;open_id=0.1)" option="close"/>
