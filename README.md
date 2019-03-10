@@ -15,14 +15,14 @@
 #                                                                  
 ```
 
-Welcome to Open Scrapers Project,
+Welcome to OpenScrapers Project,
 
 This project is in hopes to unify the community and contribute to one scraper pack for multi scraper add-ons and not
 having the repo go dead or disappear. The goal is to stop the drama, the egos, everything and work together and make
 this a great scraper pack so the community can benefit. Addons4Kodi takes no credit for putting this together, and we
 thank all devs that have contributed to multiple projects over time.
 
-# Open Scrapers Repo
+# OpenScrapers Repo
 
 You can add the source directory to your own repository for convenience and updates
 ```
