@@ -66,13 +66,20 @@
     <category label="Foreign">
         <setting label="Disable All Foreign Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllForeign&amp;setting=false&amp;open_id='1.1')"/>
         <setting label="Enable All Foreign Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllForeign&amp;setting=true&amp;open_id='1.2')"/>
+        <setting type="sep" />
         <setting label="Spanish" type="lsep" />
+        <setting label="Disable All Spanish Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllSpanish&amp;setting=false&amp;open_id='1.1')"/>
+        <setting label="Enable All Spanish Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllSpanish&amp;setting=true&amp;open_id='1.2')"/>
+        <setting type="sep" />
         <setting id="provider.megapelistv" type="bool" label="MEGAPELISTV" default="false" />
         <setting id="provider.peliculasdk" type="bool" label="PELICULASDK" default="false" />
         <setting id="provider.pelisplustv" type="bool" label="PELISPLUSTV" default="false" />
         <setting id="provider.pepecine" type="bool" label="PEPCINE" default="false" />
         <setting id="provider.seriespapaya" type="bool" label="SERIESPAPAYA" default="false" />
         <setting label="German" type="lsep" />
+        <setting label="Disable All German Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllGerman&amp;setting=false&amp;open_id='1.1')"/>
+        <setting label="Enable All German Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllGerman&amp;setting=true&amp;open_id='1.2')"/>
+        <setting type="sep" />
         <setting id="provider.allucde" type="bool" label="ALLUC" default="false" />
         <setting id="provider.animebase" type="bool" label="ANIMEBASE" default="false" />
         <setting id="provider.animeloads" type="bool" label="ANIMELOADS" default="false" />
@@ -110,12 +117,18 @@
         <setting id="provider.video4k" type="bool" label="VIDEO$NUMBER[4]K" default="false" />
         <setting id="provider.view4u" type="bool" label="VIEW4U" default="false" />
         <setting label="Greek" type="lsep" />
+        <setting label="Disable All Greek Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllGreek&amp;setting=false&amp;open_id='1.1')"/>
+        <setting label="Enable All Greek Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllGreek&amp;setting=true&amp;open_id='1.2')"/>
+        <setting type="sep" />
         <setting id="provider.gamatotv" type="bool" label="GAMATOTV" default="false" />
         <setting id="provider.liomenoi" type="bool" label="LIOMENOI" default="false" />
         <setting id="provider.tainiesonline" type="bool" label="TAINIESONLINE" default="false" />
         <setting id="provider.tainiomania" type="bool" label="TAINIOMANIA" default="false" />
         <setting id="provider.xrysoi" type="bool" label="XRYSOI" default="false" />
         <setting label="Polish" type="lsep" />
+        <setting label="Disable All Polish Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllPolish&amp;setting=false&amp;open_id='1.1')"/>
+        <setting label="Enable All Greek Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllPolish&amp;setting=true&amp;open_id='1.2')"/>
+        <setting type="sep" />
         <setting id="provider.alltube" type="bool" label="ALLTUBE" default="false" />
         <setting id="provider.boxfilm" type="bool" label="BOXFILM" default="false" />
         <setting id="provider.cdahd" type="bool" label="CDAHD" default="false" />
