@@ -51,8 +51,9 @@ if mode == "toggleAll":
     toggleAll(params['setting'], open_id, sourceList=sourcelist)
 
 if mode == "toggleAllDebrid":
-    sourcelist = ['300mbfilms','bestmoviez','ddlvalley','ddlspot','directdl','invictus','myvideolink',
-    'playmovies','scenerls','ultrahdindir','wrzcraft','iwantmyshow','moviesleak']
+    sourcelist = ['300mbfilms','bestmoviez','ddlspot','ddlvalley','directdl','invictus',
+    'iwantmyshow','moviesleak','myvideolink','playmovies','rlsbb','scenerls','scnsrc',
+    'ultrahdindir','wrzcraft']
     toggleAll(params['setting'], params['open_id'], sourcelist)
 
 if mode == "toggleAllGerman":
@@ -77,14 +78,20 @@ if mode == "toggleAllGreek":
     toggleAll(params['setting'], params['open_id'], sourcelist)
 
 if mode == "toggleAllForeign":
-    sourcelist = ['gamatotv','liomenoi','tainiesonline','tainiomania','xrysoi',
+    sourcelist = ['allucde','animebase','animeloads','bs','cine','cinenator','ddl',
+    'filmpalast','foxx','hdfilme','hdstreams','horrorkino','iload','kinodogs',
+    'kinoking','kinow','kinox','lichtspielhaus','movie2k-ac','movie2k-ag','movie2z',
+    'movie4k','moviesever','movietown','netzkino','proxer','pureanime','serienstream',
+    'seriesever','stream-to','streamdream','streamflix','streamit','tata','video4k','view4u',
     'alltube','boxfilm','cdahd','cdax','ekinomaniak','ekinotv','filiser',
-    'filmwebbooster','iitv','movieneo','openkatalog','paczamy','segos',
-    'szukajkatv','trt','megapelistv','peliculasdk','pelisplustv','pepecine','seriespapaya']
+    'filmwebbooster','iitv','movieneo','openkatalog','paczamy','segos','szukajkatv','trt',
+    'megapelistv','peliculasdk','pelisplustv','pepecine','seriespapaya',
+    'gamatotv','liomenoi','tainiesonline','tainiomania','xrysoi']
     toggleAll(params['setting'], params['open_id'], sourcelist)
 
 if mode == "toggleAllTorrent":
-    sourcelist = ['bitlord','torrentapi','yify','piratebay','eztv','zoogle','glodls','limetorrents','torrentdownloads']
+    sourcelist = ['bitlord','eztv','glodls','limetorrents','kickass2','piratebay',
+    'torrentapi','torrentdownloads','yify','zoogle']
     toggleAll(params['setting'], params['open_id'], sourcelist)
 
 if mode == "Defaults":
