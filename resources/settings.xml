@@ -73,6 +73,43 @@
         <setting id="provider.pepecine" type="bool" label="PEPCINE" default="false" />
         <setting id="provider.seriespapaya" type="bool" label="SERIESPAPAYA" default="false" />
         <setting label="German" type="lsep" />
+        <setting id="provider.allucde" type="bool" label="ALLUC" default="false" />
+        <setting id="provider.animebase" type="bool" label="ANIMEBASE" default="false" />
+        <setting id="provider.animeloads" type="bool" label="ANIMELOADS" default="false" />
+        <setting id="provider.bs" type="bool" label="BS" default="false" />
+        <setting id="provider.cine" type="bool" label="CINE" default="false" />
+        <setting id="provider.cinenator" type="bool" label="CINENATOR" default="false" />
+        <setting id="provider.ddl" type="bool" label="DDL" default="false" />
+        <setting id="provider.filmpalast" type="bool" label="FILMPALAST" default="false" />
+        <setting id="provider.foxx" type="bool" label="FOXX" default="false" />
+        <setting id="provider.hdfilme" type="bool" label="HDFILME" default="false" />
+        <setting id="provider.hdstreams" type="bool" label="HDSTREAMS" default="false" />
+        <setting id="provider.horrorkino" type="bool" label="HORRORKINO" default="false" />
+        <setting id="provider.iload" type="bool" label="ILOAD" default="false" />
+        <setting id="provider.kinodogs" type="bool" label="KINODOGS" default="false" />
+        <setting id="provider.kinoking" type="bool" label="KINOKING" default="false" />
+        <setting id="provider.kinow" type="bool" label="KINOW" default="false" />
+        <setting id="provider.kinox" type="bool" label="KINOX" default="false" />
+        <setting id="provider.lichtspielhaus" type="bool" label="LICHTSPIELHAUS" default="false" />
+        <setting id="provider.movie2k-ac" type="bool" label="MOVIE$NUMBER[2]K-AC" default="false" />
+        <setting id="provider.movie2k-ag" type="bool" label="MOVIE$NUMBER[2]K-AG" default="false" />
+        <setting id="provider.movie2z" type="bool" label="MOVIE$NUMBER[2]Z" default="false" />
+        <setting id="provider.movie4k" type="bool" label="MOVIE$NUMBER[4]K" default="false" />
+        <setting id="provider.moviesever" type="bool" label="MOVIESEVER" default="false" />
+        <setting id="provider.movietown" type="bool" label="MOVIETOWN" default="false" />
+        <setting id="provider.netzkino" type="bool" label="NETZKINO" default="false" />
+        <setting id="provider.proxer" type="bool" label="PROXER" default="false" />
+        <setting id="provider.pureanime" type="bool" label="PUREANIME" default="false" />
+        <setting id="provider.serienstream" type="bool" label="SERIENSTREAM" default="false" />
+        <setting id="provider.seriesever" type="bool" label="SERIESEVER" default="false" />
+        <setting id="provider.stream-to" type="bool" label="STREAM-TO" default="false" />
+        <setting id="provider.streamdream" type="bool" label="STREAMDREAM" default="false" />
+        <setting id="provider.streamflix" type="bool" label="STREAMFLIX" default="false" />
+        <setting id="provider.streamit" type="bool" label="STREAMIT" default="false" />
+        <setting id="provider.tata" type="bool" label="TATA" default="false" />
+        <setting id="provider.video4k" type="bool" label="VIDEO$NUMBER[4]K" default="false" />
+        <setting id="provider.view4u" type="bool" label="VIEW4U" default="false" />
+        <setting label="Greek" type="lsep" />
         <setting id="provider.gamatotv" type="bool" label="GAMATOTV" default="false" />
         <setting id="provider.liomenoi" type="bool" label="LIOMENOI" default="false" />
         <setting id="provider.tainiesonline" type="bool" label="TAINIESONLINE" default="false" />

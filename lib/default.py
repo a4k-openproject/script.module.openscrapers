@@ -56,7 +56,11 @@ if mode == "toggleAllDebrid":
     toggleAll(params['setting'], params['open_id'], sourcelist)
 
 if mode == "toggleAllGerman":
-    sourcelist = ['gamatotv','liomenoi','tainiesonline','tainiomania','xrysoi']
+    sourcelist = ['allucde','animebase','animeloads','bs','cine','cinenator','ddl',
+    'filmpalast','foxx','hdfilme','hdstreams','horrorkino','iload','kinodogs',
+    'kinoking','kinow','kinox','lichtspielhaus','movie2k-ac','movie2k-ag','movie2z',
+    'movie4k','moviesever','movietown','netzkino','proxer','pureanime','serienstream',
+    'seriesever','stream-to','streamdream','streamflix','streamit','tata','video4k','view4u']
     toggleAll(params['setting'], params['open_id'], sourcelist)
 
 if mode == "toggleAllPolish":
@@ -66,6 +70,10 @@ if mode == "toggleAllPolish":
 
 if mode == "toggleAllSpanish":
     sourcelist = ['megapelistv','peliculasdk','pelisplustv','pepecine','seriespapaya']
+    toggleAll(params['setting'], params['open_id'], sourcelist)
+
+if mode == "toggleAllGreek":
+    sourcelist = ['gamatotv','liomenoi','tainiesonline','tainiomania','xrysoi']
     toggleAll(params['setting'], params['open_id'], sourcelist)
 
 if mode == "toggleAllForeign":
