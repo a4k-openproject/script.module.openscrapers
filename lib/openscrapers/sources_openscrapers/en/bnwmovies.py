@@ -15,8 +15,8 @@
     Updated and refactored by someone.
     Originally created by others.
 '''
-import re,traceback,urllib,urlparse,base64
-import requests
+import re
+import traceback
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -35,9 +35,10 @@ class source:
         try:
             scrape = title.lower().replace(' ','+').replace(':', '')
 
-            start_url = self.search_link %(self.goog,scrape,year)
-
+            start_url = self.search_link % (self.goog, scrape, year)
+            print(start_url)
             html = client.request(start_url)
+            print(html)
             results = re.compile('href="(.+?)"',re.DOTALL).findall(html)
             for url in results:
                 if self.base_link in url:

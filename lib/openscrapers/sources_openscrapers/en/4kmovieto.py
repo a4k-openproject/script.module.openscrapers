@@ -43,7 +43,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search(imdb, [localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search(imdb, [title] + source_utils.aliases_to_array(aliases), year)
+            if not url and title != localtitle:
+                url = self.__search(imdb, [title] + source_utils.aliases_to_array(aliases), year)
             return url
         except:
             return

@@ -38,7 +38,7 @@ class source:
                 return url
             else:
                 return
-        except Exception:
+        except:
             return
 
 

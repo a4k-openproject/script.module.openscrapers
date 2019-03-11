@@ -25,94 +25,104 @@ import sys
 import urllib
 import urlparse
 
-import xbmc
-import xbmcaddon
-import xbmcgui
-import xbmcplugin
-import xbmcvfs
+try:
+    import xbmc
+    import xbmcaddon
+    import xbmcgui
+    import xbmcplugin
+    import xbmcvfs
+except:
+    pass
 
 integer = 1000
 
-lang = xbmcaddon.Addon().getLocalizedString
+try:
+    lang = xbmcaddon.Addon().getLocalizedString
 
-lang2 = xbmc.getLocalizedString
+    lang2 = xbmc.getLocalizedString
 
-setting = xbmcaddon.Addon().getSetting
+    setting = xbmcaddon.Addon().getSetting
 
-setSetting = xbmcaddon.Addon().setSetting
+    setSetting = xbmcaddon.Addon().setSetting
 
-addon = xbmcaddon.Addon
+    addon = xbmcaddon.Addon
 
-addItem = xbmcplugin.addDirectoryItem
+    addItem = xbmcplugin.addDirectoryItem
 
-item = xbmcgui.ListItem
+    item = xbmcgui.ListItem
 
-directory = xbmcplugin.endOfDirectory
+    directory = xbmcplugin.endOfDirectory
 
-content = xbmcplugin.setContent
+    content = xbmcplugin.setContent
 
-property = xbmcplugin.setProperty
+    property = xbmcplugin.setProperty
 
-addonInfo = xbmcaddon.Addon().getAddonInfo
+    addonInfo = xbmcaddon.Addon().getAddonInfo
 
-infoLabel = xbmc.getInfoLabel
+    infoLabel = xbmc.getInfoLabel
 
-condVisibility = xbmc.getCondVisibility
+    condVisibility = xbmc.getCondVisibility
 
-jsonrpc = xbmc.executeJSONRPC
+    jsonrpc = xbmc.executeJSONRPC
 
-window = xbmcgui.Window(10000)
+    window = xbmcgui.Window(10000)
 
-dialog = xbmcgui.Dialog()
+    dialog = xbmcgui.Dialog()
 
-progressDialog = xbmcgui.DialogProgress()
+    progressDialog = xbmcgui.DialogProgress()
 
-progressDialogBG = xbmcgui.DialogProgressBG()
+    progressDialogBG = xbmcgui.DialogProgressBG()
 
-windowDialog = xbmcgui.WindowDialog()
+    windowDialog = xbmcgui.WindowDialog()
 
-button = xbmcgui.ControlButton
+    button = xbmcgui.ControlButton
 
-image = xbmcgui.ControlImage
+    image = xbmcgui.ControlImage
 
-getCurrentDialogId = xbmcgui.getCurrentWindowDialogId()
+    getCurrentDialogId = xbmcgui.getCurrentWindowDialogId()
 
-keyboard = xbmc.Keyboard
+    keyboard = xbmc.Keyboard
+
+    execute = xbmc.executebuiltin
+
+    skin = xbmc.getSkinDir()
+
+    player = xbmc.Player()
+
+    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+
+    resolve = xbmcplugin.setResolvedUrl
+
+    openFile = xbmcvfs.File
+
+    makeFile = xbmcvfs.mkdir
+
+    deleteFile = xbmcvfs.delete
+
+    deleteDir = xbmcvfs.rmdir
+
+    listDir = xbmcvfs.listdir
+
+    transPath = xbmc.translatePath
+
+    skinPath = xbmc.translatePath('special://skin/')
+
+    addonPath = xbmc.translatePath(addonInfo('path'))
+
+    dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+
+except:
+    def setting(id):
+        return ''
+
+    dataPath = ''
+    pass
 
 # Modified `sleep` command that honors a user exit request
 def sleep (time):
     while time > 0 and not xbmc.abortRequested:
         xbmc.sleep(min(100, time))
         time = time - 100
-
-
-execute = xbmc.executebuiltin
-
-skin = xbmc.getSkinDir()
-
-player = xbmc.Player()
-
-playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-
-resolve = xbmcplugin.setResolvedUrl
-
-openFile = xbmcvfs.File
-
-makeFile = xbmcvfs.mkdir
-
-deleteFile = xbmcvfs.delete
-
-deleteDir = xbmcvfs.rmdir
-
-listDir = xbmcvfs.listdir
-
-transPath = xbmc.translatePath
-
-skinPath = xbmc.translatePath('special://skin/')
-
-addonPath = xbmc.translatePath(addonInfo('path'))
-
-dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
 
 settingsFile = os.path.join(dataPath, 'settings.xml')
 
@@ -134,42 +144,6 @@ key = "RgUkXp2s5v8x/A?D(G+KbPeShVmYq3t6"
 
 iv = "p2s5v8y/B?E(H+Mb"
 
-def addonIcon():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'icon.png')
-    return addonInfo('icon')
-
-
-def addonThumb():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'poster.png')
-    elif theme == '-': return 'DefaultFolder.png'
-    return addonInfo('icon')
-
-
-def addonPoster():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'poster.png')
-    return 'DefaultVideo.png'
-
-
-def addonBanner():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'banner.png')
-    return 'DefaultVideo.png'
-
-
-def addonFanart():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'fanart.jpg')
-    return addonInfo('fanart')
-
-
-def addonNext():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'next.png')
-    return 'DefaultVideo.png'
-
 
 def addonId():
     return addonInfo('id')
@@ -190,41 +164,6 @@ def get_plugin_url(queries):
     addon_id = sys.argv[0]
     if not addon_id: addon_id = addonId()
     return addon_id + '?' + query
-
-
-def artPath():
-    theme = appearance()
-    if theme in ['-', '']: return
-    elif condVisibility('System.HasAddon(script.placenta.artwork)'):
-        return os.path.join(xbmcaddon.Addon('script.placenta.artwork').getAddonInfo('path'), 'resources', 'media', theme)
-
-
-def appearance():
-    appearance = setting('appearance.1').lower() if condVisibility('System.HasAddon(script.placenta.artwork)') else setting('appearance.alt').lower()
-    return appearance
-
-
-def artwork():
-    execute('RunPlugin(plugin://script.placenta.artwork)')
-
-
-def infoDialog(message, heading=addonInfo('name'), icon='', time=3000, sound=False):
-    if icon == '': icon = addonIcon()
-    elif icon == 'INFO': icon = xbmcgui.NOTIFICATION_INFO
-    elif icon == 'WARNING': icon = xbmcgui.NOTIFICATION_WARNING
-    elif icon == 'ERROR': icon = xbmcgui.NOTIFICATION_ERROR
-    dialog.notification(heading, message, icon, time, sound=sound)
-
-def yesnoDialog(line1, line2, line3, heading=addonInfo('name'), nolabel='', yeslabel=''):
-    return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel)
-
-
-def selectDialog(list, heading=addonInfo('name')):
-    return dialog.select(heading, list)
-
-def metaFile():
-    if condVisibility('System.HasAddon(script.placenta.metadata)'):
-        return os.path.join(xbmcaddon.Addon('script.placenta.metadata').getAddonInfo('path'), 'resources', 'data', 'meta.db')
 
 def apiLanguage(ret_name=None):
     langDict = {'Bulgarian': 'bg', 'Chinese': 'zh', 'Croatian': 'hr', 'Czech': 'cs', 'Danish': 'da', 'Dutch': 'nl', 'English': 'en', 'Finnish': 'fi', 'French': 'fr', 'German': 'de', 'Greek': 'el', 'Hebrew': 'he', 'Hungarian': 'hu', 'Italian': 'it', 'Japanese': 'ja', 'Korean': 'ko', 'Norwegian': 'no', 'Polish': 'pl', 'Portuguese': 'pt', 'Romanian': 'ro', 'Russian': 'ru', 'Serbian': 'sr', 'Slovak': 'sk', 'Slovenian': 'sl', 'Spanish': 'es', 'Swedish': 'sv', 'Thai': 'th', 'Turkish': 'tr', 'Ukrainian': 'uk'}
@@ -283,16 +222,19 @@ def cdnImport(uri, name):
     return m
 
 
-def openSettings(query=None, id=addonInfo('id')):
-    try:
-        idle()
-        execute('Addon.OpenSettings(%s)' % id)
-        if query == None: raise Exception()
-        c, f = query.split('.')
-        execute('SetFocus(%i)' % (int(c) + 100))
-        execute('SetFocus(%i)' % (int(f) + 200))
-    except:
-        return
+try:
+    def openSettings(query=None, id=addonInfo('id')):
+        try:
+            idle()
+            execute('Addon.OpenSettings(%s)' % id)
+            if query == None: raise Exception()
+            c, f = query.split('.')
+            execute('SetFocus(%i)' % (int(c) + 100))
+            execute('SetFocus(%i)' % (int(f) + 200))
+        except:
+            return
+except:
+    pass
 
 
 def getCurrentViewId():

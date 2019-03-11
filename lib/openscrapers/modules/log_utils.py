@@ -4,22 +4,41 @@
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
-import os, time, cProfile, StringIO, pstats, json, xbmc
+import StringIO
+import cProfile
+import json
+import os
+import pstats
+import time
 
-from xbmc import LOGDEBUG, LOGERROR, LOGFATAL, LOGINFO, LOGNONE, LOGNOTICE, LOGSEVERE, LOGWARNING  # @UnusedImport
-from datetime import date, datetime, timedelta
+from datetime import datetime
+
 from openscrapers.modules import control
 
-name        = control.addonInfo('name')
-DEBUGPREFIX = '[COLOR red][ PLACENTA DEBUG ][/COLOR]' # Using color coding, for color formatted log viewers like Assassin's Tools
-LOGPATH     = xbmc.translatePath('special://logpath/')
+try:
+    import xbmc
+    from xbmc import LOGDEBUG, LOGNOTICE, LOGWARNING  # @UnusedImport
+
+    LOGPATH = xbmc.translatePath('special://logpath/')
+    name = control.addonInfo('name')
+except:
+    xbmc = False
+    LOGDEBUG = "LOGDEBUG"
+    LOGNOTICE = "LOGNOTICE"
+    LOGWARNING = "LOGWARNING"
+    name = "OPENSCRAPERS"
+
+# Using color coding, for color formatted log viewers like Assassin's Tools
+DEBUGPREFIX = '[COLOR red][ OPENSCRAPERS DEBUG ][/COLOR]'
+
 
 def log(msg, level=LOGNOTICE):
     debug_enabled = control.setting('addon_debug')
     debug_log = control.setting('debug.location')
 
-    print DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled)
-    print DEBUGPREFIX + ' Debug Log?: ' + str(debug_log)
+    if xbmc:
+        print DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled)
+        print DEBUGPREFIX + ' Debug Log?: ' + str(debug_log)
 
     if not control.setting('addon_debug') == 'true':
         return
@@ -29,8 +48,13 @@ def log(msg, level=LOGNOTICE):
             msg = '%s (ENCODED)' % (msg.encode('utf-8'))
 
         if not control.setting('debug.location') == '0':
-            log_file = os.path.join(LOGPATH, 'placenta.log')
-            if not os.path.exists(log_file): f = open(log_file, 'w'); f.close()
+
+            log_file = os.path.join(LOGPATH, 'openscrapers.log')
+
+            if not os.path.exists(log_file):
+                f = open(log_file, 'w')
+                f.close()
+
             with open(log_file, 'a') as f:
                 line = '[%s %s] %s: %s' % (datetime.now().date(), str(datetime.now().time())[:8], DEBUGPREFIX, msg)
                 f.write(line.rstrip('\r\n')+'\n')
@@ -39,10 +63,12 @@ def log(msg, level=LOGNOTICE):
     except Exception as e:
         try:
             xbmc.log('Logging Failure: %s' % (e), level)
-        except:
+        except Exception:
             pass
 
+
 class Profiler(object):
+
     def __init__(self, file_path, sort_by='time', builtins=False):
         self._profiler = cProfile.Profile(builtins=builtins)
         self.file_path = file_path
@@ -56,7 +82,7 @@ class Profiler(object):
                 self._profiler.disable()
                 return result
             except Exception as e:
-                log('Profiler Error: %s' % (e), LOGWARNING)
+                log('Profiler Error: %s' % e, LOGWARNING)
                 return f(*args, **kwargs)
 
         def method_profile_off(*args, **kwargs):
@@ -86,7 +112,10 @@ def trace(method):
         start = time.time()
         result = method(*args, **kwargs)
         end = time.time()
-        log('{name!r} time: {time:2.4f}s args: |{args!r}| kwargs: |{kwargs!r}|'.format(name=method.__name__, time=end - start, args=args, kwargs=kwargs), LOGDEBUG)
+        log('{name!r} time: {time:2.4f}s args: |{args!r}| kwargs: |{kwargs!r}|'.format(name=method.__name__,
+                                                                                       time=end - start,
+                                                                                       args=args,
+                                                                                       kwargs=kwargs), LOGDEBUG)
         return result
 
     def method_trace_off(*args, **kwargs):
@@ -99,8 +128,10 @@ def trace(method):
 
 
 def _is_debugging():
-    command = {'jsonrpc': '2.0', 'id': 1, 'method': 'Settings.getSettings', 'params': {'filter': {'section': 'system', 'category': 'logging'}}}
+    command = {'jsonrpc': '2.0', 'id': 1, 'method': 'Settings.getSettings',
+               'params': {'filter': {'section': 'system', 'category': 'logging'}}}
     js_data = execute_jsonrpc(command)
+
     for item in js_data.get('result', {}).get('settings', {}):
         if item['id'] == 'debug.showloginfo':
             return item['value']

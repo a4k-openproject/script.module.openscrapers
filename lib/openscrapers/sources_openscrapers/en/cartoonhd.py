@@ -16,13 +16,19 @@
     Updated and refactored by someone.
     Originally created by others.
 '''
-import re,traceback,urllib,urlparse,json,base64,time,xbmc
+import base64
+import json
+import re
+import time
+import traceback
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import cache
 from openscrapers.modules import directstream
 from openscrapers.modules import source_utils
+from openscrapers.modules import log_utils
 
 class source:
     def __init__(self):

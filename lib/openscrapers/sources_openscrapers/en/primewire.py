@@ -26,8 +26,6 @@ try:
 except ImportError:
     from urllib.parse import urlencode
 
-import xbmc
-
 from openscrapers.modules.client import randomagent
 from openscrapers.modules import cleantitle
 from openscrapers.modules import jsunpack
@@ -78,7 +76,7 @@ class source:
             # This code will crash if they change the website structure in the future.
 
             session = self._createSession(data['UA'], data['cookies'], data['referer'])
-            xbmc.sleep(1000)
+            time.sleep(1)
             r = self._sessionGET(seasonsPageURL, session)
             if r.ok:
                 soup = BeautifulSoup(r.content, 'html.parser')
@@ -110,7 +108,7 @@ class source:
             session = self._createSession(data['UA'], data['cookies'], data['referer'])
             pageURL = data['pageURL']
 
-            xbmc.sleep(1000)
+            time.sleep(1)
             r = self._sessionGET(pageURL, session)
             if not r.ok:
                 self._logException('PRIMEWIRE > Sources page request failed: ' + data['pageURL'])
@@ -174,9 +172,9 @@ class source:
                         pass # Or sometimes their page is just broken.
 
             # Do a little delay, if necessary, between resolve() calls.
-            elapsed = int((datetime.now() - startTime).total_seconds() * 1000)
+            elapsed = int((datetime.now() - startTime).total_seconds())
             if elapsed < DELAY_PER_REQUEST:
-                xbmc.sleep(max(DELAY_PER_REQUEST - elapsed, 100))
+                time.sleep(max(DELAY_PER_REQUEST - elapsed, 100))
 
             return hostURL
         except:
@@ -246,7 +244,7 @@ class source:
 
 
     def _debug(self, name, val=None):
-        xbmc.log('PRIMEWIRE Debug > ' + name + (' %s' % repr(val) if val else ''), xbmc.LOGWARNING)
+        pass
 
 
     def _logException(self, text=None):

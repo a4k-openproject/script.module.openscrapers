@@ -18,6 +18,7 @@
 '''
 import re
 import requests
+
 from bs4 import BeautifulSoup
 from datetime import datetime
 try:
@@ -25,7 +26,7 @@ try:
 except ImportError:
     from urllib.parse import quote
 
-import xbmc
+import time
 
 from openscrapers.modules.client import randomagent
 
@@ -127,9 +128,9 @@ class source:
                 r = session.get(url, timeout=8)
 
             if delayAmount:
-                elapsed = int((datetime.now() - startTime).total_seconds() * 1000)
+                elapsed = int((datetime.now() - startTime).total_seconds())
                 if elapsed < delayAmount and elapsed > 100:
-                    xbmc.sleep(delayAmount - elapsed)
+                    time.sleep(delayAmount - elapsed)
             return r
         except:
             return type('FailedResponse', (object,), {'ok': False})
@@ -215,7 +216,7 @@ class source:
 
 
     def _debug(self, name, val=None):
-        xbmc.log('VIDICS Debug > ' + name + (' %s' % repr(val) if val else ''), xbmc.LOGWARNING)
+        pass
 
 
     def _logException(self, text=None):

@@ -25,9 +25,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import requests,re,time,xbmcaddon
-import base64,resolveurl,random
-from openscrapers.modules import debrid
+import base64
+import random
+import resolveurl
+
+import re
+import requests
+import time
+
 
 def clean_search(title):
     if title == None: return
