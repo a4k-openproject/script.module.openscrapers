@@ -18,15 +18,17 @@
     Originally created by others.
 '''
 import re
-import requests
 import traceback
+
+import requests
 from bs4 import BeautifulSoup, SoupStrainer
+
 try:
     from urllib import urlencode, quote_plus # Python 2
 except ImportError:
     from urllib.parse import urlencode, quote_plus # Python 3
 
-import xbmc
+import time
 
 from openscrapers.modules.client import randomagent
 
@@ -130,7 +132,7 @@ class source:
 
             session = self._createSession(data['UA'], data['cookies'])
 
-            xbmc.sleep(1200)
+            time.sleep(1.2)
             r = self._sessionGET(pageURL, session)
             if not r.ok:
                 self._logException('%s Sources page request failed' % data['type'].capitalize())
@@ -143,7 +145,7 @@ class source:
             session.headers['Referer'] = pageURL # Refer to this page that "we're on" right now to avoid suspicion.
             pageID = pageURL.rsplit('.', 1)[1]
             token = self._makeToken({'ts': timeStamp}, stringConstant)
-            xbmc.sleep(200)
+            time.sleep(.2)
             serversHTML = self._getServers(pageID, timeStamp, token, session)
 
             # Go through the list of hosts and create a source entry for each.
@@ -209,7 +211,7 @@ class source:
         # The 'data' parameter is the 'unresolvedData' dictionary sent from sources().
         try:
             session = self._createSession(data['UA'], data['cookies'], data['referer'])
-            xbmc.sleep(500) # Give some room between requests (_getHost() -> _requestJSON() will also sleep some more).
+            time.sleep(.5) # Give some room between requests (_getHost() -> _requestJSON() will also sleep some more).
             return self._getHost(data['url'], session) # Return a host URL for use with ResolveURL and play.
         except:
             self._logException()
@@ -232,7 +234,7 @@ class source:
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             )
-            xbmc.sleep(1500)
+            time.sleep(1.5)
             r = self._sessionGET(url, session)
             session.headers['Accept'] = oldAccept
             del session.headers['X-Requested-With']
@@ -278,7 +280,7 @@ class source:
         # Get the minified main javascript file.
         jsPath = re.search(self.ALL_JS_PATTERN, homepageHTML, re.DOTALL).group(1)
         session.headers['Accept'] = '*/*' # Use the same 'Accept' for JS files as web browsers do.
-        xbmc.sleep(200)
+        time.sleep(.2)
         allJS = self._sessionGET(self.BASE_URL + jsPath, session).text
         session.headers['Accept'] = self.DEFAULT_ACCEPT
 
@@ -322,7 +324,10 @@ class source:
 
 
     def _debug(self, name, val=None):
-        xbmc.log('PLOCKER Debug > %s %s' % (name, repr(val) if val else ''), xbmc.LOGWARNING)
+        try:
+            xbmc.log('PLOCKER Debug > %s %s' % (name, repr(val) if val else ''), xbmc.LOGWARNING)
+        except:
+            pass
 
 
     def _logException(self, text=None):

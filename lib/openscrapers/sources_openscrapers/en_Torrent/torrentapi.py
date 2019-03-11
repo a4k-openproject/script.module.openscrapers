@@ -10,9 +10,13 @@
     Torrentapi
 '''
 
-import re, requests, xbmc
-from resolveurl.plugins.premiumize_me import PremiumizeMeResolver
+import re
+import requests
+import time
+
 from openscrapers.modules import source_utils
+from resolveurl.plugins.premiumize_me import PremiumizeMeResolver
+
 
 class source:
 
@@ -62,7 +66,7 @@ class source:
         try:
             with requests.Session() as s:
                 gettoken = s.get(self.tokenta).text
-                xbmc.sleep(2000)
+                time.sleep(2)
                 tokenapi = re.compile('n\W+(.*?)[\'"]', re.I).findall(gettoken)[0]
                 if 'episode' in url:
                     iep = url['episode'].zfill(2)

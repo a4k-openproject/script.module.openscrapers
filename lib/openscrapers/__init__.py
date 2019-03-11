@@ -3,14 +3,20 @@
 import pkgutil
 import os.path
 
-import xbmcaddon
-
-__addon__ = xbmcaddon.Addon(id='script.module.openscrapers')
+try:
+    import xbmcaddon
+    __addon__ = xbmcaddon.Addon(id='script.module.openscrapers')
+except:
+    __addon__ = None
+    pass
 
 def sources():
     try:
         sourceDict = []
-        provider = __addon__.getSetting('module.provider')
+        if __addon__ is not None:
+            provider = __addon__.getSetting('module.provider')
+        else:
+            provider = 'openscrapers'
         sourceFolder = getScraperFolder(provider)
         sourceFolderLocation = os.path.join(os.path.dirname(__file__), sourceFolder)
         sourceSubFolders = [x[1] for x in os.walk(sourceFolderLocation)][0]
@@ -21,14 +27,18 @@ def sources():
                 try:
                     module = loader.find_module(module_name).load_module(module_name)
                     sourceDict.append((module_name, module.source()))
-                except: pass
+                except:
+                    pass
         return enabledHosters(sourceDict)
     except:
         return []
 
 def enabledHosters(sourceDict, function=False):
-    enabledHosts = [i[0] for i in sourceDict if __addon__.getSetting('provider.' + i[0].split('_')[0]) == 'true']
-    returnedHosts = [i for i in sourceDict if i[0] in enabledHosts]
+    if __addon__ is not None:
+        enabledHosts = [i[0] for i in sourceDict if __addon__.getSetting('provider.' + i[0].split('_')[0]) == 'true']
+        returnedHosts = [i for i in sourceDict if i[0] in enabledHosts]
+    else:
+        return sourceDict
     return returnedHosts
 
 def providerSources():

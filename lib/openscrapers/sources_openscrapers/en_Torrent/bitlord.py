@@ -10,9 +10,12 @@
     BitLord
 '''
 
-import re, requests, xbmc
-from resolveurl.plugins.premiumize_me import PremiumizeMeResolver
+import re
+import requests
+
 from openscrapers.modules import source_utils
+from resolveurl.plugins.premiumize_me import PremiumizeMeResolver
+
 
 class source:
 

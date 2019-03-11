@@ -19,7 +19,13 @@
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
-import re, os, urllib, urlparse, json, binascii
+import binascii
+import json
+import os
+import re
+import urllib
+import urlparse
+
 from openscrapers.modules import client
 
 
@@ -78,9 +84,8 @@ def google(url):
             result = [i['url'] for i in result if 'video' in i['type']]
             result = sum([googletag(i, append_height=True) for i in result], [])
 
-
         elif netloc == 'plus':
-            id = (urlparse.urlparse(url).path).split('/')[-1]
+            id = urlparse.urlparse(url).path.split('/')[-1]
 
             result = result.replace('\r', '').replace('\n', '').replace('\t', '')
             result = result.split('"%s"' % id)[-1].split(']]')[0]
@@ -245,7 +250,8 @@ def cldmailru(url):
         r = client.request(url)
         r = re.sub(r'[^\x00-\x7F]+', ' ', r)
 
-        tok = re.findall('"tokens"\s*:\s*{\s*"download"\s*:\s*"([^"]+)', r)[0]
+        # TODO Escaped dangling character {, can we confirm this needs to be here
+        tok = re.findall('"tokens"\s*:\s*\{\s*"download"\s*:\s*"([^"]+)', r)[0]
 
         url = re.findall('"weblink_get"\s*:\s*\[.+?"url"\s*:\s*"([^"]+)', r)[0]
 

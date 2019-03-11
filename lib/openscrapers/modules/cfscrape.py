@@ -4,7 +4,6 @@ import re
 import subprocess
 from copy import deepcopy
 from time import sleep
-import requests
 from openscrapers.modules import cfdecoder
 
 from requests.sessions import Session

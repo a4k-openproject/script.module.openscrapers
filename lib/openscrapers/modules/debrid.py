@@ -20,6 +20,7 @@
 # Addon id: script.module.openscrapers
 
 from openscrapers.modules import log_utils
+from openscrapers.modules import control
 
 try:
     import resolveurl
