@@ -127,7 +127,7 @@
         <setting id="provider.xrysoi" type="bool" label="XRYSOI" default="false" />
         <setting label="Polish" type="lsep" />
         <setting label="Disable All Polish Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllPolish&amp;setting=false&amp;open_id='1.1')"/>
-        <setting label="Enable All Greek Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllPolish&amp;setting=true&amp;open_id='1.2')"/>
+        <setting label="Enable All Polish Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?mode=toggleAllPolish&amp;setting=true&amp;open_id='1.2')"/>
         <setting type="sep" />
         <setting id="provider.alltube" type="bool" label="ALLTUBE" default="false" />
         <setting id="provider.boxfilm" type="bool" label="BOXFILM" default="false" />
