@@ -163,7 +163,7 @@
         <setting id="provider.rlsbb" type="bool" label="RLSBB" default="true" />
         <setting id="provider.scnsrc" type="bool" label="SCNSRC" default="true" /> 
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true" />  
-        <setting id="provider.ultrahdindir" type="bool" label="ULTRAHDINDIR" default="false" /> 
+        <setting id="provider.ultrahdindir" type="bool" label="ULTRAHDINDIR" default="true" /> 
         <setting id="provider.wrzcraft" type="bool" label="WRZCRAFT" default="false" /> 
     </category>
 
