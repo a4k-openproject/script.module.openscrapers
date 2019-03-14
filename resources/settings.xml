@@ -139,11 +139,8 @@
         <setting id="provider.filmwebbooster" type="bool" label="FILMWEBBOOSTER" default="false" />
         <setting id="provider.iitv" type="bool" label="IITV" default="false" />
         <setting id="provider.movieneo" type="bool" label="MOVIENEO" default="false" />
-        <setting id="provider.openkatalog" type="bool" label="OPENKATALOG" default="false" />
-        <setting id="provider.paczamy" type="bool" label="PACZAMY" default="false" />
         <setting id="provider.segos" type="bool" label="SEGOS (need login)" default="false" />
         <setting id="provider.szukajkatv" type="bool" label="SZUKAJKATV" default="false" />
-        <setting id="provider.trt" type="bool" label="TRT" default="false" />
     </category>
 
     <category label="Debrid Only">
