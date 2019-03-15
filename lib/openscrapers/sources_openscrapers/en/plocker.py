@@ -8,15 +8,6 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-'''
-    plocker scraper for Exodus forks.
-    Nov 9 2018 - Checked
-    Nov 06 2018 - Cleaned and Checked
-    Sep 22 2018 - Cleaned and Checked
-
-    Updated and refactored by someone.
-    Originally created by others.
-'''
 import re
 import traceback
 
@@ -31,6 +22,7 @@ except ImportError:
 import time
 
 from openscrapers.modules.client import randomagent
+from openscrapers.modules import control
 
 
 class source:
@@ -40,7 +32,6 @@ class source:
         self.domains = ['putlocker.se', 'putlockertv.to']
         self.base_link = 'https://www6.putlockertv.to'
 
-        self.ALL_JS_PATTERN = '<script src=\"(/assets/min/public/all.js?.*?)\"'
         self.DEFAULT_ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 
         self.BASE_URL = 'https://www5.putlockertv.to'
@@ -277,21 +268,22 @@ class source:
         homepageHTML = r.text
         timeStamp = self._getTimeStamp(homepageHTML)
 
-        # Get the minified main javascript file.
-        jsPath = re.search(self.ALL_JS_PATTERN, homepageHTML, re.DOTALL).group(1)
-        session.headers['Accept'] = '*/*' # Use the same 'Accept' for JS files as web browsers do.
-        time.sleep(.2)
-        allJS = self._sessionGET(self.BASE_URL + jsPath, session).text
-        session.headers['Accept'] = self.DEFAULT_ACCEPT
-
-        # Some unknown cookie flag that they use, set after 'all.js' is loaded.
-        # Doesn't seem to make a difference, but it might help with staying unnoticed.
-        session.cookies.set('', '__test')
+        STRING_CONSTANT_PROPERTY = 'plocker.constant'
+        stringConstant = control.window.getProperty(STRING_CONSTANT_PROPERTY)
+        if not stringConstant:
+            # Memory cache the string constant so it doesn't have to be computed all the time.
+            # Get the minified main javascript file.
+            sleep(.2)
+            jsPath = re.search('<script src=\"(/assets/min/public/all.js?.*?)\"', homepageHTML, re.DOTALL).group(1)
+            session.headers['Accept'] = '*/*' # Use the same 'Accept' for JS files as web browsers do.
+            allJS = self._sessionGET(self.BASE_URL + jsPath, session).text
+            stringConstant = self._makeStringConstant(allJS)
+            control.window.setProperty(STRING_CONSTANT_PROPERTY, stringConstant)
+            session.headers['Accept'] = self.DEFAULT_ACCEPT
 
         # Get the underscore token used to verify all requests. It's calculated from all parameters on JSON requests.
         # The value for 'keyword' is the search query, it should have normal spaces (like a movie title).
         data = {'ts': timeStamp, 'keyword': lowerTitle, 'sort': 'year:desc'}
-        stringConstant = self._makeStringConstant(allJS)
         token = self._makeToken(data, stringConstant)
 
         # We use their JSON api as it's much less data needed from their servers. Easier on them, faster for us too.
@@ -319,7 +311,6 @@ class source:
         )
         if cookies:
             session.cookies.update(cookies)
-            session.cookies[''] = '__test' # See _getSearch() for more info on this.
         return session
 
 
