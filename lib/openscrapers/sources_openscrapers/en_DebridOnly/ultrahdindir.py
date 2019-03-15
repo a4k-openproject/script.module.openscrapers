@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -8,35 +8,29 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-#######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @tantrumdev wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
-#######################################################################
-
-# Addon Name: Yoda
-# Addon id: plugin.video.Yoda
-# Addon Provider: Supremacy
-
-import re,traceback,urllib,urlparse
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser2
-from openscrapers.modules import log_utils
+from resources.lib.modules import log_utils
 from openscrapers.modules import source_utils
+
+from bs4 import BeautifulSoup
 
 class source:
     def __init__(self):
-        self.priority = 1
+        self.priority = 0
         self.language = ['en']
-        self.domains = ['ultrahdindir.net']
-        self.base_link = 'https://www.ultrahdindir.net/'
-        self.post_link = '/index.php?do=search'
+        # List of base urls
+        self.domains = ['ultrahdindir.com']
+        # Base URL
+        self.base_link = 'https://ultrahdindir.com'
+        # part of link on search results page, with %s on any portion where you need to insert title, year, etc.
+        self.search_link = '/index.php?do=search'
+                                                                                                                # Example: '/s=%s'
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -44,108 +38,61 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            failure = traceback.format_exc()
-            log_utils.log('UltraHD - Exception: \n' + str(failure))
-            return
+            log_utils.log('Ran into problems making the "url" (dict of things)')
 
     def sources(self, url, hostDict, hostprDict):
+        #log_utils.log('URLS GIVE: '+str(url))
+        #EXAMPLE: URLS GIVE: year=2015&imdb=tt2395427&title=Avengers%3A+Age+of+Ultron
         try:
             sources = []
-
-            if url == None: return sources
-
+            # if no link returned in movie and tvshow searches, nothing to do here, return out.
+            if url == None or len(url) == 0:
+                return sources
             if debrid.status() is False: raise Exception()
+            #            log_utils.log('Scraper Template - Sources - url: ' + str(url))
 
-            data = urlparse.parse_qs(url)
-            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+            #Lets get scraping.
+            url = urlparse.parse_qs(url)
+            title = url['title'][0]
+            imdb = url['imdb'][0]
+            year = url['year'][0]
+            #Create the string of post data to send.
+            post = 'do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=' + urllib.quote_plus(title) + ' ' + urllib.quote_plus(imdb)
+            #Join site links
+            site_link = urlparse.urljoin(self.base_link, self.search_link)
+            # Pulls the webpage HTML for search results
+            search_results = client.request(site_link, post=post)
+            search_soup = BeautifulSoup(search_results, "html.parser")
+            # Find all the results in the html
+            results = search_soup.findAll("div", {"class": "news-title"})
+            result_links = []
+            for result in results:
+                # Gets the link from that results
+                link = result.find("a", href=True)['href']
+                result_links.append(link)  # Put said link into the list
+            for link in result_links:
+                link_result = client.request(link.encode('ascii'))
+                link_soup = BeautifulSoup(link_result, "html.parser")
+                dl_links = link_soup.findAll("div", {"class": "quote"})
+                nonvip_dl_links = []
+                for dl_link in dl_links:
+                    if "vip" in str(dl_link).lower():
+                        continue
+                    else:
+                        nonvip_dl_links.append(dl_link)    #For loop filters out the "VIP" links we don't need
+                actual_links = []
+                for nonvip_dl_link in nonvip_dl_links:
+                    the_link = nonvip_dl_link.find('a', href=True)['href']
+                    actual_links.append(the_link.encode('ascii'))
 
-            title = data['title'].replace(':','').lower()
-            year = data['year']
-
-            query = '%s %s' % (data['title'], data['year'])
-            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-
-            url = urlparse.urljoin(self.base_link, self.post_link)
-
-            post = 'do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=%s' % urllib.quote_plus(query)
-
-            r = client.request(url, post=post)
-            r = client.parseDOM(r, 'div', attrs={'class': 'box-out margin'})
-            r = [(dom_parser2.parse_dom(i, 'div', attrs={'class':'news-title'})) for i in r if data['imdb'] in i]
-            r = [(dom_parser2.parse_dom(i[0], 'a', req='href')) for i in r if i]
-            r = [(i[0].attrs['href'], i[0].content) for i in r if i]
-
-            hostDict = hostprDict + hostDict
-
-            for item in r:
-                try:
-                    name = item[1]
-                    y = re.findall('\((\d{4})\)', name)[0]
-                    if not y == year: raise Exception()
-
-                    s = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)
-                    s = s[0] if s else '0'
-                    data = client.request(item[0])
-                    data = dom_parser2.parse_dom(data, 'div', attrs={'id': 'r-content'})
-                    data = re.findall('\s*<b><a href=.+?>(.+?)</b>.+?<u><b><a href="(.+?)".+?</a></b></u>',
-                                      data[0].content, re.DOTALL)
-                    u = [(i[0], i[1], s) for i in data if i]
-
-                    for name, url, size in u:
-                        try:
-                            if '4K' in name:
-                                quality = '4K'
-                            elif '1080p' in name:
-                                quality = '1080p'
-                            elif '720p' in name:
-                                quality = '720p'
-                            elif any(i in ['dvdscr', 'r5', 'r6'] for i in name):
-                                quality = 'SCR'
-                            elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts']
-                                     for i in name):
-                                quality = 'CAM'
-                            else: quality = '720p'
-
-                            info = []
-                            if '3D' in name or '.3D.' in url: info.append('3D'); quality = '1080p'
-                            if any(i in ['hevc', 'h265', 'x265'] for i in name): info.append('HEVC')
-                            try:
-                                size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[-1]
-                                div = 1 if size.endswith(('Gb', 'GiB', 'GB')) else 1024
-                                size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-                                size = '%.2f GB' % size
-                                info.append(size)
-                            except:
-                                pass
-
-                            info = ' | '.join(info)
-
-                            url = client.replaceHTMLCodes(url)
-                            url = url.encode('utf-8')
-                            if any(x in url for x in ['.rar', '.zip', '.iso', 'turk']):continue
-
-                            if 'ftp' in url: host = 'COV'; direct = True;
-                            else: direct = False; host= 'turbobit.net'
-                            #if not host in hostDict: continue
-
-                            host = client.replaceHTMLCodes(host)
-                            host = host.encode('utf-8')
-
-                            sources.append({'source': host, 'quality': quality, 'language': 'en',
-                                            'url': url, 'info': info, 'direct': direct, 'debridonly': False})
-
-                        except:
-                            pass
-                except:
-                    pass
-
+            for link in actual_links:
+                quality,info = source_utils.get_release_quality(link, url)                                      # Run two strings through this to try to pull Quality and info on the file (such as 1080p, etc)
+                host = link.replace('https://', '').split('/')[0].split('.')[0]    # By splitting the URL repeatedly we end up with the host.
+                sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': False})
             return sources
-        except:
-            failure = traceback.format_exc()
-            log_utils.log('UltraHD - Exception: \n' + str(failure))
+        except Exception as e:
+            log_utils.log('EXCEPTION MSG: '+str(e))
             return sources
 
     def resolve(self, url):
         return url
-
-
