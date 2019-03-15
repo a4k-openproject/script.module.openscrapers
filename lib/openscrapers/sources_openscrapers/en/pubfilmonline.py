@@ -21,7 +21,7 @@ import json
 
 class source:
     def __init__(self):
-        self.priority = 0
+        self.priority = 1
         self.language = ['en']
         self.domains = ['pubfilmonline.ws']                                                                   # List of base urls, such as 'filmfrantic.com'
         self.base_link = 'https://pubfilmonline.ws'                                                                      # Base URL, such as 'http://filmfrantic.com'
