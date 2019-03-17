@@ -62,6 +62,7 @@
         <setting id="provider.vdonip" type="bool" label="VDONIP" default="true" />
         <setting id="provider.ymovies" type="bool" label="YMOVIES" default="true" />
         <setting id="provider.pubfilmonline" type="bool" label="PUBFILMONLINE" default="true" />
+        <setting id="provider.filepursuit" type="bool" label="FILEPURSUIT" default="true" />
     </category>
 
     <category label="Foreign">
