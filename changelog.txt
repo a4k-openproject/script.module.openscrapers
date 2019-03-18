@@ -1,4 +1,10 @@
 OpenScrapers Module Changelog:
+0.0.0.4
+- Scraper updates
+- Settings updates
+- updated Client.py to one from overeasy for torrent support
+- removed dead scrapers from pl language
+
 0.0.0.3
 - Label changes
 
