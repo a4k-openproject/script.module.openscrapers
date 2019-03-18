@@ -18,8 +18,8 @@
 import re,urlparse,json,base64
 
 from openscrapers.modules import cache
-from openscrapers.modules import control
 from openscrapers.modules import client
+from resources.lib.modules import control
 
 
 class source:
@@ -137,5 +137,3 @@ class source:
 
     def resolve(self, url):
         return url
-
-
