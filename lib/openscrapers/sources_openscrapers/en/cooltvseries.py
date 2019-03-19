@@ -10,7 +10,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import re,urllib,urlparse
-from resources.lib.modules import client,cleantitle,proxy,source_utils
+from openscrapers.modules import client,cleantitle,proxy,source_utils
 
 
 class source:
