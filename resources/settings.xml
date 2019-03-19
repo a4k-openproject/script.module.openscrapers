@@ -13,7 +13,7 @@
         <setting id="provider.123fox" type="bool" label="$NUMBER[123]FOX" default="true" /> 
         <setting id="provider.123hbo" type="bool" label="$NUMBER[123]HBO" default="true" /> 
         <setting id="provider.123hulu" type="bool" label="$NUMBER[123]HULU" default="false" />
-		<setting id="provider.123movies4u" type="bool" label="$NUMBER[123]MOVIES4U" default="true" />  
+	<setting id="provider.123movies4u" type="bool" label="$NUMBER[123]MOVIES4U" default="true" />  
         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="true" />
         <setting id="provider.300mbdownload" type="bool" label="$NUMBER[300]MBDOWNLOAD" default="false" />
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="false" />
