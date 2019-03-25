@@ -17,10 +17,9 @@ try:
 except ImportError:
     from urllib.parse import urlencode, quote_plus # Python 3
 
-from time import time, sleep as timeSleep
+import xbmc
 
 from openscrapers.modules.client import randomagent
-from openscrapers.modules import control
 
 
 class source:
@@ -28,9 +27,12 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['putlocker.se', 'putlockertv.to']
-        self.BASE_URL = 'https://www6.putlockertv.to'
-        
-        self.DEFAULT_ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'        
+        self.base_link = 'https://www6.putlockertv.to'
+
+        self.ALL_JS_PATTERN = '<script src=\"(/assets/min/public/all.js?.*?)\"'
+        self.DEFAULT_ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+
+        self.BASE_URL = 'https://www5.putlockertv.to'
 
         # Path to search for either a film or season from a tvshow.
         self.SEARCH_PATH = '/ajax/film/search?ts=%s&_=%i&keyword=%s&sort=year%%3Adesc'
@@ -119,7 +121,8 @@ class source:
 
             session = self._createSession(data['UA'], data['cookies'])
 
-            r = self._sessionGET(pageURL, session, delayAmount=1.5)
+            xbmc.sleep(1200)
+            r = self._sessionGET(pageURL, session)
             if not r.ok:
                 self._logException('%s Sources page request failed' % data['type'].capitalize())
                 return None
@@ -129,8 +132,10 @@ class source:
             # Get a HTML block with a list of host names and internal links to them.
 
             session.headers['Referer'] = pageURL # Refer to this page that "we're on" right now to avoid suspicion.
+            pageID = pageURL.rsplit('.', 1)[1]
             token = self._makeToken({'ts': timeStamp}, stringConstant)
-            serversHTML = self._getServers(pageURL.rsplit('.', 1)[1], timeStamp, token, session, delayAmount=None)
+            xbmc.sleep(200)
+            serversHTML = self._getServers(pageID, timeStamp, token, session)
 
             # Go through the list of hosts and create a source entry for each.
 
@@ -150,11 +155,11 @@ class source:
 
                 for a in serverDIV.findAll('a', {'data-id': True}):
                     # The text in the <a> tag can be the movie quality ("HDRip", "CAM" etc.) or for TV shows
-                    # it's the episode number with a .zfill(2) padding, like "09", for each episode in the season.
+                    # it's the episode number with a one-zero-padding, like "09", for each episode in the season.
                     label = a.text.lower().strip()
                     hostID = a['data-id'] # A string identifying a host embed to be retrieved from putlocker's servers.
 
-                    if isMovie or (label.isdigit() and episode == str(int(label))):
+                    if isMovie or episode == str(int(label)):
                         if isMovie:
                             if 'hd' in label:
                                 quality = 'HD'
@@ -192,46 +197,44 @@ class source:
 
 
     def resolve(self, data):
-        # The 'data' parameter is the 'unresolvedData' dictionary sent from 'sources()'.
+        # The 'data' parameter is the 'unresolvedData' dictionary sent from sources().
         try:
-            # Return a host URL for use with ResolveURL.
             session = self._createSession(data['UA'], data['cookies'], data['referer'])
-            return self._getHost(data['url'], session, delayAmount=1.0)
+            xbmc.sleep(500) # Give some room between requests (_getHost() -> _requestJSON() will also sleep some more).
+            return self._getHost(data['url'], session) # Return a host URL for use with ResolveURL and play.
         except:
             self._logException()
             return None
 
 
-    def _sessionGET(self, url, session, delayAmount, ajax=None):
+    def _sessionGET(self, url, session):
         try:
-            startTime = time() if delayAmount else None
-
-            if ajax:
-                # Regarding PLOCKER, every XMLHttpRequest is made for JSON data only.
-                oldAccept = session.headers['Accept']
-                session.headers['Accept'] = 'application/json, text/javascript, */*; q=0.01'
-                session.headers['X-Requested-With'] = 'XMLHttpRequest'
-
-            r = session.get(url, timeout=20)
-
-            if delayAmount:
-                elapsed = time() - startTime
-                if elapsed < delayAmount and elapsed > 0.1:
-                    timeSleep(delayAmount - elapsed)
-
-            if ajax:
-                # Restore the session headers.
-                session.headers['Accept'] = oldAccept
-                del session.headers['X-Requested-With']
-                return r.json()
-            else:
-                return r
+            return session.get(url, timeout=10)
         except:
             return type('FailedResponse', (object,), {'ok': False})
 
 
-    def _getHost(self, url, session, delayAmount):
-        jsonData = self._sessionGET(url, session, delayAmount, ajax=True)
+    def _requestJSON(self, url, session):
+        try:
+            oldAccept = session.headers['Accept']
+            session.headers.update(
+                {
+                    'Accept': 'application/json, text/javascript, */*; q=0.01',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            )
+            xbmc.sleep(1500)
+            r = self._sessionGET(url, session)
+            session.headers['Accept'] = oldAccept
+            del session.headers['X-Requested-With']
+            return r.json() if r.ok and r.content else None
+        except:
+            self._logException()
+            return None
+
+
+    def _getHost(self, url, session):
+        jsonData = self._requestJSON(url, session)
         if jsonData:
             return jsonData['target']
         else:
@@ -239,12 +242,9 @@ class source:
             return ''
 
 
-    def _getServers(self, pageID, timeStamp, token, session, delayAmount):
-        jsonData = self._sessionGET(
-            self.BASE_URL + (self.SERVERS_PATH % (pageID, timeStamp, token)),
-            session,
-            delayAmount,
-            ajax=True
+    def _getServers(self, pageID, timeStamp, token, session):
+        jsonData = self._requestJSON(
+            self.BASE_URL + (self.SERVERS_PATH % (pageID, timeStamp, token)), session
         )
         if jsonData:
             return jsonData['html']
@@ -259,36 +259,33 @@ class source:
         If they change it in the future, it'll crash.
         '''
         # Get the homepage HTML.
-        r = self._sessionGET(self.BASE_URL, session, delayAmount=0.2)
+        r = self._sessionGET(self.BASE_URL, session)
         if not r.ok:
             self._logException('Homepage request failed')
             return ''
         homepageHTML = r.text
         timeStamp = self._getTimeStamp(homepageHTML)
 
-        STRING_CONSTANT_PROPERTY = 'plocker.constant'
-        stringConstant = control.window.getProperty(STRING_CONSTANT_PROPERTY)
-        if not stringConstant:
-            # Memory cache the string constant so it doesn't have to be computed all the time.
-            # Get the minified main javascript file.
-            jsPath = re.search('<script src=\"(/assets/min/public/all.js?.*?)\"', homepageHTML, re.DOTALL).group(1)
-            session.headers['Accept'] = '*/*' # Use the same 'Accept' for JS files as web browsers do.
-            allJS = self._sessionGET(self.BASE_URL + jsPath, session, delayAmount=2.0).text
-            stringConstant = self._makeStringConstant(allJS)
-            control.window.setProperty(STRING_CONSTANT_PROPERTY, stringConstant)
-            session.headers['Accept'] = self.DEFAULT_ACCEPT
+        # Get the minified main javascript file.
+        jsPath = re.search(self.ALL_JS_PATTERN, homepageHTML, re.DOTALL).group(1)
+        session.headers['Accept'] = '*/*' # Use the same 'Accept' for JS files as web browsers do.
+        xbmc.sleep(200)
+        allJS = self._sessionGET(self.BASE_URL + jsPath, session).text
+        session.headers['Accept'] = self.DEFAULT_ACCEPT
+
+        # Some unknown cookie flag that they use, set after 'all.js' is loaded.
+        # Doesn't seem to make a difference, but it might help with staying unnoticed.
+        session.cookies.set('', '__test')
 
         # Get the underscore token used to verify all requests. It's calculated from all parameters on JSON requests.
         # The value for 'keyword' is the search query, it should have normal spaces (like a movie title).
         data = {'ts': timeStamp, 'keyword': lowerTitle, 'sort': 'year:desc'}
+        stringConstant = self._makeStringConstant(allJS)
         token = self._makeToken(data, stringConstant)
 
-        # We use their JSON API as it's much less data needed from their servers. Easier on them, faster for us too.
-        jsonData = self._sessionGET(
-            self.BASE_URL + (self.SEARCH_PATH % (timeStamp, token, quote_plus(lowerTitle))),
-            session,
-            delayAmount=None,
-            ajax=True
+        # We use their JSON api as it's much less data needed from their servers. Easier on them, faster for us too.
+        jsonData = self._requestJSON(
+            self.BASE_URL + (self.SEARCH_PATH % (timeStamp, token, quote_plus(lowerTitle))), session
         )
         if jsonData:
             return stringConstant, jsonData['html']
@@ -298,7 +295,7 @@ class source:
 
 
     def _createSession(self, userAgent=None, cookies=None, referer=None):
-        # Spoof a header from a desktop browser.
+        # Try to spoof a header from a web browser.
         session = requests.Session()
         session.headers.update(
             {
@@ -306,28 +303,22 @@ class source:
                 'User-Agent': userAgent if userAgent else randomagent(),
                 'Accept-Language': 'en-US,en;q=0.5',
                 'Referer': referer if referer else self.BASE_URL + '/',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
                 'DNT': '1'
             }
         )
         if cookies:
             session.cookies.update(cookies)
+            session.cookies[''] = '__test' # See _getSearch() for more info on this.
         return session
 
 
     def _debug(self, name, val=None):
-        try:
-            import xbmc
-            xbmc.log('PLOCKER Debug > %s %s' % (name, repr(val) if val else ''), xbmc.LOGWARNING)
-        except:
-            pass
+        xbmc.log('PLOCKER Debug > %s %s' % (name, repr(val) if val else ''), xbmc.LOGWARNING)
 
 
     def _logException(self, text=None):
         return # Comment this line to output errors to the Kodi log, useful for debugging this script.
         # ------------------
-        import xbmc
         if text:
             xbmc.log('PLOCKER ERROR > %s' % text, xbmc.LOGERROR)
         else:

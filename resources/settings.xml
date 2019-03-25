@@ -13,7 +13,7 @@
         <setting id="provider.123fox" type="bool" label="$NUMBER[123]FOX" default="true" /> 
         <setting id="provider.123hbo" type="bool" label="$NUMBER[123]HBO" default="true" /> 
         <setting id="provider.123hulu" type="bool" label="$NUMBER[123]HULU" default="false" />
-	<setting id="provider.123movies4u" type="bool" label="$NUMBER[123]MOVIES4U" default="true" />  
+		<setting id="provider.123movies4u" type="bool" label="$NUMBER[123]MOVIES4U" default="true" />  
         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="true" />
         <setting id="provider.300mbdownload" type="bool" label="$NUMBER[300]MBDOWNLOAD" default="false" />
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="false" />
@@ -179,7 +179,8 @@
         <setting id="provider.eztv" type="bool" label="EZTV" default="true" />
         <setting id="provider.glodls" type="bool" label="GLODLS" default="true" />
         <setting id="provider.limetorrents" type="bool" label="LIMETORRENTS" default="true" />
-        <setting id="provider.kickass2" type="bool" label="KICKASS2" default="true" />
+        <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true" />
+		<setting id="provider.kickass2" type="bool" label="KICKASS2" default="true" />
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true" />
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true" />
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true" />
