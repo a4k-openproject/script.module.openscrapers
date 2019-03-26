@@ -25,12 +25,11 @@
 """
 
 import re
+import traceback
 import urllib
-
 import urlparse
-from openscrapers.modules import cleantitle, client, debrid, source_utils
 
-from openscrapers.modules import control
+from openscrapers.modules import cleantitle, client, control, debrid, log_utils, source_utils
 
 
 class source:
