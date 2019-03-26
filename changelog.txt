@@ -1,4 +1,9 @@
 OpenScrapers Module Changelog:
+0.0.0.5
+- Scraper updates
+- Settings updates
+- Added MagentDL scraper
+
 0.0.0.4
 - Scraper updates
 - Settings updates
