@@ -3,6 +3,9 @@
 import pkgutil
 import os.path
 
+import sources_openscrapers
+
+
 try:
     import xbmcaddon
     __addon__ = xbmcaddon.Addon(id='script.module.openscrapers')
