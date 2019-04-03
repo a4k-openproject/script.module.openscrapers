@@ -8,6 +8,7 @@ from openscrapers import providerSources, providerNames
 
 params = dict(urlparse.parse_qsl(sys.argv[2].replace('?', '')))
 action = params.get('action')
+mode = params.get('mode')
 query = params.get('query')
 
 
@@ -27,19 +28,12 @@ def ScraperChoice():
 if action == "OpenscrapersSettings":
     control.openSettings('0.0', 'script.module.openscrapers')
 
+elif mode == "OpenscrapersSettings":
+    control.openSettings('0.0', 'script.module.openscrapers')
+
 
 elif action == "ScraperChoice":
     ScraperChoice()
-
-
-elif action == 'urlResolver':
-    try: import resolveurl
-    except: pass
-    resolveurl.display_settings()
-
-
-elif action == 'urlResolverRDTorrent':
-    control.openSettings(query, "script.module.resolveurl")
 
 
 elif action == "toggleAll":
@@ -48,7 +42,7 @@ elif action == "toggleAll":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-    xbmc.log('All providers = %s' % sourceList,2)
+#    xbmc.log('All providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -58,6 +52,7 @@ elif action == "toggleAllHosters":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Hoster providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -67,6 +62,7 @@ elif action == "toggleAllForeign":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Foregin providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -76,6 +72,7 @@ elif action == "toggleAllSpanish":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Spanish providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -85,6 +82,7 @@ elif action == "toggleAllGerman":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All German providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -94,16 +92,17 @@ elif action == "toggleAllGreek":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Greek providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
 elif action == "toggleAllPolish":
     sourcelist = []
     sourceList = sources_openscrapers.polish_providers
-    xbmc.log('foreign_sources_list = %s' % sourceList,2)
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Polish providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -113,6 +112,7 @@ elif action == "toggleAllPaid":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Paid providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -122,6 +122,7 @@ elif action == "toggleAllDebrid":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Debrid providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -131,6 +132,7 @@ elif action == "toggleAllTorrent":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
+#    xbmc.log('All Torrent providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 

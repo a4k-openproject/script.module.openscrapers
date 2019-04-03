@@ -161,21 +161,3 @@ def infoDialog(message, heading=addonInfo('name'), icon='', time=3000, sound=Fal
     dialog.notification(heading, message, icon, time, sound=sound)
 
 
-def clearSources():
-    try:
-        idle()
-        yes = yesnoDialog(lang(32407).encode('utf-8'), '', '')
-        if not yes: return
-        makeFile(dataPath)
-        dbcon = database.connect(providercacheFile)
-        dbcur = dbcon.cursor()
-        dbcur.execute("DROP TABLE IF EXISTS rel_src")
-        dbcur.execute("DROP TABLE IF EXISTS rel_url")
-        dbcur.execute("VACUUM")
-        dbcon.commit()
-        infoDialog(lang(32408).encode('utf-8'), sound=True, icon='INFO')
-    except:
-        pass
-
-
-

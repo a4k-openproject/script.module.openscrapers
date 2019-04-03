@@ -39,19 +39,18 @@ def byteify(data, ignore_dicts=False):
         return dict([(byteify(key, ignore_dicts=True), byteify(value, ignore_dicts=True)) for key, value in data.iteritems()])
     return data
 
+
 def title_key(title):
     try:
         if title is None: title = ''
         articles_en = ['the', 'a', 'an']
         articles_de = ['der', 'die', 'das']
         articles = articles_en + articles_de
-
         match = re.match('^((\w+)\s+)', title.lower())
         if match and match.group(2) in articles:
             offset = len(match.group(1))
         else:
             offset = 0
-
         return title[offset:]
     except:
         return title

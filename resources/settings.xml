@@ -2,12 +2,11 @@
 <settings>
 <!-- General-0 -->
     <category label="General">
-        <setting id="module.provider" label="Choose Module Scraper" type="action" option="close" enable="false" action="RunPlugin(plugin://script.module.openscrapers/?action=ScraperChoice)" default="OpenScrapers" />
-        <setting type="sep" />
-        <setting label="OpenScrapers Default Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=Defaults&setting=true&query=0.2)"/>
-        <setting label="Disable All Providers" type="action" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&setting=false&query=0.3)" option="close"/>
-        <setting label="Enable All Providers" type="action" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&setting=true&query=0.4)" option="close"/>
-        <setting label="Enable Paid Debrid-w/Torrents" type="action" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPaid&setting=true&query=0.5)" option="close" />
+        <setting id="module.provider" label="Choose Module Scraper" type="action" option="close" enable="false" visible="hidden" action="RunPlugin(plugin://script.module.openscrapers/?action=ScraperChoice)" default="OpenScrapers" />
+        <setting label="OpenScrapers Default Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=Defaults&setting=true&query=0.1)"/>
+        <setting label="Disable All Providers" type="action" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&setting=false&query=0.2)" option="close"/>
+        <setting label="Enable All Providers" type="action" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&setting=true&query=0.3)" option="close"/>
+        <setting label="Enable Paid Debrid-w/Torrents" type="action" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPaid&setting=true&query=0.4)" option="close" />
     </category>
 
 <!-- Providers/Hosters-1 -->

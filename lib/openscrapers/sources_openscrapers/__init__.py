@@ -8,8 +8,7 @@ import de,es,gr,pl
 
 
 scraper_source = os.path.dirname(__file__)
-source_SubFolders = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
-
+__all__ = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
 
 
 ##--en--##
@@ -34,12 +33,14 @@ for key, value in paid_providers.iteritems():
     all_paid_providers += value
 
 
-#foreign_sources =  de.sourcePath
+##--Foreign Providers--##
 spanish_providers = es.__all__
 german_providers = de.__all__
 greek_providers = gr.__all__
 polish_providers = pl.__all__
 
+
+##--All Foreign Providers--##
 foreign_providers = {'es': spanish_providers, 'de': german_providers, 'gr': greek_providers, 'pl': polish_providers}
 all_foreign_providers = []
 for key, value in foreign_providers.iteritems():
