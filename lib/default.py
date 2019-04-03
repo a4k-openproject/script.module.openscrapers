@@ -141,7 +141,7 @@ if action == "Defaults":
     'extramovies','fmovies','freefmovies','freeputlockers','gostream','Hdmto','hdpopcorns',
     'kattv','l23movies','iwaatch','openloadmovie','primewire','putlocker','reddit','rlsbb','scenerls',
     'seehd','series9','seriesfree','seriesonline','solarmoviez','tvbox','vidics','watchseries',
-    'xwatchseries','vdonip','odb','downflix','ymovies','ddlspot','filmxy','kickass2','sezonlukdizi']
+    'xwatchseries','vdonip','downflix','ymovies','ddlspot','filmxy','kickass2','sezonlukdizi']
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
