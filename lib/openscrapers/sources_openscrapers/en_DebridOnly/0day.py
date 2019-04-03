@@ -32,7 +32,7 @@ import traceback
 import urllib
 import urlparse
 
-from resources.lib.modules import cleantitle, client, debrid, log_utils, source_utils, cfscrape
+from openscrapers.modules import cleantitle, client, debrid, log_utils, source_utils, cfscrape
 
 
 class source:

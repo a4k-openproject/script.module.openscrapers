@@ -27,14 +27,7 @@
 
 import re, urllib, urlparse
 
-from resources.lib.modules import cleantitle
-from resources.lib.modules import client
-from resources.lib.modules import source_utils
-from resources.lib.modules import debrid
-from resources.lib.modules import dom_parser2
-from resources.lib.modules import workers
-from resources.lib.modules import cfscrape
-
+from openscrapers.modules import cleantitle, client, debrid, source_utils, cfscrape, dom_parser2, workers
 
 class source:
     def __init__(self):
