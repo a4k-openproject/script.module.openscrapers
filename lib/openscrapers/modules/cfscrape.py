@@ -1,16 +1,29 @@
 import logging
 import random
 import re
-import subprocess
-import copy
-import time
+import ast
+import operator as op
 
+import requests
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.sessions import Session
+from copy import deepcopy
+from time import sleep
 
 try:
     from urlparse import urlparse
+    from urlparse import urlunparse
 except ImportError:
     from urllib.parse import urlparse
+    from urllib.parse import urlunparse
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+# supported operators
+operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
+             ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,
+             ast.USub: op.neg}
 
 __version__ = "1.9.7"
 
@@ -26,58 +39,51 @@ DEFAULT_USER_AGENTS = [
 
 DEFAULT_USER_AGENT = random.choice(DEFAULT_USER_AGENTS)
 
-BUG_REPORT = """\
-Cloudflare may have changed their technique, or there may be a bug in the script.
-
-Please read https://github.com/Anorov/cloudflare-scrape#updates, then file a \
-bug report at https://github.com/Anorov/cloudflare-scrape/issues."\
-"""
-
-ANSWER_ACCEPT_ERROR = """\
-The challenge answer was not properly accepted by Cloudflare. This can occur if \
-the target website is under heavy load, or if Cloudflare is experiencing issues. You can
-potentially resolve this by increasing the challenge answer delay (default: 8 seconds). \
-For example: cfscrape.create_scraper(delay=15)
-
-If increasing the delay does not help, please open a GitHub issue at \
-https://github.com/Anorov/cloudflare-scrape/issues\
-"""
+BUG_REPORT = ("Cloudflare may have changed their technique, or there may be a bug in the script.\n\nPlease read https://github.com/Anorov/cloudflare-scrape#updates, then file a bug report at https://github.com/Anorov/cloudflare-scrape/issues.")
 
 class CloudflareScraper(Session):
     def __init__(self, *args, **kwargs):
-        self.delay = kwargs.pop("delay", 8)
         super(CloudflareScraper, self).__init__(*args, **kwargs)
+        self.tries = 0
 
         if "requests" in self.headers["User-Agent"]:
-            # Set a random User-Agent if no custom User-Agent has been set
+            # Spoof Firefox on Linux if no custom User-Agent has been set
             self.headers["User-Agent"] = DEFAULT_USER_AGENT
-
-    def is_cloudflare_challenge(self, resp):
-        return (
-            resp.status_code == 503
-            and resp.headers.get("Server", "").startswith("cloudflare")
-            and b"jschl_vc" in resp.content
-            and b"jschl_answer" in resp.content
-        )
 
     def request(self, method, url, *args, **kwargs):
         resp = super(CloudflareScraper, self).request(method, url, *args, **kwargs)
 
-        # Check if Cloudflare anti-bot is on
-        if self.is_cloudflare_challenge(resp):
-            resp = self.solve_cf_challenge(resp, **kwargs)
+        if 'why_captcha' in resp.text:
+            raise Exception('Cloudflare returned captcha!')
 
+        if 'cf-error-code' in resp.text:
+            raise Exception('Cloudflare returned error!')
+
+        # Check if Cloudflare anti-bot is on
+        if (resp.headers.get("Server", "").startswith("cloudflare")
+            and b"jschl_vc" in resp.content
+            and b"jschl_answer" in resp.content):
+            if self.tries >= 3:
+                raise Exception('Failed to solve Cloudflare challenge!')
+            return self.solve_cf_challenge(resp, **kwargs)
+
+        # Otherwise, no Cloudflare anti-bot detected
         return resp
 
     def solve_cf_challenge(self, resp, **original_kwargs):
-        start_time = time.time()
+        self.tries += 1
+
+        timeout = int(re.compile("\}, ([\d]+)\);", re.MULTILINE).findall(resp.text)[0]) / 1000
+        sleep(timeout)
 
         body = resp.text
         parsed_url = urlparse(resp.url)
         domain = parsed_url.netloc
         submit_url = "%s://%s/cdn-cgi/l/chk_jschl" % (parsed_url.scheme, domain)
 
-        cloudflare_kwargs = copy.deepcopy(original_kwargs)
+        self.domain = domain
+
+        cloudflare_kwargs = deepcopy(original_kwargs)
         params = cloudflare_kwargs.setdefault("params", {})
         headers = cloudflare_kwargs.setdefault("headers", {})
         headers["Referer"] = resp.url
@@ -85,16 +91,26 @@ class CloudflareScraper(Session):
         try:
             params["jschl_vc"] = re.search(r'name="jschl_vc" value="(\w+)"', body).group(1)
             params["pass"] = re.search(r'name="pass" value="(.+?)"', body).group(1)
-            params["s"] = re.search(r'name="s"\svalue="(?P<s_value>[^"]+)', body).group('s_value')
+            if 'name="s"' in body:
+                params["s"] = re.search(r'name="s"\svalue="(?P<s_value>[^"]+)', body).group('s_value')
+            answer = self.get_answer(body)
+
         except Exception as e:
             # Something is wrong with the page.
             # This may indicate Cloudflare has changed their anti-bot
             # technique. If you see this and are running the latest version,
             # please open a GitHub issue so I can update the code accordingly.
-            raise ValueError("Unable to parse Cloudflare anti-bots page: %s %s" % (e.message, BUG_REPORT))
+            logging.error("[!] %s Unable to parse Cloudflare anti-bots page. "
+                          "Try upgrading cloudflare-scrape, or submit a bug report "
+                          "if you are running the latest version. Please read "
+                          "https://github.com/Anorov/cloudflare-scrape#updates "
+                          "before submitting a bug report." % e)
+            raise
 
-        # Solve the Javascript challenge
-        params["jschl_answer"] = self.solve_challenge(body, domain)
+        try:
+            params["jschl_answer"] = str(answer)  # str(int(jsunfuck.cfunfuck(js)) + len(domain))
+        except:
+            pass
 
         # Requests transforms any request into a GET after a redirect,
         # so the redirect has to be handled manually here to allow for
@@ -102,113 +118,83 @@ class CloudflareScraper(Session):
         method = resp.request.method
         cloudflare_kwargs["allow_redirects"] = False
 
-        end_time = time.time()
-        time.sleep(self.delay - (end_time - start_time)) # Cloudflare requires a delay before solving the challenge
-
         redirect = self.request(method, submit_url, **cloudflare_kwargs)
-
+        if redirect.status_code == 403:
+            raise Exception('Unable to pass the Cloudflare challenge!')
         redirect_location = urlparse(redirect.headers["Location"])
+
         if not redirect_location.netloc:
-            redirect_url = "%s://%s%s" % (parsed_url.scheme, domain, redirect_location.path)
+            redirect_url = urlunparse((parsed_url.scheme, domain, redirect_location.path, redirect_location.params, redirect_location.query, redirect_location.fragment))
             return self.request(method, redirect_url, **original_kwargs)
         return self.request(method, redirect.headers["Location"], **original_kwargs)
 
-    def solve_challenge(self, body, domain):
-        try:
-            js = re.search(r"setTimeout\(function\(\){\s+(var "
-                        "s,t,o,p,b,r,e,a,k,i,n,g,f.+?\r?\n[\s\S]+?a\.value =.+?)\r?\n", body).group(1)
-        except Exception:
-            raise ValueError("Unable to identify Cloudflare IUAM Javascript on website. %s" % BUG_REPORT)
-
-        js = re.sub(r"a\.value = (.+ \+ t\.length(\).toFixed\(10\))?).+", r"\1", js)
-        js = re.sub(r"\s{3,}[a-z](?: = |\.).+", "", js).replace("t.length", str(len(domain)))
-
-        # Strip characters that could be used to exit the string context
-        # These characters are not currently used in Cloudflare's arithmetic snippet
-        js = re.sub(r"[\n\\']", "", js)
-
-        if "toFixed" not in js:
-            raise ValueError("Error parsing Cloudflare IUAM Javascript challenge. %s" % BUG_REPORT)
-
-        # Use vm.runInNewContext to safely evaluate code
-        # The sandboxed code cannot use the Node.js standard library
-        js = "console.log(require('vm').runInNewContext('%s', Object.create(null), {timeout: 5000}));" % js
-
-        try:
-            result = subprocess.check_output(["node", "-e", js]).strip()
-        except OSError as e:
-            if e.errno == 2:
-                raise EnvironmentError("Missing Node.js runtime. Node is required and must be in the PATH (check with `node -v`). Your Node binary may be called `nodejs` rather than `node`, in which case you may need to run `apt-get install nodejs-legacy` on some Debian-based systems. (Please read the cfscrape"
-                    " README's Dependencies section: https://github.com/Anorov/cloudflare-scrape#dependencies.")
-            raise
-        except Exception:
-            logging.error("Error executing Cloudflare IUAM Javascript. %s" % BUG_REPORT)
-            raise
-
-        try:
-            float(result)
-        except Exception:
-            raise ValueError("Cloudflare IUAM challenge returned unexpected answer. %s" % BUG_REPORT)
-
-        return result
-
-    @classmethod
-    def create_scraper(cls, sess=None, **kwargs):
-        """
-        Convenience function for creating a ready-to-go CloudflareScraper object.
-        """
-        scraper = cls(**kwargs)
-
-        if sess:
-            attrs = ["auth", "cert", "cookies", "headers", "hooks", "params", "proxies", "data"]
-            for attr in attrs:
-                val = getattr(sess, attr, None)
-                if val:
-                    setattr(scraper, attr, val)
-
-        return scraper
-
-
-    ## Functions for integrating cloudflare-scrape with other applications and scripts
-
-    @classmethod
-    def get_tokens(cls, url, user_agent=None, **kwargs):
-        scraper = cls.create_scraper()
-        if user_agent:
-            scraper.headers["User-Agent"] = user_agent
-
-        try:
-            resp = scraper.get(url, **kwargs)
-            resp.raise_for_status()
-        except Exception as e:
-            logging.error("'%s' returned an error. Could not collect tokens." % url)
-            raise
-
-        domain = urlparse(resp.url).netloc
-        cookie_domain = None
-
-        for d in scraper.cookies.list_domains():
-            if d.startswith(".") and d in ("." + domain):
-                cookie_domain = d
-                break
+    def get_answer(self, body):
+        init = re.findall('setTimeout\(function\(\){\s*var.*?.*:(.*?)}', body)[-1]
+        builder = re.findall(r"challenge-form\'\);\s*(.*)a.v", body)[0]
+        if '/' in init:
+            init = init.split('/')
+            decryptVal = self.parseJSString(init[0]) / float(self.parseJSString(init[1]))
         else:
-            raise ValueError("Unable to find Cloudflare cookies. Does the site actually have Cloudflare IUAM (\"I'm Under Attack Mode\") enabled?")
+            decryptVal = self.parseJSString(init)
+        lines = builder.split(';')
 
-        return ({
-                    "__cfduid": scraper.cookies.get("__cfduid", "", domain=cookie_domain),
-                    "cf_clearance": scraper.cookies.get("cf_clearance", "", domain=cookie_domain)
-                },
-                scraper.headers["User-Agent"]
-               )
+        char_code_at_sep = '"("+p+")")}'
+        for line in lines:
+            if len(line) > 0 and '=' in line:
+                sections = line.split('=')
+                if '/' in sections[1]:
+                    subsecs = sections[1].split('/')
+                    val_1 = self.parseJSString(subsecs[0])
+                    if char_code_at_sep in subsecs[1]:
+                        subsubsecs = re.findall(r"^(.*?)(.)\(function", subsecs[1])[0]
+                        operand_1 = self.parseJSString(subsubsecs[0] + ')')
+                        operand_2 = ord(self.domain[self.parseJSString(subsecs[1][subsecs[1].find(char_code_at_sep) + len(char_code_at_sep):-2])])
+                        val_2 = '%.16f%s%.16f' % (float(operand_1), subsubsecs[1], float(operand_2))
+                        val_2 = eval_expr(val_2)
+                    else:
+                        val_2 = self.parseJSString(subsecs[1])
+                    line_val = val_1 / float(val_2)
+                elif len(sections) > 2 and 'atob' in sections[2]:
+                    expr = re.findall((r"id=\"%s.*?>(.*?)</" % re.findall(r"k = '(.*?)'", body)[0]), body)[0]
+                    if '/' in expr:
+                        expr_parts = expr.split('/')
+                        val_1 = self.parseJSString(expr_parts[0])
+                        val_2 = self.parseJSString(expr_parts[1])
+                        line_val = val_1 / float(val_2)
+                    else:
+                        line_val = self.parseJSString(expr)
+                else:
+                    line_val = self.parseJSString(sections[1])
+                decryptVal = '%.16f%s%.16f' % (float(decryptVal), sections[0][-1], float(line_val))
+                decryptVal = eval_expr(decryptVal)
 
-    @classmethod
-    def get_cookie_string(cls, url, user_agent=None, **kwargs):
-        """
-        Convenience function for building a Cookie HTTP header value.
-        """
-        tokens, user_agent = cls.get_tokens(url, user_agent=user_agent, **kwargs)
-        return "; ".join("=".join(pair) for pair in tokens.items()), user_agent
+        answer = float('%.10f' % decryptVal)
 
-create_scraper = CloudflareScraper.create_scraper
-get_tokens = CloudflareScraper.get_tokens
-get_cookie_string = CloudflareScraper.get_cookie_string
+        if '+ t.length' in body:
+            answer += len(self.domain)
+
+        return answer
+
+    def parseJSString(self, s):
+        offset = 1 if s[0] == '+' else 0
+        val = s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0')[offset:]
+        val = val.replace('(+0', '(0').replace('(+1', '(1')
+        val = re.findall(r'\((?:\d|\+|\-)*\)', val)
+        val = ''.join([str(eval_expr(i)) for i in val])
+        return int(val)
+
+
+def create_scraper(sess=None, **kwargs):
+    """
+    Convenience function for creating a ready-to-go requests.Session (subclass) object.
+    """
+    scraper = CloudflareScraper()
+
+    if sess:
+        attrs = ["auth", "cert", "cookies", "headers", "hooks", "params", "proxies", "data"]
+        for attr in attrs:
+            val = getattr(sess, attr, None)
+            if val:
+                setattr(scraper, attr, val)
+
+    return scraper
