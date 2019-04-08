@@ -1,4 +1,7 @@
 OpenScrapers Module Changelog:
+0.0.0.8
+- cfscrape updates
+
 0.0.0.7
 - Settings improvements
 - Disabled malfunctioning scrapers
