@@ -35,8 +35,10 @@ movie_info = {'title': 'Inception', 'imdb': 'tt1375666', 'aliases': [], 'localti
 # TODO Fill out showinfo and episode info for tests
 show_info = {''}
 
+RUNNING_PROVIDERS = []
 
 def worker_thread(provider_name, provider_source):
+    global RUNNING_PROVIDERS
     start_time = time.time()
     try:
         # Confirm Provider contains the movie function
@@ -75,8 +77,9 @@ def worker_thread(provider_name, provider_source):
             runtime = time.time() - start_time
 
             passed_providers.append((provider_name, unit_test, runtime))
-
+        RUNNING_PROVIDERS.remove(provider_name)
     except Exception as e:
+        RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         failed_providers.append((provider_name, e))
 
@@ -94,13 +97,15 @@ if __name__ == '__main__':
     # Build and run threads
     if test_mode == 1:
         for provider in provider_list:
+            RUNNING_PROVIDERS.append(provider[0])
             workers.append(threading.Thread(target=worker_thread, args=(provider[0], provider[1])))
 
         for worker in workers:
             worker.start()
 
-        for worker in workers:
-            worker.join()
+        while len(RUNNING_PROVIDERS) > 0:
+            print('Running Providers: %s' % (' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
+            time.sleep(1)
 
     else:
         print('Please Select a provider:')
