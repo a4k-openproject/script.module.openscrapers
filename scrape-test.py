@@ -27,12 +27,14 @@ test_mode = 1
 
 # Set test_mode to 'movie' to test movie scraping
 # Set test_mode to 'episode' to test episode scraping
-test_type = 'movie'
+test_type = 'episode'
 
 # Test information
 movie_info = {'title': 'Inception', 'imdb': 'tt1375666', 'aliases': [], 'localtitle': 'Inception', 'year': '2010'}
-show_info = {}
-episode_info = {}
+show_info = {'imdb': 'tt0944947', 'tvshowtitle': 'Game Of Thrones', 'localtvshowtitle': 'Game Of Thrones',
+             'aliases': [], 'year': '2011'}
+episode_info = {'imdb': 'tt1480055', 'tvdb': '3254641', 'title': 'Winter Is Coming', 'premiered': '2011-04-19',
+                'season': '1', 'episode': '1'}
 
 RUNNING_PROVIDERS = []
 TOTAL_SOURCES = []
@@ -40,6 +42,7 @@ TOTAL_SOURCES = []
 def worker_thread(provider_name, provider_source):
     global RUNNING_PROVIDERS
     global TOTAL_SOURCES
+    RUNNING_PROVIDERS.append(provider_name)
     start_time = time.time()
     try:
         # Confirm Provider contains the movie function
@@ -109,6 +112,8 @@ def worker_thread(provider_name, provider_source):
         RUNNING_PROVIDERS.remove(provider_name)
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         failed_providers.append((provider_name, e))
@@ -127,12 +132,11 @@ if __name__ == '__main__':
     # Build and run threads
     if test_mode == 1:
         for provider in provider_list:
-            RUNNING_PROVIDERS.append(provider[0])
             workers.append(threading.Thread(target=worker_thread, args=(provider[0], provider[1])))
 
         for worker in workers:
             worker.start()
-
+        time.sleep(1)
         while len(RUNNING_PROVIDERS) > 0:
             print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
                                                   ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
@@ -153,6 +157,7 @@ if __name__ == '__main__':
             except IndexError:
                 print("You've entered and incorrect selection")
 
+        RUNNING_PROVIDERS.append('')
         worker_thread(provider[0], provider[1])
 
     total_runtime = time.time() - total_runtime

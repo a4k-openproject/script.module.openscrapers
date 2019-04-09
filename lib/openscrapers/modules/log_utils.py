@@ -33,8 +33,11 @@ DEBUGPREFIX = '[COLOR red][ OPENSCRAPERS DEBUG ][/COLOR]'
 
 
 def log(msg, level=LOGNOTICE):
-    debug_enabled = control.setting('addon_debug')
-    debug_log = control.setting('debug.location')
+    try:
+        debug_enabled = control.setting('addon_debug')
+        debug_log = control.setting('debug.location')
+    except:
+        return
     if xbmc:
         print DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled)
         print DEBUGPREFIX + ' Debug Log?: ' + str(debug_log)
