@@ -31,14 +31,15 @@ test_type = 'movie'
 
 # Test information
 movie_info = {'title': 'Inception', 'imdb': 'tt1375666', 'aliases': [], 'localtitle': 'Inception', 'year': '2010'}
-
-# TODO Fill out showinfo and episode info for tests
-show_info = {''}
+show_info = {}
+episode_info = {}
 
 RUNNING_PROVIDERS = []
+TOTAL_SOURCES = []
 
 def worker_thread(provider_name, provider_source):
     global RUNNING_PROVIDERS
+    global TOTAL_SOURCES
     start_time = time.time()
     try:
         # Confirm Provider contains the movie function
@@ -48,15 +49,40 @@ def worker_thread(provider_name, provider_source):
         if not getattr(provider_source, 'unit_test', False):
 
             # Run movie Call
-            url = provider_source.movie(movie_info['imdb'], movie_info['title'], movie_info['localtitle'],
-                                        movie_info['aliases'], movie_info['year'])
-            if url is None:
-                failed_providers.append((provider_name, 'Movie Call Returned None'))
+            if test_type == 'movie':
+                url = provider_source.movie(movie_info['imdb'], movie_info['title'], movie_info['localtitle'],
+                                            movie_info['aliases'], movie_info['year'])
+                if url is None:
+                    failed_providers.append((provider_name, 'Movie Call Returned None'))
+                    RUNNING_PROVIDERS.remove(provider_name)
+                    return
+
+            elif test_type == 'episode':
+                url = provider_source.tvshow(show_info['imdb'], show_info['tvshowtitle'], show_info['localtvshowtitle'],
+                                             show_info['aliases'], show_info['year'])
+                if url is None:
+                    failed_providers.append((provider_name, 'TV Show call Returned None'))
+                    RUNNING_PROVIDERS.remove(provider_name)
+                    return
+
+                url = provider_source.episode(url, episode_info['imdb'], episode_info['tvdb'], episode_info['title'],
+                                              episode_info['premiered'], episode_info['season'], episode_info['episode']
+                                              )
+                if url is None:
+                    failed_providers.append((provider_name, 'Episode call Returned None'))
+                    RUNNING_PROVIDERS.remove(provider_name)
+                    return
+            else:
+                raise Exception('wrong test type dumbass')
 
             # Run source call
             url = provider_source.sources(url, hosts, [])
             if url is None:
                 failed_providers.append((provider_name, 'Sources Call Returned None'))
+                RUNNING_PROVIDERS.remove(provider_name)
+                return
+            else:
+                TOTAL_SOURCES += url
 
             # Gather time analytics
             runtime = time.time() - start_time
@@ -73,17 +99,21 @@ def worker_thread(provider_name, provider_source):
             if unit_test is None:
                 failed_providers.append((provider_name, 'Unit Test Returned None'))
                 return
+            else:
+                TOTAL_SOURCES += unit_test
 
             runtime = time.time() - start_time
 
             passed_providers.append((provider_name, unit_test, runtime))
+
         RUNNING_PROVIDERS.remove(provider_name)
+
     except Exception as e:
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         failed_providers.append((provider_name, e))
 
-provider_list = openscrapers.sources()
+provider_list = openscrapers.sources(['en', 'en_DebridOnly'])
 failed_providers = []
 passed_providers = []
 workers = []
@@ -104,7 +134,8 @@ if __name__ == '__main__':
             worker.start()
 
         while len(RUNNING_PROVIDERS) > 0:
-            print('Running Providers: %s' % (' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
+            print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
+                                                  ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
 
     else:
@@ -154,5 +185,6 @@ if __name__ == '__main__':
         print('Total Passed Providers: %s' % len(passed_providers))
         print('Total Failed Providers: %s' % len(failed_providers))
         print('Skipped Providers: %s' % (len(provider_list) - (len(passed_providers) + len(failed_providers))))
+        print('Total Sources: %s' % len(TOTAL_SOURCES))
     else:
         print('Total No. Sources: %s' % len(all_sources))

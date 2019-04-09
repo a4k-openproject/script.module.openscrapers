@@ -13,7 +13,7 @@ except:
     __addon__ = None
     pass
 
-def sources():
+def sources(specified_folders=None):
     try:
         sourceDict = []
         if __addon__ is not None:
@@ -23,6 +23,8 @@ def sources():
         sourceFolder = getScraperFolder(provider)
         sourceFolderLocation = os.path.join(os.path.dirname(__file__), sourceFolder)
         sourceSubFolders = [x[1] for x in os.walk(sourceFolderLocation)][0]
+        if specified_folders is not None:
+            sourceSubFolders = specified_folders
         for i in sourceSubFolders:
             for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(sourceFolderLocation, i)]):
                 if is_pkg:
