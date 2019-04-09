@@ -4,6 +4,7 @@ import threading
 import time
 
 sys.path.append(os.path.join(os.path.curdir, 'lib'))
+
 from lib import openscrapers
 
 hosts = [u'', u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'thevideo.me', u'filesmonster.com',
@@ -22,7 +23,7 @@ hosts = [u'', u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'th
 
 # Set test_mode to 1 for automatic testing of all providers
 # Set test_mode to 0 to select which provider to test
-test_mode = 0
+test_mode = 1
 
 # Set test_mode to 'movie' to test movie scraping
 # Set test_mode to 'episode' to test episode scraping
