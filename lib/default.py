@@ -137,11 +137,12 @@ elif action == "toggleAllTorrent":
 
 
 if action == "Defaults":
-    sourceList = ['123fox','123hbo','123movieshubz','animetoon','azmovies','bnwmovies','cartoonhd',
-    'extramovies','fmovies','freefmovies','freeputlockers','gostream','Hdmto','hdpopcorns',
-    'kattv','l23movies','iwaatch','openloadmovie','primewire','putlocker','reddit','rlsbb','scenerls',
-    'seehd','series9','seriesfree','seriesonline','solarmoviez','tvbox','vidics','watchseries',
-    'xwatchseries','vdonip','downflix','ymovies','ddlspot','filmxy','kickass2','sezonlukdizi']
+    sourceList = ['123fox','123hbo','123movieshubz','300mbdownload','azmovies','cartoonhd','downflix',
+    'extramovies','filepursuit','freefmovies','freeputlockers','gostream','Hdmto','hdpopcorns',
+    'iwaatch','kattv','l23movies','openloadmovie','pokemonfire','primewire','pubfilmonline',
+	'putlocker','reddit','seehd','series9','toonget','tvbox','vdonip','vidics','ymovies',
+    '300mbfilms','bestmoviez','ddlspot','directdl','ganool123','invictus','iwantmyshow',
+	'playmovies','rlsbb','scnsrc','scenerls','ultrahdindir']
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])

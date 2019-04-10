@@ -21,7 +21,7 @@
         <setting id="provider.123hulu" type="bool" label="$NUMBER[123]HULU" default="false" />
         <setting id="provider.123movies4u" type="bool" label="$NUMBER[123]MOVIES4U" default="false" />
         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="true" />
-        <setting id="provider.300mbdownload" type="bool" label="$NUMBER[300]MBDOWNLOAD" default="false" />
+        <setting id="provider.300mbdownload" type="bool" label="$NUMBER[300]MBDOWNLOAD" default="true" />
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="false" />
         <setting id="provider.azmovie" type="bool" label="AZMOVIE" default="true" />
         <setting id="provider.bnwmovies" type="bool" label="BNWMOVIES" default="false" />
@@ -49,7 +49,7 @@
         <setting id="provider.moviesonline" type="bool" label="MOVIESONLINE" default="false" />
         <setting id="provider.movietoken" type="bool" label="MOVIETOKEN" default="false" />
 <!--        <setting id="provider.myprojectfreetv" type="bool" label="MYPROJECTFREETV" default="false" /> -->
-        <setting id="provider.odb" type="bool" label="ODB" default="true" />
+        <setting id="provider.odb" type="bool" label="ODB" default="false" />
         <setting id="provider.openloadmovie" type="bool" label="OPENLOADMOVIE" default="true" />
         <setting id="provider.ororo" type="bool" label="ORORO" default="false" />
 <!--    <setting id="provider.plocker" type="bool" label="PLOCKER" default="false" /> -->
