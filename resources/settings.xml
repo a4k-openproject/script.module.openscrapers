@@ -173,7 +173,7 @@
         <setting id="provider.ganool123" type="bool" label="GANOOL" default="true" />
         <setting id="provider.invictus" type="bool" label="INVICTUS" default="true" />
         <setting id="provider.iwantmyshow" type="bool" label="IWANTMYSHOW" default="true" />
-        <setting id="provider.moviesleak" type="bool" label="MOVIESLEAK" default="true" />
+        <setting id="provider.moviesleak" type="bool" label="MOVIESLEAK" default="false" />
         <setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="false" />
         <setting id="provider.playmovies" type="bool" label="PLAYMOVIES" default="true" />
         <setting id="provider.rlsbb" type="bool" label="RLSBB" default="true" />
