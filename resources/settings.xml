@@ -15,7 +15,7 @@
         <setting label="Enable All Hosters" type="action" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllHosters&setting=true&query=1.1)" option="close" />
         <setting type="sep" />
         <setting id="provider.4kmovieto" type="bool" label="$NUMBER[4]KMOVIETO" default="false" />
-        <setting id="provider.0123putlocker" type="bool" label="$NUMBER[0123]PUTLOCKER" default="false" />
+<!--        <setting id="provider.0123putlocker" type="bool" label="$NUMBER[0123]PUTLOCKER" default="false" /> -->
         <setting id="provider.123fox" type="bool" label="$NUMBER[123]FOX" default="true" />
         <setting id="provider.123hbo" type="bool" label="$NUMBER[123]HBO" default="true" />
         <setting id="provider.123hulu" type="bool" label="$NUMBER[123]HULU" default="false" />
@@ -27,9 +27,9 @@
         <setting id="provider.bnwmovies" type="bool" label="BNWMOVIES" default="false" />
         <setting id="provider.cartoonhd" type="bool" label="CARTOONHD" default="true" />
         <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="false" />
-        <setting id="provider.cmovieshdbz" type="bool" label="CMOVIESHDBZ" default="false" />
+<!--        <setting id="provider.cmovieshdbz" type="bool" label="CMOVIESHDBZ" default="false" /> -->
         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="false" />
-        <setting id="provider.cooltvseries" type="bool" label="COOLTVSERIES" default="true" />
+<!--        <setting id="provider.cooltvseries" type="bool" label="COOLTVSERIES" default="true" /> -->
         <setting id="provider.downflix" type="bool" label="DOWNFLIX" default="true" />
         <setting id="provider.extramovies" type="bool" label="EXTRAMOVIES" default="true" />
         <setting id="provider.filepursuit" type="bool" label="FILEPURSUIT" default="true" />
@@ -48,7 +48,7 @@
         <setting id="provider.library" type="bool" label="LIBRARY" default="false" />
         <setting id="provider.moviesonline" type="bool" label="MOVIESONLINE" default="false" />
         <setting id="provider.movietoken" type="bool" label="MOVIETOKEN" default="false" />
-        <setting id="provider.myprojectfreetv" type="bool" label="MYPROJECTFREETV" default="false" />
+<!--        <setting id="provider.myprojectfreetv" type="bool" label="MYPROJECTFREETV" default="false" /> -->
         <setting id="provider.odb" type="bool" label="ODB" default="true" />
         <setting id="provider.openloadmovie" type="bool" label="OPENLOADMOVIE" default="true" />
         <setting id="provider.ororo" type="bool" label="ORORO" default="false" />
@@ -60,18 +60,18 @@
         <setting id="provider.reddit" type="bool" label="REDDIT" default="true" />
         <setting id="provider.seehd" type="bool" label="SEEHD" default="true" />
         <setting id="provider.series9" type="bool" label="SERIES9" default="true" />
-        <setting id="provider.seriesfree" type="bool" label="SERIESFREE" default="false" /> 
+<!--        <setting id="provider.seriesfree" type="bool" label="SERIESFREE" default="false" />  -->
         <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="false" />
-        <setting id="provider.sezonlukdizi" type="bool" label="SEZONLUKDIZI" default="true" />
+<!--        <setting id="provider.sezonlukdizi" type="bool" label="SEZONLUKDIZI" default="true" /> -->
         <setting id="provider.solarmoviez" type="bool" label="SOLARMOVIEZ" default="false" />
         <setting id="provider.toonget" type="bool" label="TOONGET" default="true" />
         <setting id="provider.tvbox" type="bool" label="TVBOX" default="true" />
         <setting id="provider.vdonip" type="bool" label="VDONIP" default="true" />
         <setting id="provider.videoscraper" type="bool" label="VIDEOSCRAPER" default="false" />
         <setting id="provider.vidics" type="bool" label="VIDICS" default="true" />
-        <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="false" />
+<!--        <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="false" />
         <setting id="provider.watchseriessi" type="bool" label="WATCHSERIESSI" default="true" />
-        <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="true" />
+        <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="true" /> -->
         <setting id="provider.ymovies" type="bool" label="YMOVIES" default="true" />
     </category>
 
@@ -88,16 +88,16 @@
         <setting id="provider.peliculasdk" type="bool" label="PELICULASDK" default="false" />
         <setting id="provider.pelisplustv" type="bool" label="PELISPLUSTV" default="false" />
         <setting id="provider.pepecine" type="bool" label="PEPCINE" default="false" />
-        <setting id="provider.seriespapaya" type="bool" label="SERIESPAPAYA" default="false" />
+<!--        <setting id="provider.seriespapaya" type="bool" label="SERIESPAPAYA" default="false" /> -->
 
         <setting label="German" type="lsep" />
         <setting label="Disable All German Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&setting=false&query=2.14)" />
         <setting label="Enable All German Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&setting=true&query=2.15)" />
         <setting type="sep" />
         <setting id="provider.allucde" type="bool" label="ALLUC" default="false" />
-        <setting id="provider.animebase" type="bool" label="ANIMEBASE" default="false" />
+<!--    <setting id="provider.animebase" type="bool" label="ANIMEBASE" default="false" /> -->
         <setting id="provider.animeloads" type="bool" label="ANIMELOADS" default="false" />
-        <setting id="provider.bs" type="bool" label="BS" default="false" />
+<!--    <setting id="provider.bs" type="bool" label="BS" default="false" /> -->
         <setting id="provider.cine" type="bool" label="CINE" default="false" />
         <setting id="provider.cinenator" type="bool" label="CINENATOR" default="false" />
         <setting id="provider.ddl" type="bool" label="DDL" default="false" />
@@ -153,7 +153,7 @@
         <setting id="provider.ekinotv" type="bool" label="EKINTOV" default="false" />
         <setting id="provider.filiser" type="bool" label="FILISER" default="false" />
         <setting id="provider.filmwebbooster" type="bool" label="FILMWEBBOOSTER" default="false" />
-        <setting id="provider.iitv" type="bool" label="IITV" default="false" />
+<!--        <setting id="provider.iitv" type="bool" label="IITV" default="false" /> -->
         <setting id="provider.movieneo" type="bool" label="MOVIENEO" default="false" />
         <setting id="provider.segos" type="bool" label="SEGOS (need login)" default="false" />
         <setting id="provider.szukajkatv" type="bool" label="SZUKAJKATV" default="false" />
@@ -164,7 +164,7 @@
         <setting label="Disable All Debrid Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&setting=false&query=3.0)"/>
         <setting label="Enable All Debrid Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&setting=true&query=3.1)"/>
         <setting type="sep" />
-        <setting id="provider.0day" type="bool" label="$NUMBER[0]DAY" default="true" />
+<!--        <setting id="provider.0day" type="bool" label="$NUMBER[0]DAY" default="true" /> -->
         <setting id="provider.300mbfilms" type="bool" label="$NUMBER[300]MBFILMS" default="true" />
         <setting id="provider.bestmoviez" type="bool" label="BESTMOVIEZ" default="true" />
         <setting id="provider.ddlvalley" type="bool" label="DDLVALLEY" default="false" />

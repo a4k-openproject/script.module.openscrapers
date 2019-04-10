@@ -27,7 +27,7 @@ test_mode = 1
 
 # Set test_mode to 'movie' to test movie scraping
 # Set test_mode to 'episode' to test episode scraping
-test_type = 'episode'
+test_type = 'movie'
 
 # Test information
 movie_info = {'title': 'Inception', 'imdb': 'tt1375666', 'aliases': [], 'localtitle': 'Inception', 'year': '2010'}
