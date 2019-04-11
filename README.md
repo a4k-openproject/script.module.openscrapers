@@ -69,7 +69,7 @@ add the following:
 `from openscrapers import sources`
 
 
-# Scraper tester
+# External Scraper Tester
 
 With the help of Jabaxtor, we now have an external scraper tester that can test any scraper folder in
 the lib\openscrapers\sources_openscrapers and this also means your can bring in scraper folders from other addons
@@ -79,9 +79,15 @@ In the root directory of OpenScrapers you will find two files
 
 `scrape-test.py and Scraper Tester.bat`
 
-scrape-test.py is where all the magic happens. 
+scrape-test.py is where all the magic happens.
 
-# Command Arguments for it are as follows
+REQUIREMENTS
+Python2 latest version
+install bs4 dependency for Python
+
+`pip install bs4`
+
+# Command Arguments
 
 folders=(name of scraper folder ie:en,en_DebridOnly)
 
