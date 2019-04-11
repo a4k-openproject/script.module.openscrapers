@@ -77,16 +77,20 @@ and add them to this directory, but you will have to do a lil bit of work to get
 
 In the root directory of OpenScrapers you will find two files
 
-`scrape-test.py and Scraper Tester.bat
+`scrape-test.py and Scraper Tester.bat`
 
 scrape-test.py is where all the magic happens. 
 
 # Command Arguments for it are as follows
 
 folders=(name of scraper folder ie:en,en_DebridOnly)
-test_type=(1 or 0)									
+
+test_type=(1 or 0)
+
 test_mode=(movie or episode)
+
 timeout_mode=(true, y, True, false, False, n)
+
 number_of_tests=(1-500)
 
 # Argument Explanations
@@ -119,11 +123,11 @@ Then you'll need to copy the init.py file from any other folder such as en and a
 
 Then open all the scrapers in something like Notepad++ and replace
 
-`from resources.lib.modules
+`from resources.lib.modules`
 
 with
 
-`from openscrapers.modules
+`from openscrapers.modules`
 
 This is only because it would need to use the modules from OpenScrapers instead of an external addon
 
