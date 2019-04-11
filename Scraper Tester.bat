@@ -251,6 +251,21 @@ IF ERRORLEVEL 2 GOTO End
 IF ERRORLEVEL 1 GOTO Launch
 
 :End
+CLS
+ECHO Would you like to clean up .pyc files
+ECHO 1. Yes
+ECHO 2. No
 ECHO.
-ECHO Cleaning up .pyc files please wait
+
+CHOICE /C 12 /M "Enter your choice:"
+
+IF ERRORLEVEL 2 GOTO End2
+IF ERRORLEVEL 1 GOTO Cleanup
+
+:Cleanup
+CLS
+ECHO Cleaning up .pyc files recursively...
 del /s *.pyc
+GOTO End2
+
+:End2
