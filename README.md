@@ -73,7 +73,7 @@ add the following:
 
 With the help of Jabaxtor, we now have an external scraper tester that can test any scraper folder in
 the lib\openscrapers\sources_openscrapers and this also means your can bring in scraper folders from other addons
-and add them to this directory, but you will have to do a lil bit of work to get it right.
+and add them to this directory, but you will have to do a lil bit of work to get it working right, read below for more info.
 
 In the root directory of OpenScrapers you will find two files
 
@@ -122,8 +122,9 @@ and will continue until the scrape finishes
 
 # Adding Scrapers from other addons
 
-First copy the scraper folder from an addon like Overeasy for instance, rename it to something other than
-what's already in this folder, for instance, for eggscrapers call the folder: scrapertest-egg
+First copy the scraper folder, usually called something like "en", from an addon like EggScrapers for instance,
+rename it to something other than what's already `lib\openscrapers\sources_openscrapers`, for instance,
+for eggscrapers call the folder: scrapertest-egg
 
 Then you'll need to copy the init.py file from any other folder such as en and add it to this new one
 
@@ -135,6 +136,8 @@ with
 
 `from openscrapers.modules`
 
+in all open files.
+
 This is only because it would need to use the modules from OpenScrapers instead of an external addon
 
 Now you're ready to run your command make the folder argument folder=scrapertest-egg
@@ -145,9 +148,14 @@ I made an easy to use batch file pre-configured for OpenScrapers, EggScrapers, Y
 
 Once you open it you will get your options to test different addons, pretty easy to follow along :)
 
+Preset folder names in the batch file for external addons are below so please follow last section and use these
+folder names to test external scrapers from preset addons
+
+`scrapertest-egg, scrapertest-yoda, scrapertest-scrubs`
+
 Only thing you should know is that if a scraper hangs, it will stall the whole test, you can check by opening the
 test-results folder and opening the txt file results for the file you're testing. If you see the same set of scrapers
-repeating over and over, then there's an issue with those scrapers. Press ctrl+c to terminate the batch so you can move those
-scrapers out and try again!
+repeating over and over, then there's an issue with those scrapers. Close the window or press ctrl+c to terminate
+the batch so you can move those scrapers out and try again!
 
 Enjoy!
