@@ -24,8 +24,10 @@ folders = arguments.get('folders', None)
 
 if folders is not None:
     folders = folders.split(',')
+else:
+    folders = ['en', 'en_DebridOnly']
 
-test_type = int(arguments.get('test_type', 0))
+test_type = int(arguments.get('test_type', 1))
 
 test_mode = arguments.get('test_mode', 'movie')
 
@@ -109,7 +111,6 @@ def worker_thread(provider_name, provider_source):
     global RUNNING_PROVIDERS
     global TOTAL_SOURCES
     RUNNING_PROVIDERS.append(provider_name)
-    start_time = time.time()
     try:
         # Confirm Provider contains the movie function
         if not getattr(provider_source, test_mode, False):
@@ -122,7 +123,11 @@ def worker_thread(provider_name, provider_source):
                 test_objects = episode_meta
 
             provider_results = []
+            url = []
+            start_time = time.time()
+
             for i in test_objects:
+                start_time = time.time()
                 if len(provider_results) != 0:
                     break
                 # Run movie Call
@@ -149,14 +154,18 @@ def worker_thread(provider_name, provider_source):
                 if url is None:
                     continue
                 else:
-                    provider_results = url
-                    TOTAL_SOURCES += url
+                    if len(url) > 0:
+                        provider_results = url
+                        TOTAL_SOURCES += url
+                    else:
+                        continue
 
             # Gather time analytics
             runtime = time.time() - start_time
 
             passed_providers.append((provider_name, url, runtime))
         else:
+            start_time = time.time()
             # Provider has unit test entry point, run provider with it
             try:
                 unit_test = provider_source.unit_test('movie', hosts)
@@ -242,13 +251,6 @@ if __name__ == '__main__':
             print('Exception: %s' % provider[1])
             print(' ')
 
-    if test_type == 1:
-        all_sources = [source for sources in passed_providers for source in sources[1] if source is not None]
-    else:
-        all_sources = passed_providers[0][1]
-        if all_sources is None:
-            all_sources = []
-
     # TODO Expand analytical information
     print('Analytical Data:')
     print('################')
@@ -268,5 +270,8 @@ if __name__ == '__main__':
         print('#################')
         for i in passed_providers:
             print('%s: %s Sources' % (i[0], len(i[1])))
-    else:
+    elif test_type == 0:
+        all_sources = passed_providers[0][1]
+        if all_sources is None:
+            all_sources = []
         print('Total No. Sources: %s' % len(all_sources))
