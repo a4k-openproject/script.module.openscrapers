@@ -20,7 +20,7 @@
 # Addon id: script.module.openscrapers
 
 
-import urllib,json
+import urllib,json,base64
 
 from openscrapers.modules import cache
 from openscrapers.modules import client
@@ -36,7 +36,6 @@ class tvMaze:
         if (show_id != None):
             self.show_id = show_id
             return show_id
-
         return self.show_id
 
 
@@ -47,34 +46,27 @@ class tvMaze:
                 query = '?' + urllib.urlencode(query)
             else:
                 query = ''
-
             # Make the request
             request = self.api_url % (endpoint, query)
-
             # Send the request and get the response
             # Get the results from cache if available
             response = cache.get(client.request, 24, request)
-
             # Retrun the result as a dictionary
             return json.loads(response)
         except:
             pass
-
         return {}
 
 
     def showLookup(self, type, id):
         try:
             result = self.request('lookup/shows', {type: id})
-
             # Storing the show id locally
             if ('id' in result):
                 self.show_id = result['id']
-
             return result
         except:
             pass
-
         return {}
 
 
@@ -82,17 +74,13 @@ class tvMaze:
         try:
             if (not self.showID(show_id)):
                 raise Exception()
-
             result = self.request('shows/%d' % self.show_id)
-
             # Storing the show id locally
             if ('id' in result):
                 self.show_id = result['id']
-
             return result
         except:
             pass
-
         return {}
 
 
@@ -100,14 +88,11 @@ class tvMaze:
         try:
             if (not self.showID(show_id)):
                 raise Exception()
-
             result = self.request('shows/%d/seasons' % int( self.show_id ))
-
             if (len(result) > 0 and 'id' in result[0]):
                 return result
         except:
             pass
-
         return []
 
 
@@ -119,14 +104,11 @@ class tvMaze:
         try:
             if (not self.showID(show_id)):
                 raise Exception()
-
             result = self.request('shows/%d/episodes' % int( self.show_id ), 'specials=1' if specials else '')
-
             if (len(result) > 0 and 'id' in result[0]):
                 return result
         except:
             pass
-
         return []
 
 
@@ -136,7 +118,6 @@ class tvMaze:
             return int(client.parseDOM(client.request(url), 'absolute_number')[0])
         except:
             pass
-
         return episode
 
 
@@ -147,7 +128,6 @@ class tvMaze:
             title = client.parseDOM(r, 'SeriesName')[0]
             title = client.replaceHTMLCodes(title)
             title = title.encode('utf-8')
-
             return title
         except:
             pass

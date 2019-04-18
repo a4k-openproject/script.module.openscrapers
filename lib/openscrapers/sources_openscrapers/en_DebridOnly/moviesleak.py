@@ -9,8 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-    Filmnet Add-on (C) 2017
-    Credits to Exodus and Covenant; our thanks go to their creators
+    OpenScrapers Project
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,13 +27,7 @@
 
 import re, urllib, urlparse
 
-from openscrapers.modules import cleantitle
-from openscrapers.modules import client
-from openscrapers.modules import source_utils
-from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser2
-from openscrapers.modules import workers
-
+from openscrapers.modules import cleantitle, client, debrid, source_utils, cfscrape, dom_parser2, workers
 
 class source:
     def __init__(self):
@@ -43,6 +36,7 @@ class source:
         self.domains = ['300mbmoviesdl.com', 'moviesleak.net/', 'hevcbluray.net']
         self.base_link = 'https://moviesleak.net/'
         self.search_link = '?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -76,7 +70,7 @@ class source:
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
 
             posts = client.parseDOM(r, 'div', attrs={'class': 'item'})
 
@@ -136,7 +130,7 @@ class source:
             except Exception:
                 pass
 
-            data = client.request(item[1])
+            data = self.scraper.get(item[1]).content
 
             try:
                 r = client.parseDOM(data, 'li', attrs={'class': 'elemento'})
@@ -173,7 +167,7 @@ class source:
 
     def resolve(self, url):
         if 'hideurl' in url:
-            data = client.request(url)
+            data = self.scraper.get(url).content
             data = client.parseDOM(data, 'div', attrs={'class': 'row'})
             url = [dom_parser2.parse_dom(i, 'a', req='href')[0] for i in data]
             url = [i.attrs['href'] for i in url if 'direct me' in i.content][0]
