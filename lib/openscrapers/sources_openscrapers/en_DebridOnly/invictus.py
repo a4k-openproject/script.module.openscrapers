@@ -110,7 +110,6 @@ class source:
                             try:
                                 name = str(i)
                                 items.append(name)
-                                print items
                             except:
                                 pass
                     except:

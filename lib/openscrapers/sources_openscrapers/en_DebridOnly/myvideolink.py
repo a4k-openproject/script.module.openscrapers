@@ -140,7 +140,6 @@ class source:
                     fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*)(\.|\)|\]|\s)', '', name.upper())
                     fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
                     fmt = [i.lower() for i in fmt]
-                    print fmt
 
                     if any(i.endswith(('subs', 'sub', 'dubbed', 'dub')) for i in fmt): raise Exception()
                     if any(i in ['extras'] for i in fmt): raise Exception()

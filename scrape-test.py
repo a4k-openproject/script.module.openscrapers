@@ -1,11 +1,11 @@
+import json
 import os
+import random
 import sys
 import threading
 import time
-import urllib
-import json
+
 import requests
-import random
 
 sys.path.append(os.path.join(os.path.curdir, 'lib'))
 
@@ -14,7 +14,7 @@ arguments = {}
 for i in sys.argv:
     try:
         i = i.split('=')
-        arguments.update({i[0]:i[1]})
+        arguments.update({i[0]: i[1]})
     except:
         pass
 
@@ -49,7 +49,8 @@ print('Running %s tests' % no_tests)
 # Test information
 movie_meta = []
 episode_meta = []
-trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664' # Soz Not Soz ExodusRedux
+tvshow_meta = []
+trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664'  # Soz Not Soz ExodusRedux
 
 trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % no_tests
 trakt_shows_url = 'https://api.trakt.tv/shows/popular?extended=full&limit=%s' % no_tests
@@ -70,12 +71,11 @@ if test_mode == 'movie':
         movie_meta.append({'imdb': movie['ids']['imdb'], 'title': movie['title'], 'localtitle': movie['title'],
                            'year': str(movie['year']), 'aliases': []})
 
-else:
+elif test_mode == 'episode':
     resp = requests.get(trakt_shows_url, headers=trakt_headers)
     resp = json.loads(resp.text)
 
     for show in resp:
-
         episodes = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
         episodes = json.loads(episodes.text)
         episodes = [episode for season in episodes for episode in season['episodes']]
@@ -87,8 +87,9 @@ else:
                              'year': show['year'], 'imdb': episode['ids']['imdb'], 'tvdb': episode['ids']['tvdb'],
                              'title': episode['title'], 'premiered': '', 'season': episode['season'],
                              'episode': episode['number']})
-
-
+else:
+    raise Exception('Unknown test type aborting test run')
+2
 RUNNING_PROVIDERS = []
 TOTAL_SOURCES = []
 
@@ -112,16 +113,13 @@ def worker_thread(provider_name, provider_source):
     global TOTAL_SOURCES
     RUNNING_PROVIDERS.append(provider_name)
     try:
-        # Confirm Provider contains the movie function
-        if not getattr(provider_source, test_mode, False):
-            return
-
-        if not getattr(provider_source, 'unit_test', False):
+        if getattr(provider_source, test_mode, False):
             if test_mode == 'movie':
                 test_objects = movie_meta
-            else:
+            elif test_mode == 'episode':
                 test_objects = episode_meta
-
+            else:
+                return
             provider_results = []
             url = []
             start_time = time.time()
@@ -130,24 +128,23 @@ def worker_thread(provider_name, provider_source):
                 start_time = time.time()
                 if len(provider_results) != 0:
                     break
+
                 # Run movie Call
                 if test_mode == 'movie':
                     url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
                     if url is None:
                         continue
-
                 elif test_mode == 'episode':
                     url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
                                                  i['localtvshowtitle'], i['aliases'], i['year'])
                     if url is None:
                         continue
-
                     url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'], i['season'],
                                                   i['episode'])
                     if url is None:
                         continue
                 else:
-                    raise Exception('wrong test type dumbass')
+                    return
 
                 # Run source call
                 url = provider_source.sources(url, hosts, [])
@@ -164,33 +161,14 @@ def worker_thread(provider_name, provider_source):
             runtime = time.time() - start_time
 
             passed_providers.append((provider_name, url, runtime))
-        else:
-            start_time = time.time()
-            # Provider has unit test entry point, run provider with it
-            try:
-                unit_test = provider_source.unit_test('movie', hosts)
-            except Exception as e:
-                failed_providers.append((provider_name, e))
-                return
-
-            if unit_test is None:
-                failed_providers.append((provider_name, 'Unit Test Returned None'))
-                return
-            else:
-                TOTAL_SOURCES += unit_test
-
-            runtime = time.time() - start_time
-
-            passed_providers.append((provider_name, unit_test, runtime))
-
-        RUNNING_PROVIDERS.remove(provider_name)
-
     except Exception as e:
         import traceback
         traceback.print_exc()
-        RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         failed_providers.append((provider_name, e))
+
+    RUNNING_PROVIDERS.remove(provider_name)
+
 
 provider_list = openscrapers.sources(folders)
 failed_providers = []
@@ -214,11 +192,12 @@ if __name__ == '__main__':
         total_runtime = 0
         while len(RUNNING_PROVIDERS) > 0:
             if TIMEOUT_MODE:
-                if total_runtime > 60: break
+                if total_runtime > 60:
+                    break
             print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
                                                   ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
-            total_runtime +=1
+            total_runtime += 1
 
     else:
         print('Please Select a provider:')
@@ -267,9 +246,18 @@ if __name__ == '__main__':
         print('Total Sources: %s' % len(post_dup))
         print('Total Duplicates: %s' % total_duplicates)
         print('   ')
+        print('Source per provider:')
         print('#################')
         for i in passed_providers:
-            print('%s: %s Sources' % (i[0], len(i[1])))
+            print('%s: %s Sources' % (i[0], len([] if i[1] is None else i[1])))
+        print('   ')
+        print('Sources quality:')
+        print('#################')
+        quality = {}
+        for i in TOTAL_SOURCES:
+            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
+        for x in quality:
+            print('%s: %s Sources' % (x, quality[x]))
     elif test_type == 0:
         all_sources = passed_providers[0][1]
         if all_sources is None:

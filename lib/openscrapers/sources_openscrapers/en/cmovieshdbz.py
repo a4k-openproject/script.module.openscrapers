@@ -94,12 +94,3 @@ class source:
 
     def resolve(self, url):
         return url
-
-    def unit_test(self, test_type, hosts):
-
-        if test_type == 'movie':
-           url = self.movie('', 'Holiday', '', [], '2018')
-           url = self.sources(url, hosts, [])
-        else:
-            raise Exception("No Episode Calls Available")
-        return url
