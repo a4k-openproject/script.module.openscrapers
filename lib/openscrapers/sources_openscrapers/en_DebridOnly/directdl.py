@@ -25,7 +25,7 @@ import re,urllib,urlparse,json,random,base64
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import cache
+from openscrapers.modules import source_utils
 from openscrapers.modules import debrid
 
 
@@ -139,26 +139,21 @@ class source:
 
                     quality = i['quality']
 
-                    quality = quality.upper()
-
                     size = i['size']
                     size = float(size)/1024
                     size = '%.2f GB' % size
 
-                    if any(x in quality for x in ['HEVC', 'X265', 'H265']): info = '%s | HEVC' % size
-                    else: info = size
+                    quality, info = source_utils.get_release_quality(quality)
 
-                    if '1080P' in quality: quality = '1080p'
-                    elif '720P' in quality: quality = 'HD'
-                    else: quality = 'SD'
+                    info = ' | % | ' % size.join(info)
 
                     url = i['links']
                     #for x in url.keys(): links.append({'url': url[x], 'quality': quality, 'info': info})
 
                     links = []
-                    
+
                     for x in url.keys(): links.append({'url': url[x], 'quality': quality})
-                    
+
                     for link in links:
                         try:
                             url = link['url']

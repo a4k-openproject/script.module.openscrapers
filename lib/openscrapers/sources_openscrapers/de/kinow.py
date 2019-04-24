@@ -79,7 +79,7 @@ class source:
                     r = [(i[0][0].attrs['href'], i[1][0].content) for i in r if i[0] and i[1]]
                     r = [(i[0], i[1] if i[1] else '0') for i in r]
                     r = [i[0] for i in r if int(i[1]) == int(checkval)][0]
-                    r = re.sub('/(1080p|720p|x264|3d)', '', r, flags=re.I)
+                    r = re.sub('/(2160p|1080p|720p|x264|3d)', '', r, flags=re.I)
 
                     return source_utils.strip_domain(r)
                 except:

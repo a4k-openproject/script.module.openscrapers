@@ -62,12 +62,8 @@ class source:
             qual = re.compile('class="quality">(.+?)<').findall(r)
 
             for i in qual:
-                if '1080' in i:
-                    quality = '1080p'
-                elif '720' in i:
-                    quality = '720p'
-                else:
-                    quality = 'SD'
+                quality = source_utils.check_direct_url(i)
+
             u = client.parseDOM(r, "div", attrs={"class": "pa-main anime_muti_link"})
 
             for t in u:

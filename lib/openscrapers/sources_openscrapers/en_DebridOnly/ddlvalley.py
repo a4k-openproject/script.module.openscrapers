@@ -31,6 +31,7 @@ from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import cfscrape
 from openscrapers.modules import dom_parser2
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -125,16 +126,7 @@ class source:
                                 if any(i.endswith(('subs', 'sub', 'dubbed', 'dub')) for i in fmt): raise Exception()
                                 if any(i in ['extras'] for i in fmt): raise Exception()
 
-                                if '2160p' in fmt: quality = '4K'
-                                elif '1080p' in fmt: quality = '1080p'
-                                elif '720p' in fmt: quality = '720p'
-                                else: quality = 'SD'
-                                if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt): quality = 'SCR'
-                                elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in fmt): quality = 'CAM'
-
-                                info = []
-
-                                if '3d' in fmt: info.append('3D')
+                                quality, info = source_utils.get_release_quality(name, url)
 
                                 try:
                                     size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', name[2])[-1]
@@ -144,8 +136,6 @@ class source:
                                     info.append(size)
                                 except:
                                     pass
-
-                                if any(i in ['hevc', 'h265', 'x265'] for i in fmt): info.append('HEVC')
 
                                 info = ' | '.join(info)
 
