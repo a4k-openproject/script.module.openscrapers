@@ -21,10 +21,10 @@
 
 import urlparse, urllib
 
-from resources.lib.modules import cache
-from resources.lib.modules import client
-from resources.lib.modules import cleantitle
-from resources.lib.modules import utils
+from openscrapers.modules import cache
+from openscrapers.modules import client
+from openscrapers.modules import cleantitle
+from openscrapers.modules import utils
 
 
 def _getAniList(url):

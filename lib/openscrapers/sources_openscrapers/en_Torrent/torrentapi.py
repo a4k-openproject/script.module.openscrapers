@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
 #  .##.....#.##.....#.##......####..#.##......##......##.....#..##...##.##.....#.##......##.....#.##......
@@ -6,109 +8,81 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-'''
-    Torrentapi
-'''
-
-import re
-import requests
-import time
-
-from openscrapers.modules import source_utils
-from resolveurl.plugins.premiumize_me import PremiumizeMeResolver
+import re,urllib,urlparse,json
+from openscrapers.modules import client,debrid,source_utils
+from openscrapers.modules import dom_parser2 as dom
 
 
 class source:
-
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domain = 'https://Torrentapi.top'
-        self.api_key = PremiumizeMeResolver.get_setting('password')
-        self.tvsearch = 'https://torrentapi.org//pubapi_v2.php?app_id=poached&mode=search&search_string=%s&category=tv&ranked=0&token=%s'
-        self.msearch = 'https://torrentapi.org//pubapi_v2.php?app_id=poached&mode=search&search_string=%s&category=movies&ranked=0&token=%s'
-        self.tokenta = 'https://torrentapi.org//pubapi_v2.php?app_id=poached&get_token=get_token'
-        self.checkc = 'https://www.premiumize.me/api/torrent/checkhashes?apikey=%s&hashes[]=%s&apikey=%s'
-        self.pr_link = 'https://www.premiumize.me/api/transfer/directdl?apikey=%s&src=magnet:?xt=urn:btih:%s'
+        self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&{2}'
+        self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&{2}'
+        self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            url = {'title': title, 'year': year}
+            url = {'imdb': imdb, 'title': title, 'year': year}
+            url = urllib.urlencode(url)
             return url
-        except:
-            print("Unexpected error in Torrentapi Script: episode", sys.exc_info()[0])
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(exc_type, exc_tb.tb_lineno)
-            return url
+        except BaseException:
+            return
+
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
-            url = tvshowtitle
+            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+            url = urllib.urlencode(url)
             return url
-        except:
-            print("Unexpected error in Torrentapi Script: TV", sys.exc_info()[0])
-            return url
-        return url
+        except BaseException:
+            return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            url = url
-            url = {'tvshowtitle': url, 'season': season, 'episode': episode, 'premiered': premiered}
+            if url is None: return
+            url = urlparse.parse_qs(url)
+            url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
+            url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
+            url = urllib.urlencode(url)
             return url
-        except:
-            print("Unexpected error in Torrentapi Script: episode", sys.exc_info()[0])
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(exc_type, exc_tb.tb_lineno)
-            return url
+        except BaseException:
+            return
+
 
     def sources(self, url, hostDict, hostprDict):
-        sources = []
         try:
-            with requests.Session() as s:
-                gettoken = s.get(self.tokenta).text
-                time.sleep(2)
-                tokenapi = re.compile('n\W+(.*?)[\'"]', re.I).findall(gettoken)[0]
-                if 'episode' in url:
-                    iep = url['episode'].zfill(2)
-                    ise = url['season'].zfill(2)
-                    se = 's' + ise + 'e' + iep
-                    sel = url['tvshowtitle'].replace(' ','.') + '.' + se
-                    search_link = self.tvsearch
-                else:
-                    sel = url['title'].replace(' ','.') + '.' + url['year']
-                    search_link = self.msearch
-                gs = s.get(search_link % (sel, tokenapi)).text
-                gl = re.compile('ame\W+(.*?)[\'"].*?ih:(.*?)\W', re.I).findall(gs)
-                for nam,hass in gl:
-                    checkca = s.get(self.checkc % (self.api_key, hass, self.api_key)).text
-                    quality = source_utils.check_sd_url(nam)
-                    if 'finished' in checkca:
-                        url = self.pr_link % (self.api_key, hass)
-                        sources.append({
-                            'source': 'cached',
-                            'quality': quality,
-                            'language': 'en',
-                            'url': url,
-                            'direct': False,
-                            'debridonly': False,
-                            'info': nam,
-                        })  
+            sources = []
+            if url == None: return sources
+            if debrid.status() == False: raise Exception()
+			if debrid.tor_enabled() is False: raise Exception()
+            data = urlparse.parse_qs(url)
+            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s' % data['imdb']
+            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+            token = client.request(self.token)
+            token = json.loads(token)["token"]
+            if 'tvshowtitle' in data:
+                search_link = self.tvsearch.format(token, urllib.quote_plus(query), 'format=json_extended')
+            else:
+                search_link = self.msearch.format(token, data['imdb'], 'format=json_extended')
+            rjson = client.request(search_link)
+            files = json.loads(rjson)['torrent_results']
+            for file in files:
+                name = file["title"]
+                quality, info = source_utils.get_release_quality(name, name)
+                size = source_utils.convert_size(file["size"])
+                info.append(size)
+                info = ' | '.join(info)
+                url = file["download"]
+                url = url.split('&tr')[0]
+                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
             return sources
-        except:
-            print("Unexpected error in Torrentapi Script: Sources", sys.exc_info()[0])
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(exc_type, exc_tb.tb_lineno)
+        except BaseException:
             return sources
 
-        
+
     def resolve(self, url):
-        try:
-            getpl = requests.get(url).text
-            sl = re.compile('link.*?"(h.*?)["\'].\n.*?s.*?http', re.I).findall(getpl)[0]
-            url = sl.replace('\\','')
-            return url
-        except:
-            print("Unexpected error in Torrentapi Script: episode", sys.exc_info()[0])
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(exc_type, exc_tb.tb_lineno)
-            return url
+        return url

@@ -68,7 +68,6 @@ add the following:
 
 `from openscrapers import sources`
 
-
 # External Scraper Tester
 
 With the help of Jabaxtor, we now have an external scraper tester that can test any scraper folder in

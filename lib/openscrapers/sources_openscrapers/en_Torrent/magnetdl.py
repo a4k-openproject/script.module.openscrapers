@@ -72,6 +72,9 @@ class source:
         try:
             if debrid.status() is False:
                 raise Exception()
+				
+			if debrid.tor_enabled() is False:
+				raise Exception()
 
             if url is None:
                 return sources
