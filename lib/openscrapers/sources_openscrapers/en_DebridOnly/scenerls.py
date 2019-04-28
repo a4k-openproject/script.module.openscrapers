@@ -79,10 +79,6 @@ class source:
                         if not cleantitle.get(title) in cleantitle.get(x): raise Exception()
                         y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', t)[-1].upper()
                         if not y == hdlr: raise Exception()
-                        fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*)(\.|\)|\]|\s)', '', t.upper())
-                        fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
-                        fmt = [i.lower() for i in fmt]
-                        #if not any(i in ['1080p', '720p'] for i in fmt): raise Exception()
                         if len(dupes) > 2: raise Exception()
                         dupes += [x]
                         u = client.parseDOM(post, 'a', ret='href')[0]

@@ -87,44 +87,44 @@ def getTraktAsJson(url, post=None):
         pass
 
 
-def authTrakt():
-    try:
-        if getTraktCredentialsInfo() == True:
-            if control.yesnoDialog(control.lang(32511).encode('utf-8'), control.lang(32512).encode('utf-8'), '', 'Trakt'):
-                control.setSetting(id='trakt.user', value='')
-                control.setSetting(id='trakt.token', value='')
-                control.setSetting(id='trakt.refresh', value='')
-            raise Exception()
-        result = getTraktAsJson('/oauth/device/code', {'client_id': V2_API_KEY})
-        verification_url = (control.lang(32513) % result['verification_url']).encode('utf-8')
-        user_code = (control.lang(32514) % result['user_code']).encode('utf-8')
-        expires_in = int(result['expires_in'])
-        device_code = result['device_code']
-        interval = result['interval']
-        progressDialog = control.progressDialog
-        progressDialog.create('Trakt', verification_url, user_code)
-        for i in range(0, expires_in):
-            try:
-                if progressDialog.iscanceled(): break
-                time.sleep(1)
-                if not float(i) % interval == 0: raise Exception()
-                r = getTraktAsJson('/oauth/device/token', {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'code': device_code})
-                if 'access_token' in r: break
-            except:
-                pass
-        try: progressDialog.close()
-        except: pass
-        token, refresh = r['access_token'], r['refresh_token']
-        headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': 2, 'Authorization': 'Bearer %s' % token}
-        result = client.request(urlparse.urljoin(BASE_URL, '/users/me'), headers=headers)
-        result = utils.json_loads_as_str(result)
-        user = result['username']
-        control.setSetting(id='trakt.user', value=user)
-        control.setSetting(id='trakt.token', value=token)
-        control.setSetting(id='trakt.refresh', value=refresh)
-        raise Exception()
-    except:
-        control.openSettings('4.1')
+# def authTrakt():
+#     try:
+#         if getTraktCredentialsInfo() == True:
+#             if control.yesnoDialog(control.lang(32511).encode('utf-8'), control.lang(32512).encode('utf-8'), '', 'Trakt'):
+#                 control.setSetting(id='trakt.user', value='')
+#                 control.setSetting(id='trakt.token', value='')
+#                 control.setSetting(id='trakt.refresh', value='')
+#             raise Exception()
+#         result = getTraktAsJson('/oauth/device/code', {'client_id': V2_API_KEY})
+#         verification_url = (control.lang(32513) % result['verification_url']).encode('utf-8')
+#         user_code = (control.lang(32514) % result['user_code']).encode('utf-8')
+#         expires_in = int(result['expires_in'])
+#         device_code = result['device_code']
+#         interval = result['interval']
+#         progressDialog = control.progressDialog
+#         progressDialog.create('Trakt', verification_url, user_code)
+#         for i in range(0, expires_in):
+#             try:
+#                 if progressDialog.iscanceled(): break
+#                 time.sleep(1)
+#                 if not float(i) % interval == 0: raise Exception()
+#                 r = getTraktAsJson('/oauth/device/token', {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'code': device_code})
+#                 if 'access_token' in r: break
+#             except:
+#                 pass
+#         try: progressDialog.close()
+#         except: pass
+#         token, refresh = r['access_token'], r['refresh_token']
+#         headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': 2, 'Authorization': 'Bearer %s' % token}
+#         result = client.request(urlparse.urljoin(BASE_URL, '/users/me'), headers=headers)
+#         result = utils.json_loads_as_str(result)
+#         user = result['username']
+#         control.setSetting(id='trakt.user', value=user)
+#         control.setSetting(id='trakt.token', value=token)
+#         control.setSetting(id='trakt.refresh', value=refresh)
+#         raise Exception()
+#     except:
+#         control.openSettings('4.1')
 
 
 def getTraktCredentialsInfo():

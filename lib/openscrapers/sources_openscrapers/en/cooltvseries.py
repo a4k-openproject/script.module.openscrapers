@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 03-16-2019 by JewBMX in Scrubs.
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -9,8 +8,10 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urllib,urlparse
-from openscrapers.modules import client,cleantitle,proxy,source_utils
+# -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
+
+import re
+from openscrapers.modules import client,cleantitle,source_utils
 
 
 class source:

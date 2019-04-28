@@ -29,14 +29,15 @@ import re,urllib,urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['myvideolinks.net','iwantmyshow.tk']
-        self.base_link = 'http://myvideolinks.net'
+        self.domains = ['iwantmyshow.tk']
+        self.base_link = 'http://iwantmyshow.tk'
         self.search_link = '/?s=%s'
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -137,27 +138,9 @@ class source:
 
                     if not y == hdlr: raise Exception()
 
-                    fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*)(\.|\)|\]|\s)', '', name.upper())
-                    fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
-                    fmt = [i.lower() for i in fmt]
-                    print fmt
+                    url = item[1]
 
-                    if any(i.endswith(('subs', 'sub', 'dubbed', 'dub')) for i in fmt): raise Exception()
-                    if any(i in ['extras'] for i in fmt): raise Exception()
-
-                    if '1080p' in fmt:
-                        quality = '1080p'
-                    elif '720p' in fmt:
-                        quality = '720p'
-                    else:
-                        quality = '720p'
-
-                    if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt): quality = 'SCR'
-                    elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in fmt): quality = 'CAM'
-
-                    info = []
-
-                    if '3d' in fmt: info.append('3D')
+                    quality, info = source_utils.get_release_quality(url,name)
 
                     try:
                         size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', item[2])[-1]
@@ -168,11 +151,8 @@ class source:
                     except:
                         pass
 
-                    if any(i in ['hevc', 'h265', 'x265'] for i in fmt): info.append('HEVC')
-
                     info = ' | '.join(info)
 
-                    url = item[1]
                     if any(x in url for x in ['.rar', '.zip', '.iso']): raise Exception()
                     url = client.replaceHTMLCodes(url)
                     url = url.encode('utf-8')

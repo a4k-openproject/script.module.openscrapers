@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import re,sys,cookielib,urllib,urllib2,urlparse,gzip,StringIO,HTMLParser,time,random,base64,xbmc
+import re,sys,cookielib,urllib,urllib2,urlparse,gzip,StringIO,HTMLParser,time,random,base64
 from openscrapers.modules import dom_parser,cache,workers,utils,log_utils
 
 
@@ -422,17 +422,6 @@ class sucuri:
             return self.cookie
         except:
             pass
-
-
-"""Bennu Specific"""
-def _get_keyboard( default="", heading="", hidden=False ):
-    """ shows a keyboard and returns a value """
-    keyboard = xbmc.Keyboard( default, heading, hidden )
-    keyboard.doModal()
-    if ( keyboard.isConfirmed() ):
-        return unicode( keyboard.getText(), "utf-8" )
-    return default
-
 
 def removeNonAscii(s): 
     return "".join(i for i in s if ord(i)<128)

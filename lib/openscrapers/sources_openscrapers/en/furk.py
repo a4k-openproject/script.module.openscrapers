@@ -25,7 +25,7 @@
 
 import requests, json, sys
 from openscrapers.modules import source_utils
-from resources.lib.modules import control
+from openscrapers.modules import control
 
 
 class source:

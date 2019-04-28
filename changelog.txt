@@ -1,4 +1,14 @@
 OpenScrapers Module Changelog:
+0.0.1.0
+- Module import line fixes
+
+0.0.0.9
+- Scraper cleanup
+- File cleanup
+- Module cleanup
+- External Scraper tester updates
+- Scraper updates from other addons
+
 0.0.0.8
 - cfscrape updates
 

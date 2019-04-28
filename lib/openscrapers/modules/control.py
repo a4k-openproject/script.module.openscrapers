@@ -21,62 +21,63 @@
 
 
 import os,sys,urllib,urlparse
-import xbmc,xbmcaddon,xbmcgui,xbmcplugin,xbmcvfs
 
+try:
+    import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
 
-integer = 1000
-dialog = xbmcgui.Dialog()
-lang = xbmcaddon.Addon().getLocalizedString
-lang2 = xbmc.getLocalizedString
-setting = xbmcaddon.Addon().getSetting
-setSetting = xbmcaddon.Addon().setSetting
-addon = xbmcaddon.Addon
-addItem = xbmcplugin.addDirectoryItem
-item = xbmcgui.ListItem
-directory = xbmcplugin.endOfDirectory
-content = xbmcplugin.setContent
-property = xbmcplugin.setProperty
-addonInfo = xbmcaddon.Addon().getAddonInfo
-infoLabel = xbmc.getInfoLabel
-condVisibility = xbmc.getCondVisibility
-jsonrpc = xbmc.executeJSONRPC
-window = xbmcgui.Window(10000)
-dialog = xbmcgui.Dialog()
-progressDialog = xbmcgui.DialogProgress()
-progressDialogBG = xbmcgui.DialogProgressBG()
-windowDialog = xbmcgui.WindowDialog()
-button = xbmcgui.ControlButton
-image = xbmcgui.ControlImage
-getCurrentDialogId = xbmcgui.getCurrentWindowDialogId()
-keyboard = xbmc.Keyboard
-execute = xbmc.executebuiltin
-skin = xbmc.getSkinDir()
-player = xbmc.Player()
-playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-resolve = xbmcplugin.setResolvedUrl
-openFile = xbmcvfs.File
-makeFile = xbmcvfs.mkdir
-deleteFile = xbmcvfs.delete
-deleteDir = xbmcvfs.rmdir
-listDir = xbmcvfs.listdir
-transPath = xbmc.translatePath
-skinPath = xbmc.translatePath('special://skin/')
-addonPath = xbmc.translatePath(addonInfo('path'))
-dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+    integer = 1000
+    lang = xbmcaddon.Addon().getLocalizedString
+    lang2 = xbmc.getLocalizedString
+    setting = xbmcaddon.Addon().getSetting
+    setSetting = xbmcaddon.Addon().setSetting
+    addon = xbmcaddon.Addon
+    addItem = xbmcplugin.addDirectoryItem
+    item = xbmcgui.ListItem
+    directory = xbmcplugin.endOfDirectory
+    content = xbmcplugin.setContent
+    property = xbmcplugin.setProperty
+    addonInfo = xbmcaddon.Addon().getAddonInfo
+    infoLabel = xbmc.getInfoLabel
+    condVisibility = xbmc.getCondVisibility
+    jsonrpc = xbmc.executeJSONRPC
+    window = xbmcgui.Window(10000)
+    dialog = xbmcgui.Dialog()
+    progressDialog = xbmcgui.DialogProgress()
+    progressDialogBG = xbmcgui.DialogProgressBG()
+    windowDialog = xbmcgui.WindowDialog()
+    button = xbmcgui.ControlButton
+    image = xbmcgui.ControlImage
+    getCurrentDialogId = xbmcgui.getCurrentWindowDialogId()
+    keyboard = xbmc.Keyboard
+    execute = xbmc.executebuiltin
+    skin = xbmc.getSkinDir()
+    player = xbmc.Player()
+    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+    resolve = xbmcplugin.setResolvedUrl
+    openFile = xbmcvfs.File
+    makeFile = xbmcvfs.mkdir
+    deleteFile = xbmcvfs.delete
+    deleteDir = xbmcvfs.rmdir
+    listDir = xbmcvfs.listdir
+    transPath = xbmc.translatePath
+    skinPath = xbmc.translatePath('special://skin/')
+    addonPath = xbmc.translatePath(addonInfo('path'))
+    dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
 
-settingsFile = os.path.join(dataPath, 'settings.xml')
-viewsFile = os.path.join(dataPath, 'views.db')
-bookmarksFile = os.path.join(dataPath, 'bookmarks.db')
-providercacheFile = os.path.join(dataPath, 'providers.13.db')
-metacacheFile = os.path.join(dataPath, 'meta.5.db')
-searchFile = os.path.join(dataPath, 'search.1.db')
-libcacheFile = os.path.join(dataPath, 'library.db')
-cacheFile = os.path.join(dataPath, 'cache.db')
-key = "RgUkXp2s5v8x/A?D(G+KbPeShVmYq3t6"
-iv = "p2s5v8y/B?E(H+Mb"
-addonIcon = os.path.join(addonPath, 'icon.png')
-
-
+    settingsFile = os.path.join(dataPath, 'settings.xml')
+    viewsFile = os.path.join(dataPath, 'views.db')
+    bookmarksFile = os.path.join(dataPath, 'bookmarks.db')
+    providercacheFile = os.path.join(dataPath, 'providers.13.db')
+    metacacheFile = os.path.join(dataPath, 'meta.5.db')
+    searchFile = os.path.join(dataPath, 'search.1.db')
+    libcacheFile = os.path.join(dataPath, 'library.db')
+    cacheFile = os.path.join(dataPath, 'cache.db')
+    key = "RgUkXp2s5v8x/A?D(G+KbPeShVmYq3t6"
+    iv = "p2s5v8y/B?E(H+Mb"
+    addonIcon = os.path.join(addonPath, 'icon.png')
+except:
+    addonInfo = {}
+    pass
 
 def sleep (time): # Modified `sleep` command that honors a user exit request
     while time > 0 and not xbmc.abortRequested:
@@ -106,20 +107,23 @@ def version():
     return int(num)
 
 
-def openSettings(query=None, id=addonInfo('id')):
-    try:
-        idle()
-        execute('Addon.OpenSettings(%s)' % id)
-        if query == None: raise Exception()
-        c, f = query.split('.')
-        if int(getKodiVersion()) >= 18:
-            execute('SetFocus(%i)' % (int(c) - 100))
-            execute('SetFocus(%i)' % (int(f) - 80))
-        else:
-            execute('SetFocus(%i)' % (int(c) + 100))
-            execute('SetFocus(%i)' % (int(f) + 200))
-    except:
-        return
+try:
+    def openSettings(query=None, id=addonInfo('id')):
+        try:
+            idle()
+            execute('Addon.OpenSettings(%s)' % id)
+            if query == None: raise Exception()
+            c, f = query.split('.')
+            if int(getKodiVersion()) >= 18:
+                execute('SetFocus(%i)' % (int(c) - 100))
+                execute('SetFocus(%i)' % (int(f) - 80))
+            else:
+                execute('SetFocus(%i)' % (int(c) + 100))
+                execute('SetFocus(%i)' % (int(f) + 200))
+        except:
+            return
+except:
+    pass
 
 
 def getCurrentViewId():
@@ -143,21 +147,5 @@ def idle():
         return execute('Dialog.Close(busydialognocancel)')
     else:
         return execute('Dialog.Close(busydialog)')
-
-
-def yesnoDialog(line1, line2, line3, heading=addonInfo('name'), nolabel='', yeslabel=''):
-    return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel)
-
-
-def selectDialog(list, heading=addonInfo('name')):
-    return dialog.select(heading, list)
-
-
-def infoDialog(message, heading=addonInfo('name'), icon='', time=3000, sound=False):
-    if icon == '': icon = addonIcon
-    elif icon == 'INFO': icon = xbmcgui.NOTIFICATION_INFO
-    elif icon == 'WARNING': icon = xbmcgui.NOTIFICATION_WARNING
-    elif icon == 'ERROR': icon = xbmcgui.NOTIFICATION_ERROR
-    dialog.notification(heading, message, icon, time, sound=sound)
 
 

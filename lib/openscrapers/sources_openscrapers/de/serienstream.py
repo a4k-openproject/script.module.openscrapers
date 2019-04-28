@@ -116,7 +116,7 @@ class source:
                 if self.base_link not in res:
                     url = res
                 else:
-                    control.infoDialog(control.lang(32572).encode('utf-8'), sound=True, icon='WARNING')
+                    raise Exception
             except:
                 return
 

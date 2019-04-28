@@ -25,7 +25,7 @@ import re,urllib,urlparse,json,random,base64
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import cache
+from openscrapers.modules import source_utils
 from openscrapers.modules import debrid
 
 
@@ -81,7 +81,6 @@ class source:
             if not cookie == None: headers['Cookie'] = cookie
             if not referer == None: headers['Referer'] = referer
             result = client.request(url, post=post, headers=headers, output=output, close=close)
-            print(result)
             result = result.decode('iso-8859-1').encode('utf-8')
             result = urllib.unquote_plus(result)
             return(result)
@@ -92,9 +91,7 @@ class source:
     def directdl_cache(self, url):
         try:
             url = urlparse.urljoin(base64.b64decode(self.b_link), url)
-            print(url)
             result = self.request(url)
-            print(result)
             result = re.compile('id=(\d+)>.+?href=(.+?)>').findall(result)
             result = [(re.sub('http.+?//.+?/','/', i[1]), 'tt' + i[0]) for i in result]
             return(result)
@@ -124,8 +121,7 @@ class source:
                 q = self.search_link + urllib.quote_plus('%s %s' % (t, f[0]))
                 
                 q = urlparse.urljoin(self.base_link, q)
-                result = client.request(q)
-                print(q)
+                result = client.request(q)   
                 result = json.loads(result)
 
                 result = result['results']
@@ -143,28 +139,21 @@ class source:
 
                     quality = i['quality']
 
-
-
-                    quality = quality.upper()
-
                     size = i['size']
                     size = float(size)/1024
                     size = '%.2f GB' % size
 
-                    if any(x in quality for x in ['HEVC', 'X265', 'H265']): info = '%s | HEVC' % size
-                    else: info = size
+                    quality, info = source_utils.get_release_quality(quality)
 
-                    if '1080P' in quality: quality = '1080p'
-                    elif '720P' in quality: quality = 'HD'
-                    else: quality = 'SD'
+                    info = ' | % | ' % size.join(info)
 
                     url = i['links']
                     #for x in url.keys(): links.append({'url': url[x], 'quality': quality, 'info': info})
 
                     links = []
-                    
+
                     for x in url.keys(): links.append({'url': url[x], 'quality': quality})
-                    
+
                     for link in links:
                         try:
                             url = link['url']

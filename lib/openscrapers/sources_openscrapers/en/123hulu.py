@@ -8,13 +8,6 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-'''
-    123hulu scraper for Exodus forks.
-    Nov 9 2018 - Checked
-
-    Updated and refactored by someone.
-    Originally created by others.
-'''
 import re, urllib, urlparse, json, base64
 from openscrapers.modules import client, cleantitle, directstream, dom_parser2, cfscrape
 
@@ -24,7 +17,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['123hulu.com']
-        self.base_link = 'http://123hulu.com'
+        self.base_link = 'http://www0.123hulu.com'
         self.search_link = '/search-movies/%s.html'
 
     def movie(self, imdb, title, localtitle, aliases, year):
