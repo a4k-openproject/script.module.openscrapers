@@ -90,12 +90,8 @@ class source:
             for o1,o2 in itertools.izip(options1,options2):
                 if 'trailer' in o1[1].lower():
                     continue
-                elif '1080p' in o1[1].lower():
-                    quality = '1080p'
-                elif '720p' in o1[1].lower():
-                    quality = 'HD'
-                else:
-                    quality = 'SD'
+
+                quality = source_utils.check_direct_url(o1[1].lower())
 
                 s = '(?<=src=\")(.*?)(?=\")'
                 if re.match(s, o2[1]) is not None:

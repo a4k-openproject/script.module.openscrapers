@@ -109,7 +109,6 @@ class source:
                             try:
                                 name = str(i)
                                 items.append(name)
-                                print items
                             except:
                                 pass
                     except:
@@ -119,26 +118,13 @@ class source:
 
             for item in items:
                 try:
-                    info = []
-
                     i = str(item)
                     r = client.request(i)
                     u = client.parseDOM(r, "div", attrs={"class": "multilink_lnks"})
                     for t in u:
                         r = client.parseDOM(t, 'a', ret='href')
                         for url in r:
-                            if '1080p' in url:
-                                quality = '1080p'
-                            elif '1080' in url:
-                                quality = '1080p'
-                            elif '720p' in url:
-                                quality = '720p'
-                            elif '720' in url:
-                                quality = '720p'
-                            elif 'HD' in url:
-                                quality = '720p'
-                            else:
-                                quality = 'SD'
+                            quality, info = source_utils.get_release_quality(url)
                             info = ' | '.join(info)
                             valid, host = source_utils.is_host_valid(url, hostDict)
                             sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
