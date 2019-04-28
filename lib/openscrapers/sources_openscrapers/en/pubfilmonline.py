@@ -89,7 +89,7 @@ class source:
                     'data': b64_string
                 }
                 html = scraper.post(urlparse.urljoin(self.base_link, '/wp-content/plugins/apiplayer/load.php'), data=post).content
-                soup = BeautifulSoup(html)
+                soup = BeautifulSoup(html, 'html.parser')
                 javascripts = soup.findAll("script", {"type": "text/javascript"})
                 links_qual = []
                 for javascript in javascripts:

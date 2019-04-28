@@ -9,7 +9,6 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -155,8 +154,6 @@ class source:
 
             for item in items:
                 try:
-                    info = []
-
                     url = str(item)
                     url = client.replaceHTMLCodes(url)
                     url = url.encode('utf-8')
@@ -171,14 +168,7 @@ class source:
                     if not host in hostDict: raise Exception()
                     if any(x in host2 for x in ['.rar', '.zip', '.iso']): continue
 
-                    if '720p' in host2:
-                        quality = 'HD'
-                    elif '1080p' in host2:
-                        quality = '1080p'
-                    elif '2160p' in host2:
-                        quality = '4K'
-                    else:
-                        quality = 'SD'
+                    quality, info = source_utils.get_release_quality(url)
 
                     info = ' | '.join(info)
                     host = client.replaceHTMLCodes(host)

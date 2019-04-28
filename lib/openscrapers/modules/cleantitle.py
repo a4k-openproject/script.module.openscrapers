@@ -33,6 +33,7 @@ def get(title):
 
 def geturl(title):
     if title is None: return
+    title = str(title)
     title = title.lower()
     title = title.translate(None, ':*?"\'\.<>|&!,')
     title = title.replace('/', '-')

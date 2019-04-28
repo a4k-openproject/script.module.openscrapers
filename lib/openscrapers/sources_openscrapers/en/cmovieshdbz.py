@@ -62,12 +62,8 @@ class source:
             qual = re.compile('class="quality">(.+?)<').findall(r)
 
             for i in qual:
-                if '1080' in i:
-                    quality = '1080p'
-                elif '720' in i:
-                    quality = '720p'
-                else:
-                    quality = 'SD'
+                quality = source_utils.check_direct_url(i)
+
             u = client.parseDOM(r, "div", attrs={"class": "pa-main anime_muti_link"})
 
             for t in u:
@@ -93,13 +89,4 @@ class source:
             return
 
     def resolve(self, url):
-        return url
-
-    def unit_test(self, test_type, hosts):
-
-        if test_type == 'movie':
-           url = self.movie('', 'Holiday', '', [], '2018')
-           url = self.sources(url, hosts, [])
-        else:
-            raise Exception("No Episode Calls Available")
         return url

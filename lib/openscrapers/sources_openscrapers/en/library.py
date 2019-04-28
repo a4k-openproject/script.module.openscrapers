@@ -22,7 +22,7 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import log_utils
-
+from openscrapers.modules import source_utils
 from openscrapers.modules import control
 
 class source:
@@ -117,11 +117,7 @@ class source:
             try: quality = int(r['streamdetails']['video'][0]['width'])
             except: quality = -1
 
-            if quality >= 2160: quality = '4K'
-            if quality >= 1440: quality = '1440p'
-            if quality >= 1080: quality = '1080p'
-            if 720 <= quality < 1080: quality = 'HD'
-            if quality < 720: quality = 'SD'
+            quality = source_utils.label_to_quality(quality)
 
             info = []
             try:
