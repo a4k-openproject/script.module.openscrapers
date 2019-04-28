@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -8,22 +8,20 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-'''
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+#######################################################################
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
+#######################################################################
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+# Addon Name: Placenta
+# Addon id: plugin.video.placenta
+# Addon Provider: Mr.Blamo
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
-
-import re,urllib,urlparse,json,random,base64, traceback
+import re,urllib,urlparse,json,random,base64
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -88,7 +86,6 @@ class source:
             result = urllib.unquote_plus(result)
             return(result)
         except:
-			traceback.print_exc()
             return
 
 
@@ -102,7 +99,6 @@ class source:
             result = [(re.sub('http.+?//.+?/','/', i[1]), 'tt' + i[0]) for i in result]
             return(result)
         except:
-			traceback.print_exc()
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -134,7 +130,6 @@ class source:
 
                 result = result['results']
             except:
-				traceback.print_exc()
                 links = result = []
             
             for i in result:
@@ -185,17 +180,14 @@ class source:
 
                             sources.append({'source': host, 'quality': quality2, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
                         except:
-							traceback.print_exc()
                             pass
                     
                 except:
-					traceback.print_exc()
                     pass
 
 
             return sources
         except:
-			traceback.print_exc()
             return sources
 
 
@@ -219,7 +211,6 @@ class source:
 
             return url
         except:
-			traceback.print_exc()
             return
 
 
