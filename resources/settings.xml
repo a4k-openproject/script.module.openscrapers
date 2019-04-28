@@ -30,6 +30,7 @@
         <setting id="provider.freefmovies" type="bool" label="FREEFMOVIES" default="true" />
         <setting id="provider.freeputlockers" type="bool" label="FREEPUTLOCKERS" default="true" />
         <setting id="provider.furk" type="bool" label="FURK" default="false" />
+        <setting id="provider.gostream" type="bool" label="GOSTREAM" default="false" />		
         <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true" />
         <setting id="provider.Hdmto" type="bool" label="HDMTO" default="true" /> 
         <setting id="provider.iwaatch" type="bool" label="IWAATCH" default="true" />
@@ -184,6 +185,32 @@
         <setting id="provider.ytsam" type="bool" label="YTSAM" default="true" />
         <setting id="provider.zoogle" type="bool" label="ZOOGLE" default="true" />
     </category>
+	
+<!-- Accounts-5 -->
+	<category label="Scraper Accounts">
+		<setting type="lsep" label="Furk.net" />
+		<setting id="furk.user_name" type="text" label="Furk Username" default="" />
+		<setting id="furk.user_pass" type="text" label="Furk Password" option="hidden" default="" />
+		<setting id="furk.api" type="text" label="Furk API Key" default="" />
+<!--    <setting id="furk.mod.level" type="labelenum" label="Set Furk Moderation Level" default="Yes" values="No|Yes|Full" />   -->
+		<setting id="furk.limit" label="Limit results" type="slider" default="25" range="5,5,200" option="int" />
+
+		<setting type="lsep" label="Gostream" />
+		<setting id="gostream.user" type="text" label="User" default="" />
+		<setting id="gostream.pass" type="text" label="Password" default="" />
+
+		<setting type="lsep" label="Ororo.tv" />
+		<setting id="ororo.user" type="text" label="Email" default="" />
+		<setting id="ororo.pass" type="text" option="hidden" label="Password" default="" />    
+
+		<setting type="lsep" label="SerienStream.to" />
+		<setting id="serienstream.user" type="text" label="Email" default="" />
+		<setting id="serienstream.pass" type="text" option="hidden" label="Password" default="" />
+
+<!--	<setting type="lsep" label="Streamlord.com" /> -->
+<!--	<setting id="streamlord.user" type="text" label="User" default="" /> -->
+<!--	<setting id="streamlord.pass" type="text" option="hidden" label="Password" default="" /> -->
+	</category>		
 <!--    <category label="Debug">\-->
 <!--        <setting id="addon_debug" type="bool" label="Enable Debug" default="false" />-->
 <!--    </category>-->
