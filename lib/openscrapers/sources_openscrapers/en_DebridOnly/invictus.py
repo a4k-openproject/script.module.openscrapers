@@ -9,7 +9,6 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -36,7 +35,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['invictus.ws']
-        self.base_link = 'http://invictus.ws'
+        self.base_link = 'http://2ddl.vg'
         self.search_link = '/?s=%s'
 
     def movie(self, imdb, title, localtitle, aliases, year):

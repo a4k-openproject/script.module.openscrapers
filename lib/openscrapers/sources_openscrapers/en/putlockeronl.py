@@ -24,23 +24,43 @@
 '''
 
 import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,proxy
+from openscrapers.modules import cleantitle,client,cfscrape,proxy
 
 
 class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['reddit.com']
-		self.base_link = 'https://www.reddit.com/user/nbatman/m/streaming2/search?q=%s&restrict_sr=on'
+		self.domains = ['putlocker.onl']
+		self.base_link = 'https://putlocker.onl'
+		self.tv_link = '/show/%s/season/%s/episode/%s'
+		self.movie_link = '/movie/%s'
+		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			title = cleantitle.geturl(title)
-			title = title.replace('-','+')
-			query = '%s+%s' % (title,year)
-			url = self.base_link % query
+			url = self.base_link + self.movie_link % title
+			return url
+		except:
+			return
+
+
+	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+		try:
+			tvshowtitle = cleantitle.geturl(tvshowtitle)
+			url = tvshowtitle
+			return url
+		except:
+			return
+
+
+	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
+		try:
+			if not url: return
+			tvshowtitle = url
+			url = self.base_link + self.tv_link % (tvshowtitle,season,episode)
 			return url
 		except:
 			return
@@ -49,25 +69,17 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
-			r = client.request(url)
+			r = self.scraper.get(url).content
 			try:
-				match = re.compile('class="search-title may-blank" >(.+?)</a>.+?<span class="search-result-icon search-result-icon-external"></span><a href="(.+?)://(.+?)/(.+?)" class="search-link may-blank" >').findall(r)
-				for info,http,host,ext in match: 
-					if '2160' in info: quality = '4K'
-					elif '1080' in info: quality = '1080p'
-					elif '720' in info: quality = 'HD'
-					elif '480' in info: quality = 'SD'
-					else: quality = 'SD'
-					url = '%s://%s/%s' % (http,host,ext)
-					if 'google' in host: host = 'GDrive'
-					if 'Google' in host: host = 'GDrive'
-					if 'GOOGLE' in host: host = 'GDrive'
+				match = re.compile('<IFRAME.+?SRC=.+?//(.+?)/(.+?)"').findall(r)
+				for host,url in match: 
+					url = 'http://%s/%s' % (host,url)
+					host = host.replace('www.','')
 					sources.append({
 						'source': host,
-						'quality': quality,
+						'quality': 'SD',
 						'language': 'en',
 						'url': url,
-						'info': info,
 						'direct': False,
 						'debridonly': False
 					})

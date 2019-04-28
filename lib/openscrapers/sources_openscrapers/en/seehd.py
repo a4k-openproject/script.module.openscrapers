@@ -11,15 +11,16 @@
 '''
     seehd scraper for Exodus forks.
     Nov 9 2018 - Checked
-
     Updated and refactored by someone.
     Originally created by others.
 '''
 import re
-
-from openscrapers.modules import cfscrape
+import urllib
+import urlparse
 from openscrapers.modules import cleantitle
-
+from openscrapers.modules import client
+from openscrapers.modules import proxy
+from openscrapers.modules import cfscrape
 
 class source:
     def __init__(self):
@@ -61,7 +62,8 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = self.scraper.get(url).content
+            scraper = cfscrape.create_scraper()
+            r = scraper.get(url).content
             try:
                 match = re.compile('<iframe.+?src="(.+?)://(.+?)/(.+?)"').findall(r)
                 for http,host,url in match: 
