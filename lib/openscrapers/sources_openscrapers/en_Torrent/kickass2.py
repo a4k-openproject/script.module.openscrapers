@@ -81,6 +81,9 @@ class source:
 
             if debrid.status() is False:
                 raise Exception()
+				
+			if debrid.tor_enabled() is False:
+				raise Exception()
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
