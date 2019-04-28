@@ -12,7 +12,7 @@ import re,urllib,urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from resources.lib.modules import log_utils
+from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
 from openscrapers.modules import cfscrape
 

@@ -15,7 +15,7 @@ import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from resources.lib.modules import log_utils
+from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
 
 from bs4 import BeautifulSoup
