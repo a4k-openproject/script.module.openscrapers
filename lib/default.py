@@ -137,12 +137,12 @@ elif action == "toggleAllTorrent":
 
 
 if action == "Defaults":
-    sourceList = ['123fox','123hbo','123movieshubz','300mbdownload','azmovies','cartoonhd','downflix',
-    'extramovies','filepursuit','freefmovies','freeputlockers','gostream','Hdmto','hdpopcorns',
-    'iwaatch','kattv','l23movies','openloadmovie','pokemonfire','primewire','pubfilmonline',
-	'putlocker','reddit','seehd','series9','toonget','tvbox','vdonip','vidics','ymovies',
-    '300mbfilms','bestmoviez','ddlspot','directdl','ganool123','invictus','iwantmyshow',
-	'playmovies','rlsbb','scnsrc','scenerls','ultrahdindir']
+    sourceList = ['123hbo','123movieshd','123movieshubz','123123movies','animetoon','cartoonhd','cmovieshd',
+    'cmovieshdbz','cooltvseries','extramovies','flixmy','freefmovies','freeputlockers','gowatchseries','Hdmto','iwaatch',
+    'kattv','mymoviego','mywatchepseries','naturalbd','odb','openloadmovie','plocker','primewire','projectfreetv',
+	'pubfilmonline','putlocker','putlockeronl','reddit','seehd','series9','seriesonline','solarmoviefree','toonget',
+	'tvbox','vidics','watchepisodes','watchfree1','watchseries','watchserieshd','300mbdownload','300mbfilms','bestmoviez',
+	'ddlspot','directdl','ganool123','invictus','rlsbb','scenerls','ultrahd']
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
