@@ -1,4 +1,7 @@
 OpenScrapers Module Changelog:
+0.0.1.0
+- Module import line fixes
+
 0.0.0.9
 - Scraper cleanup
 - File cleanup
