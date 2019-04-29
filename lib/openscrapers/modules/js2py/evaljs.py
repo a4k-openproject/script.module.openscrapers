@@ -1,16 +1,16 @@
 # coding=utf-8
 """ This module is still experimental!
 """
-from .translators import translate_js, DEFAULT_HEADER
+import codecs
+import hashlib
+import json
+import os
 import sys
 import time
-import json
+
 import six
-import os
-import hashlib
-import codecs
 
-
+from .translators import translate_js, DEFAULT_HEADER
 
 __all__  = ['EvalJs', 'translate_js', 'import_js', 'eval_js', 'translate_file', 'run_file']
 DEBUG = False

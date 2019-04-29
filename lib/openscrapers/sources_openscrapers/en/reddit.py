@@ -8,29 +8,21 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-'''
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+import re
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
-
-import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,proxy
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 
 
 class source:
-	def __init__(self):
-		self.priority = 1
-		self.language = ['en']
+    def __init__(self):
+        self.priority = 1
+        self.language = ['en']
+        self.domains = ['www.reddit.com']
+        self.base_link = ['https://www.reddit.com/r/fullmoviesonyoutube/',
+                          'https://www.reddit.com/r/fullmoviesonvimeo/',
+                          'https://www.reddit.com/r/fullmoviesongoogle/']
+        self.search_link = 'search.json?q=%s+%s&restrict_sr=1'
 		self.domains = ['reddit.com']
 		self.base_link = 'https://www.reddit.com/user/nbatman/m/streaming2/search?q=%s&restrict_sr=on'
 

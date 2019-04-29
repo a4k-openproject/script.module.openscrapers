@@ -32,7 +32,10 @@
 
 # -*- coding: latin-1 -*-
 from __future__ import print_function
+
 import re
+
+
 def typeof(t):
     if t is None: return 'undefined'
     elif isinstance(t, bool): return 'boolean'

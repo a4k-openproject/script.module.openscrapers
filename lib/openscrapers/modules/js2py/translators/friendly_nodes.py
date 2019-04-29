@@ -1,7 +1,9 @@
 import binascii
 
-from .pyjsparser import PyJsParser
 import six
+
+from .pyjsparser import PyJsParser
+
 if six.PY3:
     basestring = str
     long = int

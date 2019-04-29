@@ -20,7 +20,7 @@
 # Addon id: script.module.openscrapers
 
 
-import os,sys,urllib,urlparse
+import os
 
 try:
     import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs

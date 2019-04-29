@@ -25,10 +25,9 @@
 
 
 import re
-import traceback
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape, cleantitle, client, debrid, dom_parser2, log_utils
 
 

@@ -1,6 +1,7 @@
-from ..base import *
 import math
 import random
+
+from ..base import *
 
 Math = PyJsObject(prototype=ObjectPrototype)
 Math.Class = 'Math'

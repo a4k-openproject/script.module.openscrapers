@@ -26,9 +26,9 @@
 
 import re
 import urllib
-import urlparse
 
-from openscrapers.modules import cleantitle, client, dom_parser, log_utils
+import urlparse
+from openscrapers.modules import cleantitle, client, dom_parser
 
 
 class source:

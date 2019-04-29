@@ -9,8 +9,9 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urllib,urlparse
-from openscrapers.modules import client,cleantitle,proxy
+import re
+
+from openscrapers.modules import client, cleantitle
 
 
 class source:

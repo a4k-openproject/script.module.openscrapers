@@ -12,11 +12,11 @@
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.blamo
 
-import urllib, urlparse
-import urlparse
-from openscrapers.modules import source_utils, dom_parser, client, cleantitle
 import urllib
-from httplib import FOUND
+
+import urlparse
+from openscrapers.modules import source_utils, client, cleantitle
+
 
 class source:
     def __init__(self):

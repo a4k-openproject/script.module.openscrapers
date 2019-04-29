@@ -20,15 +20,15 @@
 # Addon id: script.module.openscrapers
 
 import base64
-import urlparse
-import urllib
 import hashlib
 import re
+import urllib
 
+import urlparse
 from openscrapers.modules import client
 from openscrapers.modules import directstream
-from openscrapers.modules import trakt
 from openscrapers.modules import pyaes
+from openscrapers.modules import trakt
 
 
 def is_anime(content, type, type_id):

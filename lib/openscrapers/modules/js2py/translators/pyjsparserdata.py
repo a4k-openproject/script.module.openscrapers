@@ -21,8 +21,9 @@ from __future__ import unicode_literals
 
 import sys
 import unicodedata
-import six
 from collections import defaultdict
+
+import six
 
 if six.PY3:
     unichr = chr

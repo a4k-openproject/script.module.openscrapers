@@ -15,8 +15,10 @@
     Updated and refactored by someone.
     Originally created by others.
 '''
-import json, urllib, urlparse
+import json
+import urllib
 
+import urlparse
 from openscrapers.modules import client
 from openscrapers.modules import directstream
 

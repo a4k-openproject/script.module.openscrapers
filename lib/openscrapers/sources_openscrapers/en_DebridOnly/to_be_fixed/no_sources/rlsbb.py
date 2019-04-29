@@ -24,18 +24,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urllib,urlparse,json
+import ast
+import json
+import operator as op
+import re
+import urllib
+import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import control
 from openscrapers.modules import debrid
-from openscrapers.modules import log_utils
-from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
-
-import ast
-import operator as op
 
 operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
              ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,

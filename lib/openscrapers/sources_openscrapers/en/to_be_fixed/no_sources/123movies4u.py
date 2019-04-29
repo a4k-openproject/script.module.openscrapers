@@ -11,7 +11,8 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import re
-from openscrapers.modules import client,cleantitle,source_utils
+
+from openscrapers.modules import client, cleantitle, source_utils
 
 
 class source:

@@ -6,9 +6,9 @@
 import re
 import time
 import urllib
-import urlparse
+from decimal import Decimal
 
-from decimal import Decimal, ROUND_UP
+import urlparse
 
 
 class Cloudflare:

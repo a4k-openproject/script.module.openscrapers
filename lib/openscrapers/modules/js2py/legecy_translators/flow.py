@@ -9,11 +9,11 @@ FOR 123
 FOR iter
 CONTINUE, BREAK, RETURN, LABEL, THROW, TRY, SWITCH
 """
-from utils import *
-from jsparser import *
-from nodevisitor import exp_translator
 import random
 
+from jsparser import *
+from nodevisitor import exp_translator
+from utils import *
 
 TO_REGISTER = []
 CONTINUE_LABEL = 'JS_CONTINUE_LABEL_%s'

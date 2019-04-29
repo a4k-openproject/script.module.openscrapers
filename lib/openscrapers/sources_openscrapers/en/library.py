@@ -18,12 +18,13 @@
 import json
 import traceback
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
+from openscrapers.modules import control
 from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
-from openscrapers.modules import control
+
 
 class source:
     def __init__(self):

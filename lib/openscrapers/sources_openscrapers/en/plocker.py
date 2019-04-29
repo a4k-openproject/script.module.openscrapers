@@ -9,9 +9,11 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import re
-import requests
 import traceback
+
+import requests
 from bs4 import BeautifulSoup, SoupStrainer
+
 try:
     from urllib import urlencode, quote_plus # Python 2
 except ImportError:

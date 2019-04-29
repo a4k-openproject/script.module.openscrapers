@@ -27,6 +27,7 @@
 import re
 import traceback
 import urllib
+
 import urlparse
 from openscrapers.modules import cache, cleantitle, client, control, debrid, log_utils, source_utils
 
@@ -36,15 +37,15 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['pirateproxy.live', 'thepiratebay.org', 'thepiratebay.fun', 'thepiratebay.asia', 'tpb.party', 'thepiratebay3.org', 'thepiratebayz.org', 'thehiddenbay.com', 'piratebay.live', 'thepiratebay.zone']
-        self._base_link = None
+        self.base_link = None
         self.search_link = '/s/?q=%s&page=0&&video=on&orderby=99'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
 
     @property
     def base_link(self):
-        if not self._base_link:
-            self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
-        return self._base_link
+        if not self.base_link:
+            self.base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
+        return self.base_link
 
     def movie(self, imdb, title, localtitle, aliases, year):
         if debrid.status(True) is False:

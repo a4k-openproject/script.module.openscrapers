@@ -15,14 +15,18 @@
     Updated and refactored by someone.
     Originally created by others.
 '''
-import re,urllib,urlparse,json,base64, random
+import random
+import re
+import urllib
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
-from openscrapers.modules import dom_parser
 from openscrapers.modules import debrid
+from openscrapers.modules import dom_parser
 from openscrapers.modules import log_utils
+from openscrapers.modules import source_utils
+
 
 # Working: https://seriesfree.to/episode/dawsons_creek_s6_e23.html
 

@@ -24,8 +24,9 @@
 '''
 
 import re
-from openscrapers.modules import cleantitle
+
 from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 
 
@@ -36,6 +37,7 @@ class source:
         self.domains = ['playmovies.es']
         self.base_link = 'http://playmovies.es'
         self.search_link = '/%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -48,8 +50,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            scraper = cfscrape.create_scraper()
-            r = scraper.get(url).content
+            r = self.scraper.get(url).content
             try:
                 qual = re.compile('class="quality">(.+?)<').findall(r)
 

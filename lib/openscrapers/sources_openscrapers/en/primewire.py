@@ -25,6 +25,14 @@
 
 
 import re
+import traceback
+
+import requests
+
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 import urllib
 import urlparse
 

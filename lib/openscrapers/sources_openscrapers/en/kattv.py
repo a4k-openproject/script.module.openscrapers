@@ -26,8 +26,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>..
 '''
 
-import re,urlparse,urllib,base64
-from openscrapers.modules import cleantitle,client,dom_parser2,cfscrape
+import base64
+import re
+import urllib
+
+import urlparse
+from openscrapers.modules import cleantitle, client, dom_parser2, cfscrape
 
 
 class source:

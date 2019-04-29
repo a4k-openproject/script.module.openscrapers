@@ -22,10 +22,14 @@
 # Addon Provider: Mr.blamo
 
 
-import re, urlparse, json, base64
+import base64
+import json
+import re
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+
 
 def byteify(input):
     if isinstance(input, dict):

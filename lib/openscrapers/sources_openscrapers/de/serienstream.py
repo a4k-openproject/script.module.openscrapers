@@ -28,10 +28,9 @@ import urllib
 import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import control
 from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
-
-from openscrapers.modules import control
 
 
 class source:

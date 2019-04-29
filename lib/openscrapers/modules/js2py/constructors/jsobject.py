@@ -1,5 +1,7 @@
-from ..base import *
 import six
+
+from ..base import *
+
 
 #todo Double check everything is OK
 

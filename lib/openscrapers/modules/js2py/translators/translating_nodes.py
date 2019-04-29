@@ -1,8 +1,11 @@
 from __future__ import unicode_literals
-from .pyjsparserdata import *
-from .friendly_nodes import *
+
 import random
+
 import six
+
+from .friendly_nodes import *
+from .pyjsparserdata import *
 
 if six.PY3:
     from functools import reduce

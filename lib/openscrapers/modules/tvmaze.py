@@ -20,7 +20,8 @@
 # Addon id: script.module.openscrapers
 
 
-import urllib,json,base64
+import json
+import urllib
 
 from openscrapers.modules import cache
 from openscrapers.modules import client

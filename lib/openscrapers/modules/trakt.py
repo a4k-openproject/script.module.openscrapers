@@ -22,10 +22,9 @@
 
 import json
 import re
-import time
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cache
 from openscrapers.modules import cleandate
 from openscrapers.modules import client

@@ -16,8 +16,9 @@ If case of parsing errors it must return a pos of error.
 NOTES:
 Strings and other literals are not present so each = means assignment
 """
-from utils import *
 from jsparser import *
+from utils import *
+
 
 def exps_translator(js):
     #Check  () {} and [] nums

@@ -11,8 +11,9 @@
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 
 
-import re,urlparse,json
-from openscrapers.modules import client,cleantitle,dom_parser2,source_utils
+import json
+import urlparse
+from openscrapers.modules import client, cleantitle, dom_parser2, source_utils
 
 
 class source:

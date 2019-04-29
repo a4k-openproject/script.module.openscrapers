@@ -1,11 +1,14 @@
 # -*- coding: UTF-8 -*-
 
 import os.path
+
+import de
 import en
 import en_DebridOnly
 import en_Torrent
-import de,es,gr,pl
-
+import es
+import gr
+import pl
 
 scraper_source = os.path.dirname(__file__)
 __all__ = [x[1] for x in os.walk(os.path.dirname(__file__))][0]

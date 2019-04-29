@@ -10,8 +10,18 @@
 
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 
-import re,urllib,urlparse,base64,json,time
-from openscrapers.modules import client,cleantitle,directstream,source_utils
+
+import base64
+import json
+import re
+import time
+import urllib
+
+import urlparse
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import directstream
+from openscrapers.modules import source_utils
 
 
 class source:

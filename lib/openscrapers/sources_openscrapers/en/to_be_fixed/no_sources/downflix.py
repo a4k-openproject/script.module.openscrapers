@@ -25,9 +25,8 @@
 """
 
 import re
-import traceback
 
-from openscrapers.modules import cfscrape, cleantitle, directstream, log_utils, source_utils
+from openscrapers.modules import cfscrape, cleantitle, directstream, source_utils
 
 
 class source:

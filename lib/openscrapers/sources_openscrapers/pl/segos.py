@@ -22,10 +22,13 @@
 # Addon Provider: Mr.blamo
 
     
-from openscrapers.modules import source_utils, client, cleantitle
-from openscrapers.modules import control
-import urllib, urlparse
+import urllib
+
 import requests
+import urlparse
+from openscrapers.modules import control
+from openscrapers.modules import source_utils, client, cleantitle
+
 
 class source:
     def __init__(self):

@@ -25,9 +25,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re, urllib, urlparse
+import re
+import urllib
 
+import urlparse
 from openscrapers.modules import cleantitle, client, debrid, source_utils, cfscrape, dom_parser2, workers
+
 
 class source:
     def __init__(self):

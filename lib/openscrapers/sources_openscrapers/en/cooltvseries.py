@@ -9,9 +9,9 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
-
 import re
-from openscrapers.modules import client,cleantitle,source_utils
+
+from openscrapers.modules import client, cleantitle, source_utils
 
 
 class source:

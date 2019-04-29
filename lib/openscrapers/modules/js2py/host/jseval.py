@@ -1,5 +1,7 @@
-from js2py.base import *
 import inspect
+
+from js2py.base import *
+
 try:
     from js2py.translators.translator import translate_js
 except:

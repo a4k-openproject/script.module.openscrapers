@@ -3,11 +3,12 @@ Also it has  s function translating removed object/array to python code.
 Use this module just after removing constants. Later move on to removing functions"""
 OBJECT_LVAL = 'PyJsLvalObject%d_'
 ARRAY_LVAL = 'PyJsLvalArray%d_'
-from utils import *
-from jsparser import *
-from nodevisitor import  exp_translator
 import functions
 from flow import KEYWORD_METHODS
+from jsparser import *
+from nodevisitor import exp_translator
+from utils import *
+
 
 def FUNC_TRANSLATOR(*a):#  stupid import system in python
     raise RuntimeError('Remember to set func translator. Thank you.')

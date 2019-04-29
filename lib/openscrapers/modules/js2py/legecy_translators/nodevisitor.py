@@ -1,6 +1,7 @@
+import re
+
 from jsparser import *
 from utils import *
-import re
 from utils import *
 
 #Note all white space sent to this module must be ' ' so no '\n'
@@ -457,10 +458,7 @@ def transform_crap(code): #needs some more tests
     return transform_crap(code[:beg]+formula+code[end:])
 
 
-from code import InteractiveConsole
-
 #e = InteractiveConsole(globals()).interact()
-import traceback
 def trans(code):
     return NodeVisitor(code.strip()).translate().strip()
 

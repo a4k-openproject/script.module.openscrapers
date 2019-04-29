@@ -8,9 +8,13 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urllib,urlparse,json
-from openscrapers.modules import client,debrid,source_utils
-from openscrapers.modules import dom_parser2 as dom
+import json
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import client, debrid
+from openscrapers.modules import source_utils
 
 
 class source:

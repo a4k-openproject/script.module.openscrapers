@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -23,15 +24,55 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urllib,urlparse,json
+import ast
+import json
+import operator as op
+import re
+import urllib
 
+import urlparse
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import control
 from openscrapers.modules import debrid
-from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
+
+operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
+             ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,
+             ast.USub: op.neg}
+
+
+def eval_expr(expr):
+    return eval_(ast.parse(expr, mode='eval').body)
+
+
+def eval_(node):
+    if isinstance(node, ast.Num):  # <number>
+        return node.n
+    elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
+        return operators[type(node.op)](eval_(node.left), eval_(node.right))
+    elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+        return operators[type(node.op)](eval_(node.operand))
+    else:
+        raise TypeError(node)
+
+
+def parseJSString(s):
+    result = ''
+    for x in s:
+        if '(' in x:
+            if '((' in x:
+                result += parseJSString(re.findall(r'.(\(.*?\))', x))
+                continue
+            offset = 1 if s[0] == '+' else 0
+            val = x.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0')[offset:]
+            val = val.strip('(').strip(')')
+            val = val.replace('(+0', '(0').replace('(+1', '(1')
+            result += str(eval_expr(val.strip(' ')))
+        else:
+            result += x.strip('\'')
+    return result
+
 
 class source:
     def __init__(self):
@@ -39,13 +80,14 @@ class source:
         self.language = ['en']
         self.domains = ['rlsbb.ru']
         self.base_link = 'http://rlsbb.ru'
-        self.search_base_link = 'http://search.rlsbb.ru'
+        self.searchbase_link = 'http://search.rlsbb.ru'
         self.search_cookie = 'serach_mode=rlsbb'
-        self.search_link = '/lib/search526049.php?phrase=%s&pindex=1&content=true'
+        self.search_link = '/lib/search%s?phrase=%s&pindex=1&code=%s&rand=0.7736787998237127'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            url = {'imdb': imdb, 'title': title, 'year': year}
+            url = {'imdb': imdb, 'title': cleantitle.getsearch(title), 'year': year}
             url = urllib.urlencode(url)
             return url
         except:
@@ -53,7 +95,7 @@ class source:
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
-            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': cleantitle.getsearch(tvshowtitle), 'year': year}
             url = urllib.urlencode(url)
             return url
         except:
@@ -74,18 +116,19 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            scraper = cfscrape.create_scraper()
 
-            if url == None: return sources
+            if url == None:
+                return sources
 
-            if debrid.status() == False: raise Exception()
+            if debrid.status() == False:
+                raise Exception()
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-            title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             premDate = ''
-            
+
             query = '%s S%02dE%02d' % (
             data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
             data['title'], data['year'])
@@ -94,46 +137,61 @@ class source:
             query = query.replace("&", "and")
             query = query.replace("  ", " ")
             query = query.replace(" ", "-")
-            
-            url = self.search_link % urllib.quote_plus(query)
-            url = urlparse.urljoin(self.base_link, url)
 
-            url = "http://rlsbb.ru/" + query                                
-            if 'tvshowtitle' not in data: url = url + "-1080p"				 
+            query =  urllib.quote_plus(query)
+            url = '%s/?s=%s&submit=Find' % (self.base_link, query)
 
-            r = scraper.get(url).content                                         
-            
-            if r == None and 'tvshowtitle' in data:
-                season = re.search('S(.*?)E', hdlr)
-                season = season.group(1)
-                query = title
-                query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-                query = query + "-S" + season
-                query = query.replace("&", "and")
-                query = query.replace("  ", " ")
-                query = query.replace(" ", "-")
-                url = "http://rlsbb.ru/" + query
-                r = scraper.get(url).content
+            resp = self.scraper.get(url)
 
-            
-            for loopCount in range(0,2):
-                if loopCount == 1 or (r == None and 'tvshowtitle' in data):                     
-                    
-                    
-                    premDate = re.sub('[ \.]','-',data['premiered'])                            
-                    query = re.sub('[\\\\:;*?"<>|/\-\']', '', data['tvshowtitle'])              
-                    query = query.replace("&", " and ").replace("  ", " ").replace(" ", "-")    
-                    query = query + "-" + premDate                      
-                    
-                    url = "http://rlsbb.to/" + query            
-                    url = url.replace('The-Late-Show-with-Stephen-Colbert','Stephen-Colbert')   
-                    
+            capture = re.findall(r'<script id="rlsbb_script" data-code-rlsbb="(\d*)" .*? src="(.*?)"><', resp.text)[0]
+            rlsbb_code = capture[0]
+            script_url = capture[1]
 
-                    r = scraper.get(url).content
-                    
+            resp = self.scraper.get(script_url)
+            location_code = re.findall(r'\'/lib/search\' (.*?);', resp.text)[0]
+
+            location_maths = re.findall(r'( \(.*?\) )| (\'.*?\') |\+ (\d*) \+|(\'\d*.php\')', location_code)
+
+            location_maths = [x for i in location_maths for x in i if str(x) != '']
+
+            location_builder = parseJSString(location_maths)
+
+            url = '%s%s' % (self.searchbase_link, self.search_link % (location_builder, query, rlsbb_code) )
+
+            r = self.scraper.get(url).content
+
+            try:
+                results = json.loads(r)['results']
+            except:
+                return None
+
+            if 'tvshowtitle' in data:
+                regex = r'.*?(%s) .*?(s%se%s)' % (data['tvshowtitle'].lower(),
+                                                  str(data['season']).zfill(2),
+                                                  str(data['episode']).zfill(2))
+            else:
+                regex = r'.*?(%s) .*?(%s)' % (data['title'], data['year'])
+
+            post_urls = []
+
+            for post in results:
+
+                if 'old' in post['domain']:
+                    continue
+                capture = re.findall(regex, post['post_title'].lower())
+                capture = [i for i in capture if len(i) > 1]
+                if len(capture) >= 1:
+                     post_urls.append('http://%s/%s' % (post['domain'], post['post_name']))
+
+            if len(post_urls) == 0:
+                return None
+
+            for url in post_urls:
+                items = []
+                r = self.scraper.get(url).content
                 posts = client.parseDOM(r, "div", attrs={"class": "content"})
                 hostDict = hostprDict + hostDict
-                items = []
+
                 for post in posts:
                     try:
                         u = client.parseDOM(post, 'a', ret='href')
@@ -141,13 +199,13 @@ class source:
                             try:
                                 name = str(i)
                                 if hdlr in name.upper(): items.append(name)
-                                elif len(premDate) > 0 and premDate in name.replace(".","-"): items.append(name)      
-                                
+                                elif len(premDate) > 0 and premDate in name.replace(".","-"): items.append(name)
+
                             except:
                                 pass
                     except:
                         pass
-                        
+
                 if len(items) > 0: break
 
             seen_urls = set()
@@ -174,7 +232,7 @@ class source:
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
                     sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info, 'direct': False, 'debridonly': False})
-                    
+
                 except:
                     pass
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -185,3 +243,4 @@ class source:
 
     def resolve(self, url):
         return url
+

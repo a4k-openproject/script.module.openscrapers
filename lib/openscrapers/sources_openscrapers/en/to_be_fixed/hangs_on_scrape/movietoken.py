@@ -24,10 +24,12 @@
 '''
 
 import re
-from openscrapers.modules import cleantitle
+
 from openscrapers.modules import cfscrape
-from openscrapers.modules import source_utils
+from openscrapers.modules import cleantitle
 from openscrapers.modules import directstream
+from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):
@@ -36,6 +38,7 @@ class source:
         self.domains = ['movietoken.to']
         self.base_link = 'https://movietoken.to'
         self.search_link = '/%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -48,8 +51,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            scraper = cfscrape.create_scraper()
-            r = scraper.get(url).content
+            r = self.scraper.get(url).content
             try:
                 qual = re.compile('class="quality">(.+?)<').findall(r)
 

@@ -17,13 +17,13 @@
 '''
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -31,14 +31,14 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['movie4k.is']
-        self._base_link = 'https://movie4kto.st/'
+        self.base_link = 'https://movie4kto.st/'
         self.search_link = '/movies.php?list=search&search=%s'
 
     @property
     def base_link(self):
-        if not self._base_link:
-            self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
-        return self._base_link
+        if not self.base_link:
+            self.base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
+        return self.base_link
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

@@ -19,15 +19,13 @@
 
 # -Cleaned and Checked on 10-27-2018 by JewBMX
 
-import re
-import urllib
-import urlparse
-import json
 import base64
+import re
 
-from openscrapers.modules import client, cleantitle, directstream, dom_parser2
-from openscrapers.modules import debrid
+import urlparse
 from openscrapers.modules import cfscrape
+from openscrapers.modules import client, cleantitle, dom_parser2
+
 
 class source:
     def __init__(self):

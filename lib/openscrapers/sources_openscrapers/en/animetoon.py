@@ -10,8 +10,8 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import re
-import requests
 
+import requests
 from openscrapers.modules import cleantitle, source_utils
 
 

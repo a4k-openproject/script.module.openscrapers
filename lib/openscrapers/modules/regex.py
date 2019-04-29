@@ -19,16 +19,16 @@
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
-import re
 import os
+import re
 import sys
+import traceback
 import urllib
+
+import cookielib
 import urllib2
 import xbmc
 import xbmcaddon
-import traceback
-import cookielib
-import base64
 
 profile = functions_dir = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile').decode('utf-8'))
 

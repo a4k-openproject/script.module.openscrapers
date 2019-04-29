@@ -1,17 +1,15 @@
 '''Most important file in Js2Py implementation: PyJs class - father of all PyJs objects'''
-from copy import copy
 import re
-#from translators import translator
-
-from .translators.friendly_nodes import REGEXP_CONVERTER
-from .utils.injector import fix_js_args
-from types import FunctionType, ModuleType, GeneratorType, BuiltinFunctionType, MethodType, BuiltinMethodType
 import traceback
-
-
+from types import FunctionType, BuiltinFunctionType, MethodType, BuiltinMethodType
 
 # python 3 support
 import six
+
+from .translators.friendly_nodes import REGEXP_CONVERTER
+from .utils.injector import fix_js_args
+
+# from translators import translator
 if six.PY3:
     basestring = str
     long = int

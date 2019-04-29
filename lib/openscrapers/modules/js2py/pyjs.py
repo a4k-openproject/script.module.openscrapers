@@ -1,17 +1,6 @@
 from .base import *
-from .constructors.jsmath import Math
-from .constructors.jsdate import Date
-from .constructors.jsobject import Object
-from .constructors.jsfunction import Function
-from .constructors.jsstring import String
-from .constructors.jsnumber import Number
-from .constructors.jsboolean import Boolean
-from .constructors.jsregexp import RegExp
-from .constructors.jsarray import Array
-from .prototypes.jsjson import JSON
-from .host.console import console
 from .host.jseval import Eval
-from .host.jsfunctions import parseFloat, parseInt, isFinite, isNaN
+from .prototypes.jsjson import JSON
 
 # Now we have all the necessary items to create global environment for script
 __all__ = ['Js', 'PyJsComma', 'PyJsStrictEq', 'PyJsStrictNeq',

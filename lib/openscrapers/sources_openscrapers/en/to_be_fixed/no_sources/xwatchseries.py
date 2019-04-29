@@ -19,12 +19,11 @@ import json
 import re
 import traceback
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import log_utils
-
 from openscrapers.modules import proxy
 
 

@@ -1,10 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-import pkgutil
 import os.path
-
-import sources_openscrapers
-
+import pkgutil
 
 try:
     import xbmcaddon

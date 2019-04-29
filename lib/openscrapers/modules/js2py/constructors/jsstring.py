@@ -1,6 +1,8 @@
-from ..base import *
 # python 3 support
 import six
+
+from ..base import *
+
 if six.PY3:
     unichr = chr
 

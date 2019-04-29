@@ -24,6 +24,7 @@
 '''
 
 import re
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 

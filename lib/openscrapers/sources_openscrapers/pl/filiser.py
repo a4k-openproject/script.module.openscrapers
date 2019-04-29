@@ -12,8 +12,9 @@
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.blamo
 
-import urllib, urlparse
+import urllib
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 

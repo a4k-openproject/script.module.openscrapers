@@ -23,13 +23,15 @@
 
 # Scraper Checked and Fixed 11-08-2018 -JewBMX
 
-import re, urlparse, urllib, base64
+import base64
+import re
+import urllib
 
+import urlparse
+from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import cache
-from openscrapers.modules import dom_parser2
-from openscrapers.modules import debrid
+
 
 class source:
     def __init__(self):

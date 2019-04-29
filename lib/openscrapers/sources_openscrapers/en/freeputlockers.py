@@ -15,12 +15,15 @@
     Updated and refactored by someone.
     Originally created by others.
 '''
-import re,urllib,urlparse,json,base64,time
+import json
+import re
+import urllib
 
+import urlparse
 from openscrapers.modules import cleantitle
-from openscrapers.modules import dom_parser2
 from openscrapers.modules import client
-from openscrapers.modules import debrid
+from openscrapers.modules import dom_parser2
+
 
 class source:
     def __init__(self):

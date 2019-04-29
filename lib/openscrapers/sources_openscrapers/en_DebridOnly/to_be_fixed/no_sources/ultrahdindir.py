@@ -8,17 +8,15 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re
 import urllib
-import urlparse
 
-from openscrapers.modules import cleantitle
+import urlparse
+from bs4 import BeautifulSoup
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
+from resources.lib.modules import log_utils
 
-from bs4 import BeautifulSoup
 
 class source:
     def __init__(self):

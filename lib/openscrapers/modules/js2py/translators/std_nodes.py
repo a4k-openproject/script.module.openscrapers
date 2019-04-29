@@ -1,5 +1,5 @@
 from .pyjsparserdata import *
-import six
+
 
 class BaseNode:
         def finish(self):

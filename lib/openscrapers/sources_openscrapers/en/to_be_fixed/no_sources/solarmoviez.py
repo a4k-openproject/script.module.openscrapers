@@ -19,15 +19,19 @@
 
 # -Cleaned and Checked on 10-27-2018 by JewBMX
 
-import re,urllib,urlparse,hashlib,random,string,json,base64,sys,time
+import base64
+import json
+import re
+import time
+import urllib
 
+import urlparse
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import cache
 from openscrapers.modules import directstream
 from openscrapers.modules import jsunfuck
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
 
 CODE = '''def retA():
     class Infix:
@@ -62,6 +66,7 @@ class source:
         self.embed_link = '/ajax/movie_embed/%s'
         self.token_link = '/ajax/movie_token?eid=%s&mid=%s&_=%s'
         self.source_link = '/ajax/movie_sources/%s?x=%s&y=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def matchAlias(self, title, aliases):
         try:
@@ -106,7 +111,7 @@ class source:
             title = cleantitle.normalize(title)
             search = '%s Season %01d' % (title, int(season))
             url = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.getsearch(search)))
-            r = self.s.get(url, headers=headers).content
+            r = self.scraper.get(url, headers=headers).content
             r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
             r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
             r = [(i[0], i[1], re.findall('(.*?)\s+-\s+Season\s+(\d)', i[1])) for i in r]
@@ -120,7 +125,7 @@ class source:
         try:
             title = cleantitle.normalize(title)
             url = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.getsearch(title)))
-            r = self.s.get(url, headers=headers).content
+            r = self.scraper.get(url, headers=headers).content
             r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
             r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
             r = [(i[0], i[1], re.findall('(\d+)', i[0])[0]) for i in r]
@@ -162,8 +167,7 @@ class source:
             mozhdr = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'}
             headers = mozhdr
             headers['X-Requested-With'] = 'XMLHttpRequest'
-            
-            self.s = cfscrape.create_scraper()
+
             if 'tvshowtitle' in data:
                 episode = int(data['episode'])
                 url = self.searchShow(data['tvshowtitle'], data['season'], aliases, headers)
@@ -175,10 +179,10 @@ class source:
             ref_url = url
             mid = re.findall('-(\d*)\.',url)[0]
             data = {'id':mid}
-            r = self.s.post(url, headers=headers)
+            r = self.scraper.post(url, headers=headers)
             try:
                 u = urlparse.urljoin(self.base_link, self.server_link % mid)
-                r = self.s.get(u, headers=mozhdr).content
+                r = self.scraper.get(u, headers=mozhdr).content
                 r = json.loads(r)['html']
                 rl = client.parseDOM(r, 'div', attrs = {'class': 'pas-list'})
                 rh = client.parseDOM(r, 'div', attrs = {'class': 'pas-header'})
@@ -202,7 +206,7 @@ class source:
                             quali = source_utils.get_release_quality(eid[2])[0]
                             if 'embed' in types[eid[1]]:
                                 url = urlparse.urljoin(self.base_link, self.embed_link % (eid[0]))
-                                xml = self.s.get(url, headers=headers).content
+                                xml = self.scraperget(url, headers=headers).content
                                 url = json.loads(xml)['src']
                                 valid, hoster = source_utils.is_host_valid(url, hostDict)
                                 if not valid: continue
@@ -212,7 +216,7 @@ class source:
                                 continue
                             else:
                                 url = urlparse.urljoin(self.base_link, self.token_link % (eid[0], mid, t))
-                            script = self.s.get(url, headers=headers).content
+                            script = self.scraper.get(url, headers=headers).content
                             if '$_$' in script:
                                 params = self.uncensored1(script)
                             elif script.startswith('[]') and script.endswith('()'):
@@ -227,7 +231,7 @@ class source:
                             length = 0
                             count = 0
                             while length == 0 and count < 11:
-                                r = self.s.get(u, headers=headers).text
+                                r = self.scraper.get(u, headers=headers).text
                                 length = len(r)
                                 if length == 0: count += 1
                             uri = None

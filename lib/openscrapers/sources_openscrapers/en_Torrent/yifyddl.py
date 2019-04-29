@@ -2,8 +2,11 @@
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 # Created by Tempest
 
-import re,urllib,urlparse
-from openscrapers.modules import client,debrid,source_utils
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import client, debrid, source_utils
 
 
 class source:

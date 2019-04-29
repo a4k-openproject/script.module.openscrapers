@@ -1,9 +1,9 @@
-from . import pyjsparser
-#from pyesprima import esprima
-from . import translating_nodes
-
 import hashlib
 import re
+
+from . import pyjsparser
+# from pyesprima import esprima
+from . import translating_nodes
 
 # the re below is how we'll recognise numeric constants.
 # it finds any 'simple numeric that is not preceded with an alphanumeric character

@@ -24,9 +24,10 @@
 '''
 
 import re
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
+
 
 class source:
     def __init__(self):

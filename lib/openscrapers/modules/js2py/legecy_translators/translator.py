@@ -1,8 +1,8 @@
-from flow import translate_flow
 from constants import remove_constants, recover_constants
-from objects import remove_objects, remove_arrays, translate_object, translate_array, set_func_translator
+from flow import translate_flow
 from functions import remove_functions, reset_inline_count
 from jsparser import inject_before_lval, indent, dbg
+from objects import remove_objects, remove_arrays, translate_object, translate_array, set_func_translator
 
 TOP_GLOBAL = '''from js2py.pyjs import *\nvar = Scope( JS_BUILTINS )\nset_global_object(var)\n'''
 
@@ -112,7 +112,6 @@ set_func_translator(translate_func)
 
 
 #print inject_before_lval('   chuj\n   moj\n   lval\nelse\n', 'lval', 'siema\njestem piter\n')
-import time
 #print time.time()
 #print translate_js('if (1) console.log("Hello, World!"); else if (5) console.log("Hello world?");')
 #print time.time()

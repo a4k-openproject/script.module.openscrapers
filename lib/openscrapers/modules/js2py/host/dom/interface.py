@@ -1,7 +1,7 @@
-from StringIO import StringIO
 from constants import *
-from bs4 import BeautifulSoup
+from constants import *
 from js2py.base import *
+
 try:
     import lxml
     def parse(source):

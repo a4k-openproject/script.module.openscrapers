@@ -15,8 +15,11 @@
     Updated and refactored by someone.
     Originally created by others.
 '''
-import re,urlparse,json,base64
+import base64
+import json
+import re
 
+import urlparse
 from openscrapers.modules import cache
 from openscrapers.modules import client
 from openscrapers.modules import control

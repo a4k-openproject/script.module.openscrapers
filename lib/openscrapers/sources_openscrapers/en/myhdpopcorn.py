@@ -12,7 +12,8 @@
 # Made on 02-04-2019 because it doesnt match the usual hdpopcorns scraper.
 
 import re
-from openscrapers.modules import client,cleantitle,source_utils
+
+from openscrapers.modules import client, cleantitle, source_utils
 
 
 class source:

@@ -1,7 +1,8 @@
 __all__ = ['fix_js_args']
 
-import types
 import opcode
+import types
+
 import six
 
 if six.PY3:

@@ -26,7 +26,7 @@
 
 import re
 
-from openscrapers.modules import cleantitle,client, source_utils
+from openscrapers.modules import cleantitle, client, source_utils
 
 
 class source:

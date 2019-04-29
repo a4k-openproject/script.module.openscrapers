@@ -10,8 +10,12 @@
 
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 
-import re,urlparse,urllib,base64
-from openscrapers.modules import cleantitle,client,dom_parser2,source_utils,cfscrape
+import base64
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cleantitle, client, dom_parser2, source_utils, cfscrape
 
 
 class source:

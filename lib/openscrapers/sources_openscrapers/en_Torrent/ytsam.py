@@ -2,9 +2,13 @@
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 
 import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,control,debrid,source_utils
 
+import re
+import traceback
+import urllib
 
+import urlparse
+from openscrapers.modules import cleantitle, client, control, debrid, log_utils, source_utils
 class source:
     def __init__(self):
         self.priority = 1

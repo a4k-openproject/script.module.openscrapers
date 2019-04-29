@@ -10,8 +10,14 @@
 
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 
-import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,directstream
+    Updated and refactored by someone.
+    Originally created by others.
+'''
+import re
+import traceback
+import urllib
+import urlparse
+
 
 
 class source:

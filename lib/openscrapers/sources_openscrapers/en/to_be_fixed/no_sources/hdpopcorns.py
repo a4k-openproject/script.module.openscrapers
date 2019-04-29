@@ -17,13 +17,14 @@
     Originally created by others.
 '''
 
-import re,requests,traceback,base64,urllib,urlparse
+import re
+import traceback
 
-from openscrapers.modules import cleantitle
-from openscrapers.modules import client
-from openscrapers.modules import log_utils
-from openscrapers.modules import debrid
+import urlparse
 from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import log_utils
+
 
 class source:
     def __init__(self):
