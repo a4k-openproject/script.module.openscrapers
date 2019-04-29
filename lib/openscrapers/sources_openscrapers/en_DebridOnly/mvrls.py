@@ -102,8 +102,7 @@ class source:
                 try:
 
                     url = item[1]
-                    if any(x in url for x in ['.rar', '.zip', '.iso', '.part']):
-                        raise Exception()
+                    if any(x in url for x in ['.rar', '.zip', '.iso', '.part']): raise Exception()
                     url = client.replaceHTMLCodes(url)
                     url = url.encode('utf-8')
 
