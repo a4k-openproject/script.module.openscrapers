@@ -181,23 +181,7 @@ def worker_thread(provider_name, provider_source):
 
             PASSED_PROVIDERS.append((provider_name, url, runtime))
         else:
-            start_time = time.time()
-            # Provider has unit test entry point, run provider with it
-            try:
-                unit_test = provider_source.unit_test('movie', hosts)
-            except Exception as e:
-                FAILED_PROVIDERS.append((provider_name, e))
-                return
-
-            if unit_test is None:
-                FAILED_PROVIDERS.append((provider_name, 'Unit Test Returned None'))
-                return
-            else:
-                TOTAL_SOURCES += unit_test
-
-            runtime = time.time() - start_time
-
-            PASSED_PROVIDERS.append((provider_name, unit_test, runtime))
+            pass
 
     except Exception as e:
         import traceback
