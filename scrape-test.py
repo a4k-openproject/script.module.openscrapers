@@ -1,11 +1,12 @@
+import json
 import os
+import random
 import sys
 import threading
 import time
 import urllib
-import json
+
 import requests
-import random
 
 sys.path.append(os.path.join(os.path.curdir, 'lib'))
 
@@ -14,7 +15,7 @@ arguments = {}
 for i in sys.argv:
     try:
         i = i.split('=')
-        arguments.update({i[0]:i[1]})
+        arguments.update({i[0]: i[1]})
     except:
         pass
 
@@ -49,7 +50,7 @@ print('Running %s tests' % no_tests)
 # Test information
 movie_meta = []
 episode_meta = []
-trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664' # Soz Not Soz ExodusRedux
+trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664'  # Soz Not Soz ExodusRedux
 
 trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % no_tests
 trakt_shows_url = 'https://api.trakt.tv/shows/popular?extended=full&limit=%s' % no_tests
@@ -75,10 +76,9 @@ else:
     resp = json.loads(resp.text)
 
     for show in resp:
-
         episodes = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
         episodes = json.loads(episodes.text)
-        episodes = [episode for season in episodes for episode in season['episodes']]
+        episodes = [episode for season in episodes for episode in season['episodes'] if season['number'] != 0]
         random.shuffle(episodes)
         episode = episodes[0]
         print('Adding Episode: %s - S%sE%s' % (show['title'], episode['season'], episode['number']))
@@ -87,7 +87,6 @@ else:
                              'year': show['year'], 'imdb': episode['ids']['imdb'], 'tvdb': episode['ids']['tvdb'],
                              'title': episode['title'], 'premiered': '', 'season': episode['season'],
                              'episode': episode['number']})
-
 
 RUNNING_PROVIDERS = []
 TOTAL_SOURCES = []
@@ -122,15 +121,16 @@ def worker_thread(provider_name, provider_source):
     RUNNING_PROVIDERS.append(provider_name)
     try:
         # Confirm Provider contains the movie function
-        if not getattr(provider_source, test_mode, False):
-            RUNNING_PROVIDERS.remove(provider_name)
-            return
 
-        if not getattr(provider_source, 'unit_test', False):
+        if getattr(provider_source, test_mode, False):
             if test_mode == 'movie':
                 test_objects = movie_meta
-            else:
+            elif test_mode == 'episode':
                 test_objects = episode_meta
+
+            else:
+                RUNNING_PROVIDERS.remove(provider_name)
+                return
 
             provider_results = []
             url = []
@@ -162,7 +162,8 @@ def worker_thread(provider_name, provider_source):
                     if url is None:
                         continue
                 else:
-                    raise Exception('wrong test type dumbass')
+                    RUNNING_PROVIDERS.remove(provider_name)
+                    return
 
                 # Run source call
                 url = provider_source.sources(url, hosts, [])
@@ -198,14 +199,17 @@ def worker_thread(provider_name, provider_source):
 
             PASSED_PROVIDERS.append((provider_name, unit_test, runtime))
 
-        RUNNING_PROVIDERS.remove(provider_name)
-
     except Exception as e:
         import traceback
         traceback.print_exc()
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         FAILED_PROVIDERS.append((provider_name, e))
+
+    try:
+        RUNNING_PROVIDERS.remove(provider_name)
+    except:
+        pass
 
 
 if __name__ == '__main__':
@@ -229,7 +233,7 @@ if __name__ == '__main__':
             print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
                                                   ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
-            TOTAL_RUNTIME +=1
+            TOTAL_RUNTIME += 1
 
     else:
         print('Please Select a provider:')
@@ -281,7 +285,6 @@ if __name__ == '__main__':
         print('#################')
         print('Passed Providers:')
 
-
         base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
         output_filename = 'results-%s.csv' % time.time()
 
@@ -293,9 +296,16 @@ if __name__ == '__main__':
             for i in PASSED_PROVIDERS:
                 try:
                     if i[1] is not None:
-                        output.write('%s,%s,%s\n' % (i[0], len(i[1]), i[2]))
+                        output.write('%s,%s,%s\n' % (i[0], len([] if i[1] is None else i[1]), i[2]))
                 except:
                     pass
+        quality = {}
+
+        for i in TOTAL_SOURCES:
+            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
+
+        for x in quality:
+            print('%s: %s Sources' % (x, quality[x]))
 
     elif test_type == 0:
         all_sources = PASSED_PROVIDERS[0][1]
