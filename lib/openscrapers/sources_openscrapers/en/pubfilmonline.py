@@ -8,16 +8,15 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urllib,urlparse
-
-from openscrapers.modules import cleantitle
-from openscrapers.modules import client
-from openscrapers.modules import log_utils
-from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
-
-from bs4 import BeautifulSoup
 import json
+import re
+import urllib
+
+import urlparse
+from bs4 import BeautifulSoup
+from openscrapers.modules import cfscrape
+from openscrapers.modules import log_utils
+
 
 class source:
     def __init__(self):
@@ -26,7 +25,7 @@ class source:
         self.domains = ['pubfilmonline.ws']                                                                   # List of base urls, such as 'filmfrantic.com'
         self.base_link = 'https://pubfilmonline.ws'                                                                      # Base URL, such as 'http://filmfrantic.com'
         self.search_link = '/?s='                                                           # part of link on search results page, with %s on any portion where you need to insert title, year, etc.
-                                                                                                                # Example: '/s=%s'
+        self.scraper = cfscrape.create_scraper()                                                                                          # Example: '/s=%s'
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -51,9 +50,8 @@ class source:
             #Create search link
             searchlink = self.search_link = self.search_link + title + ' ' + year
             url = urlparse.urljoin(self.base_link, searchlink)
-            
-            scraper = cfscrape.create_scraper()
-            html = scraper.get(url).content                                                                          # Get the HTML for the page
+
+            html = self.scraper.get(url).content                                                                          # Get the HTML for the page
             soup = BeautifulSoup(html)
             #Find all search results and add to array
             results = soup.findAll("div", {"class": "result-item"})

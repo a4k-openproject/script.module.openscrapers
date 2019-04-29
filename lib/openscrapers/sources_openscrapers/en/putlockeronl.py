@@ -23,8 +23,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,cfscrape,proxy
+import re
+
+from openscrapers.modules import cleantitle, cfscrape
 
 
 class source:

@@ -25,14 +25,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib, urlparse, re
+import re
+import urllib
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 from openscrapers.modules import trakt
-
 
 
 class source:

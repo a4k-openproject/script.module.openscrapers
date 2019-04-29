@@ -23,8 +23,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re, urllib, urlparse, json
+import json
+import urllib
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client, source_utils
 

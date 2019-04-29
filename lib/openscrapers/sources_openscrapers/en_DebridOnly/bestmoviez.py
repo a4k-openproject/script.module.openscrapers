@@ -21,14 +21,14 @@
 # Addon id: OpenScrapers
 # Addon Provider: Addons4Kodi
 
-import re,urllib,urlparse
+import re
+import urllib
 
-from openscrapers.modules import cleantitle
+import urlparse
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
 
 
 class source:
@@ -38,6 +38,7 @@ class source:
 		self.domains = ['best-moviez.ws']
 		self.base_link = 'http://www.best-moviez.ws'
 		self.search_link = '/%s'
+		self.scraper = cfscrape.create()
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -70,7 +71,6 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
-			scraper = cfscrape.create_scraper()
 
 			if url == None: return sources
 
@@ -88,7 +88,7 @@ class source:
 
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
-			r = scraper.get(url).content
+			r = self.scraper.get(url).content
 
 			
 

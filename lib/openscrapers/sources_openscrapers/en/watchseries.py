@@ -24,13 +24,16 @@
 '''
 
 
-import re,urllib,urlparse,json,base64
+import re
+import urllib
 
+import urlparse
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
-from openscrapers.modules import cfscrape
+from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):

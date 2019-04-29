@@ -25,8 +25,8 @@ import base64
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import anilist
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle

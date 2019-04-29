@@ -23,14 +23,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urllib,urlparse,os
+import re
+import urllib
 
-from openscrapers.modules import cleantitle
+import urlparse
 from openscrapers.modules import client
-from openscrapers.modules import control
+from openscrapers.modules import cfscrape
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
-from openscrapers.modules import dom_parser2
+
 
 class source:
     def __init__(self):
@@ -39,6 +40,7 @@ class source:
         self.domains = ['ultrahdindir.com']
         self.base_link = 'http://ultrahdindir.com'
         self.post_link = '/index.php?do=search'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -62,7 +64,7 @@ class source:
 
             post = {'query': data['imdb']}
             url = urlparse.urljoin(self.base_link, 'engine/ajax/search.php')
-            r = client.request(url, post=post)
+            r = self.scraper.post(url, data=post).content
             urls = client.parseDOM(r, 'a', ret='href')
             urls = [i for i in urls if not data['imdb'] in i]
 
@@ -70,7 +72,7 @@ class source:
             links = []
             for u in urls:
                 try:
-                    data = client.request(u)
+                    data = self.scraper.get(u).content
                     data = re.findall('</iframe>(.+?)QuoteEEnd--><br /><br', data, re.DOTALL)[0]
                     links += re.findall('''start--><b>(.+?)</b>.+?<b><a href=['"](.+?)['"]''', data, re.DOTALL)
 
@@ -82,7 +84,6 @@ class source:
                         name = re.sub('<.+?>', '', name)
                         if '4K' in name:
                             quality = '4K'
-
                         elif '1080p' in name:
                             quality = '1080p'
                         elif '720p' in name:

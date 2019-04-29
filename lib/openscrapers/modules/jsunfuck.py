@@ -21,10 +21,10 @@
 
 
 import re
+import string
 import sys
 import urllib
-import string
-import json
+
 
 class JSUnfuck(object):
     numbers = None

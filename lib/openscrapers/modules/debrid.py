@@ -19,8 +19,8 @@
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
-from openscrapers.modules import log_utils
 from openscrapers.modules import control
+from openscrapers.modules import log_utils
 
 try:
     import resolveurl

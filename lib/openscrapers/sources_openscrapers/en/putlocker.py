@@ -18,7 +18,7 @@
 '''
 import re
 
-from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 
 
 class source:
@@ -28,6 +28,7 @@ class source:
         self.domains = ['putlockerr.is','putlockers.movie'] 
         self.base_link = 'https://putlockerr.is'
         self.search_link = '/embed/%s/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -39,7 +40,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r =self.scraper.get(url).content
             try:
                 match = re.compile('<iframe src="(.+?)://(.+?)/(.+?)"').findall(r)
                 for http,host,url in match: 

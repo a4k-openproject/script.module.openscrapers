@@ -17,10 +17,11 @@
     Originally created by others.
 '''
 import re
-import requests
-
-from bs4 import BeautifulSoup
 from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup
+
 try:
     from urllib import quote
 except ImportError:

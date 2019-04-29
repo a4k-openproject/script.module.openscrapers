@@ -24,10 +24,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import urlparse
-import urllib
 import re
+import urllib
 
+import urlparse
 from openscrapers.modules import debrid, cleantitle, client, source_utils
 
 

@@ -9,8 +9,12 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urlparse,urllib,base64
-from openscrapers.modules import cleantitle,client,cfscrape
+import base64
+import re
+import urllib
+
+import urlparse
+from openscrapers.modules import cleantitle, client, cfscrape
 
 
 class source:

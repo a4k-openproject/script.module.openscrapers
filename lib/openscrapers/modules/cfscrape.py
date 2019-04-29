@@ -1,15 +1,15 @@
+import ast
 import logging
+import operator as op
 import random
 import re
-import ast
-import operator as op
-import requests
-
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.sessions import Session
+from collections import OrderedDict
 from copy import deepcopy
 from time import sleep
-from collections import OrderedDict
+
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.sessions import Session
 
 try:
     from urlparse import urlparse

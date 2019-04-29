@@ -22,10 +22,14 @@
 # Addon Provider: Mr.blamo
 
 
-import re, urlparse, base64, json
+import base64
+import json
+import re
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+
 
 class source:
     def __init__(self):

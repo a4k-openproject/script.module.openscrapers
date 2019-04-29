@@ -3,8 +3,6 @@
 import urlparse
 from openscrapers import sources_openscrapers
 from openscrapers.modules import control
-from openscrapers import providerSources, providerNames
-
 
 params = dict(urlparse.parse_qsl(sys.argv[2].replace('?', '')))
 action = params.get('action')

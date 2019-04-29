@@ -8,21 +8,19 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 
-import re,urllib,urlparse
-
-from openscrapers.modules  import cleantitle, client, log_utils, source_utils, cfscrape
-
+import urlparse
 from bs4 import BeautifulSoup
+from openscrapers.modules import source_utils, cfscrape
 
 
 class source:
     def __init__(self):
         self.priority = 0
         self.language = ['en']
-        self.domains = ['filepursuit.com']                                                                   # List of base urls, such as 'filmfrantic.com'
-        self.base_link = 'https://filepursuit.com'                                                                      # Base URL, such as 'http://filmfrantic.com'
-        self.search_link = '/pursuit?q='                                                           # part of link on search results page, with %s on any portion where you need to insert title, year, etc.
-                                                                                                                # Example: '/s=%s'
+        self.domains = ['filepursuit.com']
+        self.base_link = 'https://filepursuit.com'
+        self.search_link = '/pursuit?q='
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -45,9 +43,7 @@ class source:
             searchLink = self.search_link + title + ' ' + year
             url = urlparse.urljoin(self.base_link, searchLink)
 
-            #Site uses cf, so we need cfscrape
-            scraper = cfscrape.create_scraper()
-            html = scraper.get(url).content
+            html = self.scraper.get(url).content
             result_soup = BeautifulSoup(html, "html.parser")
 
             #Parse the table of results
@@ -68,7 +64,7 @@ class source:
             actualLinks = []
             for fileLink in fileLinks:
                 actual_url = urlparse.urljoin(self.base_link, fileLink)
-                html = scraper.get(actual_url.encode('ascii')).content
+                html = self.scraper.get(actual_url.encode('ascii')).content
                 linkSoup = BeautifulSoup(html, "html.parser")
                 link = str(linkSoup.find("button", {"title": "Copy Link"})['data-clipboard-text'])               
                 #Exclude zip and rar files

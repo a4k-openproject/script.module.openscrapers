@@ -17,9 +17,9 @@
 
 import re
 import urllib
-import urlparse
 
-from openscrapers.modules import cleantitle, client, debrid, source_utils
+import urlparse
+from openscrapers.modules import cleantitle, client, debrid, log_utils, source_utils, cfscrape
 
 
 class source:
@@ -29,6 +29,7 @@ class source:
         self.domains = ['mvrls.com']
         self.base_link = 'http://mvrls.com'
         self.search_link = '/search/%s/feed/rss2/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -80,7 +81,7 @@ class source:
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
 
-            html = client.request(url)
+            html = self.scraper.get(url).content
             posts = client.parseDOM(html, 'item')
 
             hostDict = hostprDict + hostDict
@@ -106,7 +107,8 @@ class source:
                     url = url.encode('utf-8')
 
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    if not valid: raise Exception()
+                    if not valid:
+                        raise Exception()
 
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
@@ -121,7 +123,8 @@ class source:
 
                     y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', name)[-1].upper()
 
-                    if not y == hdlr: raise Exception()
+                    if not y == hdlr:
+                        raise Exception()
 
                     quality, info = source_utils.get_release_quality(name, url)
 

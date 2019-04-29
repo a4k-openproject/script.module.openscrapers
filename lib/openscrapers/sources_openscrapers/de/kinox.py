@@ -24,12 +24,12 @@
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cache
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -37,16 +37,16 @@ class source:
         self.priority = 1
         self.language = ['de']
         self.domains = ['kinox.to', 'kinox.ag', 'kinox.tv', 'kinox.me', 'kinox.am', 'kinox.nu', 'kinox.pe', 'kinox.sg']
-        self._base_link = None
+        self.base_link = None
         self.search_link = '/Search.html?q=%s'
         self.get_links_epi = '/aGET/MirrorByEpisode/?Addr=%s&SeriesID=%s&Season=%s&Episode=%s'
         self.mirror_link = '/aGET/Mirror/%s&Hoster=%s&Mirror=%s'
 
     @property
     def base_link(self):
-        if not self._base_link:
-            self._base_link = cache.get(self.__get_base_url, 120, 'http://%s' % self.domains[0])
-        return self._base_link
+        if not self.base_link:
+            self.base_link = cache.get(self.__get_base_url, 120, 'http://%s' % self.domains[0])
+        return self.base_link
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

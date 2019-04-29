@@ -19,7 +19,8 @@
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
-import json, re
+import json
+import re
 
 
 def json_load_as_str(file_handle):

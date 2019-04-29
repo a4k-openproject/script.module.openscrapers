@@ -4,9 +4,17 @@ import random
 import sys
 import threading
 import time
-import urllib
 
+import traceback
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 sys.path.append(os.path.join(os.path.curdir, 'lib'))
 
@@ -112,6 +120,34 @@ hosts = [u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'thevide
          u'clicknupload.me', u'userscloud.com', u'ulozto.net', u'easybytez.com']
 
 
+def domain_analysis(domain_name):
+    result = {'domain_status': 'None', 'cloudflare_enabled': '', 'cloudflare_captcha_enabled': '',
+              'cloudflare_antibot_enabled': ''}
+    try:
+        resp = requests.get(domain_name)
+        result['domain_status'] = resp.status_code
+        domain = urlparse(resp.url).netloc
+        cookie_domain = None
+
+        for d in resp.cookies.list_domains():
+            if d.startswith(".") and d in ("." + domain):
+                cookie_domain = d
+                break
+
+        cloudflare_cookie = resp.cookies.get("__cfduid", "", domain=cookie_domain)
+        result['cloudflare_enabled'] = cloudflare_cookie is not None
+        if resp.headers.get('Server', '').startswith('cloudflare'):
+            if b'/cdn-cgi/l/chk_captcha' in resp.content:
+                result['cloudflare_captcha_enabled'] = True
+            elif resp.status_code == 503:
+                result['cloudflare_antibot_enabled'] = True
+
+        result['domain_status'] = resp.status_code
+    except Exception:
+        result['domain_status'] = 'Error'
+    return result
+
+
 def worker_thread(provider_name, provider_source):
     global RUNNING_PROVIDERS
     global TOTAL_SOURCES
@@ -123,68 +159,83 @@ def worker_thread(provider_name, provider_source):
         # Confirm Provider contains the movie function
 
         if getattr(provider_source, test_mode, False):
-            if test_mode == 'movie':
-                test_objects = movie_meta
-            elif test_mode == 'episode':
-                test_objects = episode_meta
+            analysis = {}
 
+            # Run analysis on the domains
+            if not hasattr(provider_source, 'base_link'):
+                print('Warning: provider %s is missing base_link property' % provider_name)
             else:
-                RUNNING_PROVIDERS.remove(provider_name)
-                return
+                analysis = domain_analysis(provider_source.base_link)
 
-            provider_results = []
-            url = []
-            start_time = time.time()
-            current_meta = {}
-            for i in test_objects:
-                if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE: break
+                if analysis['domain_status'] is not 'Offline' \
+                        and not hasattr(provider_source, 'scraper') \
+                        and ('cloudflare_enabled' in analysis and analysis['cloudflare_enabled']):
+                    print('Warning: provider %s is missing a CF scraper but CF cookie is detected' % provider_name)
 
-                print('')
-                print('%s: Now testing -> %s' % (provider_name.upper(), i))
-                print('')
-                start_time = time.time()
-                if len(provider_results) != 0:
-                    break
-                # Run movie Call
+            if hasattr(provider_source, 'base_link') \
+                    and (('domain_status' not in analysis) or (analysis['domain_status'] is 'Offline')):
+                print('Warning: Error while fetching domains for provider %s' % provider_name)
+
+            if not getattr(provider_source, 'unit_test', False):
                 if test_mode == 'movie':
-                    url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
-                    if url is None:
-                        continue
-
+                    test_objects = movie_meta
                 elif test_mode == 'episode':
-                    url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
-                                                 i['localtvshowtitle'], i['aliases'], i['year'])
-                    if url is None:
-                        continue
+                    test_objects = episode_meta
 
-                    url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'], i['season'],
-                                                  i['episode'])
-                    if url is None:
-                        continue
                 else:
                     RUNNING_PROVIDERS.remove(provider_name)
                     return
 
-                # Run source call
-                url = provider_source.sources(url, hosts, [])
-                if url is None:
-                    continue
-                else:
-                    if len(url) > 0:
-                        provider_results = url
-                        TOTAL_SOURCES += url
-                    else:
-                        continue
-            if url is None: url = []
-            # Gather time analytics
-            runtime = time.time() - start_time
+                provider_results = []
+                url = []
+                start_time = time.time()
 
-            PASSED_PROVIDERS.append((provider_name, url, runtime))
-        else:
-            pass
+                for i in test_objects:
+                    if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE: break
+
+                    start_time = time.time()
+                    if len(provider_results) != 0:
+                        break
+                    # Prepare test by fetching url
+                    if test_mode == 'movie':
+                        url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
+                        if url is None:
+                            continue
+
+                    elif test_mode == 'episode':
+                        url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
+                                                     i['localtvshowtitle'], i['aliases'], i['year'])
+                        if url is None:
+                            continue
+
+                        url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'],
+                                                      i['season'],
+                                                      i['episode'])
+                        if url is None:
+                            continue
+                    else:
+                        RUNNING_PROVIDERS.remove(provider_name)
+                        return
+
+                    # Execute source method to gather urls
+                    url = provider_source.sources(url, hosts, [])
+                    if url is None:
+                        continue
+                    else:
+                        if len(url) > 0:
+                            provider_results = url
+                            TOTAL_SOURCES += url
+                        else:
+                            continue
+                if url is None: url = []
+                # Gather time analytics
+                runtime = time.time() - start_time
+
+                PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
+            else:
+                pass
 
     except Exception as e:
-        import traceback
         traceback.print_exc()
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
@@ -212,13 +263,12 @@ if __name__ == '__main__':
         time.sleep(1)
 
         while len(RUNNING_PROVIDERS) > 0:
-            if TIMEOUT_MODE:
-                if TOTAL_RUNTIME > TIMEOUT: break
+            if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
+                break
             print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
                                                   ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
             TOTAL_RUNTIME += 1
-
     else:
         print('Please Select a provider:')
         for idx, provider in enumerate(PROVIDER_LIST):
@@ -266,8 +316,13 @@ if __name__ == '__main__':
         print('Total Sources: %s' % len(post_dup))
         print('Total Duplicates: %s' % total_duplicates)
         print('   ')
+        print('Sources quality:')
         print('#################')
-        print('Passed Providers:')
+        quality = {}
+        for i in TOTAL_SOURCES:
+            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
+        for x in quality:
+            print('%s: %s Sources' % (x, quality[x]))
 
         base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
         output_filename = 'results-%s.csv' % time.time()
@@ -276,20 +331,15 @@ if __name__ == '__main__':
             os.makedirs(base_output_path)
 
         with open(os.path.join(base_output_path, output_filename), 'w+') as output:
-            output.write('Provider Name,Number Of Sources,Runtime\n')
+            output.write('Provider Name;Number Of Sources;Runtime;%s\n' %
+                         ';'.join(str(x) for x in PASSED_PROVIDERS[1][3].keys()))
             for i in PASSED_PROVIDERS:
                 try:
                     if i[1] is not None:
-                        output.write('%s,%s,%s\n' % (i[0], len([] if i[1] is None else i[1]), i[2]))
+                        output.write('%s;%s;%s;%s\n' % (
+                        i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
                 except:
                     pass
-        quality = {}
-
-        for i in TOTAL_SOURCES:
-            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
-
-        for x in quality:
-            print('%s: %s Sources' % (x, quality[x]))
 
     elif test_type == 0:
         all_sources = PASSED_PROVIDERS[0][1]

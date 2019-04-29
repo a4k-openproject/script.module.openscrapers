@@ -8,10 +8,11 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urllib,urlparse,json,random,base64
+import re,urllib,urlparse,json,base64
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import debrid
 
 
@@ -28,7 +29,7 @@ class source:
         self.r_link = 'aHR0cDovL2lwdjYuaWNlZmlsbXMuaW5mby9pcC5waHA/dj0lcyY='
         self.j_link = 'aHR0cDovL2lwdjYuaWNlZmlsbXMuaW5mby9tZW1iZXJzb25seS9jb21wb25lbnRzL2NvbV9pY2VwbGF5ZXIvdmlkZW8ucGhwQWpheFJlc3AucGhwP3M9JXMmdD0lcw=='
         self.p_link = 'aWQ9JXMmcz0lcyZpcXM9JnVybD0mbT0lcyZjYXA9KyZzZWM9JXMmdD0lcw=='
-
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -65,7 +66,7 @@ class source:
             headers = {'Accept': '*/*'}
             if not cookie == None: headers['Cookie'] = cookie
             if not referer == None: headers['Referer'] = referer
-            result = client.request(url, post=post, headers=headers, output=output, close=close)
+            result = self.scraper.get(url, post=post, headers=headers, output=output, close=close).content
             result = result.decode('iso-8859-1').encode('utf-8')
             result = urllib.unquote_plus(result)
             return result
@@ -76,7 +77,7 @@ class source:
     def directdl_cache(self, url):
         try:
             url = urlparse.urljoin(base64.b64decode(self.b_link), url)
-            result = self.request(url)
+            result = self.scraper.get(url).content
             result = re.compile('id=(\d+)>.+?href=(.+?)>').findall(result)
             result = [(re.sub('http.+?//.+?/','/', i[1]), 'tt' + i[0]) for i in result]
             return result
@@ -98,7 +99,7 @@ class source:
                 t = t.replace("&", "")
                 q = self.search_link + urllib.quote_plus('%s %s' % (t, f[0]))
                 q = urlparse.urljoin(self.base_link, q)
-                result = client.request(q)
+                result = self.scraper.get(q).content
                 result = json.loads(result)
                 result = result['results']
             except:

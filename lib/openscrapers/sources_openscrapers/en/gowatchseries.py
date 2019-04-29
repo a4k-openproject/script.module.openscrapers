@@ -18,12 +18,13 @@
 import json
 import re
 import urllib
-import urlparse
 
-										
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
+from openscrapers.modules import cfscrape
+
 
 class source:
     def __init__(self):
@@ -33,6 +34,7 @@ class source:
         self.base_link = 'https://ww5.gowatchseries.co'
         self.search_link = '/ajax-search.html?keyword=%s&id=-1'
         self.search_link2 = '/search.html?keyword=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -81,16 +83,11 @@ class source:
                 if 'episode' in data: episode = data['episode']
                 year = data['year']
 
-                r = client.request(self.base_link, output='extended', timeout='10')
-                cookie = r[4] ; headers = r[3] ; result = r[0]
-                headers['Cookie'] = cookie
-
                 query = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.getsearch(title)))
-                r = client.request(query, headers=headers, XHR=True)
+                r = self.scraper.get(query).content
                 r = json.loads(r)['content']
                 r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a'))
-                
-                
+
                 if 'tvshowtitle' in data:                   
                     cltitle = cleantitle.get(title+'season'+season)
                     cltitle2 = cleantitle.get(title+'season%02d'%int(season))
@@ -104,21 +101,19 @@ class source:
                     vurl = '%s%s-episode-0'%(self.base_link, str(r[0][0]).replace('/info',''))
                     vurl2 = '%s%s-episode-1'%(self.base_link, str(r[0][0]).replace('/info',''))                
 
-                r = client.request(vurl, headers=headers)
-                headers['Referer'] = vurl
-                
+                r = self.scraper.get(vurl).content
+
                 slinks = client.parseDOM(r, 'div', attrs = {'class': 'anime_muti_link'})
                 slinks = client.parseDOM(slinks, 'li', ret='data-video')
-                if len(slinks) == 0 and not vurl2 == None:
-                    r = client.request(vurl2, headers=headers)
-                    headers['Referer'] = vurl2
+                if len(slinks) == 0 and not vurl2 is None:
+                    r = self.scraper.get(vurl2).content
                     slinks = client.parseDOM(r, 'div', attrs = {'class': 'anime_muti_link'})                
                     slinks = client.parseDOM(slinks, 'li', ret='data-video')
 
                 for slink in slinks:
                     try:
                         if 'vidnode.net/streaming.php' in slink:
-                            r = client.request('https:%s'%slink, headers=headers)
+                            r = self.scraper.get('https:%s'%slink)
                             clinks = re.findall(r'sources:\[(.*?)\]',r)[0]
                             clinks = re.findall(r'file:\s*\'(http[^\']+)\',label:\s*\'(\d+)', clinks)
                             for clink in clinks:

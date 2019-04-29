@@ -10,8 +10,19 @@
 
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 
-import re,urllib,urlparse,base64,json,time
-from openscrapers.modules import client,cleantitle,directstream,source_utils
+
+import base64
+import json
+import re
+import time
+import urllib
+
+import urlparse
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import cfscrape
+from openscrapers.modules import directstream
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -20,6 +31,7 @@ class source:
         self.language = ['en']
         self.domains = ['cartoonhd.de', 'cartoonhd.care']
         self.base_link = 'https://www1.cartoonhd.care'
+        self.scraper = cfscrape.create_scraper()
 
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -58,8 +70,8 @@ class source:
         try:
             for alias in aliases:
                 url = '%s/show/%s/season/%01d/episode/%01d' % (self.base_link, cleantitle.geturl(title), int(season), int(episode))
-                url = client.request(url, headers=headers,output='geturl', timeout='10')
-                if not url is None and url != self.base_link: break
+                result =self.scraper.get(url, headers=headers).status
+                if not result == 200 and url != self.base_link: break
             return url
         except:
             return
@@ -69,13 +81,13 @@ class source:
         try:
             for alias in aliases:
                 url = '%s/film/%s' % (self.base_link, cleantitle.geturl(alias['title']))
-                url = client.request(url, headers=headers, output='geturl', timeout='10')
-                if not url is None and url != self.base_link: break
+                result =self.scraper.get(url, headers=headers).status
+                if not result == 200 and url != self.base_link: break
             if url is None:
                 for alias in aliases:
                     url = '%s/film/%s-%s' % (self.base_link, cleantitle.geturl(alias['title']), year)
-                    url = client.request(url, headers=headers, output='geturl', timeout='10')
-                    if not url is None and url != self.base_link: break
+                    result =self.scraper.get(url, headers=headers).status
+                    if not result == 200 and url != self.base_link: break
             return url
         except:
             return

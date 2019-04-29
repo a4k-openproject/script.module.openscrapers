@@ -15,8 +15,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import re,sys,cookielib,urllib,urllib2,urlparse,gzip,StringIO,HTMLParser,time,random,base64
-from openscrapers.modules import dom_parser,cache,workers,utils,log_utils
+import base64
+import gzip
+import random
+import re
+import sys
+import time
+import urllib
+
+import HTMLParser
+import StringIO
+import cookielib
+import urllib2
+import urlparse
+from openscrapers.modules import dom_parser, cache, workers, utils, log_utils
 
 
 def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False, limit=None, referer=None, cookie=None, compression=True, output='', timeout='30'):
