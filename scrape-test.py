@@ -1,11 +1,12 @@
+import json
 import os
+import random
 import sys
 import threading
 import time
-import json
+
 import traceback
 import requests
-import random
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 try:
@@ -85,7 +86,7 @@ else:
     for show in resp:
         episodes = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
         episodes = json.loads(episodes.text)
-        episodes = [episode for season in episodes for episode in season['episodes']]
+        episodes = [episode for season in episodes for episode in season['episodes'] if season['number'] != 0]
         random.shuffle(episodes)
         episode = episodes[0]
         print('Adding Episode: %s - S%sE%s' % (show['title'], episode['season'], episode['number']))
@@ -156,10 +157,8 @@ def worker_thread(provider_name, provider_source):
     RUNNING_PROVIDERS.append(provider_name)
     try:
         # Confirm Provider contains the movie function
-        if not getattr(provider_source, test_mode, False):
-            RUNNING_PROVIDERS.remove(provider_name)
-            return
 
+        if getattr(provider_source, test_mode, False):
         analysis = {}
 
         # Run analysis on the domains
@@ -180,8 +179,12 @@ def worker_thread(provider_name, provider_source):
         if not getattr(provider_source, 'unit_test', False):
             if test_mode == 'movie':
                 test_objects = movie_meta
-            else:
+            elif test_mode == 'episode':
                 test_objects = episode_meta
+
+            else:
+                RUNNING_PROVIDERS.remove(provider_name)
+                return
 
             provider_results = []
             url = []
@@ -210,7 +213,8 @@ def worker_thread(provider_name, provider_source):
                     if url is None:
                         continue
                 else:
-                    raise Exception('wrong test type dumbass')
+                    RUNNING_PROVIDERS.remove(provider_name)
+                    return
 
                 # Execute source method to gather urls
                 url = provider_source.sources(url, hosts, [])
@@ -228,32 +232,18 @@ def worker_thread(provider_name, provider_source):
 
             PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
         else:
-            # Why are we maintaining this? for unit_test there is one provider implementing this method
-            # results of the Movie wand Episode tests are not comparable
-            start_time = time.time()
-            # Provider has unit test entry point, run provider with it
-            try:
-                unit_test = provider_source.unit_test('movie', hosts)
-            except Exception as e:
-                FAILED_PROVIDERS.append((provider_name, e))
-                return
+            pass
 
-            if unit_test is None:
-                FAILED_PROVIDERS.append((provider_name, 'Unit Test Returned None'))
-                return
-            else:
-                TOTAL_SOURCES += unit_test
-
-            runtime = time.time() - start_time
-
-            PASSED_PROVIDERS.append((provider_name, unit_test, runtime))
-
-        RUNNING_PROVIDERS.remove(provider_name)
     except Exception as e:
         traceback.print_exc()
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         FAILED_PROVIDERS.append((provider_name, e))
+
+    try:
+        RUNNING_PROVIDERS.remove(provider_name)
+    except:
+        pass
 
 
 if __name__ == '__main__':
@@ -274,8 +264,8 @@ if __name__ == '__main__':
         while len(RUNNING_PROVIDERS) > 0:
             if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
                 break
-            #          print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
-            #                                                ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
+                      print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
+                                                            ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
             TOTAL_RUNTIME += 1
     else:
@@ -345,9 +335,16 @@ if __name__ == '__main__':
             for i in PASSED_PROVIDERS:
                 try:
                     if i[1] is not None:
-                        output.write('%s;%s;%s;%s\n' % (i[0], len(i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
+                        output.write('%s;%s;%s;%s\n' % (i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
                 except:
                     pass
+        quality = {}
+
+        for i in TOTAL_SOURCES:
+            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
+
+        for x in quality:
+            print('%s: %s Sources' % (x, quality[x]))
 
     elif test_type == 0:
         all_sources = PASSED_PROVIDERS[0][1]
