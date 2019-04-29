@@ -114,3 +114,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 test.txt
+*.csv
+test-results/en-en_DebridOnly/os-en-and-debrid-episode-scrape-test.txt
