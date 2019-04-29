@@ -31,6 +31,7 @@ import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
+from openscrapers.modules import cfscrape
 
 
 class source:
@@ -40,7 +41,7 @@ class source:
         self.domains = ['filmxy.me']
         self.base_link = 'https://www.filmxy.one/'
         self.search_link = 'search/%s/feed/rss2/'
-        self.post = 'https://cdn.filmxy.one/asset/json/posts.json'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -62,8 +63,7 @@ class source:
             tit = cleantitle.geturl(title + ' ' + year)
             query = urlparse.urljoin(self.base_link, tit)
 
-           
-            r = client.request(query, referer=self.base_link, redirect=True)
+            r = self.scraper.get(query, referer=self.base_link, redirect=True).content
             if not data['imdb'] in r:
                 return sources
        

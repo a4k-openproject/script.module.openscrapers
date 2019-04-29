@@ -22,6 +22,7 @@ import urllib
 import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import dom_parser2
 
 
@@ -31,7 +32,8 @@ class source:
         self.language = ['en']
         self.domains = ['freeputlockers.org']
         self.base_link = 'http://freeputlockers.org'
-        self.search_link = '/watch/%s-%s-online-putlockers.html' 
+        self.search_link = '/watch/%s-%s-online-putlockers.html'
+        self.scraper = cfscrape.create_scraper()
         
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -56,8 +58,8 @@ class source:
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             clean_title = cleantitle.geturl(url['tvshowtitle'])+'-s%02d' % int(season)
-            url = urlparse.urljoin(self.base_link, (self.search_link %(clean_title,url['year'])))
-            r = client.request(url)
+            url = urlparse.urljoin(self.base_link, (self.search_link %(clean_title, url['year'])))
+            r = self.scraper.get(url).content
             r = dom_parser2.parse_dom(r, 'div', {'id': 'ip_episode'})
             r = [dom_parser2.parse_dom(i, 'a', req=['href']) for i in r if i]
             for i in r[0]:
@@ -72,7 +74,7 @@ class source:
             sources = []
             if url == None: return sources
             
-            r = client.request(url)
+            r = self.scraper.get(url).content
             quality = re.findall(">(\w+)<\/p",r)
             if quality[0] == "HD":
                 quality = "720p"
@@ -94,15 +96,15 @@ class source:
             urldata = urlparse.parse_qs(url)
             urldata = dict((i, urldata[i][0]) for i in urldata)
             post = {'ipplugins': 1,'ip_film': urldata['data-film'], 'ip_server': urldata['data-server'], 'ip_name': urldata['data-name'],'fix': "0"}
-            p1 = client.request('http://freeputlockers.org/ip.file/swf/plugins/ipplugins.php', post=post, referer=urldata['url'], XHR=True)
+            p1 = self.scraper.request('http://freeputlockers.org/ip.file/swf/plugins/ipplugins.php', post=post, referer=urldata['url'], XHR=True)
             p1 = json.loads(p1)
-            p2 = client.request('http://freeputlockers.org/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' %(p1['s'],urldata['data-server']))
+            p2 = self.scraper.request('http://freeputlockers.org/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' %(p1['s'],urldata['data-server']))
             p2 = json.loads(p2)
-            p3 = client.request('http://freeputlockers.org/ip.file/swf/ipplayer/api.php?hash=%s' %(p2['hash']))
+            p3 = self.scraper.request('http://freeputlockers.org/ip.file/swf/ipplayer/api.php?hash=%s' %(p2['hash']))
             p3 = json.loads(p3)
             n = p3['status']
             if n == False:
-                p2 = client.request('http://freeputlockers.org/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=1' %(p1['s'],urldata['data-server']))
+                p2 = self.scraper.request('http://freeputlockers.org/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=1' %(p1['s'],urldata['data-server']))
                 p2 = json.loads(p2)
             url =  "https:%s" %p2["data"].replace("\/","/")
             return url

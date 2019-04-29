@@ -25,8 +25,8 @@
 
 import json
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client, source_utils
 

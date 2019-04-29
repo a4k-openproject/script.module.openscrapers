@@ -26,7 +26,7 @@
 
 import re
 
-from openscrapers.modules import cleantitle, client, source_utils
+from openscrapers.modules import cleantitle, client, source_utils, cfscrape
 
 
 class source:
@@ -35,7 +35,7 @@ class source:
 		self.language = ['en']
 		self.domains = ['coolmoviezone.online']
 		self.base_link = 'https://coolmoviezone.online'
-
+		self.scraper = cfscrape.create_scraper()
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -49,7 +49,7 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
-			r = client.request(url)
+			r = self.scraper.get(url).content
 			match = re.compile('<td align="center"><strong><a href="(.+?)"').findall(r)
 			for url in match: 
 				host = url.split('//')[1].replace('www.','')

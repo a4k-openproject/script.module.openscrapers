@@ -25,6 +25,7 @@ import urllib
 import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -36,6 +37,7 @@ class source:
         self.domains = ['300mbfilms.co']
         self.base_link = 'https://300mbfilms.co' #https://www.300mbfilms.co
         self.search_link = '/search/%s/feed/rss2/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -87,7 +89,7 @@ class source:
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
 
             posts = client.parseDOM(r, 'item')
 

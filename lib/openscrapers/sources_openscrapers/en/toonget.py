@@ -11,8 +11,9 @@
 
 import re
 
-from openscrapers.modules import client, cleantitle
-
+from openscrapers.modules import client
+from openscrapers.modules import cleantitle
+from openscrapers.modules import cfscrape
 
 class source:
     def __init__(self):
@@ -21,6 +22,7 @@ class source:
         self.genre_filter = ['animation', 'anime']
         self.domains = ['toonget.net']
         self.base_link = 'https://toonget.net'
+        self.scraper = cfscrape.create_scraper()
 
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -56,17 +58,18 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 match = re.compile('<iframe src="(.+?)"').findall(r)
                 for url in match: 
-                    r = client.request(url)
+                    r = self.scraper.get(url).content
                     if 'playpanda' in url:
                         match = re.compile("url: '(.+?)',").findall(r)
                     else:
                         match = re.compile('file: "(.+?)",').findall(r)
-                        for url in match:
-                            sources.append({'source': 'Direct','quality': 'SD','language': 'en','url': url,'direct': False,'debridonly': False}) 
+                    for url in match:
+                        sources.append({'source': 'Direct','quality': 'SD','language': 'en','url': url,'direct': False,
+                                        'debridonly': False})
             except:
                 return
         except Exception:

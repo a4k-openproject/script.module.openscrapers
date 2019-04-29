@@ -12,8 +12,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import client, cleantitle, dom_parser, source_utils, cfscrape
 
 

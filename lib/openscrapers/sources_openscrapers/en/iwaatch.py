@@ -26,6 +26,7 @@
 import re
 
 import urlparse
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 
 
@@ -36,23 +37,24 @@ class source:
         self.domains = ['iwaatch.com']
         self.base_link = 'https://iwaatch.com/'
         self.search_link = 'https://iwaatch.com/?q=%s'
-        self.sources2 = []
+        self.sources = []
+        self.scraper = cfscrape.create_scraper()
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
-        if 1:  # try:
+        try:
             clean_title = cleantitle.geturl(title).replace('-', '%20')
             url = urlparse.urljoin(self.base_link, (
             self.search_link % (clean_title))) + '$$$$$' + title + '$$$$$' + year + '$$$$$' + 'movie'
             return url
-            # except:
-            #    return
+        except:
+            return
 
     def sources(self, url, hostDict, hostprDict):
-        import requests
-        self.sources2 = []
+        self.sources = []
 
         if url is None:
-            return self.sources2
+            return self.sources
 
         data = url.split('$$$$$')
 
@@ -71,22 +73,22 @@ class source:
             'TE': 'Trailers',
         }
 
-        response = requests.get(url, headers=headers).content
+        response = self.scraper.get(url, headers=headers).content
         regex = '<div class="col-xs-.+?a href="(.+?)".+?div class="post-title">(.+?)<'
         match2 = re.compile(regex, re.DOTALL).findall(response)
 
         for link_in, title_in in match2:
             if title in title_in:
-                x = requests.get(link_in.replace('movie', 'view'), headers=headers).content
+                x = self.scraper.get(link_in.replace('movie', 'view'), headers=headers).content
                 regex = "file: '(.+?)'.+?label: '(.+?)'"
                 match3 = re.compile(regex, re.DOTALL).findall(x)
 
                 for url, q in match3:
-                    self.sources2.append(
+                    self.sources.append(
                         {'source': 'Direct', 'quality': q, 'language': 'en', 'url': url, 'direct': True,
                          'debridonly': False})
 
-        return self.sources2
+        return self.sources
 
     def resolve(self, url):
         return url

@@ -15,6 +15,7 @@ import urllib
 import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import source_utils
 
 
@@ -23,8 +24,9 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['ganol.si', 'ganool123.com']
-        self.base_link = 'https://www1.ganool123.com'
+        self.base_link = 'https://ganool.ws/'
         self.search_link = '/search/?q=%s'
+        self.scraper = cfscrape.create_scraper()
 
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -39,17 +41,18 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url is None: return sources
+            if url is None:
+                return sources
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             q = '%s' % cleantitle.geturl(data['title'])
             url = self.base_link + self.search_link % q.replace('-','+')
-            r = client.request(url)
+            r = self.scraper.get(url).content
             v = re.compile('<a href="(.+?)" class="ml-mask jt" title="(.+?)">\n<span class=".+?">(.+?)</span>').findall(r)
             for url, check, quality in v:
                 t = '%s (%s)' % (data['title'], data['year'])
                 if t not in check: raise Exception()
-                r = client.request(url + '/watch.html')
+                r = self.scraper.get(url + '/watch.html').content
                 url = re.compile('<iframe.+?src="(.+?)"').findall(r)[0]
                 quality = source_utils.check_url(quality)
                 valid, host = source_utils.is_host_valid(url, hostDict)
@@ -58,7 +61,6 @@ class source:
             return sources
         except BaseException:
             return sources
-
 
     def resolve(self, url):
         return url

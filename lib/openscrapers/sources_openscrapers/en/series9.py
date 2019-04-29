@@ -9,15 +9,18 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
-
+''''
     Updated and refactored by someone.
     Originally created by others.
 '''
 import re
-import traceback
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import directstream
 
 
 class source:
@@ -27,7 +30,7 @@ class source:
         self.domains = ['series9.io']
         self.base_link = 'https://series9.io'
         self.search_link = '/movie/search/%s'
-# Removed  seriesonline.io  series9.co
+        self.scraper = cfscrape.create_scraper()
 
 
     def matchAlias(self, title, aliases):
@@ -76,7 +79,7 @@ class source:
             title = cleantitle.normalize(title)
             search = '%s Season %01d' % (title, int(season))
             url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(search))
-            r = client.request(url, headers=headers, timeout='15')
+            r = self.scraper.get(url, headers=headers, timeout='15').content
             r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
             r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
             r = [(i[0], i[1], re.findall('(.*?)\s+-\s+Season\s+(\d)', i[1])) for i in r]
@@ -92,7 +95,7 @@ class source:
         try:
             title = cleantitle.normalize(title)
             url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(title))
-            r = client.request(url, headers=headers, timeout='15')
+            r = self.scraper.get(url, headers=headers, timeout='15').content
             r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
             r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
             results = [(i[0], i[1], re.findall('\((\d{4})', i[1])) for i in r]
@@ -121,13 +124,13 @@ class source:
             if 'tvshowtitle' in data:
                 ep = data['episode']
                 url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
-                r = client.request(url, headers=headers, timeout='10', output='geturl')
-                if url == None:
+                result =self.scraper.get(url, headers=headers).status
+                if not result == 200:
                     url = self.searchShow(data['tvshowtitle'], data['season'], aliases, headers)
             else:
                 url = self.searchMovie(data['title'], data['year'], aliases, headers)
             if url == None: raise Exception()
-            r = client.request(url, headers=headers, timeout='10')
+            r = self.scraper.get(url, headers=headers, timeout='10').content
             r = client.parseDOM(r, 'div', attrs={'class': 'les-content'})
             if 'tvshowtitle' in data:
                 ep = data['episode']

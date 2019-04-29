@@ -34,6 +34,7 @@ from openscrapers.modules import debrid
 from openscrapers.modules import dom_parser2
 from openscrapers.modules import source_utils
 from openscrapers.modules import workers
+from openscrapers.modules import cfscrape
 
 
 class source:
@@ -42,6 +43,7 @@ class source:
         self.language = ['en']
         self.domains = ['scnsrc.me']
         self.base_link = 'https://www.scnsrc.me'
+        self.scraper = cfscrape.create_scraper()
 
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -94,7 +96,7 @@ class source:
             url = urlparse.urljoin(self.base_link, query)
 
             headers = {'User-Agent': client.agent()}
-            r = client.request(url, headers=headers)
+            r =self.scraper.get(url, headers=headers).content
             posts = dom_parser2.parse_dom(r, 'li', {'class': re.compile('.+?'), 'id': re.compile('comment-.+?')})
             self.hostDict = hostDict + hostprDict
             threads = []

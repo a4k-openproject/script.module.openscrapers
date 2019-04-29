@@ -120,8 +120,8 @@ hosts = [u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'thevide
 
 
 def domain_analysis(domain_name):
-    result = {'domain_status': 'None','cloudflare_enabled': '', 'cloudflare_captcha_enabled': '',
-              'cloudflare_antibot_enabled': '' }
+    result = {'domain_status': 'None', 'cloudflare_enabled': '', 'cloudflare_captcha_enabled': '',
+              'cloudflare_antibot_enabled': ''}
     try:
         resp = requests.get(domain_name)
         result['domain_status'] = resp.status_code
@@ -274,8 +274,8 @@ if __name__ == '__main__':
         while len(RUNNING_PROVIDERS) > 0:
             if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
                 break
-            print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
-                                                  ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
+            #          print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
+            #                                                ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
             TOTAL_RUNTIME += 1
     else:
@@ -332,7 +332,6 @@ if __name__ == '__main__':
             quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
         for x in quality:
             print('%s: %s Sources' % (x, quality[x]))
-        print('Passed Providers:')
 
         base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
         output_filename = 'results-%s.csv' % time.time()
@@ -341,12 +340,12 @@ if __name__ == '__main__':
             os.makedirs(base_output_path)
 
         with open(os.path.join(base_output_path, output_filename), 'w+') as output:
-            output.write('Provider Name,Number Of Sources,Runtime%s\n' %
+            output.write('Provider Name;Number Of Sources;Runtime;%s\n' %
                          ','.join(str(x) for x in PASSED_PROVIDERS[1][3].keys()))
             for i in PASSED_PROVIDERS:
                 try:
                     if i[1] is not None:
-                        output.write('%s,%s,%s,%s\n' % (i[0], len(i[1]), i[2], ','.join(str(x) for x in i[3].values())))
+                        output.write('%s;%s;%s;%s\n' % (i[0], len(i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
                 except:
                     pass
 

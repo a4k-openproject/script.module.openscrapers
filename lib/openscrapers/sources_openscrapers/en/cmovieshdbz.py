@@ -27,9 +27,9 @@ import re
 
 import requests
 from openscrapers.modules import cleantitle
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
-
 
 class source:
     def __init__(self):
@@ -38,6 +38,7 @@ class source:
         self.domains = ['cmovieshd.bz']
         self.base_link = 'http://w1.cmovieshd.bz'
         self.search_link = '/film/%s/watching.html?ep=0'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

@@ -11,7 +11,7 @@
 
 import re
 
-from openscrapers.modules import client, cleantitle, source_utils
+from openscrapers.modules import client, cleantitle, source_utils, cfscrape
 
 
 class source:
@@ -23,7 +23,7 @@ class source:
         self.base_link = 'https://www.pokemonfire.com'
         self.movie_link = '/movies/%s'
         self.tv_link = '/episodes/%s-season-%s-episode-%s/'
-
+        self.scraper = cfscrape.create_scraper(0)
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -54,7 +54,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 match = re.compile('<iframe class="metaframe rptss" src="https\://veohb\.net/(.+?)"').findall(r)
                 for url in match:
@@ -70,7 +70,7 @@ class source:
 
 
     def resolve(self, url):
-        r = client.request(url)
+        r = self.scraper.get(url).content
         match = re.compile('<source src="(.+?)"').findall(r)
         for url in match:
             return url

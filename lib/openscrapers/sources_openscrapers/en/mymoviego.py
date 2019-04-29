@@ -13,8 +13,8 @@
 import base64
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle, client, dom_parser2, source_utils, cfscrape
 
 

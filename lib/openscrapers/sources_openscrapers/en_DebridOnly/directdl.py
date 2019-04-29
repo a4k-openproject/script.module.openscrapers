@@ -27,8 +27,8 @@ import re
 import urllib
 
 import urlparse
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -46,7 +46,7 @@ class source:
         self.r_link = 'aHR0cDovL2lwdjYuaWNlZmlsbXMuaW5mby9pcC5waHA/dj0lcyY='
         self.j_link = 'aHR0cDovL2lwdjYuaWNlZmlsbXMuaW5mby9tZW1iZXJzb25seS9jb21wb25lbnRzL2NvbV9pY2VwbGF5ZXIvdmlkZW8ucGhwQWpheFJlc3AucGhwP3M9JXMmdD0lcw=='
         self.p_link = 'aWQ9JXMmcz0lcyZpcXM9JnVybD0mbT0lcyZjYXA9KyZzZWM9JXMmdD0lcw=='
-
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -84,7 +84,7 @@ class source:
             headers = {'Accept': '*/*'}
             if not cookie == None: headers['Cookie'] = cookie
             if not referer == None: headers['Referer'] = referer
-            result = client.request(url, post=post, headers=headers, output=output, close=close)
+            result = self.scraper.get(url, post=post, headers=headers, output=output, close=close).content
             result = result.decode('iso-8859-1').encode('utf-8')
             result = urllib.unquote_plus(result)
             return(result)
@@ -125,7 +125,7 @@ class source:
                 q = self.search_link + urllib.quote_plus('%s %s' % (t, f[0]))
                 
                 q = urlparse.urljoin(self.base_link, q)
-                result = client.request(q)   
+                result = self.scraper.get(q).content
                 result = json.loads(result)
 
                 result = result['results']
@@ -152,23 +152,23 @@ class source:
                     info = ' | % | ' % size.join(info)
 
                     url = i['links']
-                    #for x in url.keys(): links.append({'url': url[x], 'quality': quality, 'info': info})
 
                     links = []
 
-                    for x in url.keys(): links.append({'url': url[x], 'quality': quality})
+                    for x in url.keys():
+                        links.append({'url': url[x], 'quality': quality})
 
                     for link in links:
                         try:
                             url = link['url']
                             quality2 = link['quality']
-                            #url = url[1]
-                            #url = link
-                            if len(url) > 1: raise Exception()
+                            if len(url) > 1:
+                                raise Exception()
                             url = url[0].encode('utf-8')
                             
                             host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
-                            if not host in hostprDict: raise Exception()
+                            if host not in hostprDict:
+                                raise Exception()
                             host = host.encode('utf-8')
 
                             sources.append({'source': host, 'quality': quality2, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})

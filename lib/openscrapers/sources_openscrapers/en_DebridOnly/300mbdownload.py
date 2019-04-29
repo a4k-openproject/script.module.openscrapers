@@ -29,6 +29,7 @@ import re
 import urllib
 
 import urlparse
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -42,6 +43,7 @@ class source:
         self.domains = ['300mbdownload']
         self.base_link = 'https://www.300mbdownload.club'
         self.search_link = '/search/%s/feed/rss2/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -94,7 +96,7 @@ class source:
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
 
-            html = client.request(url)
+            html =self.scraper.get(url).content
             posts = client.parseDOM(html, 'item')
 
             hostDict = hostprDict + hostDict
@@ -116,12 +118,14 @@ class source:
                 try:
 
                     url = item[1]
-                    if any(x in url for x in ['.rar', '.zip', '.iso']): raise Exception()
+                    if any(x in url for x in ['.rar', '.zip', '.iso']):
+                        raise Exception()
                     url = client.replaceHTMLCodes(url)
                     url = url.encode('utf-8')
 
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    if not valid: raise Exception()
+                    if not valid:
+                        raise Exception()
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
 
@@ -130,11 +134,13 @@ class source:
 
                     t = re.sub('(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*|3D)(\.|\)|\]|\s|)(.+|)', '', name, flags=re.I)
 
-                    if not cleantitle.get(t) == cleantitle.get(title): raise Exception()
+                    if not cleantitle.get(t) == cleantitle.get(title):
+                        raise Exception()
 
                     y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', name)[-1].upper()
 
-                    if not y == hdlr: raise Exception()
+                    if not y == hdlr:
+                        raise Exception()
 
                     quality, info = source_utils.get_release_quality(name, url)
 
@@ -153,9 +159,6 @@ class source:
                                     'direct': False, 'debridonly': True})
                 except:
                     pass
-
-            check = [i for i in sources if not i['quality'] == 'CAM']
-            if check: sources = check
 
             return sources
         except:

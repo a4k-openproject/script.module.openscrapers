@@ -25,9 +25,6 @@
 
 
 import re
-import traceback
-
-import requests
 
 try:
     from urllib import urlencode
@@ -38,8 +35,10 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser2 as dom
+from openscrapers.modules import jsunpack
 
 
 class source:
@@ -50,12 +49,13 @@ class source:
         self.base_link = 'https://www4.primewire.ac/'
         self.moviesearch_link = '?keywords=%s&type=movie'
         self.tvsearch_link = '?keywords=%s&type=tv'
+        self.scraper = cfscrape.create_scrper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             query = self.moviesearch_link % urllib.quote_plus((title))
             query = urlparse.urljoin(self.base_link, query.lower())
-            result = client.request(query, referer=self.base_link)
+            result = self.scraper.get(query, referer=self.base_link).content
 
             result = client.parseDOM(result, 'div', attrs={'class': 'index_item.+?'})
 
@@ -75,7 +75,7 @@ class source:
                 cleantitle.query(tvshowtitle))
             query = urlparse.urljoin(self.base_link, query.lower())
 
-            result = client.request(query)
+            result = self.scraper.get(query).content
             result = client.parseDOM(
                 result, 'div', attrs={
                     'class': 'index_item.+?'})
@@ -118,7 +118,7 @@ class source:
 
             url = urlparse.urljoin(self.base_link, url) if not url.startswith('http') else url
 
-            result = client.request(url)
+            result = self.scraper.get(url).content
             links = client.parseDOM(result, 'tbody')
 
             for i in links:
@@ -155,24 +155,15 @@ class source:
     def resolve(self, url):
         try:
             if '/stream/' in url or '/watch/' in url:
-                r = client.request(url, referer=self.base_link)
+                r = self.scraper.get(url, referer=self.base_link).content
                 link = client.parseDOM(r, 'a', ret='data-href', attrs={'id': 'iframe_play'})[0]
             else:
-                try:
-                    from openscrapers.modules import jsunpack
-                    data = client.request(url, referer=self.base_link)
-                    data = re.findall(
-                        r'\s*(eval.+?)\s*</script', data, re.DOTALL)[0]
-                    link = jsunpack.unpack(data)
-                    link = link.replace('\\', '')
-                    link = re.findall(r'''go\(['"](.+?)['"]\)''', link)[0]
-                except BaseException:
-                    link = client.request(url, output='geturl', timeout=10)
-                    if link == url:
-                        return
-                    else:
-                        return link
-
+                data = self.scraper.get(url, referer=self.base_link).content
+                data = re.findall(
+                    r'\s*(eval.+?)\s*</script', data, re.DOTALL)[0]
+                link = jsunpack.unpack(data)
+                link = link.replace('\\', '')
+                link = re.findall(r'''go\(['"](.+?)['"]\)''', link)[0]
             return link
         except Exception:
             return

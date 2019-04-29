@@ -13,9 +13,9 @@
 import base64
 import re
 import urllib
-import urlparse
 
-from openscrapers.modules import client, cleantitle, dom_parser2, source_utils
+import urlparse
+from openscrapers.modules import client, cleantitle, dom_parser2, source_utils, cfscrape
 
 
 class source:
@@ -25,13 +25,13 @@ class source:
         self.domains = ['watchfree1.com']
         self.base_link = 'http://watchfree1.com'
         self.search_link = '/search-movies/%s.html'
-
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             clean_title = cleantitle.geturl(title).replace('-', '+')
             url = urlparse.urljoin(self.base_link, (self.search_link % clean_title))
-            r = client.request(url)
+            r = self.scraper.get(url).content
             r = dom_parser2.parse_dom(r, 'div', {'class': 'item'})
             r = [dom_parser2.parse_dom(i, 'a', req=['href']) for i in r if i]
             r = [(i[0].attrs['href'], re.search('Release:\s*(\d+)', i[0].content)) for i in r if i]
@@ -45,7 +45,6 @@ class source:
         except Exception:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -53,7 +52,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -73,14 +71,13 @@ class source:
                 url = r[0][0]
             except:
                 pass
-            data = client.request(url)
+            data = self.scraper.get(url).content
             data = client.parseDOM(data, 'div', attrs={'id': 'details'})
             data = zip(client.parseDOM(data, 'a'), client.parseDOM(data, 'a', ret='href'))
             url = [(i[0], i[1]) for i in data if i[0] == str(int(episode))]
             return url[0][1]
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -92,7 +89,7 @@ class source:
             entervideo_limit = 1
             megamp4_limit = 1
             vidtodo_limit = 1
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 v = re.findall('document.write\(Base64.decode\("(.+?)"\)', r)[0]
                 b64 = base64.b64decode(v)
@@ -103,7 +100,8 @@ class source:
                     host = host.encode('utf-8')
                     valid, host = source_utils.is_host_valid(host, hostDict)
                     if valid:
-                        sources.append({ 'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False })
+                        sources.append({'source': host, 'quality': 'SD', 'language': 'en',
+                                        'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False})
                 except:
                     pass
             except:
@@ -121,40 +119,54 @@ class source:
                         if 'other' in host: continue
                         valid, host = source_utils.is_host_valid(host, hostDict)
                         if 'openload' in host:
-                            if openload_limit < 1: continue
-                            else: openload_limit -= 1
+                            if openload_limit < 1:
+                                continue
+                            else:
+                                openload_limit -= 1
                         if 'vshare' in host:
-                            if vshare_limit < 1: continue
-                            else: vshare_limit -= 1
+                            if vshare_limit < 1:
+                                continue
+                            else:
+                                vshare_limit -= 1
                         if 'flashx' in host:
-                            if flashx_limit < 1: continue
-                            else: flashx_limit -= 1
+                            if flashx_limit < 1:
+                                continue
+                            else:
+                                flashx_limit -= 1
                         if 'thevideobee' in host:
-                            if thevideobee_limit < 1: continue
-                            else: thevideobee_limit -= 1
+                            if thevideobee_limit < 1:
+                                continue
+                            else:
+                                thevideobee_limit -= 1
                         if 'entervideo' in host:
-                            if entervideo_limit < 1: continue
-                            else: entervideo_limit -= 1
+                            if entervideo_limit < 1:
+                                continue
+                            else:
+                                entervideo_limit -= 1
                         if 'megamp4' in host:
-                            if megamp4_limit < 1: continue
-                            else: megamp4_limit -= 1
+                            if megamp4_limit < 1:
+                                continue
+                            else:
+                                megamp4_limit -= 1
                         if 'vidtodo' in host:
-                            if vidtodo_limit < 1: continue
-                            else: vidtodo_limit -= 1
+                            if vidtodo_limit < 1:
+                                continue
+                            else:
+                                vidtodo_limit -= 1
                         if valid:
-                            sources.append({ 'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False })
+                            sources.append(
+                                {'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'),
+                                 'direct': False, 'debridonly': False})
                     except:
                         pass
             return sources
         except Exception:
             return
 
-
     def resolve(self, url):
         if self.base_link in url:
-            url = client.request(url)
+            url = self.scraper.get(url).content
             v = re.findall('document.write\(Base64.decode\("(.+?)"\)', url)[0]
             b64 = base64.b64decode(v)
             url = client.parseDOM(b64, 'iframe', ret='src')[0]
         return url
-

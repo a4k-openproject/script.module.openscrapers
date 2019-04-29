@@ -4,8 +4,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import client, control, debrid, source_utils
 
 

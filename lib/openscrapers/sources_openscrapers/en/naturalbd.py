@@ -24,9 +24,9 @@
 '''
 
 import urllib
-import urlparse
 
-from openscrapers.modules import client
+import urlparse
+from openscrapers.modules import client, cfscrape
 
 
 class source:
@@ -36,6 +36,7 @@ class source:
         self.domains = ['naturalbd.com']
         self.base_link = 'http://naturalbd.com'
         self.search_link = 'http://naturalbd.com/rpc.php'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -77,20 +78,20 @@ class source:
 
             if not 'tvshowtitle' in data:
                 url = urlparse.urljoin(self.base_link, 'movie.php?imdbid=%s' % imdb)
-                data = client.request(url, referer=self.base_link)
+                data = self.scraper(url, referer=self.base_link).content
                 links = client.parseDOM(data, 'source', ret='src')
             else:
                 tm_api = '9c61dcfae7065994ce1008535ece53eb'
                 tm_url = 'http://api.themoviedb.org/3/find/%s?api_key=%s&external_source=imdb_id' % (imdb, tm_api)
-                tm_id = client.request(tm_url)
+                tm_id = self.scraper.get(tm_url).content
                 import json
                 tm_id = json.loads(tm_id)['tv_results'][0]['id']
                 tm_eplink = 'https://api.themoviedb.org/3/tv/%d/season/%d/episode/%d?api_key=%s' %\
                             (int(tm_id), int(data['season']), int(data['episode']), tm_api)
-                tm_epiid = client.request(tm_eplink)
+                tm_epiid = self.scraper.get(tm_eplink).content
                 tm_epiid = json.loads(tm_epiid)['id']
                 url = urlparse.urljoin(self.base_link, 'single-episode.php?epiid=%s&tvid=%s' % (tm_epiid, tm_id))
-                data = client.request(url, referer=self.base_link)
+                data = self.scraper.get(url, referer=self.base_link).content
                 links = client.parseDOM(data, 'source', ret='src')
 
             for link in links:

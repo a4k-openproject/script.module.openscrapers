@@ -28,6 +28,7 @@ import urllib
 
 import urlparse
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -39,6 +40,7 @@ class source:
         self.domains = ['invictus.ws']
         self.base_link = 'http://2ddl.vg'
         self.search_link = '/?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -88,18 +90,17 @@ class source:
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url).replace('-', '+')
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
             if r == None and 'tvshowtitle' in data:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)
                 url = title
 
-                r = client.request(url)
+                r =  self.scraper.get(url).content
 
             for loopCount in range(0,2):
                 if loopCount == 1 or (r == None and 'tvshowtitle' in data):
-
-                    r = client.request(url)
+                    r = self.scraper.get(url).content
 
                 posts = client.parseDOM(r, "div", attrs={"class": "postpage_movie_download"})
                 hostDict = hostprDict + hostDict
@@ -121,7 +122,7 @@ class source:
             for item in items:
                 try:
                     i = str(item)
-                    r = client.request(i)
+                    r = self.scraper.get(i).content
                     u = client.parseDOM(r, "div", attrs={"class": "multilink_lnks"})
                     for t in u:
                         r = client.parseDOM(t, 'a', ret='href')
@@ -133,8 +134,6 @@ class source:
 
                 except:
                     pass
-            check = [i for i in sources if not i['quality'] == 'CAM']
-            if check: sources = check
 
             return sources
         except:
