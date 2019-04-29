@@ -159,80 +159,81 @@ def worker_thread(provider_name, provider_source):
         # Confirm Provider contains the movie function
 
         if getattr(provider_source, test_mode, False):
-        analysis = {}
+            analysis = {}
 
-        # Run analysis on the domains
-        if not hasattr(provider_source, 'base_link'):
-            print('Warning: provider %s is missing base_link property' % provider_name)
-        else:
-            analysis = domain_analysis(provider_source.base_link)
-
-            if analysis['domain_status'] is not 'Offline' \
-                    and not hasattr(provider_source, 'scraper') \
-                    and ('cloudflare_enabled' in analysis and analysis['cloudflare_enabled']):
-                print('Warning: provider %s is missing a CF scraper but CF cookie is detected' % provider_name)
-
-        if hasattr(provider_source, 'base_link') \
-                and (('domain_status' not in analysis) or (analysis['domain_status'] is 'Offline')):
-            print('Warning: Error while fetching domains for provider %s' % provider_name)
-
-        if not getattr(provider_source, 'unit_test', False):
-            if test_mode == 'movie':
-                test_objects = movie_meta
-            elif test_mode == 'episode':
-                test_objects = episode_meta
-
+            # Run analysis on the domains
+            if not hasattr(provider_source, 'base_link'):
+                print('Warning: provider %s is missing base_link property' % provider_name)
             else:
-                RUNNING_PROVIDERS.remove(provider_name)
-                return
+                analysis = domain_analysis(provider_source.base_link)
 
-            provider_results = []
-            url = []
-            start_time = time.time()
+                if analysis['domain_status'] is not 'Offline' \
+                        and not hasattr(provider_source, 'scraper') \
+                        and ('cloudflare_enabled' in analysis and analysis['cloudflare_enabled']):
+                    print('Warning: provider %s is missing a CF scraper but CF cookie is detected' % provider_name)
 
-            for i in test_objects:
-                if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE: break
+            if hasattr(provider_source, 'base_link') \
+                    and (('domain_status' not in analysis) or (analysis['domain_status'] is 'Offline')):
+                print('Warning: Error while fetching domains for provider %s' % provider_name)
 
-                start_time = time.time()
-                if len(provider_results) != 0:
-                    break
-                # Prepare test by fetching url
+            if not getattr(provider_source, 'unit_test', False):
                 if test_mode == 'movie':
-                    url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
-                    if url is None:
-                        continue
-
+                    test_objects = movie_meta
                 elif test_mode == 'episode':
-                    url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
-                                                 i['localtvshowtitle'], i['aliases'], i['year'])
-                    if url is None:
-                        continue
+                    test_objects = episode_meta
 
-                    url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'], i['season'],
-                                                  i['episode'])
-                    if url is None:
-                        continue
                 else:
                     RUNNING_PROVIDERS.remove(provider_name)
                     return
 
-                # Execute source method to gather urls
-                url = provider_source.sources(url, hosts, [])
-                if url is None:
-                    continue
-                else:
-                    if len(url) > 0:
-                        provider_results = url
-                        TOTAL_SOURCES += url
-                    else:
-                        continue
-            if url is None: url = []
-            # Gather time analytics
-            runtime = time.time() - start_time
+                provider_results = []
+                url = []
+                start_time = time.time()
 
-            PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
-        else:
-            pass
+                for i in test_objects:
+                    if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE: break
+
+                    start_time = time.time()
+                    if len(provider_results) != 0:
+                        break
+                    # Prepare test by fetching url
+                    if test_mode == 'movie':
+                        url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
+                        if url is None:
+                            continue
+
+                    elif test_mode == 'episode':
+                        url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
+                                                     i['localtvshowtitle'], i['aliases'], i['year'])
+                        if url is None:
+                            continue
+
+                        url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'],
+                                                      i['season'],
+                                                      i['episode'])
+                        if url is None:
+                            continue
+                    else:
+                        RUNNING_PROVIDERS.remove(provider_name)
+                        return
+
+                    # Execute source method to gather urls
+                    url = provider_source.sources(url, hosts, [])
+                    if url is None:
+                        continue
+                    else:
+                        if len(url) > 0:
+                            provider_results = url
+                            TOTAL_SOURCES += url
+                        else:
+                            continue
+                if url is None: url = []
+                # Gather time analytics
+                runtime = time.time() - start_time
+
+                PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
+            else:
+                pass
 
     except Exception as e:
         traceback.print_exc()
@@ -264,8 +265,8 @@ if __name__ == '__main__':
         while len(RUNNING_PROVIDERS) > 0:
             if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
                 break
-                      print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
-                                                            ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
+            print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
+                                                  ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
             TOTAL_RUNTIME += 1
     else:
@@ -331,20 +332,14 @@ if __name__ == '__main__':
 
         with open(os.path.join(base_output_path, output_filename), 'w+') as output:
             output.write('Provider Name;Number Of Sources;Runtime;%s\n' %
-                         ','.join(str(x) for x in PASSED_PROVIDERS[1][3].keys()))
+                         ';'.join(str(x) for x in PASSED_PROVIDERS[1][3].keys()))
             for i in PASSED_PROVIDERS:
                 try:
                     if i[1] is not None:
-                        output.write('%s;%s;%s;%s\n' % (i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
+                        output.write('%s;%s;%s;%s\n' % (
+                        i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
                 except:
                     pass
-        quality = {}
-
-        for i in TOTAL_SOURCES:
-            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
-
-        for x in quality:
-            print('%s: %s Sources' % (x, quality[x]))
 
     elif test_type == 0:
         all_sources = PASSED_PROVIDERS[0][1]
