@@ -16,9 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Addon Name: OpenScrapers Module
-# Addon id: script.module.openscrapers
-
 from openscrapers.modules import control
 from openscrapers.modules import log_utils
 
@@ -36,14 +33,6 @@ except:
 
 def status():
     return debrid_resolvers != []
-
-
-def tor_enabled():
-    enabled = control.setting('torrent.enabled')
-    if enabled == 'true':
-        return True
-    else:
-        return False
 
 
 def resolver(url, debrid):

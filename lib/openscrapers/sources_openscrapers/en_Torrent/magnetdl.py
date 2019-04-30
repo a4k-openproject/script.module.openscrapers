@@ -26,9 +26,12 @@
 
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import debrid, cleantitle, client, source_utils
+
+from openscrapers.modules import debrid
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -73,9 +76,6 @@ class source:
             if debrid.status() is False:
                 raise Exception()
 				
-			if debrid.tor_enabled() is False:
-				raise Exception()
-
             if url is None:
                 return sources
 

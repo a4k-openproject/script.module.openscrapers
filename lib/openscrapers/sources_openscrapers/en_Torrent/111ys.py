@@ -12,9 +12,15 @@
 Created by Tempest
 """
 
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
 
-from openscrapers.modules import cleantitle,client,debrid,source_utils,cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
+from openscrapers.modules import cfscrape
 
 
 class source:
@@ -41,7 +47,6 @@ class source:
             sources = []
             if url is None: return sources
             if debrid.status() is False: raise Exception()
-            if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             query = '%s %s' % (data['title'], data['year'])

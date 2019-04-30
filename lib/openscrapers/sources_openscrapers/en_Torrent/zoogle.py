@@ -26,9 +26,13 @@
 
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import cleantitle, client, control, debrid, source_utils
+
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import control
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -90,9 +94,6 @@ class source:
 				
             if debrid.status() is False:
                 raise Exception()
-				
-			if debrid.tor_enabled() is False:
-				raise Exception()
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
