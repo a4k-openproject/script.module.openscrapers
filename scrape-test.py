@@ -121,16 +121,19 @@ hosts = [u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'thevide
 
 
 def domain_analysis(domain_name):
-    result = {'domain_status': 'None', 'cloudflare_enabled': '', 'cloudflare_captcha_enabled': '',
-              'cloudflare_antibot_enabled': ''}
+    result = {'domain_status': 'None', 'domain_protocol': '', 'domain_name': '', 'domain_http_enabled': '',
+              'cloudflare_enabled': '', 'cloudflare_captcha_enabled': '', 'cloudflare_antibot_enabled': ''}
     try:
         resp = requests.get(domain_name)
         result['domain_status'] = resp.status_code
-        domain = urlparse(resp.url).netloc
+        parsed_url = urlparse(resp.url)
         cookie_domain = None
 
+        result['domain_protocol'] = parsed_url.scheme
+        result['domain_name'] = parsed_url.netloc
+
         for d in resp.cookies.list_domains():
-            if d.startswith(".") and d in ("." + domain):
+            if d.startswith(".") and d in ("." + parsed_url.netloc):
                 cookie_domain = d
                 break
 
@@ -157,7 +160,6 @@ def worker_thread(provider_name, provider_source):
     RUNNING_PROVIDERS.append(provider_name)
     try:
         # Confirm Provider contains the movie function
-
         if getattr(provider_source, test_mode, False):
             analysis = {}
 
@@ -176,65 +178,61 @@ def worker_thread(provider_name, provider_source):
                     and (('domain_status' not in analysis) or (analysis['domain_status'] is 'Offline')):
                 print('Warning: Error while fetching domains for provider %s' % provider_name)
 
-            if not getattr(provider_source, 'unit_test', False):
-                if test_mode == 'movie':
-                    test_objects = movie_meta
-                elif test_mode == 'episode':
-                    test_objects = episode_meta
+            if test_mode == 'movie':
+                test_objects = movie_meta
+            elif test_mode == 'episode':
+                test_objects = episode_meta
+            else:
+                RUNNING_PROVIDERS.remove(provider_name)
+                return
 
+            provider_results = []
+            url = []
+            start_time = time.time()
+
+            for i in test_objects:
+                if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
+                    break
+
+                start_time = time.time()
+                if len(provider_results) != 0:
+                    break
+                # Prepare test by fetching url
+                if test_mode == 'movie':
+                    url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
+                    if url is None:
+                        continue
+
+                elif test_mode == 'episode':
+                    url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
+                                                 i['localtvshowtitle'], i['aliases'], i['year'])
+                    if url is None:
+                        continue
+
+                    url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'],
+                                                  i['season'],
+                                                  i['episode'])
+                    if url is None:
+                        continue
                 else:
                     RUNNING_PROVIDERS.remove(provider_name)
                     return
 
-                provider_results = []
-                url = []
-                start_time = time.time()
-
-                for i in test_objects:
-                    if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE: break
-
-                    start_time = time.time()
-                    if len(provider_results) != 0:
-                        break
-                    # Prepare test by fetching url
-                    if test_mode == 'movie':
-                        url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
-                        if url is None:
-                            continue
-
-                    elif test_mode == 'episode':
-                        url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
-                                                     i['localtvshowtitle'], i['aliases'], i['year'])
-                        if url is None:
-                            continue
-
-                        url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'],
-                                                      i['season'],
-                                                      i['episode'])
-                        if url is None:
-                            continue
+                # Execute source method to gather urls
+                url = provider_source.sources(url, hosts, [])
+                if url is None:
+                    continue
+                else:
+                    if len(url) > 0:
+                        provider_results = url
+                        TOTAL_SOURCES += url
                     else:
-                        RUNNING_PROVIDERS.remove(provider_name)
-                        return
-
-                    # Execute source method to gather urls
-                    url = provider_source.sources(url, hosts, [])
-                    if url is None:
                         continue
-                    else:
-                        if len(url) > 0:
-                            provider_results = url
-                            TOTAL_SOURCES += url
-                        else:
-                            continue
-                if url is None: url = []
-                # Gather time analytics
-                runtime = time.time() - start_time
-
-                PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
-            else:
-                pass
-
+            if url is None:
+                url = []
+            # Gather time analytics
+            runtime = time.time() - start_time
+            PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
     except Exception as e:
         traceback.print_exc()
         RUNNING_PROVIDERS.remove(provider_name)
