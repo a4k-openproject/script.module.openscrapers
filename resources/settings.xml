@@ -164,6 +164,7 @@
 
 <!-- Torrents-4 -->
     <category label="Torrent (cached)">
+		<setting id="torrent.enabled" type="bool" label="Enable Torrents Scraping" default="true" />	
         <setting label="Disable All Torrent Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=false&query=4.0)"/>
         <setting label="Enable All Torrent Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=true&query=4.1)"/>
         <setting type="sep" />

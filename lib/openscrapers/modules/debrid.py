@@ -34,20 +34,17 @@ except:
     debrid_resolvers = []
 
 
-def status(torrent=False):
-    try:
-        import xbmc
-        debrid_check = debrid_resolvers != []
-        if debrid_check is True:
-            if torrent:
-                enabled = control.setting('torrent.enabled')
-                if enabled == '' or enabled.lower() == 'true':
-                    return True
-                else:
-                    return False
-        return debrid_check
-    except:
+def status():
+    return debrid_resolvers != []
+
+
+def tor_enabled():
+    enabled = control.setting('torrent.enabled')
+    if enabled == 'true':
         return True
+    else:
+        return False
+
 
 def resolver(url, debrid):
     try:
@@ -59,3 +56,4 @@ def resolver(url, debrid):
     except Exception as e:
         log_utils.log('%s Resolve Failure: %s' % (debrid, e), log_utils.LOGWARNING)
         return None
+
