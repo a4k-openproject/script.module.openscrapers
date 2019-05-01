@@ -19,7 +19,6 @@ class source:
         self.base_link = 'https://yifyddl.movie/'
         self.search_link = '/movie/%s'
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -27,7 +26,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -45,7 +43,8 @@ class source:
             except:
                 return sources
             for torrent in results:
-                link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent, re.DOTALL)
+                link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent,
+                                  re.DOTALL)
                 for link, name in link:
                     link = str(client.replaceHTMLCodes(link).split('&tr')[0])
                     quality, info = source_utils.get_release_quality(name, name)
@@ -58,12 +57,12 @@ class source:
                     except Exception:
                         pass
                     info = ' | '.join(info)
-                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append(
+                        {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                         'direct': False, 'debridonly': True})
             return sources
         except:
             return
 
-
     def resolve(self, url):
         return url
-

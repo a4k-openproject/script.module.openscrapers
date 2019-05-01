@@ -28,9 +28,10 @@ import urllib
 import urlparse
 
 from openscrapers.modules import client
-from openscrapers.modules import debrid
 from openscrapers.modules import control
+from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
+
 
 class source:
 
@@ -73,7 +74,7 @@ class source:
         sources = []
         try:
             if url is None: return sources
-            if debrid.status() is False: raise Exception()	
+            if debrid.status() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -81,7 +82,9 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s s%02de%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             url = self.search_link % urllib.quote_plus(query)
@@ -96,7 +99,7 @@ class source:
                     u = [i for i in data if '/torrent/' in i]
                     for u in u:
                         match = '%s %s' % (title, hdlr)
-                        match = match.replace('+', '-').replace(' ','-').replace(':-', '-').replace('---','-')
+                        match = match.replace('+', '-').replace(' ', '-').replace(':-', '-').replace('---', '-')
                         if not match in u: continue
                         u = self.base_link + u
                         r = client.request(u)
@@ -117,13 +120,14 @@ class source:
                             except BaseException:
                                 pass
                             info = ' | '.join(info)
-                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                                 'direct': False, 'debridonly': True})
             except:
                 return
             return sources
-        except :
+        except:
             return sources
 
     def resolve(self, url):
         return url
-

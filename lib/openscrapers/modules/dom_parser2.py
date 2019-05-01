@@ -16,12 +16,12 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
 from collections import namedtuple
 
 DomMatch = namedtuple('DOMMatch', ['attrs', 'content'])
 re_type = type(re.compile(''))
+
 
 def __get_dom_content(html, name, match):
     if match.endswith('/>'): return ''
@@ -51,6 +51,7 @@ def __get_dom_content(html, name, match):
         result = ''
     return result
 
+
 def __get_dom_elements(item, name, attrs):
     if not attrs:
         pattern = '(<%s(?:\s[^>]*>|/?>))' % (name)
@@ -61,7 +62,7 @@ def __get_dom_elements(item, name, attrs):
             value_is_regex = isinstance(value, re_type)
             value_is_str = isinstance(value, basestring)
             pattern = '''(<{tag}[^>]*\s{key}=(?P<delim>['"])(.*?)(?P=delim)[^>]*>)'''.format(tag=name, key=key)
-            re_list = re.findall(pattern, item, re.M | re. S | re.I)
+            re_list = re.findall(pattern, item, re.M | re.S | re.I)
             if value_is_regex:
                 this_list = [r[0] for r in re_list if re.match(value, r[2])]
             else:
@@ -71,7 +72,7 @@ def __get_dom_elements(item, name, attrs):
                 has_space = (value_is_regex and ' ' in value.pattern) or (value_is_str and ' ' in value)
                 if not has_space:
                     pattern = '''(<{tag}[^>]*\s{key}=([^\s/>]*)[^>]*>)'''.format(tag=name, key=key)
-                    re_list = re.findall(pattern, item, re.M | re. S | re.I)
+                    re_list = re.findall(pattern, item, re.M | re.S | re.I)
                     if value_is_regex:
                         this_list = [r[0] for r in re_list if re.match(value, r[1])]
                     else:
@@ -86,7 +87,8 @@ def __get_dom_elements(item, name, attrs):
 
 def __get_attribs(element):
     attribs = {}
-    for match in re.finditer('''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element):
+    for match in re.finditer(
+            '''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element):
         match = match.groupdict()
         value1 = match.get('value1')
         value2 = match.get('value2')

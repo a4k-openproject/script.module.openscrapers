@@ -26,15 +26,15 @@
 
 import re
 import urllib
-
 import urlparse
+
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import dom_parser2
 from openscrapers.modules import source_utils
 from openscrapers.modules import workers
-from openscrapers.modules import cfscrape
 
 
 class source:
@@ -44,7 +44,6 @@ class source:
         self.domains = ['scnsrc.me']
         self.base_link = 'https://www.scnsrc.me'
         self.scraper = cfscrape.create_scraper()
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -88,15 +87,16 @@ class source:
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             query = cleantitle.geturl(query)
             url = urlparse.urljoin(self.base_link, query)
 
             headers = {'User-Agent': client.agent()}
-            r =self.scraper.get(url, headers=headers).content
+            r = self.scraper.get(url, headers=headers).content
             posts = dom_parser2.parse_dom(r, 'li', {'class': re.compile('.+?'), 'id': re.compile('comment-.+?')})
             self.hostDict = hostDict + hostprDict
             threads = []

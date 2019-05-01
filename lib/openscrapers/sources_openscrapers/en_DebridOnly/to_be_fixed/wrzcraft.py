@@ -24,12 +24,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
-
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -89,7 +87,9 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s S%02dE%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             url = self.search_link % urllib.quote_plus(query)
@@ -115,9 +115,10 @@ class source:
                     if not u: raise Exception()
 
                     if 'tvshowtitle' in data:
-                         u = [(re.sub('(720p|1080p|2160p)', '', t) + ' ' + [x for x in i.strip('//').split('/')][-1], i) for i in u]
+                        u = [(re.sub('(720p|1080p|2160p)', '', t) + ' ' + [x for x in i.strip('//').split('/')][-1], i)
+                             for i in u]
                     else:
-                         u = [(t, i) for i in u]
+                        u = [(t, i) for i in u]
 
                     items += u
                 except:
@@ -137,12 +138,12 @@ class source:
 
                     url = item[1]
 
-                    quality, info = source_utils.get_release_quality(url,name)
+                    quality, info = source_utils.get_release_quality(url, name)
 
                     try:
                         size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', item[2])[-1]
                         div = 1 if size.endswith(('GB', 'GiB')) else 1024
-                        size = float(re.sub('[^0-9|/.|/,]', '', size))/div
+                        size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
                         size = '%.2f GB' % size
                         info.append(size)
                     except:
@@ -157,7 +158,8 @@ class source:
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
 
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                    'direct': False, 'debridonly': True})
                 except:
                     pass
 
@@ -170,5 +172,3 @@ class source:
 
     def resolve(self, url):
         return url
-
-

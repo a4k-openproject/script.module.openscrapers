@@ -11,9 +11,9 @@
 
 import re
 
-from openscrapers.modules import client
-from openscrapers.modules import cleantitle
 from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+
 
 class source:
     def __init__(self):
@@ -24,16 +24,14 @@ class source:
         self.base_link = 'https://toonget.net'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             title = cleantitle.geturl(title)
-            url = '%s-%s' % (title,year)
+            url = '%s-%s' % (title, year)
             url = self.base_link + '/' + url
             return url
         except:
             return
-
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -42,11 +40,10 @@ class source:
         except:
             return
 
-
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if not url: return
-            if season == '1': 
+            if season == '1':
                 url = self.base_link + '/' + url + '-episode-' + episode
             else:
                 url = self.base_link + '/' + url + '-season-' + season + '-episode-' + episode
@@ -54,29 +51,27 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
             r = self.scraper.get(url).content
             try:
                 match = re.compile('<iframe src="(.+?)"').findall(r)
-                for url in match: 
+                for url in match:
                     r = self.scraper.get(url).content
                     if 'playpanda' in url:
                         match = re.compile("url: '(.+?)',").findall(r)
                     else:
                         match = re.compile('file: "(.+?)",').findall(r)
                     for url in match:
-                        sources.append({'source': 'Direct','quality': 'SD','language': 'en','url': url,'direct': False,
-                                        'debridonly': False})
+                        sources.append(
+                            {'source': 'Direct', 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
+                             'debridonly': False})
             except:
                 return
         except Exception:
             return
         return sources
 
-
     def resolve(self, url):
         return url
-

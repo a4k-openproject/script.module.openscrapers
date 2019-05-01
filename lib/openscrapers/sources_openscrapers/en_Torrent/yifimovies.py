@@ -64,7 +64,7 @@ class source:
 
             url = self.searchMovie(data['title'], data['year'])
             if url is None: return sources
-            
+
             r = client.request(url)
             data = client.parseDOM(r, 'div', attrs={'class': 'playex'})[0]
             frames = client.parseDOM(data, 'iframe', ret='src')

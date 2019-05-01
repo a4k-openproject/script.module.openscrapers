@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-#checked and verified in 13Clowns by Clownman 1.4.2019
+# checked and verified in 13Clowns by Clownman 1.4.2019
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -11,8 +11,8 @@
 
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cleantitle, client, debrid, source_utils, cfscrape
 
 
@@ -25,7 +25,6 @@ class source:
         self.search_link = '/?s=%s&submit=Find'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -34,7 +33,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -42,7 +40,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -55,7 +52,6 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -65,15 +61,19 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            hdlr = '%sS%02dE%02d' % (data['year'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s %s S%02dE%02d' % (data['tvshowtitle'], data['year'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            hdlr = '%sS%02dE%02d' % (
+            data['year'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+            query = '%s %s S%02dE%02d' % (data['tvshowtitle'], data['year'], int(data['season']),
+                                          int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             try:
                 url = self.search_link % urllib.quote_plus(query)
                 url = urlparse.urljoin(self.base_link, url)
                 r = self.scraper.get(url).content
                 posts = client.parseDOM(r, 'div', attrs={'class': 'post'})
-                items = []; dupes = []
+                items = [];
+                dupes = []
                 for post in posts:
                     try:
                         t = client.parseDOM(post, 'a')[0]
@@ -111,14 +111,13 @@ class source:
                     if not host in hostDict: raise Exception()
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                    'direct': False, 'debridonly': True})
                 except:
                     pass
             return sources
         except:
             return
 
-
     def resolve(self, url):
         return url
-

@@ -26,8 +26,8 @@
 
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -58,7 +58,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            return        
+            return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -131,7 +131,8 @@ class source:
 
             if 'tvshowtitle' in data:
                 ep = data['episode']
-                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
+                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (
+                self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
                 r = self.scraper.get(url).content
 
                 if url == None:
@@ -157,7 +158,8 @@ class source:
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
 
-                    sources.append({'source': host, 'quality': '720p', 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': '720p', 'language': 'en', 'url': link, 'direct': False,
+                                    'debridonly': False})
                 except:
                     pass
 

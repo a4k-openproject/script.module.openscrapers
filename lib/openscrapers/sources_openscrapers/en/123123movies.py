@@ -13,9 +13,9 @@
 import json
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import client, cleantitle, dom_parser2, source_utils, cfscrape
+
+from openscrapers.modules import cleantitle, dom_parser2, source_utils, cfscrape
 
 
 class source:
@@ -96,7 +96,7 @@ class source:
                                       referer=urldata['url'], XHR=True).content
             p1 = json.loads(p1)
             p2 = self.scraper.request('http://123123movies.net/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' % (
-            p1['s'], urldata['data-server'])).content
+                p1['s'], urldata['data-server'])).content
             p2 = json.loads(p2)
             p3 = self.scraper.request(
                 'http://123123movies.net/ip.file/swf/ipplayer/api.php?hash=%s' % (p2['hash'])).content
@@ -104,7 +104,7 @@ class source:
             n = p3['status']
             if n == False:
                 p2 = self.scraper.request('http://123123movies.net/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=1' % (
-                p1['s'], urldata['data-server'])).content
+                    p1['s'], urldata['data-server'])).content
                 p2 = json.loads(p2)
             url = "https:%s" % p2["data"].replace("\/", "/")
             return url

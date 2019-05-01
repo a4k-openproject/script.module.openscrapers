@@ -17,9 +17,9 @@
 
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import cleantitle, client, debrid, log_utils, source_utils, cfscrape
+
+from openscrapers.modules import cleantitle, client, debrid, source_utils, cfscrape
 
 
 class source:
@@ -74,7 +74,8 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            query = '%s S%02dE%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
                 data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 

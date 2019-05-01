@@ -17,8 +17,8 @@
 '''
 import json
 import urllib
-
 import urlparse
+
 from openscrapers.modules import client
 from openscrapers.modules import directstream
 
@@ -29,7 +29,6 @@ class source:
         self.language = ['en']
         self.domains = ['localhost']
         self.base_link = 'http://127.0.0.1:16735'
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -47,7 +46,8 @@ class source:
         try:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-            return urllib.urlencode({'imdb': imdb, 'title': title, 'year': data['year'], 'season': season, 'episode': episode})
+            return urllib.urlencode(
+                {'imdb': imdb, 'title': title, 'year': data['year'], 'season': season, 'episode': episode})
         except:
             return
 
@@ -68,14 +68,17 @@ class source:
                 gvideos = [i['url'] for i in result if i['source'] == 'GVIDEO']
                 for url in gvideos:
                     gtag = directstream.googletag(url)[0]
-                    sources.append({'source': 'gvideo', 'quality': gtag['quality'], 'language': 'en', 'url': gtag['url'], 'direct': True, 'debridonly': False})
+                    sources.append(
+                        {'source': 'gvideo', 'quality': gtag['quality'], 'language': 'en', 'url': gtag['url'],
+                         'direct': True, 'debridonly': False})
             except:
                 pass
 
             try:
                 oloads = [i['url'] for i in result if i['source'] == 'CDN']
                 for url in oloads:
-                    sources.append({'source': 'CDN', 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': 'CDN', 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
             except:
                 pass
 

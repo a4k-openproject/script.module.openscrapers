@@ -79,7 +79,8 @@ except:
     addonInfo = {}
     pass
 
-def sleep (time): # Modified `sleep` command that honors a user exit request
+
+def sleep(time):  # Modified `sleep` command that honors a user exit request
     while time > 0 and not xbmc.abortRequested:
         xbmc.sleep(min(100, time))
         time = time - 100
@@ -99,11 +100,15 @@ def addonName():
 
 def version():
     num = ''
-    try: version = addon('xbmc.addon').getAddonInfo('version')
-    except: version = '999'
+    try:
+        version = addon('xbmc.addon').getAddonInfo('version')
+    except:
+        version = '999'
     for i in version:
-        if i.isdigit(): num += i
-        else: break
+        if i.isdigit():
+            num += i
+        else:
+            break
     return int(num)
 
 
@@ -147,5 +152,3 @@ def idle():
         return execute('Dialog.Close(busydialognocancel)')
     else:
         return execute('Dialog.Close(busydialog)')
-
-

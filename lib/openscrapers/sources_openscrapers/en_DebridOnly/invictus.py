@@ -25,10 +25,10 @@
 
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import client
+
 from openscrapers.modules import cfscrape
+from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -96,9 +96,9 @@ class source:
                 season = season.group(1)
                 url = title
 
-                r =  self.scraper.get(url).content
+                r = self.scraper.get(url).content
 
-            for loopCount in range(0,2):
+            for loopCount in range(0, 2):
                 if loopCount == 1 or (r == None and 'tvshowtitle' in data):
                     r = self.scraper.get(url).content
 
@@ -130,7 +130,9 @@ class source:
                             quality, info = source_utils.get_release_quality(url)
                             info = ' | '.join(info)
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                 'direct': False, 'debridonly': True})
 
                 except:
                     pass

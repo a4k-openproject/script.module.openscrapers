@@ -16,12 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
 
 def lang(i, lang):
-
     if lang == 'bg':
         i = i.replace('Action', u'\u0415\u043a\u0448\u044a\u043d')
         i = i.replace('Adventure', u'\u041f\u0440\u0438\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435')
@@ -43,8 +43,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0420\u043e\u043c\u0430\u043d\u0441')
-        i = i.replace('Science Fiction', u'\u041d\u0430\u0443\u0447\u043d\u0430\u002d\u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
-        i = i.replace('Sci-Fi', u'\u041d\u0430\u0443\u0447\u043d\u0430\u002d\u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
+        i = i.replace('Science Fiction',
+                      u'\u041d\u0430\u0443\u0447\u043d\u0430\u002d\u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
+        i = i.replace('Sci-Fi',
+                      u'\u041d\u0430\u0443\u0447\u043d\u0430\u002d\u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0422\u0440\u0438\u043b\u044a\u0440')
@@ -73,8 +75,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0052\u006f\u006d\u0061\u006e\u0074\u0069\u0063\u006b\u00fd')
-        i = i.replace('Science Fiction', u'\u0056\u011b\u0064\u0065\u0063\u006b\u006f\u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u0063\u006b\u00fd')
-        i = i.replace('Sci-Fi', u'\u0056\u011b\u0064\u0065\u0063\u006b\u006f\u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u0063\u006b\u00fd')
+        i = i.replace('Science Fiction',
+                      u'\u0056\u011b\u0064\u0065\u0063\u006b\u006f\u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u0063\u006b\u00fd')
+        i = i.replace('Sci-Fi',
+                      u'\u0056\u011b\u0064\u0065\u0063\u006b\u006f\u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u0063\u006b\u00fd')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
@@ -120,7 +124,8 @@ def lang(i, lang):
         i = i.replace('Biography', u'Biography')
         i = i.replace('Comedy', u'\u004b\u006f\u006d\u00f6\u0064\u0069\u0065')
         i = i.replace('Crime', u'\u004b\u0072\u0069\u006d\u0069')
-        i = i.replace('Documentary', u'\u0044\u006f\u006b\u0075\u006d\u0065\u006e\u0074\u0061\u0072\u0066\u0069\u006c\u006d')
+        i = i.replace('Documentary',
+                      u'\u0044\u006f\u006b\u0075\u006d\u0065\u006e\u0074\u0061\u0072\u0066\u0069\u006c\u006d')
         i = i.replace('Drama', u'\u0044\u0072\u0061\u006d\u0061')
         i = i.replace('Family', u'\u0046\u0061\u006d\u0069\u006c\u0069\u0065')
         i = i.replace('Fantasy', u'\u0046\u0061\u006e\u0074\u0061\u0073\u0079')
@@ -133,8 +138,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u004c\u006f\u0076\u0065\u0073\u0074\u006f\u0072\u0079')
-        i = i.replace('Science Fiction', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
-        i = i.replace('Sci-Fi', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
+        i = i.replace('Science Fiction',
+                      u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
+        i = i.replace('Sci-Fi',
+                      u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
@@ -145,7 +152,8 @@ def lang(i, lang):
     elif lang == 'el':
         i = i.replace('Action', u'\u0394\u03c1\u03ac\u03c3\u03b7')
         i = i.replace('Adventure', u'\u03a0\u03b5\u03c1\u03b9\u03c0\u03ad\u03c4\u03b5\u03b9\u03b1')
-        i = i.replace('Animation', u'\u039a\u03b9\u03bd\u03bf\u03cd\u03bc\u03b5\u03bd\u03b1 \u03a3\u03c7\u03ad\u03b4\u03b9\u03b1')
+        i = i.replace('Animation',
+                      u'\u039a\u03b9\u03bd\u03bf\u03cd\u03bc\u03b5\u03bd\u03b1 \u03a3\u03c7\u03ad\u03b4\u03b9\u03b1')
         i = i.replace('Anime', u'Anime')
         i = i.replace('Biography', u'\u0392\u03b9\u03bf\u03b3\u03c1\u03b1\u03c6\u03b9\u03ba\u03ae')
         i = i.replace('Comedy', u'\u039a\u03c9\u03bc\u03c9\u03b4\u03af\u03b1')
@@ -193,8 +201,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0052\u006f\u006d\u0061\u006e\u0063\u0065')
-        i = i.replace('Science Fiction', u'\u0043\u0069\u0065\u006e\u0063\u0069\u0061 \u0066\u0069\u0063\u0063\u0069\u00f3\u006e')
-        i = i.replace('Sci-Fi', u'\u0043\u0069\u0065\u006e\u0063\u0069\u0061 \u0066\u0069\u0063\u0063\u0069\u00f3\u006e')
+        i = i.replace('Science Fiction',
+                      u'\u0043\u0069\u0065\u006e\u0063\u0069\u0061 \u0066\u0069\u0063\u0063\u0069\u00f3\u006e')
+        i = i.replace('Sci-Fi',
+                      u'\u0043\u0069\u0065\u006e\u0063\u0069\u0061 \u0066\u0069\u0063\u0063\u0069\u00f3\u006e')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0053\u0075\u0073\u0070\u0065\u006e\u0073\u0065')
@@ -223,8 +233,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0052\u006f\u006d\u0061\u006e\u0063\u0065')
-        i = i.replace('Science Fiction', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065\u002d\u0046\u0069\u0063\u0074\u0069\u006f\u006e')
-        i = i.replace('Sci-Fi', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065\u002d\u0046\u0069\u0063\u0074\u0069\u006f\u006e')
+        i = i.replace('Science Fiction',
+                      u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065\u002d\u0046\u0069\u0063\u0074\u0069\u006f\u006e')
+        i = i.replace('Sci-Fi',
+                      u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065\u002d\u0046\u0069\u0063\u0074\u0069\u006f\u006e')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
@@ -403,7 +415,8 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0052\u006f\u006d\u0061\u006e\u0074\u0069\u0065\u006b')
-        i = i.replace('Science Fiction', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065\u0066\u0069\u0063\u0074\u0069\u006f\u006e')
+        i = i.replace('Science Fiction',
+                      u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065\u0066\u0069\u0063\u0074\u0069\u006f\u006e')
         i = i.replace('Sci-Fi', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065\u0066\u0069\u0063\u0074\u0069\u006f\u006e')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
@@ -463,8 +476,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0052\u006f\u006d\u0061\u006e\u0063\u0065')
-        i = i.replace('Science Fiction', u'\u0046\u0069\u0063\u00e7\u00e3\u006f \u0063\u0069\u0065\u006e\u0074\u00ed\u0066\u0069\u0063\u0061')
-        i = i.replace('Sci-Fi', u'\u0046\u0069\u0063\u00e7\u00e3\u006f \u0063\u0069\u0065\u006e\u0074\u00ed\u0066\u0069\u0063\u0061')
+        i = i.replace('Science Fiction',
+                      u'\u0046\u0069\u0063\u00e7\u00e3\u006f \u0063\u0069\u0065\u006e\u0074\u00ed\u0066\u0069\u0063\u0061')
+        i = i.replace('Sci-Fi',
+                      u'\u0046\u0069\u0063\u00e7\u00e3\u006f \u0063\u0069\u0065\u006e\u0074\u00ed\u0066\u0069\u0063\u0061')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
@@ -510,7 +525,8 @@ def lang(i, lang):
         i = i.replace('Biography', u'Biography')
         i = i.replace('Comedy', u'\u043a\u043e\u043c\u0435\u0434\u0438\u044f')
         i = i.replace('Crime', u'\u043a\u0440\u0438\u043c\u0438\u043d\u0430\u043b')
-        i = i.replace('Documentary', u'\u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u043b\u044c\u043d\u044b\u0439')
+        i = i.replace('Documentary',
+                      u'\u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u043b\u044c\u043d\u044b\u0439')
         i = i.replace('Drama', u'\u0434\u0440\u0430\u043c\u0430')
         i = i.replace('Family', u'\u0441\u0435\u043c\u0435\u0439\u043d\u044b\u0439')
         i = i.replace('Fantasy', u'\u0444\u044d\u043d\u0442\u0435\u0437\u0438')
@@ -553,18 +569,22 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0052\u006f\u006d\u0061\u006e\u0074\u0069\u006b\u0061')
-        i = i.replace('Science Fiction', u'\u005a\u006e\u0061\u006e\u0073\u0074\u0076\u0065\u006e\u0061 \u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u006b\u0061')
-        i = i.replace('Sci-Fi', u'\u005a\u006e\u0061\u006e\u0073\u0074\u0076\u0065\u006e\u0061 \u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u006b\u0061')
+        i = i.replace('Science Fiction',
+                      u'\u005a\u006e\u0061\u006e\u0073\u0074\u0076\u0065\u006e\u0061 \u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u006b\u0061')
+        i = i.replace('Sci-Fi',
+                      u'\u005a\u006e\u0061\u006e\u0073\u0074\u0076\u0065\u006e\u0061 \u0066\u0061\u006e\u0074\u0061\u0073\u0074\u0069\u006b\u0061')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0422\u0072\u0069\u006c\u0065\u0072')
-        i = i.replace('War', u'\u0056\u006f\u006a\u006e\u006f\u002d\u0070\u006f\u006c\u0069\u0074\u0069\u010d\u006e\u0069')
+        i = i.replace('War',
+                      u'\u0056\u006f\u006a\u006e\u006f\u002d\u0070\u006f\u006c\u0069\u0074\u0069\u010d\u006e\u0069')
         i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
 
     elif lang == 'sr':
         i = i.replace('Action', u'\u0410\u043a\u0446\u0438\u043e\u043d\u0438')
-        i = i.replace('Adventure', u'\u0410\u0432\u0430\u043d\u0442\u0443\u0440\u0438\u0441\u0442\u0438\u0447\u043a\u0438')
+        i = i.replace('Adventure',
+                      u'\u0410\u0432\u0430\u043d\u0442\u0443\u0440\u0438\u0441\u0442\u0438\u0447\u043a\u0438')
         i = i.replace('Animation', u'\u0426\u0440\u0442\u0430\u043d\u0438')
         i = i.replace('Anime', u'Anime')
         i = i.replace('Biography', u'Biography')
@@ -583,8 +603,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0409\u0443\u0431\u0430\u0432\u043d\u0438')
-        i = i.replace('Science Fiction', u'\u041d\u0430\u0443\u0447\u043d\u0430 \u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
-        i = i.replace('Sci-Fi', u'\u041d\u0430\u0443\u0447\u043d\u0430 \u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
+        i = i.replace('Science Fiction',
+                      u'\u041d\u0430\u0443\u0447\u043d\u0430 \u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
+        i = i.replace('Sci-Fi',
+                      u'\u041d\u0430\u0443\u0447\u043d\u0430 \u0444\u0430\u043d\u0442\u0430\u0441\u0442\u0438\u043a\u0430')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0422\u0440\u0438\u043b\u0435\u0440')
@@ -613,8 +635,10 @@ def lang(i, lang):
         i = i.replace('News', u'News')
         i = i.replace('Reality-TV', u'Reality-TV')
         i = i.replace('Romance', u'\u0052\u006f\u006d\u0061\u006e\u0074\u0069\u006b')
-        i = i.replace('Science Fiction', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
-        i = i.replace('Sci-Fi', u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
+        i = i.replace('Science Fiction',
+                      u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
+        i = i.replace('Sci-Fi',
+                      u'\u0053\u0063\u0069\u0065\u006e\u0063\u0065 \u0046\u0069\u0063\u0074\u0069\u006f\u006e')
         i = i.replace('Sport', u'Sport')
         i = i.replace('Talk-Show', u'Talk-Show')
         i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
@@ -681,7 +705,4 @@ def lang(i, lang):
         i = i.replace('War', u'\u6218\u4e89')
         i = i.replace('Western', u'\u897f\u90e8')
 
-
     return i
-
-

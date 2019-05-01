@@ -23,15 +23,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
-<<<<<<< Updated upstream
+<< << << < Updated
+upstream
 
 import traceback
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cfscrape, cleantitle, log_utils
-=======
+== == == =
 import base64
 import random
 import re
@@ -68,7 +68,9 @@ def random_agent():
     index = random.randrange(len(RAND_UAS))
     return RAND_UAS[index].format(win_ver=random.choice(WIN_VERS), feature=random.choice(FEATURES),
                                   br_ver=random.choice(BR_VERS[index]))
->>>>>>> Stashed changes
+
+>> >> >> > Stashed
+changes
 
 
 class source:

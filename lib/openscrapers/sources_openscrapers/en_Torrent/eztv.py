@@ -53,7 +53,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except Exception:
-            
+
             return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -70,7 +70,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except Exception:
-            
+
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -79,9 +79,9 @@ class source:
 
             if url is None:
                 return sources
-				
+
             if debrid.status() is False:
-                raise Exception()			
+                raise Exception()
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -152,7 +152,7 @@ class source:
                     sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en',
                                     'url': link, 'info': info, 'direct': False, 'debridonly': True})
                 except Exception:
-                    
+
                     continue
 
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -161,7 +161,7 @@ class source:
 
             return sources
         except Exception:
-            
+
             return sources
 
     def resolve(self, url):

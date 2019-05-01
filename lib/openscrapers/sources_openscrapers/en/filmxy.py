@@ -26,12 +26,12 @@
 
 import re
 import urllib
-
 import urlparse
+
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
 
 
 class source:
@@ -66,7 +66,7 @@ class source:
             r = self.scraper.get(query, referer=self.base_link, redirect=True).content
             if not data['imdb'] in r:
                 return sources
-       
+
             links = []
 
             try:
