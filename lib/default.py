@@ -139,7 +139,7 @@ if action == "Defaults":
     'cmovieshdbz','cooltvseries','extramovies','flixmy','freefmovies','freeputlockers','gowatchseries','Hdmto','iwaatch',
     'kattv','mymoviego','mywatchepseries','naturalbd','odb','openloadmovie','plocker','primewire','projectfreetv',
 	'pubfilmonline','putlocker','putlockeronl','reddit','seehd','series9','seriesonline','solarmoviefree','toonget',
-	'tvbox','vidics','watchepisodes','watchfree1','watchseries','watchserieshd','0day','300mbdownload','300mbfilms','bestmoviez',
+	'tvbox','vidics','watchepisodes','watchfree1','watchseries','watchserieshd','2ddl','0day','300mbdownload','300mbfilms','bestmoviez',
 	'ddlspot','directdl','ganool123','invictus','mvrls','rlsbb','scenerls','ultrahd','111ys','1337x','eztv','glodls','kickass2',
 	'limetorrents','magnetdl','mkvcage','piratebay','skytorrents','torrentapi','torrentdownloads','yifimovies','yifyddl','ytsam','zoogle']
     for i in sourceList:
