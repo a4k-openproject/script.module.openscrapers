@@ -123,3 +123,4 @@ test-results/en-en_DebridOnly/os-en-and-debrid-movie-scrape-test.txt
 .idea/script.module.openscrapers.iml
 .idea/modules.xml
 .idea/misc.xml
+.idea/encodings.xml
