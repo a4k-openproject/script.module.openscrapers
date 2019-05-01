@@ -117,3 +117,4 @@ test.txt
 *.csv
 test-results/en-en_DebridOnly/os-en-and-debrid-episode-scrape-test.txt
 test-results/en-en_DebridOnly/os-en-and-debrid-episode-scrape-test - Copy.txt
+test-results/en-en_DebridOnly/os-en-and-debrid-movie-scrape-test.txt
