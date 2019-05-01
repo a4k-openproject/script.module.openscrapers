@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -37,12 +37,10 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['moviesonline.gy','moviesonline.tl']
+        self.domains = ['moviesonline.gy', 'moviesonline.tl']
         self.base_link = 'http://www1.moviesonline.gy'
         self.search_link = '/search-movies/%s.html'
         self.scraper = cfscrape.create_scraper()
-
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -77,7 +75,7 @@ class source:
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['premiered'], url['season'], url['episode'] = premiered, season, episode
             try:
-                clean_title = cleantitle.geturl(url['tvshowtitle'])+'-season-%d' % int(season)
+                clean_title = cleantitle.geturl(url['tvshowtitle']) + '-season-%d' % int(season)
                 search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
                 r = self.scraper.get(search_url).content
                 r = client.parseDOM(r, 'div', {'id': 'movie-featured'})
@@ -122,7 +120,8 @@ class source:
             except:
                 pass
             r = client.parseDOM(r, 'div', {'class': 'server_line'})
-            r = [(client.parseDOM(i, 'a', ret='href')[0], client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in r]
+            r = [(client.parseDOM(i, 'a', ret='href')[0],
+                  client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in r]
             if r:
                 for i in r:
                     try:
@@ -130,7 +129,7 @@ class source:
                         url = i[0]
                         host = client.replaceHTMLCodes(host)
                         host = host.encode('utf-8')
-                        if 'other'in host: continue
+                        if 'other' in host: continue
                         sources.append({
                             'source': host,
                             'quality': 'SD',

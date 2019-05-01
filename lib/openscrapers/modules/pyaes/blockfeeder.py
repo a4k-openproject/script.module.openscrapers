@@ -49,6 +49,7 @@ def _block_can_consume(self, size):
     if size >= 16: return 16
     return 0
 
+
 # After padding, we may have more than one block
 def _block_final_encrypt(self, data):
     data = append_PKCS7_padding(data)
@@ -56,13 +57,14 @@ def _block_final_encrypt(self, data):
         return self.encrypt(data[:16]) + self.encrypt(data[16:])
     return self.encrypt(data)
 
+
 def _block_final_decrypt(self, data):
     return strip_PKCS7_padding(self.decrypt(data))
+
 
 AESBlockModeOfOperation._can_consume = _block_can_consume
 AESBlockModeOfOperation._final_encrypt = _block_final_encrypt
 AESBlockModeOfOperation._final_decrypt = _block_final_decrypt
-
 
 
 # CFB is a segment cipher
@@ -70,11 +72,13 @@ AESBlockModeOfOperation._final_decrypt = _block_final_decrypt
 def _segment_can_consume(self, size):
     return self.segment_bytes * int(size // self.segment_bytes)
 
+
 # CFB can handle a non-segment-sized block at the end using the remaining cipherblock
 def _segment_final_encrypt(self, data):
     faux_padding = (chr(0) * (self.segment_bytes - (len(data) % self.segment_bytes)))
     padded = data + to_bufferable(faux_padding)
     return self.encrypt(padded)[:len(data)]
+
 
 # CFB can handle a non-segment-sized block at the end using the remaining cipherblock
 def _segment_final_decrypt(self, data):
@@ -82,10 +86,10 @@ def _segment_final_decrypt(self, data):
     padded = data + to_bufferable(faux_padding)
     return self.decrypt(padded)[:len(data)]
 
+
 AESSegmentModeOfOperation._can_consume = _segment_can_consume
 AESSegmentModeOfOperation._final_encrypt = _segment_final_encrypt
 AESSegmentModeOfOperation._final_decrypt = _segment_final_decrypt
-
 
 
 # OFB and CTR are stream ciphers
@@ -93,16 +97,18 @@ AESSegmentModeOfOperation._final_decrypt = _segment_final_decrypt
 def _stream_can_consume(self, size):
     return size
 
+
 def _stream_final_encrypt(self, data):
     return self.encrypt(data)
+
 
 def _stream_final_decrypt(self, data):
     return self.decrypt(data)
 
+
 AESStreamModeOfOperation._can_consume = _stream_can_consume
 AESStreamModeOfOperation._final_encrypt = _stream_final_encrypt
 AESStreamModeOfOperation._final_decrypt = _stream_final_decrypt
-
 
 
 class BlockFeeder(object):
@@ -116,7 +122,7 @@ class BlockFeeder(object):
         self._final = final
         self._buffer = to_bufferable("")
 
-    def feed(self, data = None):
+    def feed(self, data=None):
         '''Provide bytes to encrypt (or decrypt), returning any bytes
            possible from this or any previous calls to feed.
 
@@ -163,7 +169,8 @@ class Decrypter(BlockFeeder):
 # 8kb blocks
 BLOCK_SIZE = (1 << 13)
 
-def _feed_stream(feeder, in_stream, out_stream, block_size = BLOCK_SIZE):
+
+def _feed_stream(feeder, in_stream, out_stream, block_size=BLOCK_SIZE):
     'Uses feeder to read and convert from in_stream and write to out_stream.'
 
     while True:
@@ -176,14 +183,14 @@ def _feed_stream(feeder, in_stream, out_stream, block_size = BLOCK_SIZE):
     out_stream.write(converted)
 
 
-def encrypt_stream(mode, in_stream, out_stream, block_size = BLOCK_SIZE):
+def encrypt_stream(mode, in_stream, out_stream, block_size=BLOCK_SIZE):
     'Encrypts a stream of bytes from in_stream to out_stream using mode.'
 
     encrypter = Encrypter(mode)
     _feed_stream(encrypter, in_stream, out_stream, block_size)
 
 
-def decrypt_stream(mode, in_stream, out_stream, block_size = BLOCK_SIZE):
+def decrypt_stream(mode, in_stream, out_stream, block_size=BLOCK_SIZE):
     'Decrypts a stream of bytes from in_stream to out_stream using mode.'
 
     decrypter = Decrypter(mode)

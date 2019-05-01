@@ -15,8 +15,8 @@
 '''
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -32,7 +32,6 @@ class source:
         self.search_link = '/movie/search/%s'
         self.scraper = cfscrape.create_scraper()
 
-
     def matchAlias(self, title, aliases):
         try:
             for alias in aliases:
@@ -41,7 +40,6 @@ class source:
         except:
             return False
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             aliases.append({'country': 'us', 'title': title})
@@ -49,8 +47,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            return  
-
+            return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -59,8 +56,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            return  
-
+            return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -71,8 +67,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            return  
-
+            return
 
     def searchShow(self, title, season, aliases, headers):
         try:
@@ -88,8 +83,7 @@ class source:
             url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
             return url
         except:
-            return  
-
+            return
 
     def searchMovie(self, title, year, aliases, headers):
         try:
@@ -110,8 +104,7 @@ class source:
             url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
             return url
         except:
-            return  
-
+            return
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -123,8 +116,9 @@ class source:
             headers = {}
             if 'tvshowtitle' in data:
                 ep = data['episode']
-                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
-                result =self.scraper.get(url, headers=headers).status
+                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (
+                self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
+                result = self.scraper.get(url, headers=headers).status
                 if not result == 200:
                     url = self.searchShow(data['tvshowtitle'], data['season'], aliases, headers)
             else:
@@ -142,25 +136,27 @@ class source:
                     r = client.request(link, headers=headers, timeout='10')
                     r = re.findall('(https:.*?redirector.*?)[\'\"]', r)
                     for i in r:
-                        try: sources.append({'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'], 'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
-                        except: pass
+                        try:
+                            sources.append({'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'],
+                                            'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
+                        except:
+                            pass
                 else:
                     try:
                         host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(link.strip().lower()).netloc)[0]
                         if not host in hostDict: raise Exception()
                         host = client.replaceHTMLCodes(host)
                         host = host.encode('utf-8')
-                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': link, 'direct': False,
+                                        'debridonly': False})
                     except:
                         pass
             return sources
         except:
             return sources
 
-
     def resolve(self, url):
         if "google" in url:
             return directstream.googlepass(url)
         else:
             return url
-

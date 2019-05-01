@@ -25,10 +25,10 @@
 
 import re
 import urllib
-import urlparse
 
-from openscrapers.modules import client
+import urlparse
 from openscrapers.modules import cfscrape
+from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -42,7 +42,6 @@ class source:
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,7 +50,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,7 +57,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -71,7 +68,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -92,8 +88,8 @@ class source:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)
                 url = title
-                r =  self.scraper.get(url).content
-            for loopCount in range(0,2):
+                r = self.scraper.get(url).content
+            for loopCount in range(0, 2):
                 if loopCount == 1 or (r == None and 'tvshowtitle' in data):
                     r = self.scraper.get(url).content
                 posts = client.parseDOM(r, "div", attrs={"class": "postpage_movie_download"})
@@ -122,13 +118,14 @@ class source:
                             quality, info = source_utils.get_release_quality(url)
                             info = ' | '.join(info)
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                 'direct': False, 'debridonly': True})
                 except:
                     pass
             return sources
         except:
             return sources
-
 
     def resolve(self, url):
         return url

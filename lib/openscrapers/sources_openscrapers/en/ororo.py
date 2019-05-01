@@ -40,10 +40,9 @@ class source:
         self.user = control.setting('ororo.user')
         self.password = control.setting('ororo.pass')
         self.headers = {
-        'Authorization': 'Basic %s' % base64.b64encode('%s:%s' % (self.user, self.password)),
-        'User-Agent': 'Placenta for Kodi'
+            'Authorization': 'Basic %s' % base64.b64encode('%s:%s' % (self.user, self.password)),
+            'User-Agent': 'Placenta for Kodi'
         }
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -51,12 +50,11 @@ class source:
 
             url = cache.get(self.ororo_moviecache, 60, self.user)
             url = [i[0] for i in url if imdb == i[1]][0]
-            url= self.movie_link % url
+            url = self.movie_link % url
 
             return url
         except:
             return
-
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -64,12 +62,11 @@ class source:
 
             url = cache.get(self.ororo_tvcache, 120, self.user)
             url = [i[0] for i in url if imdb == i[1]][0]
-            url= self.show_link % url
+            url = self.show_link % url
 
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -86,12 +83,11 @@ class source:
             url = [i for i in r if season == '%01d' % int(i[1]) and episode == '%01d' % int(i[2])]
             url += [i for i in r if premiered == i[3]]
 
-            url= self.episode_link % url[0][0]
+            url = self.episode_link % url[0][0]
 
             return url
         except:
             return
-
 
     def ororo_moviecache(self, user):
         try:
@@ -105,7 +101,6 @@ class source:
         except:
             return
 
-
     def ororo_tvcache(self, user):
         try:
             url = urlparse.urljoin(self.base_link, self.tvsearch_link)
@@ -117,7 +112,6 @@ class source:
             return r
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -131,12 +125,12 @@ class source:
             url = client.request(url, headers=self.headers)
             url = json.loads(url)['url']
 
-            sources.append({'source': 'ororo', 'quality': 'HD', 'language': 'en', 'url': url, 'direct': True, 'debridonly': False})
+            sources.append(
+                {'source': 'ororo', 'quality': 'HD', 'language': 'en', 'url': url, 'direct': True, 'debridonly': False})
 
             return sources
         except:
             return sources
-
 
     def resolve(self, url):
         return url

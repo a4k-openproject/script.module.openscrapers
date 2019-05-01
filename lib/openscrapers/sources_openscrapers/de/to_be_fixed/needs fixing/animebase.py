@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -44,7 +44,9 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = None
-            for title in [tvshowtitle, localtvshowtitle, tvmaze.tvMaze().showLookup('thetvdb', tvdb).get('name')] + source_utils.aliases_to_array(aliases):
+            for title in [tvshowtitle, localtvshowtitle,
+                          tvmaze.tvMaze().showLookup('thetvdb', tvdb).get('name')] + source_utils.aliases_to_array(
+                    aliases):
                 if url: break
                 url = self.__search(title)
             return urllib.urlencode({'url': url}) if url else None
@@ -78,12 +80,15 @@ class source:
             episode = int(data.get('episode', 1))
 
             r = client.request(urlparse.urljoin(self.base_link, url))
-            r = {'': dom_parser.parse_dom(r, 'div', attrs={'id': 'gerdub'}), 'subbed': dom_parser.parse_dom(r, 'div', attrs={'id': 'gersub'})}
+            r = {'': dom_parser.parse_dom(r, 'div', attrs={'id': 'gerdub'}),
+                 'subbed': dom_parser.parse_dom(r, 'div', attrs={'id': 'gersub'})}
 
             for info, data in r.iteritems():
                 data = dom_parser.parse_dom(data, 'tr')
-                data = [dom_parser.parse_dom(i, 'a', req='href') for i in data if dom_parser.parse_dom(i, 'a', attrs={'id': str(episode)})]
-                data = [(link.attrs['href'], dom_parser.parse_dom(link.content, 'img', req='src')) for i in data for link in i]
+                data = [dom_parser.parse_dom(i, 'a', req='href') for i in data if
+                        dom_parser.parse_dom(i, 'a', attrs={'id': str(episode)})]
+                data = [(link.attrs['href'], dom_parser.parse_dom(link.content, 'img', req='src')) for i in data for
+                        link in i]
                 data = [(i[0], i[1][0].attrs['src']) for i in data if i[1]]
                 data = [(i[0], re.findall('/(\w+)\.\w+', i[1])) for i in data]
                 data = [(i[0], i[1][0]) for i in data if i[1]]
@@ -92,7 +97,8 @@ class source:
                     valid, hoster = source_utils.is_host_valid(hoster, hostDict)
                     if not valid: continue
 
-                    sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': link, 'info': info, 'direct': False, 'debridonly': False})
+                    sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': link, 'info': info,
+                                    'direct': False, 'debridonly': False})
 
             return sources
         except:

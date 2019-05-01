@@ -25,13 +25,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
-
 import re
 import traceback
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle, client, debrid, log_utils, source_utils, cfscrape
 
 

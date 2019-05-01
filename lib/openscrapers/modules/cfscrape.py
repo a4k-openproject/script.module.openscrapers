@@ -1,19 +1,19 @@
+import ast
 import logging
+import operator as op
+import os
 import random
 import re
-import ast
-import operator as op
-import requests
-import os
 import ssl
+from collections import OrderedDict
+from copy import deepcopy
+from time import sleep
 
-from requests.sessions import Session
+import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
-from copy import deepcopy
-from time import sleep
-from collections import OrderedDict
+from requests.sessions import Session
 
 try:
     from urlparse import urlparse
@@ -58,7 +58,8 @@ DEFAULT_USER_AGENTS = [
 DEFAULT_USER_AGENT = random.choice(DEFAULT_USER_AGENTS)
 
 BUG_REPORT = (
-"Cloudflare may have changed their technique, or there may be a bug in the script.\n\nPlease read https://github.com/Anorov/cloudflare-scrape#updates, then file a bug report at https://github.com/Anorov/cloudflare-scrape/issues.")
+    "Cloudflare may have changed their technique, or there may be a bug in the script.\n\nPlease read https://github.com/Anorov/cloudflare-scrape#updates, then file a bug report at https://github.com/Anorov/cloudflare-scrape/issues.")
+
 
 class CipherSuiteAdapter(HTTPAdapter):
     def __init__(self, cipherSuite=None, **kwargs):
@@ -72,6 +73,7 @@ class CipherSuiteAdapter(HTTPAdapter):
     def proxy_manager_for(self, *args, **kwargs):
         kwargs['ssl_context'] = create_urllib3_context(ciphers=self.cipherSuite)
         return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
+
 
 class CloudflareScraper(Session):
     def __init__(self, *args, **kwargs):
@@ -96,7 +98,8 @@ class CloudflareScraper(Session):
             return self.cipher_suite
 
         ciphers = [
-            'GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384', 'CHACHA20-POLY1305-SHA256',
+            'GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384',
+            'CHACHA20-POLY1305-SHA256',
             'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256', 'ECDHE-ECDSA-AES256-GCM-SHA384',
             'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-CHACHA20-POLY1305-SHA256', 'ECDHE-RSA-CHACHA20-POLY1305-SHA256',
             'ECDHE-RSA-AES128-CBC-SHA', 'ECDHE-RSA-AES256-CBC-SHA', 'RSA-AES128-GCM-SHA256', 'RSA-AES256-GCM-SHA384',
@@ -277,7 +280,6 @@ class CloudflareScraper(Session):
                         val_2 = self.parseJSString(subsecs[1])
                     line_val = val_1 / float(val_2)
 
-
                 decryptVal = '%.16f%s%.16f' % (float(decryptVal), sections[0][-1], float(line_val))
                 decryptVal = eval_expr(decryptVal)
 
@@ -296,5 +298,6 @@ class CloudflareScraper(Session):
 
         val = ''.join([str(eval_expr(i)) for i in val])
         return int(val)
+
 
 create_scraper = CloudflareScraper

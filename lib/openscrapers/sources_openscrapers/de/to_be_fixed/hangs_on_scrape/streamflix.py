@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -52,7 +52,8 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             id = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases))
-            if not id and tvshowtitle != localtvshowtitle: id = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases))
+            if not id and tvshowtitle != localtvshowtitle: id = self.__search(
+                [tvshowtitle] + source_utils.aliases_to_array(aliases))
             return urllib.urlencode({'id': id}) if id else None
         except:
             return
@@ -83,7 +84,8 @@ class source:
             episode = data.get('episode')
 
             if season and episode:
-                r = client.request(urlparse.urljoin(self.base_link, self.get_episodes), post={'series_id': id, 'mlang': 'de', 'season': season, 'episode': episode})
+                r = client.request(urlparse.urljoin(self.base_link, self.get_episodes),
+                                   post={'series_id': id, 'mlang': 'de', 'season': season, 'episode': episode})
                 r = json.loads(r).get('episode_links', [])
                 r = [([i.get('id')], i.get('hostername')) for i in r]
             else:
@@ -97,7 +99,9 @@ class source:
                 if not valid: continue
 
                 for link_id in link_ids:
-                    sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': self.out_link % (link_id, hoster), 'direct': False, 'debridonly': False})
+                    sources.append(
+                        {'source': host, 'quality': 'SD', 'language': 'de', 'url': self.out_link % (link_id, hoster),
+                         'direct': False, 'debridonly': False})
             return sources
         except:
             return sources

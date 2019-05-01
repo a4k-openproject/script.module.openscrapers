@@ -74,7 +74,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r =self.scraper.get(url).content
+            r = self.scraper.get(url).content
             try:
                 match = re.compile('iframe id="odbIframe" src="(.+?)"').findall(r)
                 for url in match:

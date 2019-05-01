@@ -39,7 +39,6 @@ class source:
         self.search_link = '/%s'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             title = cleantitle.geturl(title)
@@ -47,7 +46,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -64,13 +62,13 @@ class source:
                 match = re.compile('<iframe src="(.+?)"').findall(r)
                 for url in match:
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    sources.append({'source': host,'quality': quality,'language': 'en','url': url,'direct': False,'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
             except:
                 return
         except Exception:
             return
         return sources
-
 
     def resolve(self, url):
         return url

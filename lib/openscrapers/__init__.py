@@ -5,10 +5,12 @@ import pkgutil
 
 try:
     import xbmcaddon
+
     __addon__ = xbmcaddon.Addon(id='script.module.openscrapers')
 except:
     __addon__ = None
     pass
+
 
 def sources(specified_folders=None):
     try:
@@ -73,9 +75,12 @@ def getAllHosters():
             for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(sourceFolderLocation, i)]):
                 if is_pkg:
                     continue
-                try: mn = str(module_name).split('_')[0]
-                except: mn = str(module_name)
+                try:
+                    mn = str(module_name).split('_')[0]
+                except:
+                    mn = str(module_name)
                 appendList.append(mn)
+
     sourceSubFolders = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
     appendList = []
     for item in sourceSubFolders:
@@ -92,6 +97,8 @@ def getScraperFolder(scraper_source):
 def getModuleName(scraper_folders):
     nameList = []
     for s in scraper_folders:
-        try: nameList.append(s.split('_')[1].lower().title())
-        except: pass
+        try:
+            nameList.append(s.split('_')[1].lower().title())
+        except:
+            pass
     return nameList

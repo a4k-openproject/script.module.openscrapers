@@ -23,12 +23,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
-import traceback
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape, cleantitle, client, debrid, dom_parser2, log_utils
 
 
@@ -49,7 +47,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except Exception:
-           
+
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
@@ -90,9 +88,10 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if\
+            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if \
                 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
-            query_alt = '%s %s S%02dE%02d' % (data['tvshowtitle'], data['year'], int(data['season']), int(data['episode'])) if\
+            query_alt = '%s %s S%02dE%02d' % (
+            data['tvshowtitle'], data['year'], int(data['season']), int(data['episode'])) if \
                 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
 
             url = self.search_link % urllib.quote_plus(query).lower()
@@ -105,7 +104,7 @@ class source:
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                 'Accept-Encoding': 'gzip, deflate', 'Accept-Language': 'en-US,en;q=0.9',
                 'User-Agent':
-                'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
+                    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
             r = self.scraper.get(url, headers=headers).content
 
             items = dom_parser2.parse_dom(r, 'h2')
@@ -134,10 +133,10 @@ class source:
                     headers = {
                         'Referer': 'www.ddlvalley.me/search/',
                         'Accept':
-                        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                         'Accept-Encoding': 'gzip, deflate', 'Accept-Language': 'en-US,en;q=0.9',
                         'User-Agent':
-                        'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
+                            'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
                     r = self.scraper.get(url, headers=headers).content
                     links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', 'data-wpel-link'])
                     links = [i.attrs['href'] for i in links]
@@ -163,7 +162,8 @@ class source:
                                     quality = 'SD'
                                 if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt):
                                     quality = 'SCR'
-                                elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in fmt):
+                                elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync',
+                                               'ts'] for i in fmt):
                                     quality = 'CAM'
 
                                 info = []
@@ -174,7 +174,7 @@ class source:
                                 try:
                                     size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', name[2])[-1]
                                     div = 1 if size.endswith(('GB', 'GiB')) else 1024
-                                    size = float(re.sub('[^0-9|/.|/,]', '', size))/div
+                                    size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
                                     size = '%.2f GB' % size
                                     info.append(size)
                                 except Exception:

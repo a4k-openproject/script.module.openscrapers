@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -51,7 +51,8 @@ class source:
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
-            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'aliases': aliases, 'year': year}
+            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle,
+                   'aliases': aliases, 'year': year}
             url = urllib.urlencode(url)
             return url
         except:
@@ -93,14 +94,18 @@ class source:
             quality, info = source_utils.get_release_quality(quality)
 
             r = dom_parser.parse_dom(r, 'ul', attrs={'class': 'currentStreamLinks'})
-            r = [(dom_parser.parse_dom(i, 'p', attrs={'class': 'hostName'}), dom_parser.parse_dom(i, 'a', attrs={'class': 'stream-src'}, req='data-id')) for i in r]
-            r = [(re.sub(' hd$', '', i[0][0].content.lower()), [x.attrs['data-id'] for x in i[1]]) for i in r if i[0] and i[1]]
+            r = [(dom_parser.parse_dom(i, 'p', attrs={'class': 'hostName'}),
+                  dom_parser.parse_dom(i, 'a', attrs={'class': 'stream-src'}, req='data-id')) for i in r]
+            r = [(re.sub(' hd$', '', i[0][0].content.lower()), [x.attrs['data-id'] for x in i[1]]) for i in r if
+                 i[0] and i[1]]
 
             for hoster, id in r:
                 valid, hoster = source_utils.is_host_valid(hoster, hostDict)
                 if not valid: continue
 
-                sources.append({'source': hoster, 'quality': quality, 'language': 'de', 'info': ' | '.join(info + ['' if len(id) == 1 else 'multi-part']), 'url': id, 'direct': False, 'debridonly': False, 'checkquality': True})
+                sources.append({'source': hoster, 'quality': quality, 'language': 'de',
+                                'info': ' | '.join(info + ['' if len(id) == 1 else 'multi-part']), 'url': id,
+                                'direct': False, 'debridonly': False, 'checkquality': True})
 
             return sources
         except:

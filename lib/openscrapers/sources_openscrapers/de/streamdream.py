@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -88,7 +88,8 @@ class source:
 
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'linkbox'})[0].content
             r = re.compile('(<a.+?/a>)', re.DOTALL).findall(r)
-            r = [(dom_parser.parse_dom(i, 'a', req='href'), dom_parser.parse_dom(i, 'img', attrs={'class': re.compile('.*linkbutton')}, req='class')) for i in r]
+            r = [(dom_parser.parse_dom(i, 'a', req='href'),
+                  dom_parser.parse_dom(i, 'img', attrs={'class': re.compile('.*linkbutton')}, req='class')) for i in r]
             r = [(i[0][0].attrs['href'], i[1][0].attrs['class'].lower()) for i in r if i[0] and i[1]]
             r = [(i[0].strip(), 'HD' if i[1].startswith('hd') else 'SD') for i in r]
 
@@ -96,7 +97,8 @@ class source:
                 valid, host = source_utils.is_host_valid(url, hostDict)
                 if not valid: continue
 
-                sources.append({'source': host, 'quality': quli, 'language': 'de', 'url': url, 'direct': False, 'debridonly': False})
+                sources.append({'source': host, 'quality': quli, 'language': 'de', 'url': url, 'direct': False,
+                                'debridonly': False})
 
             return sources
         except:

@@ -44,7 +44,7 @@ class source:
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            url = {'imdb': imdb, 'title': title, 'aliases': aliases,'year': year}
+            url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
             url = urllib.urlencode(url)
             return url
         except:
@@ -77,7 +77,7 @@ class source:
 
                     links = client.parseDOM(post, 'a', ret='href')
 
-                    t = re.sub('(\.|\(|\[|\s|)(\d{4})(\.|\)|\]|\s|)(.+|)', '',name[0])
+                    t = re.sub('(\.|\(|\[|\s|)(\d{4})(\.|\)|\]|\s|)(.+|)', '', name[0])
                     if not cleantitle.get(t) == cleantitle.get(title): raise Exception()
 
                     y = re.findall('\(\s*(\d{4})\s*\)', name[0])[0]
@@ -88,13 +88,14 @@ class source:
 
                         url = client.replaceHTMLCodes(url)
                         url = url.encode('utf-8')
-                        valid, host = source_utils.is_host_valid(url,hostDict)
+                        valid, host = source_utils.is_host_valid(url, hostDict)
                         if 'hdvid' in host: valid = True
                         if not valid: continue
                         quality = 'SD'
                         info = 'SUB'
 
-                        sources.append({'source': host, 'quality': quality, 'language': 'gr', 'url': url, 'info': info, 'direct': False, 'debridonly': False})
+                        sources.append({'source': host, 'quality': quality, 'language': 'gr', 'url': url, 'info': info,
+                                        'direct': False, 'debridonly': False})
 
                 except:
                     pass

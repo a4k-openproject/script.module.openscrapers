@@ -57,7 +57,7 @@ def get(function, duration, *args):
         fresh_result = repr(function(*args))
         cache_insert(key, fresh_result)
 
-# Sometimes None is returned as a string instead of the special value None.
+        # Sometimes None is returned as a string instead of the special value None.
         invalid = False
         try:
             if not fresh_result:
@@ -66,13 +66,16 @@ def get(function, duration, *args):
                 invalid = True
             elif len(fresh_result) == 0:
                 invalid = True
-        except: pass
+        except:
+            pass
 
-# If the cache is old, but we didn't get fresh result, return the old cache
-# if not fresh_result:
+        # If the cache is old, but we didn't get fresh result, return the old cache
+        # if not fresh_result:
         if invalid:
-            if cache_result: return ast.literal_eval(cache_result['value'].encode('utf-8'))
-            else: return None
+            if cache_result:
+                return ast.literal_eval(cache_result['value'].encode('utf-8'))
+            else:
+                return None
         return ast.literal_eval(fresh_result.encode('utf-8'))
     except Exception:
         return None
@@ -95,6 +98,7 @@ def cache_get(key):
         return cursor.fetchone()
     except OperationalError:
         return None
+
 
 def cache_insert(key, value):
     # type: (str, str) -> None
@@ -121,7 +125,7 @@ def cache_clear():
         pass
 
 
-def cache_clean(duration = 1209600):
+def cache_clean(duration=1209600):
     try:
         now = int(time.time())
         cursor = _get_connection_cursor()
@@ -257,7 +261,9 @@ def _is_cache_valid(cached_time, cache_timeout):
 
 def cache_version_check():
     if _find_cache_version():
-        cache_clear(); cache_clear_meta(); cache_clear_providers()
+        cache_clear();
+        cache_clear_meta();
+        cache_clear_providers()
         control.infoDialog(control.lang(32057).encode('utf-8'), sound=True, icon='INFO')
 
 
@@ -268,16 +274,22 @@ def _find_cache_version():
         if not os.path.exists(versionFile): f = open(versionFile, 'w'); f.close()
     except Exception as e:
         import xbmc
-        print 'Placenta Addon Data Path Does not Exist. Creating Folder....'
+        print
+        'Placenta Addon Data Path Does not Exist. Creating Folder....'
         ad_folder = xbmc.translatePath('special://home/userdata/addon_data/plugin.video.placenta')
         os.makedirs(ad_folder)
-    try: 
-        with open(versionFile, 'rb') as fh: oldVersion = fh.read()
-    except: oldVersion = '0'
+    try:
+        with open(versionFile, 'rb') as fh:
+            oldVersion = fh.read()
+    except:
+        oldVersion = '0'
     try:
         curVersion = control.addon('script.module.placenta').getAddonInfo('version')
-        if oldVersion != curVersion: 
-            with open(versionFile, 'wb') as fh: fh.write(curVersion)
+        if oldVersion != curVersion:
+            with open(versionFile, 'wb') as fh:
+                fh.write(curVersion)
             return True
-        else: return False
-    except: return False
+        else:
+            return False
+    except:
+        return False

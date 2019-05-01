@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -42,7 +42,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
+                                                                    year)
             return urllib.urlencode({'url': url}) if url else None
         except:
             return
@@ -67,7 +68,8 @@ class source:
             aliases = source_utils.aliases_to_array(eval(data['aliases']))
 
             url = self.__search([localtvshowtitle] + aliases, data['year'], season)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + aliases, data['year'], season)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + aliases, data['year'],
+                                                                                season)
             if not url: return
 
             return urllib.urlencode({'url': url, 'episode': episode})
@@ -106,7 +108,8 @@ class source:
                 valid, host = source_utils.is_host_valid(link, hostDict)
                 if not valid: continue
 
-                sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False, 'debridonly': False})
+                sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False,
+                                'debridonly': False})
 
             return sources
         except:
@@ -130,13 +133,13 @@ class source:
             r = dom_parser.parse_dom(r, 'h2')
             r = dom_parser.parse_dom(r, 'a', req='href')
             r = [(i.attrs['href'], i.content.lower()) for i in r if i]
-            r = [(i[0],  re.sub('<.+?>|</.+?>', '', i[1]), re.findall('(.+?) \(*(\d{4})', i[1])) for i in r]
+            r = [(i[0], re.sub('<.+?>|</.+?>', '', i[1]), re.findall('(.+?) \(*(\d{4})', i[1])) for i in r]
             r = [(i[0], i[2][0][0] if len(i[2]) > 0 else i[1], i[2][0][1] if len(i[2]) > 0 else '0') for i in r]
             r = [(i[0], i[1], i[2], re.findall('(.+?)(\d+)\s+(?:staf+el|s)', i[1])) for i in r]
             r = [(i[0], i[3][0][0] if len(i[3]) > 0 else i[1], i[2], i[3][0][1] if len(i[3]) > 0 else '0') for i in r]
             r = [(i[0], i[1], i[2], '1' if int(season) > 0 and i[3] == '0' else i[3]) for i in r]
             r = sorted(r, key=lambda i: int(i[2]), reverse=True)  # with year > no year
-            r = [i[0]for i in r if cleantitle.get(i[1]) in t and i[2] in y and int(i[3]) == int(season)][0]
+            r = [i[0] for i in r if cleantitle.get(i[1]) in t and i[2] in y and int(i[3]) == int(season)][0]
 
             return source_utils.strip_domain(r)
         except:

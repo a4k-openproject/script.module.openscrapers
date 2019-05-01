@@ -63,7 +63,8 @@ class source:
                 match = re.compile('<iframe src="(.+?)"').findall(r)
                 for url in match:
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    sources.append({'source': host,'quality': quality,'language': 'en','url': url,'direct': False,'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
             except:
                 return
         except Exception:

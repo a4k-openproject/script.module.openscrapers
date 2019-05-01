@@ -4,8 +4,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import client
 from openscrapers.modules import control
 from openscrapers.modules import debrid
@@ -21,7 +21,6 @@ class source:
         self.search_link = '?query=%s'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -30,7 +29,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -38,7 +36,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -51,7 +48,6 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
@@ -61,7 +57,9 @@ class source:
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s s%02de%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
@@ -74,16 +72,17 @@ class source:
                         if not hdlr in data: continue
                         url = url.split('&tr')[0]
                         quality, info = source_utils.get_release_quality(data)
-                        if any(x in url for x in ['FRENCH', 'Ita', 'italian', 'TRUEFRENCH', '-lat-','Dublado']): continue
+                        if any(
+                            x in url for x in ['FRENCH', 'Ita', 'italian', 'TRUEFRENCH', '-lat-', 'Dublado']): continue
                         info = ' | '.join(info)
-                        sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                        sources.append(
+                            {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                             'direct': False, 'debridonly': True})
             except:
                 return
             return sources
-        except :
+        except:
             return sources
-
 
     def resolve(self, url):
         return url
-

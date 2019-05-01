@@ -26,8 +26,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -42,7 +42,6 @@ class source:
         self.base_link = 'https://www.300mbfilms.co/'
         self.search_link = '/search/%s/feed/rss2/'
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,7 +50,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,7 +57,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -72,7 +69,6 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -82,7 +78,9 @@ class source:
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s S%02dE%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
@@ -96,7 +94,7 @@ class source:
                     u = client.parseDOM(post, 'link')[0]
                     s = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', t)
                     s = s[0] if s else '0'
-                    items += [(t, u, s) ]
+                    items += [(t, u, s)]
                 except:
                     pass
             urls = []
@@ -113,7 +111,7 @@ class source:
                     try:
                         size = re.sub('i', '', item[2])
                         div = 1 if size.endswith('GB') else 1024
-                        size = float(re.sub('[^0-9|/.|/,]', '', size))/div
+                        size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
                         size = '%.2f GB' % size
                         info.append(size)
                     except:
@@ -133,11 +131,12 @@ class source:
                 if not valid: continue
                 host = client.replaceHTMLCodes(host)
                 host = host.encode('utf-8')
-                sources.append({'source': host, 'quality': item[1], 'language': 'en', 'url': url, 'info': item[2], 'direct': False, 'debridonly': True})
+                sources.append(
+                    {'source': host, 'quality': item[1], 'language': 'en', 'url': url, 'info': item[2], 'direct': False,
+                     'debridonly': True})
             return sources
         except:
             return sources
-
 
     def links(self, url):
         urls = []
@@ -150,7 +149,7 @@ class source:
             r = client.request(r1)
             r = client.parseDOM(r, 'div', attrs={'id': 'post-\d+'})[0]
             if 'enter the password' in r:
-                plink= client.parseDOM(r, 'form', ret='action')[0]
+                plink = client.parseDOM(r, 'form', ret='action')[0]
                 post = {'post_password': '300mbfilms', 'Submit': 'Submit'}
                 send_post = client.request(plink, post=post, output='cookie')
                 link = client.request(r1, cookie=send_post)
@@ -165,7 +164,5 @@ class source:
         except:
             pass
 
-
     def resolve(self, url):
         return url
-

@@ -26,11 +26,11 @@
 
 import re
 import urllib
-import urlparse
 
-from openscrapers.modules import debrid
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
 
@@ -42,7 +42,6 @@ class source:
         self.base_link = 'https://www.magnetdl.com'
         self.search_link = '/{0}/{1}'
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,7 +50,6 @@ class source:
         except BaseException:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,7 +57,6 @@ class source:
             return url
         except BaseException:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -72,7 +69,6 @@ class source:
         except BaseException:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
@@ -83,7 +79,7 @@ class source:
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))\
+            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
                 if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = urlparse.urljoin(self.base_link, self.search_link.format(query[0].lower(), cleantitle.geturl(query)))
@@ -114,12 +110,11 @@ class source:
                     size = '0'
                 info.append(size)
                 info = ' | '.join(info)
-                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                'direct': False, 'debridonly': True})
             return sources
         except BaseException:
             return sources
 
-
     def resolve(self, url):
         return url
-

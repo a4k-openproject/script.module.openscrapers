@@ -48,7 +48,7 @@ class source:
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
             if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(
-                aliases),year)
+                aliases), year)
             if not url: url = self.__search(trakt.getMovieTranslation(imdb, 'el'), year)
             return url
         except:
@@ -79,11 +79,11 @@ class source:
     def __search(self, titles, year):
         try:
 
-            query = self.search_link % (urllib.quote_plus(cleantitle.getsearch(titles[0]+' '+year)))
+            query = self.search_link % (urllib.quote_plus(cleantitle.getsearch(titles[0] + ' ' + year)))
 
             query = urlparse.urljoin(self.base_link, query)
 
-            t =  cleantitle.get(titles[0])
+            t = cleantitle.get(titles[0])
 
             r = client.request(query)
 
@@ -114,7 +114,7 @@ class source:
             query = urlparse.urljoin(self.base_link, url)
             r = client.request(query)
             links = client.parseDOM(r, 'tbody')
-            links = client.parseDOM(links, 'a',  ret='href')
+            links = client.parseDOM(links, 'a', ret='href')
             for i in range(len(links)):
 
                 url = links[i]
@@ -136,7 +136,7 @@ class source:
                 if not valid: continue
 
                 sources.append({'source': host, 'quality': quality, 'language': lang, 'url': url, 'info': info,
-                                'direct':False,'debridonly': False})
+                                'direct': False, 'debridonly': False})
 
             return sources
         except:

@@ -40,12 +40,11 @@ class source:
         self.sources = []
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             clean_title = cleantitle.geturl(title).replace('-', '%20')
             url = urlparse.urljoin(self.base_link, (
-            self.search_link % (clean_title))) + '$$$$$' + title + '$$$$$' + year + '$$$$$' + 'movie'
+                    self.search_link % (clean_title))) + '$$$$$' + title + '$$$$$' + year + '$$$$$' + 'movie'
             return url
         except:
             return

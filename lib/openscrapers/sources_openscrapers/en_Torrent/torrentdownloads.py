@@ -26,8 +26,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client2 as client
 from openscrapers.modules import debrid
@@ -43,7 +43,6 @@ class source:
         self.base_link = 'https://www.torrentdownloads.me'
         self.search = 'https://www.torrentdownloads.me/rss.xml?new=1&type=search&cid={0}&search={1}'
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -52,7 +51,6 @@ class source:
         except BaseException:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,7 +58,6 @@ class source:
             return url
         except BaseException:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -73,7 +70,6 @@ class source:
         except BaseException:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             self._sources = []
@@ -83,10 +79,12 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
+                'year']
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
             query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             if 'tvshowtitle' in data:
                 url = self.search.format('8', urllib.quote(query))
@@ -103,7 +101,6 @@ class source:
             return self._sources
         except BaseException:
             return self._sources
-
 
     def _get_items(self, r):
         try:
@@ -129,11 +126,11 @@ class source:
             if not seeders == '0':
                 if cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(self.title):
                     if y == self.hdlr:
-                        self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                        self._sources.append(
+                            {'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                             'direct': False, 'debridonly': True})
         except BaseException:
             pass
 
-
     def resolve(self, url):
         return url
-

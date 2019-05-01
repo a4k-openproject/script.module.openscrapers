@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -62,7 +62,8 @@ class source:
             r = client.request(r[0][0]['src'])
             r = dom_parser.parse_dom(r, 'a', attrs={'class': 'play_container'}, req='href')
             r = client.request(r[0][0]['href'])
-            url = self.get_link % (re.search('(?<=var id = \")(.*?)(?=\")', r).group(), re.search('(?<=var links = \")(.*?)(?=\")', r).group())
+            url = self.get_link % (
+            re.search('(?<=var id = \")(.*?)(?=\")', r).group(), re.search('(?<=var links = \")(.*?)(?=\")', r).group())
             r = client.request(url)
             r = dom_parser.parse_dom(r, 'ul', attrs={'id': 'articleList'})
             r = dom_parser.parse_dom(r, 'a')
@@ -78,7 +79,8 @@ class source:
                 valid, hoster = source_utils.is_host_valid(link, hostDict)
                 if not valid: continue
 
-                sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False, 'debridonly': False})
+                sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False,
+                                'debridonly': False})
 
             return sources
         except:
@@ -100,9 +102,6 @@ class source:
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'item-video'})
             r = dom_parser.parse_dom(r, 'h2', attrs={'class': 'entry-title'})
             r = dom_parser.parse_dom(r, 'a', req='href')
-
-                           
-                                         
 
             for i in r:
                 title = i[1]
