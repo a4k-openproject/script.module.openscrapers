@@ -59,7 +59,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['solarmoviez.ru','solarmovie.mrunlock.pw']
-        self.base_link = 'https://solarmoviez.ru'
+        self.base_link = 'https://solarmovie.to'
         self.search_link = '/movie/search/%s.html'
         self.info_link = '/ajax/movie_get_info/%s.html'
         self.server_link = '/ajax/v4_movie_episodes/%s'
