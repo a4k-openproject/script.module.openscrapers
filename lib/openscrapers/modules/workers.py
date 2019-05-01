@@ -30,3 +30,4 @@ class Thread(threading.Thread):
 
     def run(self):
         self._target(*self._args)
+

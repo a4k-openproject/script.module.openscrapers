@@ -13,7 +13,7 @@
 
 import re
 
-from openscrapers.modules import cleantitle, source_utils, cfscrape
+from openscrapers.modules import client, cleantitle, source_utils, cfscrape
 
 
 class source:

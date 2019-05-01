@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -23,8 +23,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import control
@@ -46,8 +46,7 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year, 'filme')
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
-                                                                    year, 'filme')
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year, 'filme')
             return url
         except:
             return
@@ -55,8 +54,7 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year, 'serien')
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
-                [tvshowtitle] + source_utils.aliases_to_array(aliases), year, 'serien')
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year, 'serien')
             return url
         except:
             return
@@ -102,8 +100,7 @@ class source:
             r = client.request(urlparse.urljoin(self.base_link, url))
 
             links = dom_parser.parse_dom(r, 'table')
-            links = [i.content for i in links if
-                     dom_parser.parse_dom(i, 'span', attrs={'class': re.compile('linkSearch(-a)?')})]
+            links = [i.content for i in links if dom_parser.parse_dom(i, 'span', attrs={'class': re.compile('linkSearch(-a)?')})]
             links = re.compile('(<a.+?/a>)', re.DOTALL).findall(''.join(links))
             links = [dom_parser.parse_dom(i, 'a', req='href') for i in links if re.findall('(.+?)\s*\(\d+\)\s*<', i)]
             links = [i[0].attrs['href'] for i in links if i]
@@ -127,8 +124,7 @@ class source:
                     r = client.request(urlparse.urljoin(self.base_link, detail[0][0]))
 
                 r = dom_parser.parse_dom(r, 'table')
-                r = [dom_parser.parse_dom(i, 'a', req=['href', 'title']) for i in r if
-                     not dom_parser.parse_dom(i, 'table')]
+                r = [dom_parser.parse_dom(i, 'a', req=['href', 'title']) for i in r if not dom_parser.parse_dom(i, 'table')]
                 r = [(l.attrs['href'], l.attrs['title']) for i in r for l in i if l.attrs['title']]
 
                 info = ' | '.join(info)
@@ -142,9 +138,7 @@ class source:
                     if hoster.lower() == 'gvideo':
                         direct = True
 
-                    sources.append(
-                        {'source': hoster, 'quality': quality, 'language': 'de', 'url': stream_link, 'info': info,
-                         'direct': direct, 'debridonly': False, 'checkquality': True})
+                    sources.append({'source': hoster, 'quality': quality, 'language': 'de', 'url': stream_link, 'info': info, 'direct': direct, 'debridonly': False, 'checkquality': True})
 
             return sources
         except:
@@ -186,8 +180,7 @@ class source:
             x = []
             for i in r:
                 if re.search('(?<=<i>\().*$', i[1]):
-                    x.append(
-                        (i[0], re.search('(.*?)(?=\s<)', i[1]).group(), re.search('(?<=<i>\().*$', i[1]).group(), i[2]))
+                    x.append((i[0], re.search('(.*?)(?=\s<)', i[1]).group(), re.search('(?<=<i>\().*$', i[1]).group(), i[2]))
                 else:
                     x.append((i[0], i[1], i[1], i[2]))
             r = [i[0] for i in x if (cleantitle.get(i[1]) in t or cleantitle.get(i[2]) in t) and i[3] == year][0]
@@ -198,14 +191,14 @@ class source:
 
     def __google(self, url):
         try:
-            url = re.sub('[^\/]+$', 'view', url)  # fix kinow problem for gvideo urls (/view)
-
+            url = re.sub('[^\/]+$', 'view', url) # fix kinow problem for gvideo urls (/view)
+            
             video_id = re.search('(?<=\/d\/)(.*?)(?=\/)', url).group()
-
+            
             url = 'https://drive.google.com/uc?id=%s&export=download' % video_id
-
+            
             cookie = client.request(url, output='cookie')
-
+            
             confirm = '(?<=%s=)(.*?)(?=;)' % video_id
             confirm = re.search(confirm, cookie).group()
 

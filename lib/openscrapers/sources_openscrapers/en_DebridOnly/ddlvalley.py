@@ -26,8 +26,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -47,7 +47,7 @@ class source:
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            clean_title = cleantitle.geturl(title).replace('-', '+').replace(': ', '+')
+            clean_title = cleantitle.geturl(title).replace('-','+').replace(': ', '+')
             url = urlparse.urljoin(self.base_link, self.search_link % clean_title).lower()
             url = {'url': url, 'title': title, 'year': year}
             url = urllib.urlencode(url)
@@ -76,13 +76,13 @@ class source:
             return
 
     def sources(self, url, hostDict, hostprDict):
-        try:
+        try:    
             sources = []
-
+            
             if url == None: return sources
-
+     
             if debrid.status() == False: raise Exception()
-
+ 
             data = urlparse.parse_qs(url)
 
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -91,7 +91,7 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if \
+            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if\
                 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
 
             url = self.search_link % urllib.quote_plus(query).lower()
@@ -101,7 +101,7 @@ class source:
             r = self.scraper.get(url, headers=headers).content
 
             items = dom_parser2.parse_dom(r, 'h2')
-            items = [dom_parser2.parse_dom(i.content, 'a', req=['href', 'rel', 'data-wpel-link']) for i in items]
+            items = [dom_parser2.parse_dom(i.content, 'a', req=['href','rel','data-wpel-link']) for i in items]
             items = [(i[0].content, i[0].attrs['href']) for i in items]
 
             hostDict = hostprDict + hostDict
@@ -116,7 +116,7 @@ class source:
                     url = item[1]
                     headers = {'Referer': url, 'User-Agent': 'Mozilla/5.0'}
                     r = self.scraper.get(url, headers=headers).content
-                    links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', 'data-wpel-link'])
+                    links = dom_parser2.parse_dom(r, 'a', req=['href','rel','data-wpel-link'])
                     links = [i.attrs['href'] for i in links]
                     for url in links:
                         try:
@@ -133,7 +133,7 @@ class source:
                                 try:
                                     size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', name[2])[-1]
                                     div = 1 if size.endswith(('GB', 'GiB')) else 1024
-                                    size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+                                    size = float(re.sub('[^0-9|/.|/,]', '', size))/div
                                     size = '%.2f GB' % size
                                     info.append(size)
                                 except:
@@ -145,15 +145,12 @@ class source:
                                     url = client.replaceHTMLCodes(url)
                                     url = url.encode('utf-8')
 
-                                    host = \
-                                    re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
-                                    if host in hostDict:
+                                    host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+                                    if host in hostDict: 
                                         host = client.replaceHTMLCodes(host)
                                         host = host.encode('utf-8')
 
-                                        sources.append(
-                                            {'source': host, 'quality': quality, 'language': 'en', 'url': url,
-                                             'info': info, 'direct': False, 'debridonly': True})
+                                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
                         except:
                             pass
                 except:

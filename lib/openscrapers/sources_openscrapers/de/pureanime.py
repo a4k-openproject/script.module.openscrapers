@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -24,8 +24,8 @@
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import anilist
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -45,8 +45,7 @@ class source:
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
-            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle,
-                   'aliases': aliases, 'year': year}
+            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'aliases': aliases, 'year': year}
             url = urllib.urlencode(url)
             return url
         except:
@@ -76,8 +75,7 @@ class source:
             tvshowtitle = data.get('tvshowtitle')
             localtvshowtitle = data.get('localtvshowtitle')
             aliases = source_utils.aliases_to_array(eval(data['aliases']))
-            episode = tvmaze.tvMaze().episodeAbsoluteNumber(data.get('tvdb'), int(data.get('season')),
-                                                            int(data.get('episode')))
+            episode = tvmaze.tvMaze().episodeAbsoluteNumber(data.get('tvdb'), int(data.get('season')), int(data.get('episode')))
 
             alt_title = anilist.getAlternativTitle(tvshowtitle)
             links = self.__search([alt_title] + aliases, episode)
@@ -88,8 +86,7 @@ class source:
                 valid, host = source_utils.is_host_valid(link, hostDict)
                 if not valid: continue
 
-                sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False,
-                                'debridonly': False})
+                sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False, 'debridonly': False})
 
             return sources
         except:
@@ -114,11 +111,7 @@ class source:
             r = [(i[0], re.findall('(.+?) (\d*)$', i[0]), i[1]) for i in r]
             r = [(i[0] if not i[1] else i[1][0][0] + ' ' + str(int(i[1][0][1])), i[2]) for i in r]
             r = [dom_parser.parse_dom(i[1], 'div') for i in r if cleantitle.get(i[0]) in t]
-            r = [[x.attrs['href'] for x in dom_parser.parse_dom(i, 'a', req='href')] + [x.attrs['src'] for x in
-                                                                                        dom_parser.parse_dom(i,
-                                                                                                             'iframe',
-                                                                                                             req='src')]
-                 for i in r]
+            r = [[x.attrs['href'] for x in dom_parser.parse_dom(i, 'a', req='href')] + [x.attrs['src'] for x in dom_parser.parse_dom(i, 'iframe', req='src')] for i in r]
             return r[0]
         except:
             return

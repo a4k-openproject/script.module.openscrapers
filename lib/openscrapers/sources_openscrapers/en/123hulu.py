@@ -11,8 +11,8 @@
 import base64
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import client, cleantitle, dom_parser2, cfscrape
 
 
@@ -58,7 +58,7 @@ class source:
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['premiered'], url['season'], url['episode'] = premiered, season, episode
             try:
-                clean_title = cleantitle.geturl(url['tvshowtitle']) + '-season-%d' % int(season)
+                clean_title = cleantitle.geturl(url['tvshowtitle'])+'-season-%d' % int(season)
                 search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
                 r = self.scraper.get(search_url).content
                 r = client.parseDOM(r, 'div', {'id': 'movie-featured'})
@@ -103,8 +103,7 @@ class source:
             except:
                 pass
             r = client.parseDOM(r, 'div', {'class': 'server_line'})
-            r = [(client.parseDOM(i, 'a', ret='href')[0],
-                  client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in r]
+            r = [(client.parseDOM(i, 'a', ret='href')[0], client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in r]
             if r:
                 for i in r:
                     try:
@@ -112,7 +111,7 @@ class source:
                         url = i[0]
                         host = client.replaceHTMLCodes(host)
                         host = host.encode('utf-8')
-                        if 'other' in host: continue
+                        if 'other'in host: continue
                         sources.append({
                             'source': host,
                             'quality': 'SD',
@@ -134,3 +133,4 @@ class source:
             b64 = base64.b64decode(v)
             url = client.parseDOM(b64, 'iframe', ret='src')[0]
         return url
+

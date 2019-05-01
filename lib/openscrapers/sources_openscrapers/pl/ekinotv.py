@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -24,7 +24,6 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-
 
 class source:
     def __init__(self):
@@ -44,8 +43,8 @@ class source:
             return url
         except:
             return
-
-    def do_search(self, search_string, title, localtitle, year, search_type):
+        
+    def do_search(self, search_string, title, localtitle , year, search_type):
         url = urlparse.urljoin(self.base_link, self.search_link)
         r = client.request(url, redirect=False, post={'search_field': search_string})
         r = client.parseDOM(r, 'div', attrs={'class': 'movies-list-item'})
@@ -55,25 +54,25 @@ class source:
         for row in r:
             row = client.parseDOM(row, 'div', attrs={'class': 'opis-list'})[0]
             title_found = client.parseDOM(row, 'div', attrs={'class': 'title'})[0]
-            link = client.parseDOM(title_found, 'a', ret='href')[0]
+            link = client.parseDOM(title_found, 'a', ret='href')[0]                        
             if not search_type in link:
                 continue
-
+            
             local_found = client.parseDOM(title_found, 'a')[0]
             title_found = client.parseDOM(title_found, 'a', attrs={'class': 'blue'})
             if not title_found or not title_found[0]:
                 title_found = local_found
-            else:
+            else: 
                 title_found = title_found[0]
-
+            
             local_found = local_found.replace('&nbsp;', '')
             title_found = title_found.replace('&nbsp;', '')
             year_found = client.parseDOM(row, 'p', attrs={'class': 'cates'})
             if year_found:
                 year_found = year_found[0][:4]
-            title_match = cleantitle.get(local_found) == local_simple or cleantitle.get(title_found) == title_simple
+            title_match = cleantitle.get(local_found) == local_simple or  cleantitle.get(title_found) == title_simple
             year_match = (not year_found) or year == year_found
-
+            
             if title_match and year_match:
                 return link
 
@@ -85,7 +84,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         url = urlparse.urljoin(self.base_link, url)
-        r = client.request(url)
+        r = client.request(url)        
         r = client.parseDOM(r, 'div', attrs={'id': 'list-series'})[0]
         p = client.parseDOM(r, 'p')
         index = p.index('Sezon ' + season)
@@ -94,7 +93,7 @@ class source:
         for row in r:
             ep_no = client.parseDOM(row, 'div')[0]
             if ep_no == episode:
-                return client.parseDOM(row, 'a', ret='href')[0]
+                return client.parseDOM(row, 'a', ret='href')[0]     
         return None
 
     def get_lang_by_type(self, lang_type):
@@ -120,10 +119,10 @@ class source:
             rows = client.parseDOM(rows, 'li')
             rows.pop()
             rows2 = client.parseDOM(r, 'div', attrs={'role': 'tabpanel'})
-
+            
             for i in range(len(rows)):
                 row = rows[i]
-                row2 = rows2[i]
+                row2 = rows2[i]                
                 link = client.parseDOM(row2, 'a', ret='onClick')[0]
                 data = client.parseDOM(row, 'a')[0]
                 qual = client.parseDOM(row, 'img ', ret='title')
@@ -133,9 +132,7 @@ class source:
                     q = 'HD'
                 lang, info = self.get_lang_by_type(lang_type)
                 host = data.splitlines()[0].strip()
-                sources.append(
-                    {'source': host, 'quality': q, 'language': lang, 'url': link, 'info': info, 'direct': False,
-                     'debridonly': False})
+                sources.append({'source': host, 'quality': q, 'language': lang, 'url': link, 'info': info, 'direct': False, 'debridonly': False})
 
             return sources
         except:
@@ -152,5 +149,5 @@ class source:
             for script in scripts:
                 if 'var url' in script:
                     return script.split("'")[1]
-        except:
-            return None
+        except: 
+            return None 

@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -25,8 +25,8 @@ import base64
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import control
@@ -47,11 +47,11 @@ class source:
         self.user = control.setting('seriesever.user')
         self.password = control.setting('seriesever.pass')
 
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
-                [tvshowtitle] + source_utils.aliases_to_array(aliases), year)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year)
             return url
         except:
             return
@@ -62,7 +62,7 @@ class source:
                 return
 
             s = 'staffel-%s-episode-%s' % (season, episode)
-            s = '(?<=<a class=\"episode-name\" href=\")(.*?)(?=' + s + ')(.*?)(?=\")'
+            s = '(?<=<a class=\"episode-name\" href=\")(.*?)(?='+s+')(.*?)(?=\")'
 
             url = '/serien' + re.sub('\.\w+$', '', url)
             url = urlparse.urljoin(self.base_link, url)
@@ -92,8 +92,7 @@ class source:
             query = urlparse.urljoin(self.base_link, self.part_link)
             id = re.compile('var\s*video_id\s*=\s*"(\d+)"').findall(r)[0]
 
-            p = dom_parser.parse_dom(r, 'a', attrs={'class': 'changePart', 'data-part': re.compile('\d+p')},
-                                     req='data-part')
+            p = dom_parser.parse_dom(r, 'a', attrs={'class': 'changePart', 'data-part': re.compile('\d+p')}, req='data-part')
 
             for i in p:
                 i = i.attrs['data-part']
@@ -124,7 +123,7 @@ class source:
                             if '/old/seframer.php' in url: url = self.__get_old_url(url)
 
                             if 'keepup' in url:
-                            # needs to be fixed (keepup.gq)
+                                # needs to be fixed (keepup.gq)
                             elif self.domains[0] in url:
                                 url = re.search('(?<=id=).*$', url).group()
                                 url = 'https://drive.google.com/file/d/' + url
@@ -132,20 +131,14 @@ class source:
                         valid, host = source_utils.is_host_valid(url, hostDict)
                         if not valid: continue
 
-                        if i in ['720p', 'HD']:
-                            quali = 'HD'
-                        elif i in ['1080p', '1440p']:
-                            quali = i
-                        elif i in ['2160p']:
-                            quali = '4K'
-                        else:
-                            quali = 'SD'
+                        if i in ['720p', 'HD']: quali = 'HD'
+                        elif i in ['1080p', '1440p']: quali = i
+                        elif i in ['2160p']: quali = '4K'
+                        else: quali = 'SD'
 
                         urls, host, direct = source_utils.check_directstreams(url, host, quali)
 
-                        for i in urls: sources.append(
-                            {'source': host, 'quality': i['quality'], 'language': 'de', 'url': i['url'],
-                             'direct': direct, 'debridonly': False})
+                        for i in urls: sources.append({'source': host, 'quality': i['quality'], 'language': 'de', 'url': i['url'], 'direct': direct, 'debridonly': False})
                     except:
                         pass
 
@@ -186,10 +179,8 @@ class source:
         hash = hash.replace("!BeF", "R")
         hash = hash.replace("@jkp", "Ax")
         hash += '=' * (-len(hash) % 4)
-        try:
-            return base64.b64decode(hash)
-        except:
-            return
+        try: return base64.b64decode(hash)
+        except: return
 
     def __get_old_url(self, url):
         try:

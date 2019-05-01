@@ -11,6 +11,7 @@
 
 import re
 
+import requests
 from openscrapers.modules import cleantitle, source_utils, cfscrape
 
 

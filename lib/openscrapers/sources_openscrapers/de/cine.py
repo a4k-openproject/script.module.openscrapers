@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -24,8 +24,8 @@
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
 
@@ -66,12 +66,8 @@ class source:
                 if not valid: continue
 
                 for link in links:
-                    try:
-                        sources.append(
-                            {'source': hoster, 'quality': 'SD', 'language': 'de', 'url': self.out_link % link,
-                             'direct': False, 'debridonly': False})
-                    except:
-                        pass
+                    try: sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': self.out_link % link, 'direct': False, 'debridonly': False})
+                    except: pass
 
             return sources
         except:

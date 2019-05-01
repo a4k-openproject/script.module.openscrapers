@@ -44,6 +44,7 @@ class source:
         self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
         self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
 
+
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -85,13 +86,11 @@ class source:
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
             self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-                'year']
+            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
             query = '%s S%02dE%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             if 'tvshowtitle' in data:
                 url = self.tvsearch.format(urllib.quote_plus(query))
@@ -156,6 +155,7 @@ class source:
             return items
         except BaseException:
             return items
+
 
     def resolve(self, url):
         return url

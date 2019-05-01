@@ -67,8 +67,7 @@ class source:
         try:
             sources = []
             quality = source_utils.check_url(url)
-            sources.append({'source': 'Direct', 'quality': quality, 'language': 'en', 'url': url, 'direct': True,
-                            'debridonly': False})
+            sources.append({'source': 'Direct', 'quality': quality, 'language': 'en', 'url': url, 'direct': True, 'debridonly': False})
             return sources
         except:
             return

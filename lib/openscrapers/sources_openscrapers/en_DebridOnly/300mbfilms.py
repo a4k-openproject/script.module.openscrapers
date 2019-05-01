@@ -9,23 +9,23 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @tantrumdev wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @tantrumdev wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # -Cleaned and Checked on 11-13-2018 by JewBMX in Scrubs.
 
 import re
 import urllib
-import urlparse
 
-from openscrapers.modules import cfscrape
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -35,7 +35,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['300mbfilms.co']
-        self.base_link = 'https://300mbfilms.co'  # https://www.300mbfilms.co
+        self.base_link = 'https://300mbfilms.co' #https://www.300mbfilms.co
         self.search_link = '/search/%s/feed/rss2/'
         self.scraper = cfscrape.create_scraper()
 
@@ -67,6 +67,7 @@ class source:
         except:
             return
 
+
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -82,9 +83,7 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             url = self.search_link % urllib.quote_plus(query)
@@ -105,7 +104,7 @@ class source:
                     s = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', t)
                     s = s[0] if s else '0'
 
-                    items += [(t, u, s)]
+                    items += [(t, u, s) ]
 
                 except:
                     pass
@@ -131,7 +130,7 @@ class source:
                     try:
                         size = re.sub('i', '', item[2])
                         div = 1 if size.endswith('GB') else 1024
-                        size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+                        size = float(re.sub('[^0-9|/.|/,]', '', size))/div
                         size = '%.2f GB' % size
                         info.append(size)
                     except:
@@ -158,9 +157,7 @@ class source:
                 host = client.replaceHTMLCodes(host)
                 host = host.encode('utf-8')
 
-                sources.append(
-                    {'source': host, 'quality': item[1], 'language': 'en', 'url': url, 'info': item[2], 'direct': False,
-                     'debridonly': True})
+                sources.append({'source': host, 'quality': item[1], 'language': 'en', 'url': url, 'info': item[2], 'direct': False, 'debridonly': True})
 
             return sources
         except:
@@ -178,7 +175,7 @@ class source:
             r = client.parseDOM(r, 'div', attrs={'id': 'post-\d+'})[0]
 
             if 'enter the password' in r:
-                plink = client.parseDOM(r, 'form', ret='action')[0]
+                plink= client.parseDOM(r, 'form', ret='action')[0]
 
                 post = {'post_password': '300mbfilms', 'Submit': 'Submit'}
                 send_post = client.request(plink, post=post, output='cookie')
@@ -198,3 +195,5 @@ class source:
 
     def resolve(self, url):
         return url
+
+

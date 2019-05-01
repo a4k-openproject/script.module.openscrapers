@@ -25,9 +25,9 @@
 
 import re
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 
 
 class source:
@@ -77,9 +77,7 @@ class source:
                         i = self.scraper.get(i).conent.replace("\\", "")
                         u = re.findall('"(https.+?)"', i)
                         for url in u:
-                            sources.append(
-                                {'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-                                 'debridonly': False})
+                            sources.append({'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
 
                 return sources
         except Exception:

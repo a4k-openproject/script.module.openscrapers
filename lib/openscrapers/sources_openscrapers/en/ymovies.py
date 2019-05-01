@@ -29,8 +29,8 @@ import json
 import re
 import traceback
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape, cleantitle, client, directstream, \
     dom_parser, jsunfuck, log_utils, source_utils
 

@@ -28,9 +28,9 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import debrid
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
 
@@ -75,7 +75,7 @@ class source:
         try:
             if debrid.status() is False:
                 raise Exception()
-
+				
             if url is None:
                 return sources
 
@@ -85,7 +85,7 @@ class source:
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
+            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))\
                 if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 

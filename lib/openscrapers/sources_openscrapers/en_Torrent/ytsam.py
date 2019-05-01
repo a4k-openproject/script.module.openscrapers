@@ -21,6 +21,7 @@ class source:
         self.search_link = '/browse-movies/%s/all/all/0/latest'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
 
+
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -28,6 +29,7 @@ class source:
             return url
         except Exception:
             return
+
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -50,8 +52,7 @@ class source:
             for entry in items:
                 try:
                     try:
-                        link, name = \
-                        re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
+                        link, name = re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
                         name = client.replaceHTMLCodes(name)
                         if not cleantitle.get(name) == cleantitle.get(data['title']):
                             continue
@@ -64,9 +65,7 @@ class source:
                     try:
                         entries = client.parseDOM(response, 'div', attrs={'class': 'modal-torrent'})
                         for torrent in entries:
-                            link, name = re.findall(
-                                'href="magnet:(.+?)" class="magnet-download download-torrent magnet" title="(.+?)"',
-                                torrent, re.DOTALL)[0]
+                            link, name = re.findall('href="magnet:(.+?)" class="magnet-download download-torrent magnet" title="(.+?)"', torrent, re.DOTALL)[0]
                             link = 'magnet:%s' % link
                             link = str(client.replaceHTMLCodes(link).split('&tr')[0])
                             quality, info = source_utils.get_release_quality(name, name)
@@ -79,9 +78,7 @@ class source:
                             except Exception:
                                 pass
                             info = ' | '.join(info)
-                            sources.append(
-                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
-                                 'direct': False, 'debridonly': True})
+                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
                     except Exception:
                         continue
                 except Exception:
@@ -90,5 +87,7 @@ class source:
         except Exception:
             return sources
 
+
     def resolve(self, url):
         return url
+

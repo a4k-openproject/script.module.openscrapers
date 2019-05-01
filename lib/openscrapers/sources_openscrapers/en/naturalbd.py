@@ -24,8 +24,8 @@
 '''
 
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import client, cfscrape
 
 
@@ -86,7 +86,7 @@ class source:
                 tm_id = self.scraper.get(tm_url).content
                 import json
                 tm_id = json.loads(tm_id)['tv_results'][0]['id']
-                tm_eplink = 'https://api.themoviedb.org/3/tv/%d/season/%d/episode/%d?api_key=%s' % \
+                tm_eplink = 'https://api.themoviedb.org/3/tv/%d/season/%d/episode/%d?api_key=%s' %\
                             (int(tm_id), int(data['season']), int(data['episode']), tm_api)
                 tm_epiid = self.scraper.get(tm_eplink).content
                 tm_epiid = json.loads(tm_epiid)['id']

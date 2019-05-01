@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -23,8 +23,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import dom_parser
@@ -40,7 +40,7 @@ class source:
         self.search_link = '/?s=%s'
         self.get_link = '/links/%s'
 
-    def movie(self, imdb, title, localtitle, aliases, year):
+    def movie(self, imdb, title, localtitle, aliases, year):        
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases))
             if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases))
@@ -51,8 +51,7 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases))
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
-                [tvshowtitle] + source_utils.aliases_to_array(aliases))
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases))
             return url
         except:
             return
@@ -72,7 +71,7 @@ class source:
         except:
             return
 
-    def sources(self, url, hostDict, hostprDict):
+    def sources(self, url, hostDict, hostprDict):        
         sources = []
 
         try:
@@ -108,8 +107,7 @@ class source:
 
                     url = self.__get_link(link)
 
-                    sources.append({'source': hoster, 'quality': quality, 'language': 'de', 'url': url, 'direct': False,
-                                    'debridonly': False})
+                    sources.append({'source': hoster, 'quality': quality, 'language': 'de', 'url': url, 'direct': False, 'debridonly': False})
 
             return sources
         except:
@@ -118,7 +116,7 @@ class source:
     def resolve(self, url):
         return url
 
-    def __search(self, titles):
+    def __search(self, titles):        
         try:
             query = self.search_link % (urllib.quote_plus(cleantitle.query(titles[0])))
             query = urlparse.urljoin(self.base_link, query)
@@ -137,7 +135,7 @@ class source:
 
                 if title in t:
                     return source_utils.strip_domain(i[0]['href'])
-
+            
             return
         except:
             return

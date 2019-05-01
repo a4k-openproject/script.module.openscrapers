@@ -29,8 +29,8 @@ import json
 import operator as op
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -130,16 +130,15 @@ class source:
             premDate = ''
 
             query = '%s S%02dE%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
             query = query.replace("&", "and")
             query = query.replace("  ", " ")
             query = query.replace(" ", "-")
 
-            query = urllib.quote_plus(query)
+            query =  urllib.quote_plus(query)
             url = '%s/?s=%s&submit=Find' % (self.base_link, query)
 
             resp = self.scraper.get(url)
@@ -157,7 +156,7 @@ class source:
 
             location_builder = parseJSString(location_maths)
 
-            url = '%s%s' % (self.searchbase_link, self.search_link % (location_builder, query, rlsbb_code))
+            url = '%s%s' % (self.searchbase_link, self.search_link % (location_builder, query, rlsbb_code) )
 
             r = self.scraper.get(url).content
 
@@ -182,7 +181,7 @@ class source:
                 capture = re.findall(regex, post['post_title'].lower())
                 capture = [i for i in capture if len(i) > 1]
                 if len(capture) >= 1:
-                    post_urls.append('http://%s/%s' % (post['domain'], post['post_name']))
+                     post_urls.append('http://%s/%s' % (post['domain'], post['post_name']))
 
             if len(post_urls) == 0:
                 return None
@@ -199,10 +198,8 @@ class source:
                         for i in u:
                             try:
                                 name = str(i)
-                                if hdlr in name.upper():
-                                    items.append(name)
-                                elif len(premDate) > 0 and premDate in name.replace(".", "-"):
-                                    items.append(name)
+                                if hdlr in name.upper(): items.append(name)
+                                elif len(premDate) > 0 and premDate in name.replace(".","-"): items.append(name)
 
                             except:
                                 pass
@@ -234,8 +231,7 @@ class source:
                     info = ' | '.join(info)
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info,
-                                    'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info, 'direct': False, 'debridonly': False})
 
                 except:
                     pass
@@ -247,3 +243,4 @@ class source:
 
     def resolve(self, url):
         return url
+

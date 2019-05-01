@@ -4,8 +4,8 @@ import random
 import sys
 import threading
 import time
-import traceback
 
+import traceback
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
@@ -335,7 +335,7 @@ if __name__ == '__main__':
                 try:
                     if i[1] is not None:
                         output.write('%s;%s;%s;%s\n' % (
-                            i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
+                        i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
                 except:
                     pass
 

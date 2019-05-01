@@ -25,8 +25,8 @@
 
 import re
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
+from openscrapers.modules import cfscrape
 from openscrapers.modules import source_utils
 
 
@@ -64,8 +64,7 @@ class source:
                     if 'youtube' in url:
                         continue
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-                                    'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
             except:
                 return
         except Exception:

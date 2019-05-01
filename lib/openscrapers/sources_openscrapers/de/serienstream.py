@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -24,8 +24,8 @@
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import control
@@ -48,8 +48,7 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
-                                                                    year)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
             return url
         except:
             return
@@ -57,8 +56,7 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
-                [tvshowtitle] + source_utils.aliases_to_array(aliases), year)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year)
             return url
         except:
             return
@@ -85,8 +83,7 @@ class source:
 
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'hosterSiteVideo'})
             r = dom_parser.parse_dom(r, 'li', attrs={'data-lang-key': re.compile('[1|3]')})
-            r = [(dom_parser.parse_dom(i, 'a', req='href'), dom_parser.parse_dom(i, 'h4'),
-                  'subbed' if i.attrs['data-lang-key'] == '3' else '') for i in r]
+            r = [(dom_parser.parse_dom(i, 'a', req='href'), dom_parser.parse_dom(i, 'h4'), 'subbed' if i.attrs['data-lang-key'] == '3' else '') for i in r]
             r = [(i[0][0].attrs['href'], i[1][0].content.lower(), i[2]) for i in r if len(i[0]) > 0 and len(i[1]) > 0]
             r = [(i[0], i[1], re.findall('(.+?)\s*<br\s*/?>(.+?)$', i[1], re.DOTALL), i[2]) for i in r]
             r = [(i[0], i[2][0][0] if len(i[2]) > 0 else i[1], i[2][0][1] if len(i[2]) > 0 else '', i[3]) for i in r]
@@ -96,9 +93,7 @@ class source:
                 valid, host = source_utils.is_host_valid(host, hostDict)
                 if not valid: continue
 
-                sources.append(
-                    {'source': host, 'quality': quality, 'language': 'de', 'url': link, 'info': info, 'direct': False,
-                     'debridonly': False})
+                sources.append({'source': host, 'quality': quality, 'language': 'de', 'url': link, 'info': info, 'direct': False, 'debridonly': False})
 
             return sources
         except:
@@ -111,7 +106,7 @@ class source:
                 return url
 
             header = {'User-Agent': self.user_agent, 'Accept': 'text/html'}
-
+            
             self.__login()
             cookie = self.cookie
 

@@ -15,9 +15,9 @@ import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
 try:
-    from urllib import urlencode, quote_plus  # Python 2
+    from urllib import urlencode, quote_plus # Python 2
 except ImportError:
-    from urllib.parse import urlencode, quote_plus  # Python 3
+    from urllib.parse import urlencode, quote_plus # Python 3
 
 import xbmc
 
@@ -53,6 +53,7 @@ class source:
             'streamango': 'streamango.com'
         }
 
+
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             session = self._createSession(randomagent())
@@ -73,10 +74,11 @@ class source:
                         'UA': session.headers['User-Agent'],
                         'cookies': session.cookies.get_dict()
                     }
-            return None  # No results found.
+            return None # No results found.
         except:
             self._logException()
             return None
+
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -84,6 +86,7 @@ class source:
         except:
             self._logException()
             return None
+
 
     def episode(self, data, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -105,10 +108,11 @@ class source:
                         'UA': session.headers['User-Agent'],
                         'cookies': session.cookies.get_dict()
                     }
-            return None  # No results found.
+            return None # No results found.
         except:
             self._logException()
             return None
+
 
     def sources(self, data, hostDict, hostprDict):
         try:
@@ -129,7 +133,7 @@ class source:
 
             # Get a HTML block with a list of host names and internal links to them.
 
-            session.headers['Referer'] = pageURL  # Refer to this page that "we're on" right now to avoid suspicion.
+            session.headers['Referer'] = pageURL # Refer to this page that "we're on" right now to avoid suspicion.
             pageID = pageURL.rsplit('.', 1)[1]
             token = self._makeToken({'ts': timeStamp}, stringConstant)
             xbmc.sleep(200)
@@ -137,7 +141,7 @@ class source:
 
             # Go through the list of hosts and create a source entry for each.
 
-            sources = []
+            sources = [ ]
             tempTokenData = {'ts': timeStamp, 'id': None, 'server': None, 'update': '0'}
             baseInfoURL = self.BASE_URL + self.INFO_PATH
 
@@ -155,7 +159,7 @@ class source:
                     # The text in the <a> tag can be the movie quality ("HDRip", "CAM" etc.) or for TV shows
                     # it's the episode number with a one-zero-padding, like "09", for each episode in the season.
                     label = a.text.lower().strip()
-                    hostID = a['data-id']  # A string identifying a host embed to be retrieved from putlocker's servers.
+                    hostID = a['data-id'] # A string identifying a host embed to be retrieved from putlocker's servers.
 
                     if isMovie or episode == str(int(label)):
                         if isMovie:
@@ -183,7 +187,7 @@ class source:
                                 'source': hostName,
                                 'quality': quality,
                                 'language': 'en',
-                                'url': unresolvedData,  # Doesn't need to be a string, just repr()-able.
+                                'url': unresolvedData, # Doesn't need to be a string, just repr()-able.
                                 'direct': False,
                                 'debridonly': False
                             }
@@ -193,21 +197,24 @@ class source:
             self._logException()
             return None
 
+
     def resolve(self, data):
         # The 'data' parameter is the 'unresolvedData' dictionary sent from sources().
         try:
             session = self._createSession(data['UA'], data['cookies'], data['referer'])
-            xbmc.sleep(500)  # Give some room between requests (_getHost() -> _requestJSON() will also sleep some more).
-            return self._getHost(data['url'], session)  # Return a host URL for use with ResolveURL and play.
+            xbmc.sleep(500) # Give some room between requests (_getHost() -> _requestJSON() will also sleep some more).
+            return self._getHost(data['url'], session) # Return a host URL for use with ResolveURL and play.
         except:
             self._logException()
             return None
+
 
     def _sessionGET(self, url, session):
         try:
             return session.get(url, timeout=10)
         except:
             return type('FailedResponse', (object,), {'ok': False})
+
 
     def _requestJSON(self, url, session):
         try:
@@ -227,6 +234,7 @@ class source:
             self._logException()
             return None
 
+
     def _getHost(self, url, session):
         jsonData = self._requestJSON(url, session)
         if jsonData:
@@ -234,6 +242,7 @@ class source:
         else:
             self._logException('_getHost JSON request failed')
             return ''
+
 
     def _getServers(self, pageID, timeStamp, token, session):
         jsonData = self._requestJSON(
@@ -244,6 +253,7 @@ class source:
         else:
             self._logException('_getServers JSON request failed')
             return ''
+
 
     def _getSearch(self, lowerTitle, session):
         '''
@@ -260,7 +270,7 @@ class source:
 
         # Get the minified main javascript file.
         jsPath = re.search(self.ALL_JS_PATTERN, homepageHTML, re.DOTALL).group(1)
-        session.headers['Accept'] = '*/*'  # Use the same 'Accept' for JS files as web browsers do.
+        session.headers['Accept'] = '*/*' # Use the same 'Accept' for JS files as web browsers do.
         xbmc.sleep(200)
         allJS = self._sessionGET(self.BASE_URL + jsPath, session).text
         session.headers['Accept'] = self.DEFAULT_ACCEPT
@@ -285,6 +295,7 @@ class source:
             self._logException('_getSearch JSON request failed')
             return ''
 
+
     def _createSession(self, userAgent=None, cookies=None, referer=None):
         # Try to spoof a header from a web browser.
         session = requests.Session()
@@ -299,19 +310,22 @@ class source:
         )
         if cookies:
             session.cookies.update(cookies)
-            session.cookies[''] = '__test'  # See _getSearch() for more info on this.
+            session.cookies[''] = '__test' # See _getSearch() for more info on this.
         return session
+
 
     def _debug(self, name, val=None):
         xbmc.log('PLOCKER Debug > %s %s' % (name, repr(val) if val else ''), xbmc.LOGWARNING)
 
+
     def _logException(self, text=None):
-        return  # Comment this line to output errors to the Kodi log, useful for debugging this script.
+        return # Comment this line to output errors to the Kodi log, useful for debugging this script.
         # ------------------
         if text:
             xbmc.log('PLOCKER ERROR > %s' % text, xbmc.LOGERROR)
         else:
             xbmc.log(traceback.format_exc(), xbmc.LOGERROR)
+
 
     # Token algorithm, present in "all.js".
     # ----------------------------------------------------------
@@ -330,6 +344,7 @@ class source:
     def _getTimeStamp(self, html):
         return re.search(r'<html data-ts="(.*?)"', html, re.DOTALL).group(1)
 
+
     def _makeStringConstant(self, allJS):
         '''
         Reference:
@@ -345,6 +360,7 @@ class source:
         }
         return ''.join(rConstants.get(key, '') for key in rSum)
 
+
     def _e(self, t):
         '''
         Reference:
@@ -355,6 +371,7 @@ class source:
         }
         '''
         return sum(ord(t[i]) + i for i in xrange(len(t)))
+
 
     def _makeToken(self, params, stringConstant):
         '''
@@ -377,7 +394,6 @@ class source:
                 }(r() + n, o[n])));
                 return u[c] = a, u[h] = s, u
         '''
-
         def __convolute(t, i):
             iLen = len(i)
             tLen = len(t)
@@ -385,7 +401,7 @@ class source:
             for n in xrange(max(tLen, iLen)):
                 r += ord(i[n]) if n < iLen else 0
                 r += ord(t[n]) if n < tLen else 0
-            return self._e(hex(r)[2:])  # Skip two characters to ignore the '0x' from the Python hex string.
+            return self._e(hex(r)[2:]) # Skip two characters to ignore the '0x' from the Python hex string.
 
         s = self._e(stringConstant)
         for key in params.keys():

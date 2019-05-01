@@ -26,9 +26,9 @@
 
 import re
 import urllib
-import urlparse
 
-from openscrapers.modules import cleantitle, dom_parser, cfscrape
+import urlparse
+from openscrapers.modules import cleantitle, client, dom_parser, cfscrape
 
 
 class source:
@@ -70,7 +70,7 @@ class source:
             data = dict((i, data[i][0]) for i in data)
             url = urlparse.urljoin(self.base_link, self.search_link %
                                    cleantitle.geturl(data['tvshowtitle']).replace('-', '+'))
-            r = self.scraper.get(url, cookie='check=2').content
+            r =  self.scraper.get(url, cookie='check=2').content
             m = dom_parser.parse_dom(r, 'div', attrs={'class': 'masonry'})
             m = dom_parser.parse_dom(m, 'a', req='href')
             m = [(i.attrs['href']) for i in m if i.content == data['tvshowtitle']]
@@ -86,7 +86,7 @@ class source:
 
             if url is None:
                 return
-            r = self.scraper.get(url, cookie='check=2').content
+            r =  self.scraper.get(url, cookie='check=2').content
 
             m = dom_parser.parse_dom(r, 'table', attrs={'class': 'show_links'})[0]
             links = re.findall('k">(.*?)<.*?f="(.*?)"', m.content)

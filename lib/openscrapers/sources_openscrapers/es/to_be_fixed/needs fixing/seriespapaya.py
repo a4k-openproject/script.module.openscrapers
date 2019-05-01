@@ -51,13 +51,14 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            tvshowtitle = url.split('=')[1].lower().replace('+', '-')
-            if 'thrones' in tvshowtitle: tvshowtitle = tvshowtitle.replace('game', 'games')
+            tvshowtitle = url.split('=')[1].lower().replace('+','-')
+            if 'thrones' in tvshowtitle: tvshowtitle = tvshowtitle.replace('game','games')
             url = self.base_link
             url += '/ver/%s/temporada-%d/capitulo-%d.html' % (tvshowtitle, int(season), int(episode))
             return url
         except:
             return
+
 
     def sources(self, url, hostDict, hostprDict):
         sources = []
@@ -68,7 +69,7 @@ class source:
             links = client.parseDOM(r, 'div', attrs={'class': 'mtos'})
 
             for i in range(1, len(links)):
-                idioma = client.parseDOM(links[i], 'img', ret='src')[0]
+                idioma = client.parseDOM(links[i], 'img', ret= 'src')[0]
                 if 'in.' in idioma: continue
                 quality = client.parseDOM(links[i], 'div', attrs={'class': 'dcalidad'})[0]
                 servidor = re.findall("src='.+?'\s*/>(.+?)</div>", links[i])[0]
@@ -82,19 +83,16 @@ class source:
                 valid, host = source_utils.is_host_valid(servidor, hostDict)
 
                 sources.append({'source': host, 'quality': quality, 'language': lang, 'url': url, 'info': info,
-                                'direct': False, 'debridonly': False})
+                                'direct':False,'debridonly': False})
 
             return sources
         except:
             return sources
 
-    def quality_fixer(self, quality):
-        if '1080p' in quality:
-            return 'HD'
-        elif '720p' in quality:
-            return 'SD'
-        else:
-            return 'SD'
+    def quality_fixer(self,quality):
+        if '1080p' in quality: return 'HD'
+        elif '720p' in quality: return 'SD'
+        else: return 'SD'
 
     def get_lang_by_type(self, lang_type):
         if 'lat' in lang_type:
@@ -110,13 +108,14 @@ class source:
             return 'en', 'Ingles'
         return 'es', None
 
-    def enlaces(self, url):
+    def enlaces(self,url):
         try:
             data = client.request(url)
             url = re.findall("location\.href='(.+?)'\">", data, re.DOTALL)[0]
             return url
         except:
             pass
+
 
     def resolve(self, url):
         if 'papaya' in url:

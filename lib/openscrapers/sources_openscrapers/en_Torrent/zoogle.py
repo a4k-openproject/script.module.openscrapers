@@ -53,7 +53,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except Exception:
-
+            
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
@@ -65,7 +65,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except Exception:
-
+            
             return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -82,7 +82,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except Exception:
-
+            
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -91,7 +91,7 @@ class source:
 
             if url is None:
                 return sources
-
+				
             if debrid.status() is False:
                 raise Exception()
 
@@ -117,8 +117,7 @@ class source:
             html = client.request(url)
             html = html.replace('&nbsp;', ' ')
             try:
-                results = \
-                client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
+                results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
             except Exception:
                 return sources
             rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
@@ -129,7 +128,7 @@ class source:
                     try:
                         name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
                         name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
-
+                       
                         if not cleantitle.get(title) in cleantitle.get(name):
                             continue
                     except Exception:
@@ -139,8 +138,7 @@ class source:
                         continue
 
                     try:
-                        seeders = int(
-                            re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0])
+                        seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0])
                     except Exception:
                         continue
                     if self.min_seeders > seeders:
@@ -167,7 +165,7 @@ class source:
                     sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en',
                                     'url': link, 'info': info, 'direct': False, 'debridonly': True})
                 except Exception:
-
+                    
                     continue
 
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -176,7 +174,7 @@ class source:
 
             return sources
         except Exception:
-
+            
             return self._sources
 
     def resolve(self, url):

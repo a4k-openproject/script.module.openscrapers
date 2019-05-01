@@ -13,8 +13,8 @@
 import base64
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle, client, dom_parser2, source_utils, cfscrape
 
 
@@ -26,6 +26,7 @@ class source:
         self.base_link = 'http://moviego.net'
         self.search_link = '/search-movies/%s.html'
         self.scraper = cfscrape.create_scraper()
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -45,6 +46,7 @@ class source:
         except Exception:
             return
 
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -52,6 +54,7 @@ class source:
             return url
         except:
             return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -79,6 +82,7 @@ class source:
         except:
             return
 
+
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -100,9 +104,7 @@ class source:
                     host = host.encode('utf-8')
                     valid, host = source_utils.is_host_valid(host, hostDict)
                     if valid:
-                        sources.append(
-                            {'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'),
-                             'direct': False, 'debridonly': False})
+                        sources.append({ 'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False })
                 except:
                     pass
             except:
@@ -119,49 +121,34 @@ class source:
                         host = host.encode('utf-8')
                         valid, host = source_utils.is_host_valid(host, hostDict)
                         if 'openload' in host:
-                            if openload_limit < 1:
-                                continue
-                            else:
-                                openload_limit -= 1
+                            if openload_limit < 1: continue
+                            else: openload_limit -= 1
                         if 'vshare' in host:
-                            if vshare_limit < 1:
-                                continue
-                            else:
-                                vshare_limit -= 1
+                            if vshare_limit < 1: continue
+                            else: vshare_limit -= 1
                         if 'flashx' in host:
-                            if flashx_limit < 1:
-                                continue
-                            else:
-                                flashx_limit -= 1
+                            if flashx_limit < 1: continue
+                            else: flashx_limit -= 1
                         if 'thevideobee' in host:
-                            if thevideobee_limit < 1:
-                                continue
-                            else:
-                                thevideobee_limit -= 1
+                            if thevideobee_limit < 1: continue
+                            else: thevideobee_limit -= 1
                         if 'entervideo' in host:
-                            if entervideo_limit < 1:
-                                continue
-                            else:
-                                entervideo_limit -= 1
+                            if entervideo_limit < 1: continue
+                            else: entervideo_limit -= 1
                         if 'megamp4' in host:
-                            if megamp4_limit < 1:
-                                continue
-                            else:
-                                megamp4_limit -= 1
+                            if megamp4_limit < 1: continue
+                            else: megamp4_limit -= 1
                         if 'vidtodo' in host:
-                            if vidtodo_limit < 1:
-                                continue
-                            else:
-                                vidtodo_limit -= 1
+                            if vidtodo_limit < 1: continue
+                            else: vidtodo_limit -= 1
                         if valid:
-                            sources.append(
-                                {'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'),
-                                 'direct': False, 'debridonly': False})
+                            sources.append({ 'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False })
                     except:
                         pass
             return sources
         except Exception:
             return
+
 
     def resolve(self, url):
         if self.base_link in url:
@@ -170,3 +157,4 @@ class source:
             b64 = base64.b64decode(v)
             url = client.parseDOM(b64, 'iframe', ret='src')[0]
         return url
+

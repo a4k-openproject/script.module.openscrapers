@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------
+ # "THE BEER-WARE LICENSE" (Revision 42):
+ # @Daddy_Blamo wrote this file.  As long as you retain this notice you
+ # can do whatever you want with this stuff. If we meet some day, and you think
+ # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+ # ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -23,8 +23,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -49,9 +49,7 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search(imdb, [localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search(imdb,
-                                                                    [title] + source_utils.aliases_to_array(aliases),
-                                                                    year)
+            if not url and title != localtitle: url = self.__search(imdb, [title] + source_utils.aliases_to_array(aliases), year)
             return url
         except:
             return
@@ -83,8 +81,7 @@ class source:
                     url = urlparse.urljoin(self.base_link, url)
                     url = url.encode('utf-8')
 
-                    sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False,
-                                    'debridonly': False})
+                    sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False, 'debridonly': False})
                 except:
                     pass
 
@@ -119,16 +116,12 @@ class source:
             r = client.request(q)
 
             r = dom_parser.parse_dom(r, 'tr', attrs={'id': re.compile('coverPreview.+?')})
-            r = [(dom_parser.parse_dom(i, 'a', req='href'),
-                  dom_parser.parse_dom(i, 'div', attrs={'style': re.compile('.+?')}),
-                  dom_parser.parse_dom(i, 'img', req='src')) for i in r]
+            r = [(dom_parser.parse_dom(i, 'a', req='href'), dom_parser.parse_dom(i, 'div', attrs={'style': re.compile('.+?')}), dom_parser.parse_dom(i, 'img', req='src')) for i in r]
             r = [(i[0][0].attrs['href'].strip(), i[0][0].content.strip(), i[1], i[2]) for i in r if i[0] and i[2]]
-            r = [(i[0], i[1], [x.content for x in i[2] if x.content.isdigit() and len(x.content) == 4], i[3]) for i in
-                 r]
+            r = [(i[0], i[1], [x.content for x in i[2] if x.content.isdigit() and len(x.content) == 4], i[3]) for i in r]
             r = [(i[0], i[1], i[2][0] if i[2] else '0', i[3]) for i in r]
             r = [i for i in r if any('us_ger_' in x.attrs['src'] for x in i[3])]
-            r = [(i[0], i[1], i[2], [re.findall('(\d+)', x.attrs['src']) for x in i[3] if 'smileys' in x.attrs['src']])
-                 for i in r]
+            r = [(i[0], i[1], i[2], [re.findall('(\d+)', x.attrs['src']) for x in i[3] if 'smileys' in x.attrs['src']]) for i in r]
             r = [(i[0], i[1], i[2], [x[0] for x in i[3] if x]) for i in r]
             r = [(i[0], i[1], i[2], int(i[3][0]) if i[3] else 0) for i in r]
             r = sorted(r, key=lambda x: x[3])[::-1]

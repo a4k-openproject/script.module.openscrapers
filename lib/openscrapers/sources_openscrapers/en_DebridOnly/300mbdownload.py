@@ -24,10 +24,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -88,15 +89,14 @@ class source:
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
             query = '%s S%02dE%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
                 data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
 
-            html = self.scraper.get(url).content
+            html =self.scraper.get(url).content
             posts = client.parseDOM(html, 'item')
 
             hostDict = hostprDict + hostDict

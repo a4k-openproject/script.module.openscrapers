@@ -12,8 +12,8 @@
 import base64
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle, client, dom_parser2, cfscrape
 
 
@@ -25,6 +25,7 @@ class source:
         self.base_link = 'http://www1.123fox.net'
         self.search_link = '/search-movies/%s.html'
         self.scraper = cfscrape.create_scraper()
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -44,6 +45,7 @@ class source:
         except:
             return
 
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -51,6 +53,7 @@ class source:
             return url
         except:
             return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -77,6 +80,7 @@ class source:
             return url[0][1]
         except:
             return
+
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -127,6 +131,7 @@ class source:
         except Exception:
             return
 
+
     def resolve(self, url):
         if self.base_link in url:
             url = self.scraper.get(url).content
@@ -134,3 +139,4 @@ class source:
             b64 = base64.b64decode(v)
             url = client.parseDOM(b64, 'iframe', ret='src')[0]
         return url
+

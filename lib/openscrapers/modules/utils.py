@@ -37,8 +37,7 @@ def byteify(data, ignore_dicts=False):
     if isinstance(data, list):
         return [byteify(item, ignore_dicts=True) for item in data]
     if isinstance(data, dict) and not ignore_dicts:
-        return dict(
-            [(byteify(key, ignore_dicts=True), byteify(value, ignore_dicts=True)) for key, value in data.iteritems()])
+        return dict([(byteify(key, ignore_dicts=True), byteify(value, ignore_dicts=True)) for key, value in data.iteritems()])
     return data
 
 
