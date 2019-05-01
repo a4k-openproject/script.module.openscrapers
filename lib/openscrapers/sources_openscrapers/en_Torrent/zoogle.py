@@ -44,74 +44,50 @@ class source:
         self.search_link = '/search?q=%s'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
 
-    def movie(self, imdb, title, localtitle, aliases, year):
-        if debrid.status(True) is False:
-            return
 
+    def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
             url = urllib.urlencode(url)
             return url
         except Exception:
-            
             return
+
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-        if debrid.status(True) is False:
-            return
-
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
             url = urllib.urlencode(url)
             return url
         except Exception:
-            
             return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-        if debrid.status(True) is False:
-            return
-
         try:
-            if url is None:
-                return
-
+            if url is None: return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
             url = urllib.urlencode(url)
             return url
         except Exception:
-            
             return
+
 
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-
-            if url is None:
-                return sources
-				
-            if debrid.status() is False:
-                raise Exception()
-
+            if url is None: return sources
+            if debrid.status() is False: raise Exception()
+            # if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-
             category = '+category%3ATV' if 'tvshowtitle' in data else '+category%3AMovies'
-
-            query = '%s S%02dE%02d' % (
-                data['tvshowtitle'],
-                int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'],
-                data['year'])
+            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|<|>|\|)', ' ', query)
-
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url) + str(category)
             html = client.request(url)
@@ -128,7 +104,6 @@ class source:
                     try:
                         name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
                         name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
-                       
                         if not cleantitle.get(title) in cleantitle.get(name):
                             continue
                     except Exception:
@@ -136,22 +111,18 @@ class source:
                     y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', name)[-1].upper()
                     if not y == hdlr:
                         continue
-
                     try:
                         seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0])
                     except Exception:
                         continue
                     if self.min_seeders > seeders:
                         continue
-
                     try:
                         link = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
                         link = str(client.replaceHTMLCodes(link).split('&tr')[0])
                     except Exception:
                         continue
-
                     quality, info = source_utils.get_release_quality(name, name)
-
                     try:
                         size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
                         div = 1 if size.endswith(('GB', 'GiB')) else 1024
@@ -160,22 +131,18 @@ class source:
                         info.append(size)
                     except Exception:
                         pass
-
                     info = ' | '.join(info)
-                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en',
-                                    'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
                 except Exception:
-                    
                     continue
-
             check = [i for i in sources if not i['quality'] == 'CAM']
             if check:
                 sources = check
-
             return sources
         except Exception:
-            
             return self._sources
+
 
     def resolve(self, url):
         return url
+

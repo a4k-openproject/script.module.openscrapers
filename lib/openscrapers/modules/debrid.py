@@ -32,7 +32,8 @@ except:
 
 
 def status():
-    return debrid_resolvers != []
+    debrid_check = debrid_resolvers != []
+    return debrid_check
 
 
 def resolver(url, debrid):

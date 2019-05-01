@@ -32,15 +32,16 @@ from openscrapers.modules import debrid
 from openscrapers.modules import control
 from openscrapers.modules import source_utils
 
-class source:
 
+class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domain = ['1337x.to', '1337x.st', '1337x.ws', '1337x.eu', '1337x.se']
+        self.domain = ['1337x.to', '1337x.is', '1337x.st', '1337x.ws', '1337x.eu', '1337x.se']
         self.base_link = 'https://1337x.to'
         self.search_link = '/search/%s/1/'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -50,6 +51,7 @@ class source:
         except:
             return
 
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -57,6 +59,7 @@ class source:
             return url
         except:
             return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -69,26 +72,22 @@ class source:
         except:
             return
 
+
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
             if url is None: return sources
-            if debrid.status() is False: raise Exception()	
+            if debrid.status() is False: raise Exception()
+            # if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-
             query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-
             r = client.request(url)
-
             try:
                 posts = client.parseDOM(r, 'div', attrs={'class': 'box-info'})
                 for post in posts:

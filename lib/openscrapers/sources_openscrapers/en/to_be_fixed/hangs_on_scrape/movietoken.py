@@ -24,35 +24,32 @@
 '''
 
 import re
-
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
+from openscrapers.modules import cfscrape
 from openscrapers.modules import source_utils
-
+from openscrapers.modules import directstream
 
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['playmovies.es']
-        self.base_link = 'http://playmovies.es'
+        self.domains = ['movietoken.to']
+        self.base_link = 'https://movietoken.to'
         self.search_link = '/%s'
-        self.scraper = cfscrape.create_scraper()
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             title = cleantitle.geturl(title)
-            url = self.base_link + self.search_link % title
+            url = self.base_link + self.search_link % (title)
             return url
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = self.scraper.get(url).content
+            scraper = cfscrape.create_scraper()
+            r = scraper.get(url).content
             try:
                 qual = re.compile('class="quality">(.+?)<').findall(r)
 
@@ -71,6 +68,5 @@ class source:
             return
         return sources
 
-
     def resolve(self, url):
-        return url
+        return directstream.googlepass(url)
