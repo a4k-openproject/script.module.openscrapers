@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import urlparse
+
 from openscrapers import sources_openscrapers
 from openscrapers.modules import control
 
@@ -123,7 +124,7 @@ elif action == "toggleAllDebrid":
 
 
 elif action == "toggleAllTorrent":
-    sourceList = []
+    sourcelist = []
     sourceList = sources_openscrapers.torrent_providers
     for i in sourceList:
         source_setting = 'provider.' + i
@@ -141,7 +142,7 @@ if action == "Defaults":
                   'solarmoviefree', 'toonget',
                   'tvbox', 'vidics', 'watchepisodes', 'watchfree1', 'watchseries', 'watchserieshd', '2ddl', '0day',
                   '300mbdownload', '300mbfilms', 'bestmoviez',
-                  'ddlspot', 'directdl', 'ganool123', 'invictus', 'mvrls', 'rlsbb', 'scenerls', 'ultrahd', '111ys',
+                  'ddlspot', 'directdl', 'ganool123', 'mvrls', 'rlsbb', 'scenerls', 'ultrahd', '111ys',
                   '1337x', 'eztv', 'glodls', 'kickass2',
                   'limetorrents', 'magnetdl', 'mkvcage', 'piratebay', 'skytorrents', 'torrentapi', 'torrentdownloads',
                   'yifimovies', 'yifyddl', 'ytsam', 'zoogle']
