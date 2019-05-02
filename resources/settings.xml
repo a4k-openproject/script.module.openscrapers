@@ -170,7 +170,7 @@
     <category label="Torrent (cached)">
         <setting label="Disable All Torrent Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=false&query=4.0)"/>
         <setting label="Enable All Torrent Providers" type="action" option="close" action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=true&query=4.1)"/>
-		<setting id="torrent.min.seeders" type="slider" label="Minimum Seeders" enable="eq(-2,true)" default="1" range="1,100" option="int" />
+		<setting id="torrent.min.seeders" type="slider" label="Minimum Seeders" default="1" range="1,100" option="int" />
         <setting type="sep" />
         <setting id="provider.111ys" type="bool" label="$NUMBER[111]YS" default="true" />
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="true" />
