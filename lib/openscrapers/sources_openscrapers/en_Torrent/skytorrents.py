@@ -4,8 +4,8 @@
 
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import client
 from openscrapers.modules import control
 from openscrapers.modules import debrid
@@ -58,9 +58,10 @@ class source:
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s s%02de%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
-            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
+            query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
             r = client.request(url)
@@ -73,7 +74,8 @@ class source:
                         url = url.split('&tr')[0]
                         quality, info = source_utils.get_release_quality(data)
                         if any(
-                            x in url for x in ['FRENCH', 'Ita', 'italian', 'TRUEFRENCH', '-lat-', 'Dublado']): continue
+                                x in url for x in
+                                ['FRENCH', 'Ita', 'italian', 'TRUEFRENCH', '-lat-', 'Dublado']): continue
                         info = ' | '.join(info)
                         sources.append(
                             {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
