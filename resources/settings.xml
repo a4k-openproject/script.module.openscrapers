@@ -155,7 +155,6 @@
         <setting id="provider.ddlvalley" type="bool" label="DDLVALLEY" default="true" />
         <setting id="provider.directdl" type="bool" label="DIRECTDL" default="true" />
         <setting id="provider.ganool123" type="bool" label="GANOOL" default="true" />
-        <setting id="provider.invictus" type="bool" label="INVICTUS" default="true" />
         <setting id="provider.iwantmyshow" type="bool" label="IWANTMYSHOW" default="true" />
         <setting id="provider.moviesleak" type="bool" label="MOVIESLEAK" default="true" />
         <setting id="provider.mvrls" type="bool" label="MVRLS" default="true" />
