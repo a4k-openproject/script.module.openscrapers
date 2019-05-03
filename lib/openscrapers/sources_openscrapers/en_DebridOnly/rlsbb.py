@@ -75,7 +75,6 @@ class source:
 
             if url is None:
                 return sources
-
             if debrid.status() == False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
