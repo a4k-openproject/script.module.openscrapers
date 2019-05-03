@@ -1,8 +1,22 @@
+# -*- coding: UTF-8 -*-
+
+#  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
+#  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
+#  .##.....#.##.....#.##......####..#.##......##......##.....#..##...##.##.....#.##......##.....#.##......
+#  .##.....#.########.######..##.##.#..######.##......########.##.....#.########.######..########..######.
+#  .##.....#.##.......##......##..###.......#.##......##...##..########.##.......##......##...##........##
+#  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
+#  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
+
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import client, source_utils, debrid, cleantitle, cfscrape
+
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -70,7 +84,7 @@ class source:
                     q = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query_base + option)
                     q = q.replace("  ", " ").replace(" ", "+")
                     url = self.search_link % q
-                    html =  self.scraper.get(url)
+                    html = self.scraper.get(url)
                     if html.status_code == 200:
                         links = client.parseDOM(html.content, "div", attrs={"class": "list_items"})
                         if len(links) == 0:

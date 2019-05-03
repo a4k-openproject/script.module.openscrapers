@@ -95,7 +95,7 @@ class source:
             url = urlparse.urljoin(self.base_link, url)
             headers = {'Referer': self.base_link}
             r = self.scraper.get(url, headers=headers).content
-            
+
             search_results = dom_parser2.parse_dom(r, 'h2')
             search_results = [dom_parser2.parse_dom(i.content, 'a', req=['href']) for i in search_results]
             search_results = [(i[0].content, i[0].attrs['href']) for i in search_results]

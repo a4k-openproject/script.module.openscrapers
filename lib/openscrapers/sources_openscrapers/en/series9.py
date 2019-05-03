@@ -11,9 +11,16 @@
     Updated and refactored by someone.
     Originally created by others.
 '''
-import re, traceback, urllib, urlparse
+import re
+import traceback
+import urllib
+import urlparse
 
-from openscrapers.modules import cleantitle, client, directstream, log_utils, source_utils
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import directstream
+from openscrapers.modules import log_utils
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -85,7 +92,6 @@ class source:
         url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
         return url
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -99,7 +105,8 @@ class source:
 
             if 'tvshowtitle' in data:
                 ep = data['episode']
-                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
+                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (
+                self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
                 r = client.request(url, headers=headers, timeout='10', output='geturl')
 
                 if url == None:
