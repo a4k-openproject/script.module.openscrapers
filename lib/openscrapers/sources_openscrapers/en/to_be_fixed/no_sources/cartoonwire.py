@@ -52,32 +52,6 @@ class source:
             try:
                 match = re.compile('var filmId = "(.+?)"').findall(r)
                 for film_id in match:
-
-                    # VIP
-                    # server = 'vip'
-                    # url = 'https://cartoonwire.to/ajax-get-link-stream/?server=' + server + '&filmId=' + film_id
-                    # r = client.request(url)
-                    # if r == '':
-                    #	pass
-                    # else:
-                    #	if '2160' in r: quality = '4K'
-                    #	elif '1080' in r: quality = '1080p'
-                    #	elif '720' in r: quality = 'HD'
-                    #	elif '480' in r: quality = 'SD'
-                    #	else: quality = 'HD'
-                    #	r = client.request(r)
-                    #	match = re.compile('<iframe src="(.+?)"').findall(r)
-                    #	for url in match:
-                    #		sources.append({
-                    #			'source': server,
-                    #			'quality': quality,
-                    #			'language': 'en',
-                    #			'url': url,
-                    #			'direct': False,
-                    #			'debridonly': False
-                    #		})
-
-                    # STREAMANGO
                     server = 'streamango'
                     url = 'https://cartoonwire.to/ajax-get-link-stream/?server=' + server + '&filmId=' + film_id
                     r = client.request(url)

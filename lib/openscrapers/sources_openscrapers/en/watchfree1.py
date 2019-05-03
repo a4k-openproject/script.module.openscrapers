@@ -13,9 +13,13 @@
 import base64
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import client, cleantitle, dom_parser2, source_utils, cfscrape
+
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import dom_parser2
+from openscrapers.modules import source_utils
 
 
 class source:

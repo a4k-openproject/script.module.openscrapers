@@ -23,20 +23,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-<< << << < Updated
-upstream
-
-import traceback
-import urllib
-
-import urlparse
-from openscrapers.modules import cfscrape, cleantitle, log_utils
-== == == =
 import base64
 import random
 import re
+import traceback
+import urllib
+import urlparse
 
 import requests
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import log_utils
 
 
 def clean_search(title):
@@ -69,8 +66,6 @@ def random_agent():
     return RAND_UAS[index].format(win_ver=random.choice(WIN_VERS), feature=random.choice(FEATURES),
                                   br_ver=random.choice(BR_VERS[index]))
 
->> >> >> > Stashed
-changes
 
 
 class source:

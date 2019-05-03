@@ -24,11 +24,17 @@ import time
 import urllib
 
 import HTMLParser
+import ssl
 import StringIO
 import cookielib
 import urllib2
 import urlparse
-from openscrapers.modules import dom_parser, cache, workers, utils, log_utils
+
+from openscrapers.modules import dom_parser
+from openscrapers.modules import cache
+from openscrapers.modules import workers
+from openscrapers.modules import utils
+from openscrapers.modules import log_utils
 
 
 def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False,
@@ -48,7 +54,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
             opener = urllib2.install_opener(opener)
         if (2, 7, 8) < sys.version_info < (2, 7, 12):
             try:
-                import ssl;
                 ssl_context = ssl.create_default_context()
                 ssl_context.check_hostname = False
                 ssl_context.verify_mode = ssl.CERT_NONE
@@ -66,7 +71,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
         if 'User-Agent' in _headers:
             pass
         elif not mobile == True:
-            # headers['User-Agent'] = agent()
             _headers['User-Agent'] = cache.get(randomagent, 1)
         else:
             _headers['User-Agent'] = 'Apple-iPhone/701.341'

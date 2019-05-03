@@ -275,8 +275,8 @@ def _find_cache_version():
     except Exception as e:
         import xbmc
         print
-        'Placenta Addon Data Path Does not Exist. Creating Folder....'
-        ad_folder = xbmc.translatePath('special://home/userdata/addon_data/plugin.video.placenta')
+        'OpenScrapers Data Path Does not Exist. Creating Folder....'
+        ad_folder = xbmc.translatePath('special://home/userdata/addon_data/plugin.video.openscrapers')
         os.makedirs(ad_folder)
     try:
         with open(versionFile, 'rb') as fh:
@@ -284,7 +284,7 @@ def _find_cache_version():
     except:
         oldVersion = '0'
     try:
-        curVersion = control.addon('script.module.placenta').getAddonInfo('version')
+        curVersion = control.addon('script.module.openscrapers').getAddonInfo('version')
         if oldVersion != curVersion:
             with open(versionFile, 'wb') as fh:
                 fh.write(curVersion)

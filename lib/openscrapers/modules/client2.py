@@ -483,8 +483,7 @@ class sucuri:
             s = re.sub(r'\n', '', s)
             s = re.sub(r'document\.cookie', 'cookie', s)
             cookie = ''
-            exec
-            s
+            exec(s)
             self.cookie = re.compile('([^=]+)=(.*)').findall(cookie)[0]
             self.cookie = '%s=%s' % (self.cookie[0], self.cookie[1])
             return self.cookie

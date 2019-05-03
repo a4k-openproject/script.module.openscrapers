@@ -24,9 +24,10 @@
 '''
 
 import urllib
-
 import urlparse
-from openscrapers.modules import client, cfscrape
+
+from openscrapers.modules import cfscrape
+from openscrapers.modules import client
 
 
 class source:

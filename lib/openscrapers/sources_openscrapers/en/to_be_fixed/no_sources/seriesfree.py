@@ -17,8 +17,8 @@
 '''
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import dom_parser
@@ -40,7 +40,6 @@ class source:
         try:
             query = self.search_link % urllib.quote_plus(cleantitle.query(tvshowtitle))
             result = client.request(query)
-            # tvshowtitle = cleantitle.get(tvshowtitle)
             t = [tvshowtitle] + source_utils.aliases_to_array(aliases)
             t = [cleantitle.get(i) for i in set(t) if i]
             result = re.compile('itemprop="url"\s+href="([^"]+).*?itemprop="name"\s+class="serie-title">([^<]+)',
@@ -106,10 +105,8 @@ class source:
                          'debridonly': False})
 
                 except:
-                    # traceback.print_exc()
                     pass
 
-                    # log_utils.log('JairoxDebug2: %s' % (str(sources)), log_utils.LOGDEBUG)
             return sources
         except:
             return sources

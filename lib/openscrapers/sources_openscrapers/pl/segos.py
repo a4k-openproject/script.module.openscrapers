@@ -23,11 +23,13 @@
 
 
 import urllib
+import urlparse
 
 import requests
-import urlparse
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 from openscrapers.modules import control
-from openscrapers.modules import source_utils, client, cleantitle
+from openscrapers.modules import source_utils
 
 
 class source:

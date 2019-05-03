@@ -35,6 +35,10 @@ except:
 
 
 def status():
+    try:
+        import xbmc
+    except:
+        return True
     debrid_check = debrid_resolvers != []
     return debrid_check
 

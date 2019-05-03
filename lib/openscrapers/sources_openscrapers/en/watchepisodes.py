@@ -25,10 +25,11 @@
 
 import json
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client, source_utils
+from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:
