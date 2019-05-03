@@ -66,7 +66,7 @@ class source:
         try:
             for alias in aliases:
                 url = '%s/show/%s/season/%01d/episode/%01d' % (
-                self.base_link, cleantitle.geturl(title), int(season), int(episode))
+                    self.base_link, cleantitle.geturl(title), int(season), int(episode))
                 result = self.scraper.get(url, headers=headers).status
                 if not result == 200 and url != self.base_link: break
             return url

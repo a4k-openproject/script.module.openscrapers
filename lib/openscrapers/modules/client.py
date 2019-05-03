@@ -15,26 +15,25 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import HTMLParser
+import StringIO
 import base64
+import cookielib
 import gzip
 import random
 import re
+import ssl
 import sys
 import time
 import urllib
-
-import HTMLParser
-import ssl
-import StringIO
-import cookielib
 import urllib2
 import urlparse
 
-from openscrapers.modules import dom_parser
 from openscrapers.modules import cache
-from openscrapers.modules import workers
-from openscrapers.modules import utils
+from openscrapers.modules import dom_parser
 from openscrapers.modules import log_utils
+from openscrapers.modules import utils
+from openscrapers.modules import workers
 
 
 def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False,
@@ -379,7 +378,7 @@ class cfcookie:
             if 'type="hidden" name="pass"' in result:
                 passval = re.findall('name="pass" value="(.*?)"', result)[0]
                 query = '%s/cdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (
-                netloc, urllib.quote_plus(passval), jschl, answer)
+                    netloc, urllib.quote_plus(passval), jschl, answer)
                 time.sleep(6)
             cookies = cookielib.LWPCookieJar()
             handlers = [urllib2.HTTPHandler(), urllib2.HTTPSHandler(), urllib2.HTTPCookieProcessor(cookies)]
@@ -467,7 +466,7 @@ class sucuri:
             s = re.sub(r'\n', '', s)
             s = re.sub(r'document\.cookie', 'cookie', s)
             cookie = '';
-            exec(s)
+            exec (s)
             self.cookie = re.compile('([^=]+)=(.*)').findall(cookie)[0]
             self.cookie = '%s=%s' % (self.cookie[0], self.cookie[1])
             return self.cookie

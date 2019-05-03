@@ -23,8 +23,8 @@
 import json
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cache
 from openscrapers.modules import cleandate
 from openscrapers.modules import client
@@ -195,7 +195,7 @@ def manager(name, imdb, tvdb, content):
             lists[i] = ((control.lang(32521) % lists[i][0]).encode('utf-8'), '/users/me/lists/%s/items' % lists[i][1])
         for i in range(1, len(lists), 2):
             lists[i] = (
-            (control.lang(32522) % lists[i][0]).encode('utf-8'), '/users/me/lists/%s/items/remove' % lists[i][1])
+                (control.lang(32522) % lists[i][0]).encode('utf-8'), '/users/me/lists/%s/items/remove' % lists[i][1])
         items += lists
         select = control.selectDialog([i[0] for i in items], control.lang(32515).encode('utf-8'))
         if select == -1:

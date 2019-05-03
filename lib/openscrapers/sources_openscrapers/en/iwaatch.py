@@ -21,7 +21,7 @@ class source:
         if 1:  # try:
             clean_title = cleantitle.geturl(title).replace('-', '%20')
             url = urlparse.urljoin(self.base_link, (
-                        self.search_link % (clean_title))) + '$$$$$' + title + '$$$$$' + year + '$$$$$' + 'movie'
+                    self.search_link % (clean_title))) + '$$$$$' + title + '$$$$$' + year + '$$$$$' + 'movie'
             return url
 
     def sources(self, url, hostDict, hostprDict):
