@@ -17,6 +17,7 @@ import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -110,20 +111,17 @@ class source:
                     y = y.upper()
                     if not any(x == y for x in f): raise Exception()
                     quality = i['quality']
-                    quality = quality.upper()
-                    size = i['size']
-                    size = float(size) / 1024
-                    size = '%.2f GB' % size
-                    if any(x in quality for x in ['HEVC', 'X265', 'H265']):
-                        info = '%s | HEVC' % size
-                    else:
-                        info = size
-                    if '1080P' in quality:
-                        quality = '1080p'
-                    elif '720P' in quality:
-                        quality = 'HD'
-                    else:
-                        quality = 'SD'
+                    quality, info = source_utils.get_release_quality(quality)
+
+                    try:
+                        size = i['size']
+                        size = float(size) / 1024
+                        size = '%.2f GB' % size
+                        info.append(size)
+                    except:
+                        pass
+
+                    info = ' | '.join(info)
                     url = i['links']
                     # for x in url.keys(): links.append({'url': url[x], 'quality': quality, 'info': info})
                     links = []

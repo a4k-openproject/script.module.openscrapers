@@ -63,7 +63,8 @@ class source:
             r = dom_parser.parse_dom(r, 'a', attrs={'class': 'play_container'}, req='href')
             r = client.request(r[0][0]['href'])
             url = self.get_link % (
-            re.search('(?<=var id = \")(.*?)(?=\")', r).group(), re.search('(?<=var links = \")(.*?)(?=\")', r).group())
+                re.search('(?<=var id = \")(.*?)(?=\")', r).group(),
+                re.search('(?<=var links = \")(.*?)(?=\")', r).group())
             r = client.request(url)
             r = dom_parser.parse_dom(r, 'ul', attrs={'id': 'articleList'})
             r = dom_parser.parse_dom(r, 'a')

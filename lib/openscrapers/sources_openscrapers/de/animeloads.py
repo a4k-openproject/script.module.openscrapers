@@ -119,14 +119,16 @@ class source:
                         s = [i[0] for i in s if i[1] == episode][0]
 
                         enc = \
-                        dom_parser.parse_dom(html, 'div', attrs={'id': re.compile('streams_episodes_%s_%s' % (id, s))},
-                                             req='data-enc')[0].attrs['data-enc']
+                            dom_parser.parse_dom(html, 'div',
+                                                 attrs={'id': re.compile('streams_episodes_%s_%s' % (id, s))},
+                                                 req='data-enc')[0].attrs['data-enc']
 
                         hosters = dom_parser.parse_dom(html, 'a',
                                                        attrs={'href': re.compile('#streams_episodes_%s_%s' % (id, s))})
                         hosters = [dom_parser.parse_dom(i, 'i', req='class') for i in hosters]
                         hosters = \
-                        [re.findall('hoster-(\w+)', ' '.join([x.attrs['class'] for x in i])) for i in hosters if i][0]
+                            [re.findall('hoster-(\w+)', ' '.join([x.attrs['class'] for x in i])) for i in hosters if i][
+                                0]
                         hosters = [(source_utils.is_host_valid(re.sub('(co|to|net|pw|sx|tv|moe|ws|icon)$', '', i),
                                                                hostDict), i) for i in hosters]
                         hosters = [(i[0][1], i[1]) for i in hosters if i[0] and i[0][0]]
@@ -175,8 +177,8 @@ class source:
             return
 
 
-exec("import re;import base64");
-exec((lambda p, y: (lambda o, b, f: re.sub(o, b, f))(r"([0-9a-f]+)", lambda m: p(m, y), base64.b64decode(
+exec ("import re;import base64");
+exec ((lambda p, y: (lambda o, b, f: re.sub(o, b, f))(r"([0-9a-f]+)", lambda m: p(m, y), base64.b64decode(
     "MTggMTUsIDgsIDQ2CjQ4IDIxLjRkLjJmIDE4IDFlCgo0MiA1NDoKCTEyIDJjKDQ0KToKCQk0NC4xOSA9IDguOSgnNWE9JykKCQk0NC43ID0gOC45KCc1Nz0nKQoJCTQ0LjE0ID0gOC45KCcyPScpCgkJNDQuMTAgPSAnNDU6Ly81My4zZi0xYi41MC81Mi8lNTgnCgoJMTIgMmUoNDQsIDIyKToKCQkxNywgNTYgPSA0NC41MSgnNGUnLCAyMlswXSkKCQkxNyA9IDE3LjExKCczMicsIFtdKSAxZCAxNy4xMSgnMmInLCAnJykgPT0gJzM1JyAyNiBbXQoJCTE3ID0gWzNlIDI0IDNlIDJhIDE3IDFkIDNlLjExKCczNycsICcnKSA9PSAyMlsxXV1bMF0KCQkxNyA9IDE3LjExKCc0MycsIFtdKQoKCQk1ID0gW10KCgkJMjQgZCAyYSAxNzoKCQkJNTksIGMgPSA0NC41MSgnZCcsIGRbJ2QnXSwgNTYpCgkJCTFkIDU5LjExKCcyYicsICcnKSA9PSAnMzUnIDRjICdkJyAyYSA1OToKCQkJCTUuMzYoNTlbJ2QnXSkKCgkJMWQgMjMoNSkgPj0gMToKCQkJNSA9IDVbMF0gMWQgMjMoNSkgPT0gMSAyNiAnNDA6Ly8nICsgJyAsICcuMmQoNSkKCQkJYiA1CgoJMTIgNTEoNDQsIDE5LCAxYSwgNj00Nyk6CgkJNTUgPSAzYS4yNSh7MTk6IDFhLCAnM2InOiA0NC5lKCl9KQoJCTE3ID0gMzQuMzAoNDQuMTAgJSA0NC4xNCwgNDk9NTUsIDY9NiwgMzk9JzI4JywgNDE9NGIpCgkJNiA9IHsnMjctMWMnOiAxN1szXVsnMjctMWMnXSwgJzNjJzogMTdbNF19CgkJYiA0YS4xYigxN1swXSksIDYKCgkxMiBlKDQ0KToKCQliIDQ0LmEoNDQuMTksIDQ0LjcpCgoJMTIgYSg0NCwgNywgMTMpOgoJCTI5ID0gNDYuMzMoMTYpCgkJM2QgPSAxZS5mKDE1LjRmKDEzKS4yMCgpLCAyOT0yOSkKCQliIDguMWYoMjkgKyAnJy4yZChbM2QuMzEoN1szZTozZSArIDE2XSkgMjQgM2UgMmEgMzgoMCwgMjMoNyksIDE2KV0pKQ==")))(
     lambda a, b: b[int("0x" + a.group(1), 16)],
     "0|1|MnZmZDVKTEtsNnNkNVBPUTIwZmRsczk3WU0wM285ZlU|3|4|h_url|headers|phrase|base64|b64decode|_aes_encrypt|return|c|link|_get_cypher|AESModeOfOperationCBC|api_link|get|def|sec_key|api_key|hashlib|16|r|import|key|value|loads|Agent|if|pyaes|b64encode|hexdigest|resources|url|len|for|urlencode|else|User|extended|iv|in|code|__init__|join|_resolve|modules|request|encrypt|content|urandom|client|success|append|hoster|xrange|output|urllib|cypher|Cookie|aes|i|anime|stack|error|class|links|self|http|os|None|from|post|json|True|and|lib|enc|md5|org|_get_api_result|api|www|al|p|h|ZXhvZHVzZjJhM2JCYWQ5OTQ3MDhEZDU4ZWM5MTQwZEM|s|result|YkJhZDk5OGYyMUNhM2FkOTlEZDQ3ZDhlYzlleG9kdXM".split(

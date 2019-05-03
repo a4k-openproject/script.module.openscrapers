@@ -77,8 +77,9 @@ class source:
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             s = client.request(self.base_link)
             s = re.findall('\'(http.+?)\'', s) + re.findall('\"(http.+?)\"', s)
@@ -137,8 +138,9 @@ class source:
                     if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt):
                         quality = 'SCR'
                     elif any(
-                        i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in
-                        fmt):
+                            i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i
+                            in
+                            fmt):
                         quality = 'CAM'
                     info = []
                     if '3d' in fmt: info.append('3D')

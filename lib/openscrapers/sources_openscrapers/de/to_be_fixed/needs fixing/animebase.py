@@ -46,7 +46,7 @@ class source:
             url = None
             for title in [tvshowtitle, localtvshowtitle,
                           tvmaze.tvMaze().showLookup('thetvdb', tvdb).get('name')] + source_utils.aliases_to_array(
-                    aliases):
+                aliases):
                 if url: break
                 url = self.__search(title)
             return urllib.urlencode({'url': url}) if url else None

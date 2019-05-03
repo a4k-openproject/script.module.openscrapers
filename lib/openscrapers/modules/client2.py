@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import HTMLParser
+import StringIO
+import base64
 import cookielib
 import gzip
+import random
 import re
 import sys
+import time
 import urllib
 import urllib2
 import urlparse
 
-import HTMLParser
-import StringIO
-import base64
-import random
-import time
 from openscrapers.modules import cache, dom_parser, log_utils, utils, control
 
 
@@ -483,7 +483,7 @@ class sucuri:
             s = re.sub(r'\n', '', s)
             s = re.sub(r'document\.cookie', 'cookie', s)
             cookie = ''
-            exec(s)
+            exec (s)
             self.cookie = re.compile('([^=]+)=(.*)').findall(cookie)[0]
             self.cookie = '%s=%s' % (self.cookie[0], self.cookie[1])
             return self.cookie

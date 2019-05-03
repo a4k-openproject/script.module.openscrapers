@@ -127,7 +127,7 @@ class source:
                                     url = client.replaceHTMLCodes(url)
                                     url = url.encode('utf-8')
                                     host = \
-                                    re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+                                        re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
                                     if host in hostDict:
                                         host = client.replaceHTMLCodes(host)
                                         host = host.encode('utf-8')

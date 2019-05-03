@@ -28,7 +28,7 @@ class source:
         self.domains = ['123123movies.net']
         self.base_link = 'http://123123movies.net'
         self.search_link = '/watch/%s-%s-123movies.html'
-        self.scraper = cfscrape.create_Scraper()
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

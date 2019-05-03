@@ -66,10 +66,10 @@ class source:
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = '%sS%02dE%02d' % (
-            data['year'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+                data['year'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s %s S%02dE%02d' % (data['tvshowtitle'], data['year'], int(data['season']),
                                           int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+                data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             try:
                 url = self.search_link % urllib.quote_plus(query)

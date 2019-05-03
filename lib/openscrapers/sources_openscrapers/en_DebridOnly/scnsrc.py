@@ -33,6 +33,7 @@ from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import dom_parser2
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -104,48 +105,21 @@ class source:
                     for url in links:
                         try:
                             if hdlr in name:
-                                fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*)(\.|\)|\]|\s)', '', name.upper())
-                                fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
-                                fmt = [i.lower() for i in fmt]
-                                if any(i.endswith(('subs', 'sub', 'dubbed', 'dub', 'MULTISUBS')) for i in
-                                       fmt): raise Exception()
-                                if any(i in ['extras'] for i in fmt): raise Exception()
-                                if '2160p' in fmt:
-                                    quality = '4K'
-                                elif '1080p' in fmt:
-                                    quality = '1080p'
-                                elif '720p' in fmt:
-                                    quality = '720p'
-                                else:
-                                    quality = ''
-                                if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt):
-                                    quality = 'SCR'
-                                elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync',
-                                               'ts'] for i in fmt):
-                                    quality = 'CAM'
-                                info = []
-                                if '3d' in fmt: info.append('3D')
-                                try:
-                                    size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', name[2])[-1]
-                                    div = 1 if size.endswith(('GB', 'GiB')) else 1024
-                                    size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-                                    size = '%.2f GB' % size
-                                    info.append(size)
-                                except:
-                                    pass
-                                if any(i in ['hevc', 'h265', 'x265'] for i in fmt): info.append('HEVC')
-                                info = ' | '.join(info)
-                                if not any(x in url for x in ['.rar', '.zip', '.iso', 'sample']):
-                                    url = client.replaceHTMLCodes(url)
-                                    url = url.encode('utf-8')
-                                    host = \
-                                        re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
-                                    if host in hostDict:
-                                        host = client.replaceHTMLCodes(host)
-                                        host = host.encode('utf-8')
-                                        sources.append(
-                                            {'source': host, 'quality': quality, 'language': 'en', 'url': url,
-                                             'info': info, 'direct': False, 'debridonly': True})
+                                url = client.replaceHTMLCodes(url)
+                                url = url.encode('utf-8')
+                                if any(x in url for x in
+                                       ['.part', 'extras', 'subs', 'dubbed', 'dub', 'MULTISUBS', 'sample', 'youtube',
+                                        'trailer']) or any(
+                                        url.endswith(x) for x in ['.rar', '.zip', '.iso', '.sub', '.idx', '.srt']):
+                                    raise Exception()
+                                quality, info = source_utils.get_release_quality(url, url)
+                                host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+                                if host in hostDict:
+                                    host = client.replaceHTMLCodes(host)
+                                    host = host.encode('utf-8')
+                                    sources.append(
+                                        {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                         'direct': False, 'debridonly': True})
                         except:
                             pass
                 except:

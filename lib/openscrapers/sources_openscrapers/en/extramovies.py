@@ -67,7 +67,6 @@ def random_agent():
                                   br_ver=random.choice(BR_VERS[index]))
 
 
-
 class source:
     def __init__(self):
         self.priority = 0
