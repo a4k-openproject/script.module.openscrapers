@@ -187,12 +187,11 @@ class source:
             if len(post_urls) == 0:
                 return None
 
+            items = []
             for url in post_urls:
-                items = []
                 r = self.scraper.get(url).content
                 posts = client.parseDOM(r, "div", attrs={"class": "content"})
                 hostDict = hostprDict + hostDict
-
                 for post in posts:
                     try:
                         u = client.parseDOM(post, 'a', ret='href')
@@ -224,6 +223,7 @@ class source:
 
                     if host not in hostDict:
                         continue
+
                     if any(x in host2 for x in ['.rar', '.zip', '.iso']):
                         continue
 
