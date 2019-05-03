@@ -8,14 +8,16 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,traceback,urllib,urlparse
+import re
+import traceback
+import urllib
+import urlparse
 
-from openscrapers.modules import control
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import control
 from openscrapers.modules import jsunpack
 from openscrapers.modules import log_utils
-
 
 
 class source:
@@ -68,7 +70,7 @@ class source:
 
             if url == None: return sources
 
-            if (self.user != '' and self.password != ''): #raise Exception()
+            if (self.user != '' and self.password != ''):  # raise Exception()
 
                 login = urlparse.urljoin(self.base_link, '/login.html')
 
@@ -81,7 +83,6 @@ class source:
                 headers = {'User-Agent': r[3]['User-Agent'], 'Cookie': r[4]}
             else:
                 headers = {}
-
 
             if not str(url).startswith('http'):
 
@@ -127,8 +128,6 @@ class source:
 
                 r = client.request(r, post=post, headers=headers)
 
-
-
             quality = 'HD' if '-movie-' in r else 'SD'
 
             try:
@@ -146,12 +145,16 @@ class source:
                 url += '|' + urllib.urlencode(headers)
             except:
                 try:
-                    url =  r = jsunpack.unpack(r)
+                    url = r = jsunpack.unpack(r)
                     url = url.replace('"', '')
                 except:
-                    url = re.findall(r'sources[\'"]\s*:\s*\[.*?file[\'"]\s*:\s*(\w+)\(\).*function\s+\1\(\)\s*\{\s*return\([\'"]([^\'"]+)',r,re.DOTALL)[0][1]
+                    url = re.findall(
+                        r'sources[\'"]\s*:\s*\[.*?file[\'"]\s*:\s*(\w+)\(\).*function\s+\1\(\)\s*\{\s*return\([\'"]([^\'"]+)',
+                        r, re.DOTALL)[0][1]
 
-            sources.append({'source': 'cdn', 'quality': quality, 'language': 'en', 'url': url, 'direct': True, 'debridonly': False, 'autoplay': True})
+            sources.append(
+                {'source': 'cdn', 'quality': quality, 'language': 'en', 'url': url, 'direct': True, 'debridonly': False,
+                 'autoplay': True})
 
             return sources
         except:

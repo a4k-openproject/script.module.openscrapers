@@ -28,7 +28,10 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import client, debrid, cfscrape, source_utils
+from openscrapers.modules import cfscrape
+from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -40,7 +43,6 @@ class source:
         self.search_link = '?s=%s'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -49,7 +51,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -57,7 +58,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -69,7 +69,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -91,7 +90,7 @@ class source:
                 season = season.group(1)
                 url = title
                 r = self.scraper.get(url).content
-            for loopCount in range(0,2):
+            for loopCount in range(0, 2):
                 if loopCount == 1 or (r == None and 'tvshowtitle' in data):
                     r = self.scraper.get(url).content
                 posts = client.parseDOM(r, "h2")
@@ -124,7 +123,9 @@ class source:
                             if any(x in url for x in ['.rar', '.zip', '.iso']): raise Exception()
                             quality, info = source_utils.get_release_quality(url)
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                 'direct': False, 'debridonly': True})
                 except:
                     pass
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -133,7 +134,5 @@ class source:
         except:
             return
 
-
     def resolve(self, url):
         return url
-

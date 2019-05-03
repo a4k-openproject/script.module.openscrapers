@@ -34,18 +34,18 @@ class source:
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            scrape = title.lower().replace(' ','+').replace(':', '')
+            scrape = title.lower().replace(' ', '+').replace(':', '')
 
             start_url = self.search_link % (self.base_link, scrape, year)
             html = self.scraper.get(start_url).content
-            results = re.compile('href="(.+?)"',re.DOTALL).findall(html)
+            results = re.compile('href="(.+?)"', re.DOTALL).findall(html)
             for url in results:
                 if self.base_link in url:
                     if 'webcache' in url:
                         continue
                     if cleantitle.get(title) in cleantitle.get(url):
                         chkhtml = self.scraper.get(url).content
-                        chktitle = re.compile('<title.+?>(.+?)</title>',re.DOTALL).findall(chkhtml)[0]
+                        chktitle = re.compile('<title.+?>(.+?)</title>', re.DOTALL).findall(chkhtml)[0]
                         if cleantitle.get(title) in cleantitle.get(chktitle):
                             if year in chktitle:
                                 return url
@@ -62,9 +62,10 @@ class source:
 
             html = self.scraper.get(url).content
 
-            Links = re.compile('<source.+?src="(.+?)"',re.DOTALL).findall(html)
+            Links = re.compile('<source.+?src="(.+?)"', re.DOTALL).findall(html)
             for link in Links:
-                sources.append({'source':'BNW','quality':'SD','language': 'en','url':link,'direct':True,'debridonly':False})
+                sources.append({'source': 'BNW', 'quality': 'SD', 'language': 'en', 'url': link, 'direct': True,
+                                'debridonly': False})
             return sources
         except:
             failure = traceback.format_exc()

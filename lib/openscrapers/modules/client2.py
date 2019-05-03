@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import re, sys, cookielib, urllib, urllib2, urlparse, gzip
-import StringIO, HTMLParser, time, random, base64
+import cookielib
+import gzip
+import re
+import sys
+import urllib
+import urllib2
+import urlparse
 
+import HTMLParser
+import StringIO
+import base64
+import random
+import time
 from openscrapers.modules import cache, dom_parser, log_utils, utils, control
 
 
-def request(url, close=True, redirect=True, error=False, verify=True, proxy=None, post=None, headers=None, mobile=False, XHR=False, limit=None, referer=None, cookie=None, compression=True, output='', timeout='30'):
+def request(url, close=True, redirect=True, error=False, verify=True, proxy=None, post=None, headers=None, mobile=False,
+            XHR=False, limit=None, referer=None, cookie=None, compression=True, output='', timeout='30'):
     try:
         if not url:
             return
@@ -84,10 +95,12 @@ def request(url, close=True, redirect=True, error=False, verify=True, proxy=None
                     infourl.status = code
                     infourl.code = code
                     return infourl
+
                 http_error_300 = http_error_302
                 http_error_301 = http_error_302
                 http_error_303 = http_error_302
                 http_error_307 = http_error_302
+
             opener = urllib2.build_opener(NoRedirectHandler())
             urllib2.install_opener(opener)
             try:
@@ -359,6 +372,7 @@ class cfcookie:
                 return val
             except:
                 pass
+
         cookies = cookielib.LWPCookieJar()
         opener = urllib2.build_opener(NoRedirection, urllib2.HTTPCookieProcessor(cookies))
         opener.addheaders = [('User-Agent', ua)]
@@ -396,7 +410,7 @@ class cfcookie:
         if 'type="hidden" name="pass"' in result:
             passval = re.findall('name="pass" value="(.*?)"', result)[0]
             query = '%scdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (
-            netloc, urllib.quote_plus(passval), jschl, answer)
+                netloc, urllib.quote_plus(passval), jschl, answer)
             time.sleep(6)
         opener.addheaders = [('User-Agent', ua),
                              ('Referer', netloc),
@@ -411,6 +425,7 @@ class cfcookie:
 class bfcookie:
     def __init__(self):
         self.COOKIE_NAME = 'BLAZINGFAST-WEB-PROTECT'
+
     def get(self, netloc, ua, timeout):
         try:
             headers = {'User-Agent': ua, 'Referer': netloc}
@@ -468,7 +483,7 @@ class sucuri:
             s = re.sub(r'\n', '', s)
             s = re.sub(r'document\.cookie', 'cookie', s)
             cookie = ''
-            exec s
+            exec(s)
             self.cookie = re.compile('([^=]+)=(.*)').findall(cookie)[0]
             self.cookie = '%s=%s' % (self.cookie[0], self.cookie[1])
             return self.cookie
@@ -486,4 +501,3 @@ def _get_keyboard(default="", heading="", hidden=False):
 
 def removeNonAscii(s):
     return "".join(i for i in s if ord(i) < 128)
-

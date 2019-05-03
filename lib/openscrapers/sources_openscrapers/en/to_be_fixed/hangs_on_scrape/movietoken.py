@@ -24,10 +24,12 @@
 '''
 
 import re
-from openscrapers.modules import cleantitle
+
 from openscrapers.modules import cfscrape
-from openscrapers.modules import source_utils
+from openscrapers.modules import cleantitle
 from openscrapers.modules import directstream
+from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):
@@ -61,7 +63,8 @@ class source:
                 match = re.compile('<iframe src="(.+?)"').findall(r)
                 for url in match:
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    sources.append({'source': host,'quality': quality,'language': 'en','url': url,'direct': False,'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
             except:
                 return
         except Exception:

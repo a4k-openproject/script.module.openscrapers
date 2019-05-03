@@ -43,7 +43,6 @@ class source:
         self.base_link = 'https://kickass2.cc/'
         self.search = 'https://kickass2.cc/usearch/{0}'
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -52,7 +51,6 @@ class source:
         except BaseException:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,7 +58,6 @@ class source:
             return url
         except BaseException:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -73,7 +70,6 @@ class source:
         except BaseException:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             self._sources = []
@@ -84,10 +80,12 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
+                'year']
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search.format(urllib.quote(query))
             self._get_items(url)
@@ -100,7 +98,6 @@ class source:
             return self._sources
         except BaseException:
             return self._sources
-
 
     def _get_items(self, url):
         try:
@@ -130,7 +127,6 @@ class source:
         except BaseException:
             return self.items
 
-
     def _get_sources(self, item):
         try:
             name = item[0]
@@ -138,11 +134,11 @@ class source:
             quality, info = source_utils.get_release_quality(url, name)
             info.append(item[2])
             info = ' | '.join(info)
-            self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+            self._sources.append(
+                {'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False,
+                 'debridonly': True})
         except BaseException:
             pass
 
-
     def resolve(self, url):
         return url
-

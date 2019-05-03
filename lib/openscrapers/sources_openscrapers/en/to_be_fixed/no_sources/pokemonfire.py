@@ -11,7 +11,7 @@
 
 import re
 
-from openscrapers.modules import client, cleantitle, source_utils, cfscrape
+from openscrapers.modules import cleantitle, source_utils, cfscrape
 
 
 class source:
@@ -33,7 +33,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = cleantitle.geturl(tvshowtitle)
@@ -41,15 +40,13 @@ class source:
         except:
             return
 
- 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if not url: return
-            url = self.base_link + self.tv_link % (url,season,episode)
+            url = self.base_link + self.tv_link % (url, season, episode)
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -61,17 +58,16 @@ class source:
                     url = 'https://veohb.net/' + url
                     info = source_utils.check_url(url)
                     quality = source_utils.check_url(url)
-                    sources.append({'source': 'veohb', 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False}) 
+                    sources.append({'source': 'veohb', 'quality': quality, 'language': 'en', 'info': info, 'url': url,
+                                    'direct': False, 'debridonly': False})
             except:
                 return
         except Exception:
             return
         return sources
 
-
     def resolve(self, url):
         r = self.scraper.get(url).content
         match = re.compile('<source src="(.+?)"').findall(r)
         for url in match:
             return url
-

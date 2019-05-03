@@ -27,8 +27,8 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import client
 from openscrapers.modules import cfscrape
+from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -80,52 +80,49 @@ class source:
                     pass
             links = [(i[0], i[1]) for i in links if not 'vip' in i[0].lower()]
             for name, url in links:
-                    try:
-                        name = re.sub('<.+?>', '', name)
-                        if '4K' in name:
-                            quality = '4K'
-                        elif '1080p' in name:
-                            quality = '1080p'
-                        elif '720p' in name:
-                            quality = '720p'
-                        else:
-                            quality = 'SD'
+                try:
+                    name = re.sub('<.+?>', '', name)
+                    if '4K' in name:
+                        quality = '4K'
+                    elif '1080p' in name:
+                        quality = '1080p'
+                    elif '720p' in name:
+                        quality = '720p'
+                    else:
+                        quality = 'SD'
 
-                        info = []
-                        if '3D' in name or '.3D.' in url:
-                            info.append('3D')
-                            quality = '1080p'
-                        if any(i in ['hevc', 'h265', 'x265'] for i in name): info.append('HEVC')
+                    info = []
+                    if '3D' in name or '.3D.' in url:
+                        info.append('3D')
+                        quality = '1080p'
+                    if any(i in ['hevc', 'h265', 'x265'] for i in name): info.append('HEVC')
 
-                        info = ' | '.join(info)
+                    info = ' | '.join(info)
 
-                        url = client.replaceHTMLCodes(url)
-                        url = url.encode('utf-8')
-                        if any(x in url for x in ['.rar', '.zip', '.iso', 'turk']): raise Exception()
+                    url = client.replaceHTMLCodes(url)
+                    url = url.encode('utf-8')
+                    if any(x in url for x in ['.rar', '.zip', '.iso', 'turk']): raise Exception()
 
-                        if 'ftp' in url:
-                            host = 'CDN'
-                            direct = True
-                        else:
-                            valid, host = source_utils.is_host_valid(url, hostDict)
-                            if not valid: raise Exception()
-                            host = host
-                            direct = False
+                    if 'ftp' in url:
+                        host = 'CDN'
+                        direct = True
+                    else:
+                        valid, host = source_utils.is_host_valid(url, hostDict)
+                        if not valid: raise Exception()
+                        host = host
+                        direct = False
 
-                        host = client.replaceHTMLCodes(host)
-                        host = host.encode('utf-8')
+                    host = client.replaceHTMLCodes(host)
+                    host = host.encode('utf-8')
 
-                        sources.append({'source': host, 'quality': quality, 'language': 'en',
-                                        'url': url, 'info': info, 'direct': direct, 'debridonly': True})
-                    except Exception:
-                        pass
+                    sources.append({'source': host, 'quality': quality, 'language': 'en',
+                                    'url': url, 'info': info, 'direct': direct, 'debridonly': True})
+                except Exception:
+                    pass
 
             return sources
         except Exception:
             return sources
 
-
     def resolve(self, url):
         return url
-
-

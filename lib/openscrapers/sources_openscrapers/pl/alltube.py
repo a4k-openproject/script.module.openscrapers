@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -25,8 +25,8 @@
 import base64
 import json
 import re
-
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
@@ -41,48 +41,46 @@ def byteify(input):
     else:
         return input
 
+
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['pl']
         self.domains = ['alltube.tv']
-        
+
         self.base_link = 'http://alltube.tv'
         self.search_link = '/szukaj'
         self.moviesearch_link = '/index.php?url=search/autocomplete/&phrase=%s'
         self.tvsearch_cache = 'http://alltube.tv/seriale-online/'
         self.episode_link = '-Season-%01d-Episode-%01d'
 
-
-    def get_rows(self, r, search_type):       
-        divs = client.parseDOM(r, 'div', attrs={'class': 'col-sm-12'})        
+    def get_rows(self, r, search_type):
+        divs = client.parseDOM(r, 'div', attrs={'class': 'col-sm-12'})
         for div in divs:
             header = client.parseDOM(div, 'h2', attrs={'class': 'headline'})
             if header and header[0] == search_type:
-                return  client.parseDOM(div, 'div', attrs={'class': 'item-block clearfix'})
-    
-    
+                return client.parseDOM(div, 'div', attrs={'class': 'item-block clearfix'})
+
     def name_matches(self, names, names_found):
-        
+
         for name in names:
             if name in names_found:
-                return True        
+                return True
         return False
-    
-    
+
     def try_read_year(self, url):
         index = url.rfind('/')
         found_year = url[index - 4:index]
         if found_year.isdigit():
             return found_year
-        return None       
-    
-    
+        return None
+
     def search(self, title, localtitle, year, search_type):
-        try:            
-            r = client.request(urlparse.urljoin(self.base_link, self.search_link), post={'search': cleantitle.query(title)})
+        try:
+            r = client.request(urlparse.urljoin(self.base_link, self.search_link),
+                               post={'search': cleantitle.query(title)})
             r = self.get_rows(r, search_type)
-            
+
             names = [cleantitle.get(i) for i in [title, localtitle]]
             for row in r:
                 url = client.parseDOM(row, 'a', ret='href')[0]
@@ -95,17 +93,17 @@ class source:
                     found_year = self.try_read_year(url)
                     if not found_year or found_year == year:
                         return url
-                    
-                
+
+
         except:
-            return    
-    
-    def movie(self, imdb, title, localtitle, aliases, year):        
+            return
+
+    def movie(self, imdb, title, localtitle, aliases, year):
         return self.search(title, localtitle, year, 'Filmy')
- 
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-        return self.search(tvshowtitle, localtvshowtitle, year, 'Seriale')      
-        
+        return self.search(tvshowtitle, localtvshowtitle, year, 'Seriale')
+
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if url == None: return
@@ -119,16 +117,15 @@ class source:
             return url
         except:
             return
-        
+
     def get_language_by_type(self, lang_type):
         if lang_type in ['Napisy', 'Lektor', 'Dubbing']:
             return 'pl', lang_type
         if lang_type == 'PL':
             return 'pl', None
-        
+
         return 'en', None
-    
-    
+
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -141,23 +138,24 @@ class source:
 
             links = client.parseDOM(result, 'tr')
             links = [(client.parseDOM(i, 'a', attrs={'class': 'watch'}, ret='data-iframe')[0],
-                    client.parseDOM(i, 'img', ret='alt')[0],
-                    client.parseDOM(i, 'td', attrs={'class':'text-center'})[0]) for i in links]
+                      client.parseDOM(i, 'img', ret='alt')[0],
+                      client.parseDOM(i, 'td', attrs={'class': 'text-center'})[0]) for i in links]
 
             for i in links:
                 try:
                     url1 = '%s?%s' % (url, i[0])
                     url1 = url1.encode('utf-8')
                     language, info = self.get_language_by_type(i[2]);
-                    
-                    sources.append({'source': i[1].encode('utf-8'), 'quality': 'SD', 'language': language, 'url': url1, 'info': info, 'direct': False, 'debridonly': False})
+
+                    sources.append({'source': i[1].encode('utf-8'), 'quality': 'SD', 'language': language, 'url': url1,
+                                    'info': info, 'direct': False, 'debridonly': False})
                 except:
                     pass
 
             return sources
         except:
             return sources
-        
+
     def resolve(self, url):
         try:
             myurl = url.split('?')
@@ -168,7 +166,8 @@ class source:
             _myFun = compile(tmp, '', 'exec')
             vGlobals = {"__builtins__": None, 'len': len, 'list': list, 'ord': ord, 'range': range}
             vLocals = {'abc': ''}
-            exec _myFun in vGlobals, vLocals
+            exec
+            _myFun in vGlobals, vLocals
             myFun1 = vLocals['abc']
 
             data = client.request(urlparse.urljoin(self.base_link, '/jsverify.php?op=tag'), cookie=mycookie)

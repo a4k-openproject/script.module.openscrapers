@@ -28,22 +28,21 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import dom_parser2
-from openscrapers.modules import cfscrape
 
 
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['scnsrc.me','scenesource.me']
+        self.domains = ['scnsrc.me', 'scenesource.me']
         self.base_link = 'http://www.scnsrc.me/'
         self.search_link = '?s=%s&x=0&y=0'
         self.scraper = cfscrape.create_scraper()
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -55,7 +54,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -63,7 +61,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -75,7 +72,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -91,7 +87,7 @@ class source:
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-            headers = {'Referer':  url}
+            headers = {'Referer': url}
             r = self.scraper.get(url, headers=headers).content
             items = dom_parser2.parse_dom(r, 'h2')
             items = [dom_parser2.parse_dom(i.content, 'a', req=['href']) for i in items]
@@ -101,7 +97,7 @@ class source:
                 try:
                     name = item[0]
                     name = client.replaceHTMLCodes(name)
-                    headers = {'Referer':  url}
+                    headers = {'Referer': url}
                     r = self.scraper.get(item[1], headers=headers).content
                     links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', ])
                     links = [i.attrs['href'] for i in links]
@@ -111,14 +107,22 @@ class source:
                                 fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*)(\.|\)|\]|\s)', '', name.upper())
                                 fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
                                 fmt = [i.lower() for i in fmt]
-                                if any(i.endswith(('subs', 'sub', 'dubbed', 'dub', 'MULTISUBS')) for i in fmt): raise Exception()
+                                if any(i.endswith(('subs', 'sub', 'dubbed', 'dub', 'MULTISUBS')) for i in
+                                       fmt): raise Exception()
                                 if any(i in ['extras'] for i in fmt): raise Exception()
-                                if '2160p' in fmt: quality = '4K'
-                                elif '1080p' in fmt: quality = '1080p'
-                                elif '720p' in fmt: quality = '720p'
-                                else: quality = ''
-                                if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt): quality = 'SCR'
-                                elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in fmt): quality = 'CAM'
+                                if '2160p' in fmt:
+                                    quality = '4K'
+                                elif '1080p' in fmt:
+                                    quality = '1080p'
+                                elif '720p' in fmt:
+                                    quality = '720p'
+                                else:
+                                    quality = ''
+                                if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt):
+                                    quality = 'SCR'
+                                elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync',
+                                               'ts'] for i in fmt):
+                                    quality = 'CAM'
                                 info = []
                                 if '3d' in fmt: info.append('3D')
                                 try:
@@ -135,11 +139,13 @@ class source:
                                     url = client.replaceHTMLCodes(url)
                                     url = url.encode('utf-8')
                                     host = \
-                                    re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+                                        re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
                                     if host in hostDict:
                                         host = client.replaceHTMLCodes(host)
                                         host = host.encode('utf-8')
-                                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                                        sources.append(
+                                            {'source': host, 'quality': quality, 'language': 'en', 'url': url,
+                                             'info': info, 'direct': False, 'debridonly': True})
                         except:
                             pass
                 except:
@@ -150,7 +156,5 @@ class source:
         except:
             return sources
 
-
     def resolve(self, url):
         return url
-

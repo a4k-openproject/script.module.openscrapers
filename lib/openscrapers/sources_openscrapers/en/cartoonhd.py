@@ -16,11 +16,11 @@ import json
 import re
 import time
 import urllib
-
 import urlparse
+
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import cfscrape
 from openscrapers.modules import directstream
 from openscrapers.modules import source_utils
 
@@ -33,7 +33,6 @@ class source:
         self.base_link = 'https://www1.cartoonhd.care'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             aliases.append({'country': 'us', 'title': title})
@@ -43,7 +42,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             aliases.append({'country': 'us', 'title': tvshowtitle})
@@ -52,7 +50,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -65,33 +62,31 @@ class source:
         except:
             return
 
-
     def searchShow(self, title, season, episode, aliases, headers):
         try:
             for alias in aliases:
-                url = '%s/show/%s/season/%01d/episode/%01d' % (self.base_link, cleantitle.geturl(title), int(season), int(episode))
-                result =self.scraper.get(url, headers=headers).status
+                url = '%s/show/%s/season/%01d/episode/%01d' % (
+                self.base_link, cleantitle.geturl(title), int(season), int(episode))
+                result = self.scraper.get(url, headers=headers).status
                 if not result == 200 and url != self.base_link: break
             return url
         except:
             return
-
 
     def searchMovie(self, title, year, aliases, headers):
         try:
             for alias in aliases:
                 url = '%s/film/%s' % (self.base_link, cleantitle.geturl(alias['title']))
-                result =self.scraper.get(url, headers=headers).status
+                result = self.scraper.get(url, headers=headers).status
                 if not result == 200 and url != self.base_link: break
             if url is None:
                 for alias in aliases:
                     url = '%s/film/%s-%s' % (self.base_link, cleantitle.geturl(alias['title']), year)
-                    result =self.scraper.get(url, headers=headers).status
+                    result = self.scraper.get(url, headers=headers).status
                     if not result == 200 and url != self.base_link: break
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -109,18 +104,24 @@ class source:
                 url = self.searchMovie(title, data['year'], aliases, headers)
             r = client.request(url, headers=headers, output='extended', timeout='10')
             if not imdb in r[0]: raise Exception()
-            cookie = r[4]; headers = r[3]; result = r[0]
+            cookie = r[4];
+            headers = r[3];
+            result = r[0]
             try:
                 r = re.findall('(https:.*?redirector.*?)[\'\"]', result)
                 for i in r:
                     try:
-                        sources.append({'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'], 'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
+                        sources.append(
+                            {'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'], 'language': 'en',
+                             'url': i, 'direct': True, 'debridonly': False})
                     except:
                         pass
             except:
                 pass
-            try: auth = re.findall('__utmx=(.+)', cookie)[0].split(';')[0]
-            except: auth = 'false'
+            try:
+                auth = re.findall('__utmx=(.+)', cookie)[0].split(';')[0]
+            except:
+                auth = 'false'
             auth = 'Bearer %s' % urllib.unquote_plus(auth)
             headers['Authorization'] = auth
             headers['Referer'] = url
@@ -133,7 +134,7 @@ class source:
             idEl = re.findall('elid\s*=\s*"([^"]+)', result)[0]
             post = {'action': action, 'idEl': idEl, 'token': token, 'nopop': '', 'elid': elid}
             post = urllib.urlencode(post)
-            cookie += ';%s=%s'%(idEl,elid)
+            cookie += ';%s=%s' % (idEl, elid)
             headers['Cookie'] = cookie
             r = client.request(u, post=post, headers=headers, cookie=cookie, XHR=True)
             r = str(json.loads(r))
@@ -143,32 +144,41 @@ class source:
                     if 'google' in i:
                         quality = 'SD'
                         if 'googleapis' in i:
-                            try: quality = source_utils.check_sd_url(i)
-                            except: pass
+                            try:
+                                quality = source_utils.check_sd_url(i)
+                            except:
+                                pass
                         if 'googleusercontent' in i:
                             i = directstream.googleproxy(i)
-                            try: quality = directstream.googletag(i)[0]['quality']
-                            except: pass
-                        sources.append({'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
+                            try:
+                                quality = directstream.googletag(i)[0]['quality']
+                            except:
+                                pass
+                        sources.append(
+                            {'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': i, 'direct': True,
+                             'debridonly': False})
                     elif 'llnwi.net' in i or 'vidcdn.pro' in i:
                         try:
                             quality = source_utils.check_sd_url(i)
-                            sources.append({'source': 'CDN', 'quality': quality, 'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
-                        except: pass
+                            sources.append(
+                                {'source': 'CDN', 'quality': quality, 'language': 'en', 'url': i, 'direct': True,
+                                 'debridonly': False})
+                        except:
+                            pass
                     else:
                         valid, hoster = source_utils.is_host_valid(i, hostDict)
                         if not valid: continue
-                        sources.append({'source': hoster, 'quality': '720p', 'language': 'en', 'url': i, 'direct': False, 'debridonly': False})
+                        sources.append(
+                            {'source': hoster, 'quality': '720p', 'language': 'en', 'url': i, 'direct': False,
+                             'debridonly': False})
                 except:
                     pass
             return sources
         except:
             return sources
 
-
     def resolve(self, url):
         if 'google' in url and not 'googleapis' in url:
             return directstream.googlepass(url)
         else:
             return url
-

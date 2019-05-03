@@ -24,28 +24,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
 import urllib
 import urlparse
-import json
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import cfscrape
 
 
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['rlsbb.ru','rlsbb.to','rlsbb.com','rlsbb.unblocked.cx']
+        self.domains = ['rlsbb.ru', 'rlsbb.to', 'rlsbb.com', 'rlsbb.unblocked.cx']
         self.base_link = 'http://rlsbb.ru'
         self.search_base_link = 'http://search.rlsbb.ru'
         self.search_cookie = 'serach_mode=rlsbb'
         self.search_link = '/lib/search526049.php?phrase=%s&pindex=1&content=true'
         self.scraper = cfscrape.create_scraper()
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -55,7 +52,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -63,7 +59,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -75,7 +70,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -146,7 +140,8 @@ class source:
                     info = ' | '.join(info)
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info,
+                                    'direct': False, 'debridonly': True})
                 except:
                     pass
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -155,7 +150,5 @@ class source:
         except:
             return sources
 
-
     def resolve(self, url):
         return url
-

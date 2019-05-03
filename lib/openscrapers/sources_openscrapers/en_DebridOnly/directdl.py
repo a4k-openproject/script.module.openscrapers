@@ -8,11 +8,14 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urllib,urlparse,json,base64
+import base64
+import json
+import re
+import urllib
+import urlparse
 
-from openscrapers.modules import cleantitle
-from openscrapers.modules import client
 from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
 from openscrapers.modules import debrid
 
 
@@ -22,7 +25,7 @@ class source:
         self.language = ['en']
         self.domains = ['directdownload.tv']
         self.base_link = 'https://directdownload.tv'
-        #self.search_link = 'L2FwaT9rZXk9NEIwQkI4NjJGMjRDOEEyOSZxdWFsaXR5W109SERUViZxdWFsaXR5W109RFZEUklQJnF1YWxpdHlbXT03MjBQJnF1YWxpdHlbXT1XRUJETCZxdWFsaXR5W109V0VCREwxMDgwUCZxdWFsaXR5W109MTA4MFAtWDI2NSZsaW1pdD0yMCZrZXl3b3JkPQ=='
+        # self.search_link = 'L2FwaT9rZXk9NEIwQkI4NjJGMjRDOEEyOSZxdWFsaXR5W109SERUViZxdWFsaXR5W109RFZEUklQJnF1YWxpdHlbXT03MjBQJnF1YWxpdHlbXT1XRUJETCZxdWFsaXR5W109V0VCREwxMDgwUCZxdWFsaXR5W109MTA4MFAtWDI2NSZsaW1pdD0yMCZrZXl3b3JkPQ=='
         self.search_link = base64.b64decode('L2FwaT9rZXk9NEIwQkI4NjJGMjRDOEEyOSZrZXl3b3JkPQ==')
         self.b_link = 'aHR0cDovL2lwdjYuaWNlZmlsbXMuaW5mbw=='
         self.u_link = 'aHR0cDovL2lwdjYuaWNlZmlsbXMuaW5mby9tZW1iZXJzb25seS9jb21wb25lbnRzL2NvbV9pY2VwbGF5ZXIvdmlkZW8ucGhwP2g9Mzc0Jnc9NjMxJnZpZD0lcyZpbWc9'
@@ -39,7 +42,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -47,7 +49,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -59,7 +60,6 @@ class source:
             return url
         except:
             return
-
 
     def request(self, url, post=None, cookie=None, referer=None, output='', close=True):
         try:
@@ -73,17 +73,15 @@ class source:
         except:
             return
 
-
     def directdl_cache(self, url):
         try:
             url = urlparse.urljoin(base64.b64decode(self.b_link), url)
             result = self.scraper.get(url).content
             result = re.compile('id=(\d+)>.+?href=(.+?)>').findall(result)
-            result = [(re.sub('http.+?//.+?/','/', i[1]), 'tt' + i[0]) for i in result]
+            result = [(re.sub('http.+?//.+?/', '/', i[1]), 'tt' + i[0]) for i in result]
             return result
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -114,29 +112,36 @@ class source:
                     quality = i['quality']
                     quality = quality.upper()
                     size = i['size']
-                    size = float(size)/1024
+                    size = float(size) / 1024
                     size = '%.2f GB' % size
-                    if any(x in quality for x in ['HEVC', 'X265', 'H265']): info = '%s | HEVC' % size
-                    else: info = size
-                    if '1080P' in quality: quality = '1080p'
-                    elif '720P' in quality: quality = 'HD'
-                    else: quality = 'SD'
+                    if any(x in quality for x in ['HEVC', 'X265', 'H265']):
+                        info = '%s | HEVC' % size
+                    else:
+                        info = size
+                    if '1080P' in quality:
+                        quality = '1080p'
+                    elif '720P' in quality:
+                        quality = 'HD'
+                    else:
+                        quality = 'SD'
                     url = i['links']
-                    #for x in url.keys(): links.append({'url': url[x], 'quality': quality, 'info': info})
+                    # for x in url.keys(): links.append({'url': url[x], 'quality': quality, 'info': info})
                     links = []
                     for x in url.keys(): links.append({'url': url[x], 'quality': quality})
                     for link in links:
                         try:
                             url = link['url']
                             quality2 = link['quality']
-                            #url = url[1]
-                            #url = link
+                            # url = url[1]
+                            # url = link
                             if len(url) > 1: raise Exception()
                             url = url[0].encode('utf-8')
                             host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
                             if not host in hostprDict: raise Exception()
                             host = host.encode('utf-8')
-                            sources.append({'source': host, 'quality': quality2, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': host, 'quality': quality2, 'language': 'en', 'url': url, 'info': info,
+                                 'direct': False, 'debridonly': True})
                         except:
                             pass
                 except:
@@ -144,7 +149,6 @@ class source:
             return sources
         except:
             return sources
-
 
     def resolve(self, url):
         try:
@@ -162,4 +166,3 @@ class source:
             return url
         except:
             return
-

@@ -44,7 +44,6 @@ class source:
         self.search_link = '/search/%s'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -52,7 +51,6 @@ class source:
             return url
         except Exception:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -65,7 +63,6 @@ class source:
             return url
         except Exception:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -129,7 +126,9 @@ class source:
                     except Exception:
                         pass
                     info = ' | '.join(info)
-                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append(
+                        {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                         'direct': False, 'debridonly': True})
                 except Exception:
                     continue
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -139,7 +138,5 @@ class source:
         except Exception:
             return sources
 
-
     def resolve(self, url):
         return url
-

@@ -23,7 +23,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
 
 try:
@@ -61,8 +60,9 @@ class source:
 
             result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
             result = [(i.attrs['href']) for i in result if
-                      cleantitle.get(title) == cleantitle.get(re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '',
-                        i.attrs['title'], flags=re.I))][0]
+                      cleantitle.get(title) == cleantitle.get(
+                          re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '',
+                                 i.attrs['title'], flags=re.I))][0]
             url = client.replaceHTMLCodes(result)
             url = url.encode('utf-8')
             return url
