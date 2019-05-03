@@ -23,8 +23,8 @@ import base64
 import hashlib
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import pyaes
@@ -110,8 +110,9 @@ def get_release_quality(release_name, release_link=None):
                     if any(i in ['dvdscr', 'r5', 'r6'] for i in release_link):
                         quality = 'SCR'
                     elif any(
-                        i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in
-                        release_link):
+                            i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i
+                            in
+                            release_link):
                         quality = 'CAM'
                     else:
                         quality = 'SD'

@@ -23,8 +23,8 @@
 import random
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import client
 from openscrapers.modules import utils
 
