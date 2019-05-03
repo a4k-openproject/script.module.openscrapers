@@ -77,55 +77,71 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url is None: return sources
-            if debrid.status() is False: raise Exception()
+            if url is None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
+
+            hostDict = hostprDict + hostDict
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if \
-                'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+                'tvshowtitle' in data else '%s' % (data['title'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-            headers = {'Referer': url}
+            headers = {'Referer': self.base_link}
             r = self.scraper.get(url, headers=headers).content
-            items = dom_parser2.parse_dom(r, 'h2')
-            items = [dom_parser2.parse_dom(i.content, 'a', req=['href']) for i in items]
-            items = [(i[0].content, i[0].attrs['href']) for i in items]
-            hostDict = hostprDict + hostDict
-            for item in items:
+
+            search_results = dom_parser2.parse_dom(r, 'h2')
+            search_results = [dom_parser2.parse_dom(i.content, 'a', req=['href']) for i in search_results]
+            search_results = [(i[0].content, i[0].attrs['href']) for i in search_results]
+
+            items = []
+            for search_result in search_results:
                 try:
-                    name = item[0]
-                    name = client.replaceHTMLCodes(name)
                     headers = {'Referer': url}
-                    r = self.scraper.get(item[1], headers=headers).content
+                    r = self.scraper.get(search_result[1], headers=headers).content
                     links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', ])
                     links = [i.attrs['href'] for i in links]
                     for url in links:
                         try:
-                            if hdlr in name:
-                                url = client.replaceHTMLCodes(url)
-                                url = url.encode('utf-8')
-                                if any(x in url for x in
-                                       ['.part', 'extras', 'subs', 'dubbed', 'dub', 'MULTISUBS', 'sample', 'youtube',
-                                        'trailer']) or any(
-                                        url.endswith(x) for x in ['.rar', '.zip', '.iso', '.sub', '.idx', '.srt']):
-                                    raise Exception()
-                                quality, info = source_utils.get_release_quality(url, url)
-                                host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
-                                if host in hostDict:
-                                    host = client.replaceHTMLCodes(host)
-                                    host = host.encode('utf-8')
-                                    sources.append(
-                                        {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-                                         'direct': False, 'debridonly': True})
+                            if hdlr in url.upper() and cleantitle.get(title) in cleantitle.get(url):
+                                items.append(url)
                         except:
                             pass
                 except:
                     pass
-            check = [i for i in sources if not i['quality'] == 'CAM']
-            if check: sources = check
+
+            seen_urls = set()
+            for item in items:
+                try:
+                    url = str(item)
+                    url = client.replaceHTMLCodes(url)
+                    url = url.encode('utf-8')
+
+                    if url in seen_urls:
+                        continue
+                    seen_urls.add(url)
+
+                    if any(x in url for x in
+                           ['.part', 'extras', 'subs', 'dubbed', 'dub', 'MULTISUBS', 'sample', 'youtube', 'trailer']) \
+                            or any(url.endswith(x) for x in ['.rar', '.zip', '.iso', '.sub', '.idx', '.srt']):
+                        raise Exception()
+                    quality, info = source_utils.get_release_quality(url, url)
+                    host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+                    if host in hostDict:
+                        host = client.replaceHTMLCodes(host)
+                        host = host.encode('utf-8')
+                        sources.append(
+                            {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                             'direct': False, 'debridonly': True})
+                except:
+                    pass
+
             return sources
         except:
             return sources

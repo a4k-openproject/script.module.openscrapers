@@ -32,7 +32,7 @@ class source:
         self.domains = ['freefmovies.net']
         self.base_link = 'http://freefmovies.net'
         self.search_link = '/watch/%s-%s-online-fmovies.html'
-        self.scraper = cfscrape.create_scraper(0)
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

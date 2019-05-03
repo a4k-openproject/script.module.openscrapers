@@ -125,3 +125,4 @@ test-results/en-en_DebridOnly/os-en-and-debrid-movie-scrape-test.txt
 .idea/misc.xml
 .idea/encodings.xml
 .idea/codeStyles/codeStyleConfig.xml
+test-results/en_torrent/os-torrents-movie-scrape-test.txt

@@ -55,7 +55,6 @@
         <setting id="provider.odb" type="bool" label="ODB" default="true"/>
         <setting id="provider.openloadmovie" type="bool" label="OPENLOADMOVIE" default="true"/>
         <setting id="provider.ororo" type="bool" label="ORORO" default="false"/>
-        <setting id="provider.plocker" type="bool" label="PLOCKER" default="true"/>
         <setting id="provider.primewire" type="bool" label="PRIMEWIRE" default="true"/>
         <setting id="provider.projectfreetv" type="bool" label="PROJECTFREETV" default="true"/>
         <setting id="provider.pubfilmonline" type="bool" label="PUBFILMONLINE" default="false"/>
@@ -179,12 +178,23 @@
         <setting id="provider.ddlspot" type="bool" label="DDLSPOT" default="true"/>
         <setting id="provider.ddlvalley" type="bool" label="DDLVALLEY" default="true"/>
         <setting id="provider.directdl" type="bool" label="DIRECTDL" default="true"/>
+        <setting id="provider.dlwarez" type="bool" label="DLWAREZ" default="true"/>
+        <setting id="provider.filmrls" type="bool" label="FILMRLS" default="true"/>
+        <setting id="provider.filmsofts" type="bool" label="FILMSOFTS" default="true"/>
         <setting id="provider.ganool123" type="bool" label="GANOOL" default="true"/>
+        <setting id="provider.gomovie" type="bool" label="GOMOVIE" default="true"/>
+        <setting id="provider.mftwbb" type="bool" label="MFTWBB" default="true"/>
         <setting id="provider.moviesleak" type="bool" label="MOVIESLEAK" default="true"/>
+        <setting id="provider.movieswbb" type="bool" label="MOVIESWBB" default="true"/>
         <setting id="provider.mvrls" type="bool" label="MVRLS" default="true"/>
         <setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="true"/>
         <setting id="provider.playmovies" type="bool" label="PLAYMOVIES" default="true"/>
+        <setting id="provider.rls4u" type="bool" label="RLS4U" default="true"/>
+        <setting id="provider.rlsarchive" type="bool" label="RLSARCHIVE" default="true"/>
         <setting id="provider.rlsbb" type="bool" label="RLSBB" default="true"/>
+        <setting id="provider.rlslog" type="bool" label="RLSLOG" default="true"/>
+        <setting id="provider.rmz" type="bool" label="RMZ" default="true"/>
+        <setting id="provider.sceneddl" type="bool" label="SCENEDDL" default="true"/>
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true"/>
         <setting id="provider.scnsrc" type="bool" label="SCNSRC" default="true"/>
         <setting id="provider.ultrahd" type="bool" label="ULTRAHD" default="true"/>
