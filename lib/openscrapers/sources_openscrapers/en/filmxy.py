@@ -63,7 +63,7 @@ class source:
             tit = cleantitle.geturl(title + ' ' + year)
             query = urlparse.urljoin(self.base_link, tit)
 
-            r = self.scraper.get(query, referer=self.base_link, redirect=True).content
+            r = self.scraper.get(query, params={'referer': self.base_link}).content
             if not data['imdb'] in r:
                 return sources
 
@@ -100,16 +100,17 @@ class source:
                             rd = True
                     else:
                         rd = False
+                    quality, info = source_utils.get_release_quality(url, url)
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
                     if rd:
                         sources.append(
-                            {'source': host, 'quality': '1080p', 'language': 'en', 'url': url,
+                            {'source': host, 'quality': quality, 'language': 'en', 'url': url,
                              'direct': False,
                              'debridonly': True})
                     else:
                         sources.append(
-                            {'source': host, 'quality': '1080p', 'language': 'en', 'url': url,
+                            {'source': host, 'quality': quality, 'language': 'en', 'url': url,
                              'direct': False,
                              'debridonly': False})
                 except Exception:
@@ -119,4 +120,5 @@ class source:
             return sources
 
     def resolve(self, url):
+
         return url
