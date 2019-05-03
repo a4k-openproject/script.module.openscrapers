@@ -197,9 +197,8 @@ class source:
                         u = client.parseDOM(post, 'a', ret='href')
                         for i in u:
                             try:
-                                name = str(i)
-                                if hdlr in name.upper() and cleantitle.get(title) in cleantitle.get(name):
-                                    items.append(name)
+                                if hdlr in i.upper() and cleantitle.get(title) in cleantitle.get(i):
+                                    items.append(i)
                             except:
                                 pass
                     except:
