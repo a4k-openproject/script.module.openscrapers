@@ -65,7 +65,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None: return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -77,17 +77,19 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None: return sources
-            if debrid.status() == False: raise Exception()
+            if url is None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if \
-                'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+                'tvshowtitle' in data else '%s' % (data['title'])
             url = self.search_link % urllib.quote_plus(query).lower()
             url = urlparse.urljoin(self.base_link, url)
-            headers = {'Referer': url, 'User-Agent': 'Mozilla/5.0'}
+            headers = {'Referer': url}
             r = self.scraper.get(url, headers=headers).content
             items = dom_parser2.parse_dom(r, 'h2')
             items = [dom_parser2.parse_dom(i.content, 'a', req=['href', 'rel', 'data-wpel-link']) for i in items]
@@ -101,13 +103,13 @@ class source:
                     if not query in item[1]:
                         continue
                     url = item[1]
-                    headers = {'Referer': url, 'User-Agent': 'Mozilla/5.0'}
+                    headers = {'Referer': url}
                     r = self.scraper.get(url, headers=headers).content
                     links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', 'data-wpel-link'])
                     links = [i.attrs['href'] for i in links]
                     for url in links:
                         try:
-                            if hdlr in name:
+                            if hdlr in name.upper() and cleantitle.get(title) in cleantitle.get(name):
                                 fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*)(\.|\)|\]|\s)', '', name.upper())
                                 fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
                                 fmt = [i.lower() for i in fmt]
@@ -139,7 +141,8 @@ class source:
                 except:
                     pass
             check = [i for i in sources if not i['quality'] == 'CAM']
-            if check: sources = check
+            if check:
+                sources = check
             return sources
         except:
             return

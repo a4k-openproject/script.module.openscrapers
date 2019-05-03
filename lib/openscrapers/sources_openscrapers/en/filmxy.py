@@ -39,7 +39,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['filmxy.me']
-        self.base_link = 'https://www.filmxy.one/'
+        self.base_link = 'https://www.filmxy.ws/'
         self.search_link = 'search/%s/feed/rss2/'
         self.scraper = cfscrape.create_scraper()
 
@@ -63,12 +63,7 @@ class source:
             tit = cleantitle.geturl(title + ' ' + year)
             query = urlparse.urljoin(self.base_link, tit)
 
-<<<<<<< HEAD
             r = self.scraper.get(query, params={'referer': self.base_link}).content
-=======
-            r = client.request(query, referer=self.base_link, redirect=True)
-            # r = self.scraper.get(query, referer=self.base_link, redirect=True).content
->>>>>>> 33ef8066c7febe4fcafc8e5f10f332b6dad3bc3d
             if not data['imdb'] in r:
                 return sources
 
@@ -105,29 +100,17 @@ class source:
                             rd = True
                     else:
                         rd = False
-<<<<<<< HEAD
                     quality, info = source_utils.get_release_quality(url, url)
-=======
-                    quality, info = source_utils.get_release_quality(url)
->>>>>>> 33ef8066c7febe4fcafc8e5f10f332b6dad3bc3d
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
                     if rd:
                         sources.append(
-<<<<<<< HEAD
                             {'source': host, 'quality': quality, 'language': 'en', 'url': url,
-=======
-                            {'source': host, 'quality': 'quality', 'language': 'en', 'url': url,
->>>>>>> 33ef8066c7febe4fcafc8e5f10f332b6dad3bc3d
                              'direct': False,
                              'debridonly': True})
                     else:
                         sources.append(
-<<<<<<< HEAD
                             {'source': host, 'quality': quality, 'language': 'en', 'url': url,
-=======
-                            {'source': host, 'quality': 'quality', 'language': 'en', 'url': url,
->>>>>>> 33ef8066c7febe4fcafc8e5f10f332b6dad3bc3d
                              'direct': False,
                              'debridonly': False})
                 except Exception:
