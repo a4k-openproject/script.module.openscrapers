@@ -10,6 +10,7 @@
 
 import re
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
@@ -25,6 +26,7 @@ class source:
         self.search_link = 'search.json?q=%s+%s&restrict_sr=1'
         self.domains = ['reddit.com']
         self.base_link = 'https://www.reddit.com/user/nbatman/m/streaming2/search?q=%s&restrict_sr=on'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -39,7 +41,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 match = re.compile(
                     'class="search-title may-blank" >(.+?)</a>.+?<span class="search-result-icon search-result-icon-external"></span><a href="(.+?)://(.+?)/(.+?)" class="search-link may-blank" >').findall(
