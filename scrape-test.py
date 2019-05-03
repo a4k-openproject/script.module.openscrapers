@@ -156,7 +156,6 @@ def worker_thread(provider_name, provider_source):
     global TOTAL_SOURCES
     global PASSED_PROVIDERS
     global FAILED_PROVIDERS
-    global providers_no_results
     RUNNING_PROVIDERS.append(provider_name)
     try:
         # Confirm Provider contains the movie function
@@ -306,41 +305,50 @@ if __name__ == '__main__':
         print('Total Passed Providers: %s' % len(PASSED_PROVIDERS))
         print('Total Failed Providers: %s' % len(FAILED_PROVIDERS))
         print('Skipped Providers: %s' % (len(PROVIDER_LIST) - (len(PASSED_PROVIDERS) + len(FAILED_PROVIDERS))))
-        pre_dup = TOTAL_SOURCES
-        post_dup = {}
-        for i in TOTAL_SOURCES:
-            post_dup.update({str(i['url']): i})
-        total_duplicates = len(pre_dup) - len([i for i in post_dup])
-        print('Total Sources: %s' % len(post_dup))
-        print('Total Duplicates: %s' % total_duplicates)
-        print('   ')
-        print('Sources quality:')
-        print('#################')
-        quality = {}
-        for i in TOTAL_SOURCES:
-            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
-        for x in quality:
-            print('%s: %s Sources' % (x, quality[x]))
-
-        base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
-        output_filename = 'results-%s.csv' % time.time()
-
-        if not os.path.exists(base_output_path):
-            os.makedirs(base_output_path)
-
-        with open(os.path.join(base_output_path, output_filename), 'w+') as output:
-            output.write('Provider Name;Number Of Sources;Runtime;%s\n' %
-                         ';'.join(str(x) for x in PASSED_PROVIDERS[1][3].keys()))
-            for i in PASSED_PROVIDERS:
-                try:
-                    if i[1] is not None:
-                        output.write('%s;%s;%s;%s\n' % (
-                            i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
-                except:
-                    pass
 
     elif test_type == 0:
         all_sources = PASSED_PROVIDERS[0][1]
         if all_sources is None:
             all_sources = []
-        print('Total No. Sources: %s' % len(all_sources))
+    pre_dup = TOTAL_SOURCES
+    post_dup = {}
+    for i in TOTAL_SOURCES:
+        post_dup.update({str(i['url']): i})
+    total_duplicates = len(pre_dup) - len([i for i in post_dup])
+    print('Total Sources: %s' % len(post_dup))
+    print('Total Duplicates: %s' % total_duplicates)
+    print('   ')
+    print('Sources quality:')
+    print('#################')
+    quality = {}
+    for i in TOTAL_SOURCES:
+        quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 1})
+    for x in quality:
+        print('%s: %s Sources' % (x, quality[x]))
+
+    base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
+    output_filename = 'results-%s' % time.time()
+
+    if not os.path.exists(base_output_path):
+        os.makedirs(base_output_path)
+
+    with open(os.path.join(base_output_path, output_filename + '.csv'), 'w+') as output:
+        output.write('Provider Name;Number Of Sources;Runtime;%s\n' %
+                     ';'.join(str(x) for x in PASSED_PROVIDERS[0][3].keys()))
+        for i in PASSED_PROVIDERS:
+            try:
+                if i[1] is not None:
+                    output.write('%s;%s;%s;%s\n' % (
+                        i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
+            except:
+                pass
+
+    for i in PASSED_PROVIDERS:
+        with open(os.path.join(base_output_path, output_filename + '-' + i[0] + '.csv'), 'w+') as output:
+            output.write('%s\n' % ';'.join(str(x) for x in i[1][0].keys()))
+            try:
+                if i[1] is not None:
+                    for s in i[1]:
+                        output.write('%s\n' % ';'.join(str(x) for x in s.values()))
+            except:
+                pass
