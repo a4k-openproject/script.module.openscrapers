@@ -30,8 +30,8 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -41,7 +41,6 @@ class source:
         self.domains = ['pelisplus.tv']
         self.base_link = 'http://pelisplus.tv'
         self.search_link = '/busqueda/?s=%s'
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -55,7 +54,8 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
+                [tvshowtitle] + source_utils.aliases_to_array(aliases), year)
             return url
         except:
             return
@@ -73,7 +73,7 @@ class source:
 
     def __search(self, titles, year):
         try:
-            query = self.search_link % (cleantitle.getsearch(titles[0].replace(' ','%20')))
+            query = self.search_link % (cleantitle.getsearch(titles[0].replace(' ', '%20')))
 
             query = urlparse.urljoin(self.base_link, query)
 
@@ -87,18 +87,17 @@ class source:
                 title = client.parseDOM(i, 'a', ret='title')[0]
                 url = client.parseDOM(i, 'a', ret='href')[0]
                 data = client.request(url)
-                y = re.findall('<p><span>Año:</span>(\d{4})',data)[0]
-                original_t = re.findall('movie-text">.+?h2.+?">\((.+?)\)</h2>',data, re.DOTALL)[0]
+                y = re.findall('<p><span>Año:</span>(\d{4})', data)[0]
+                original_t = re.findall('movie-text">.+?h2.+?">\((.+?)\)</h2>', data, re.DOTALL)[0]
                 original_t, title = cleantitle.get(original_t), cleantitle.get(title)
 
-                if (t in title or t in original_t) and y == year :
+                if (t in title or t in original_t) and y == year:
                     x = dom_parser.parse_dom(i, 'a', req='href')
                     return source_utils.strip_domain(x[0][0]['href'])
 
             return
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         sources = []
@@ -110,7 +109,7 @@ class source:
             query = urlparse.urljoin(self.base_link, url)
 
             r = client.request(query)
-            q = re.findall("'(http://www.elreyxhd.+?)'",r, re.DOTALL)[0]
+            q = re.findall("'(http://www.elreyxhd.+?)'", r, re.DOTALL)[0]
             links = client.request(q)
             links = client.parseDOM(links, 'a', ret='href')
 
@@ -118,18 +117,17 @@ class source:
                 lang, info = 'es', 'LAT'
                 qual = 'HD'
                 if not 'http' in url: continue
-                if 'elrey' in url :continue
+                if 'elrey' in url: continue
 
                 valid, host = source_utils.is_host_valid(url, hostDict)
                 if not valid: continue
 
                 sources.append({'source': host, 'quality': qual, 'language': lang, 'url': url, 'info': info, 'direct':
-                    False,'debridonly': False})
+                    False, 'debridonly': False})
 
             return sources
         except:
             return sources
-
 
     def resolve(self, url):
         return url

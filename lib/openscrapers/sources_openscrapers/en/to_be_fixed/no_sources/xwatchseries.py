@@ -24,7 +24,6 @@ import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import log_utils
-
 from openscrapers.modules import proxy
 
 
@@ -32,7 +31,7 @@ class source:
     def __init__(self):
         self.priority = 0
         self.language = ['en']
-        self.domains = ['xwatchseries.to','onwatchseries.to','itswatchseries.to']
+        self.domains = ['xwatchseries.to', 'onwatchseries.to', 'itswatchseries.to']
         self.base_link = 'https://www1.swatchseries.to'
         self.search_link = 'https://www1.swatchseries.to/show/search-shows-json'
         self.search_link_2 = 'https://www1.swatchseries.to/search/%s'
@@ -45,16 +44,21 @@ class source:
             p = urllib.urlencode({'term': q})
 
             r = client.request(self.search_link, post=p, XHR=True)
-            try: r = json.loads(r)
-            except: r = None
+            try:
+                r = json.loads(r)
+            except:
+                r = None
             r = None
 
             if r:
-                r = [(i['seo_url'], i['value'], i['label']) for i in r if 'value' in i and 'label' in i and 'seo_url' in i]
+                r = [(i['seo_url'], i['value'], i['label']) for i in r if
+                     'value' in i and 'label' in i and 'seo_url' in i]
             else:
                 r = proxy.request(self.search_link_2 % q, 'tv shows')
-                r = client.parseDOM(r, 'div', attrs = {'valign': '.+?'})
-                r = [(client.parseDOM(i, 'a', ret='href'), client.parseDOM(i, 'a', ret='title'), client.parseDOM(i, 'a')) for i in r]
+                r = client.parseDOM(r, 'div', attrs={'valign': '.+?'})
+                r = [
+                    (client.parseDOM(i, 'a', ret='href'), client.parseDOM(i, 'a', ret='title'), client.parseDOM(i, 'a'))
+                    for i in r]
                 r = [(i[0][0], i[1][0], i[2][0]) for i in r if i[0] and i[1] and i[2]]
 
             r = [(i[0], i[1], re.findall('(\d{4})', i[2])) for i in r]
@@ -79,19 +83,21 @@ class source:
             url = '%s/serie/%s' % (self.base_link, url)
 
             r = proxy.request(url, 'tv shows')
-            r = client.parseDOM(r, 'li', attrs = {'itemprop': 'episode'})
+            r = client.parseDOM(r, 'li', attrs={'itemprop': 'episode'})
 
             t = cleantitle.get(title)
 
-            r = [(client.parseDOM(i, 'a', ret='href'), client.parseDOM(i, 'span', attrs = {'itemprop': 'name'}), re.compile('(\d{4}-\d{2}-\d{2})').findall(i)) for i in r]
-            r = [(i[0], i[1][0].split('&nbsp;')[-1], i[2]) for i in r if i[1]] + [(i[0], None, i[2]) for i in r if not i[1]]
+            r = [(client.parseDOM(i, 'a', ret='href'), client.parseDOM(i, 'span', attrs={'itemprop': 'name'}),
+                  re.compile('(\d{4}-\d{2}-\d{2})').findall(i)) for i in r]
+            r = [(i[0], i[1][0].split('&nbsp;')[-1], i[2]) for i in r if i[1]] + [(i[0], None, i[2]) for i in r if
+                                                                                  not i[1]]
             r = [(i[0], i[1], i[2][0]) for i in r if i[2]] + [(i[0], i[1], None) for i in r if not i[2]]
             r = [(i[0][0], i[1], i[2]) for i in r if i[0]]
 
             url = [i for i in r if t == cleantitle.get(i[1]) and premiered == i[2]][:1]
             if not url: url = [i for i in r if t == cleantitle.get(i[1])]
             if len(url) > 1 or not url: url = [i for i in r if premiered == i[2]]
-            if len(url) > 1 or not url: raise Exception() 
+            if len(url) > 1 or not url: raise Exception()
 
             url = url[0][0]
             url = proxy.parse(url)
@@ -115,8 +121,8 @@ class source:
 
             r = proxy.request(url, 'tv shows')
 
-            links = client.parseDOM(r, 'a', ret='href', attrs = {'target': '.+?'})
-            links = [x for y,x in enumerate(links) if x not in links[:y]]
+            links = client.parseDOM(r, 'a', ret='href', attrs={'target': '.+?'})
+            links = [x for y, x in enumerate(links) if x not in links[:y]]
 
             for i in links:
                 try:
@@ -131,7 +137,8 @@ class source:
                     if not host in hostDict: raise Exception()
                     host = host.encode('utf-8')
 
-                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
                 except:
                     pass
 
@@ -143,5 +150,3 @@ class source:
 
     def resolve(self, url):
         return url
-
-

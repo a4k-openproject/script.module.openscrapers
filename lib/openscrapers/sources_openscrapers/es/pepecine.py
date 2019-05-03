@@ -25,14 +25,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib, urlparse, re
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
-
-
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -47,7 +47,7 @@ class source:
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year, 'movies')
             if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(
-                aliases),year, 'movies')
+                aliases), year, 'movies')
             return url
         except:
             return
@@ -72,7 +72,7 @@ class source:
         except:
             return
 
-    def __search(self, titles, year,content):
+    def __search(self, titles, year, content):
         try:
             query = self.search_link % (urllib.quote_plus(cleantitle.getsearch(titles[0])))
 
@@ -84,8 +84,10 @@ class source:
 
             r = client.parseDOM(r, 'div', attrs={'class': 'tab-content clearfix'})
 
-            if content == 'movies': r = client.parseDOM(r, 'div', attrs={'id': 'movies'})
-            else: r = client.parseDOM(r, 'div', attrs={'id': 'series'})
+            if content == 'movies':
+                r = client.parseDOM(r, 'div', attrs={'id': 'movies'})
+            else:
+                r = client.parseDOM(r, 'div', attrs={'id': 'series'})
 
             data = dom_parser.parse_dom(r, 'figcaption')
 
@@ -98,7 +100,7 @@ class source:
                 else:
                     url = dom_parser.parse_dom(i, 'a', req='href')
                     data = client.request(url[0][0]['href'])
-                    data = re.findall('<h3>Pelicula.+?">(.+?)\((\d{4})\).+?</a>',data, re.DOTALL)[0]
+                    data = re.findall('<h3>Pelicula.+?">(.+?)\((\d{4})\).+?</a>', data, re.DOTALL)[0]
                     if titles[0] in data[0] and year == data[1]: return source_utils.strip_domain(url[0][0]['href'])
 
             return
@@ -131,16 +133,19 @@ class source:
                         url, host = 'http://hqq.tv/player/embed_player.php?vid=%s' % url_id, 'netu.tv'
 
                     sources.append({'source': host, 'quality': quality, 'language': lang, 'url': url, 'info': info,
-                                    'direct':False,'debridonly': False})
+                                    'direct': False, 'debridonly': False})
 
             return sources
         except:
             return sources
 
-    def quality_fixer(self,quality):
-        if '1080' in quality: return '1080p'
-        elif '720' in quality: return 'HD'
-        else: return 'SD'
+    def quality_fixer(self, quality):
+        if '1080' in quality:
+            return '1080p'
+        elif '720' in quality:
+            return 'HD'
+        else:
+            return 'SD'
 
     def get_lang_by_type(self, lang_type):
         if 'Latino' in lang_type:

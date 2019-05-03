@@ -9,14 +9,15 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
+import urllib
 # Addon Name: Placenta
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.blamo
@@ -25,7 +26,6 @@ import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
-import urllib
 
 
 class source:
@@ -64,8 +64,13 @@ class source:
         return self.search(localtvshowtitle, year, 'watch-tv-shows')
 
     def demix(self, e):
-        result = {"d": "A", "D": "a", "a": "D", "a": "d", "c": "B", "C": "b", "b": "C", "b": "c", "h": "E", "H": "e", "e": "H", "E": "h", "g": "F", "G": "f", "f": "G", "F": "g", "l": "I", "L": "i", "i": "L", "I": "l", "k": "J", "K": "j", "j": "K", "J": "k", "p": "M", "P": "m", "m": "P", "M": "p", "o": "N", "O": "n", "n": "O",
-                  "N": "o", "u": "R", "U": "r", "r": "U", "R": "u", "t": "S", "T": "s", "s": "T", "S": "t", "z": "W", "Z": "w", "w": "Z", "W": "z", "y": "X", "Y": "x", "x": "Y", "X": "y", "3": "1", "1": "3", "4": "2", "2": "4", "8": "5", "5": "8", "7": "6", "6": "7", "0": "9", "9": "0"
+        result = {"d": "A", "D": "a", "a": "D", "a": "d", "c": "B", "C": "b", "b": "C", "b": "c", "h": "E", "H": "e",
+                  "e": "H", "E": "h", "g": "F", "G": "f", "f": "G", "F": "g", "l": "I", "L": "i", "i": "L", "I": "l",
+                  "k": "J", "K": "j", "j": "K", "J": "k", "p": "M", "P": "m", "m": "P", "M": "p", "o": "N", "O": "n",
+                  "n": "O",
+                  "N": "o", "u": "R", "U": "r", "r": "U", "R": "u", "t": "S", "T": "s", "s": "T", "S": "t", "z": "W",
+                  "Z": "w", "w": "Z", "W": "z", "y": "X", "Y": "x", "x": "Y", "X": "y", "3": "1", "1": "3", "4": "2",
+                  "2": "4", "8": "5", "5": "8", "7": "6", "6": "7", "0": "9", "9": "0"
                   }.get(e)
         if result == None:
             result = '%'
@@ -86,7 +91,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         url = urlparse.urljoin(self.base_link, url)
-        r = client.request(url)        
+        r = client.request(url)
         r = client.parseDOM(r, 'li', attrs={'class': 'active'})
         for row in r:
             span_season = client.parseDOM(row, 'span')[0]
@@ -97,8 +102,7 @@ class source:
                     ep_no = client.parseDOM(ep, 'a')[0].split(' ')[1]
                     if ep_no == episode:
                         return client.parseDOM(ep, 'a', ret='href')[0]
-                    
-                
+
         return None
 
     def get_lang_by_type(self, lang_type):
@@ -121,12 +125,13 @@ class source:
             r = client.parseDOM(r, 'script')[0]
             script = r.split('"')[1]
             decoded = self.shwp(script)
-            
+
             link = client.parseDOM(decoded, 'iframe', ret='src')[0]
             valid, host = source_utils.is_host_valid(link, hostDict)
             if not valid: return sources
             q = source_utils.check_sd_url(link)
-            sources.append({'source': host, 'quality': q, 'language': 'pl', 'url': link, 'info': info, 'direct': False, 'debridonly': False})
+            sources.append({'source': host, 'quality': q, 'language': 'pl', 'url': link, 'info': info, 'direct': False,
+                            'debridonly': False})
 
             return sources
         except:

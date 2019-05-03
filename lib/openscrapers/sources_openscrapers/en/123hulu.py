@@ -8,8 +8,15 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re, urllib, urlparse, json, base64
-from openscrapers.modules import client, cleantitle, directstream, dom_parser2, cfscrape
+import base64
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import dom_parser2
 
 
 class source:
@@ -19,13 +26,13 @@ class source:
         self.domains = ['123hulu.com']
         self.base_link = 'http://www0.123hulu.com'
         self.search_link = '/search-movies/%s.html'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            scraper = cfscrape.create_scraper()
             clean_title = cleantitle.geturl(title).replace('-', '+')
             url = urlparse.urljoin(self.base_link, (self.search_link % clean_title))
-            r = scraper.get(url).content
+            r = self.scraper.get(url).content
             r = dom_parser2.parse_dom(r, 'div', {'id': 'movie-featured'})
             r = [dom_parser2.parse_dom(i, 'a', req=['href']) for i in r if i]
             r = [(i[0].attrs['href'], re.search('Release:\s*(\d+)', i[0].content)) for i in r if i]
@@ -50,14 +57,13 @@ class source:
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if url == None: return
-            scraper = cfscrape.create_scraper()
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['premiered'], url['season'], url['episode'] = premiered, season, episode
             try:
-                clean_title = cleantitle.geturl(url['tvshowtitle'])+'-season-%d' % int(season)
+                clean_title = cleantitle.geturl(url['tvshowtitle']) + '-season-%d' % int(season)
                 search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
-                r = scraper.get(search_url).content
+                r = self.scraper.get(search_url).content
                 r = client.parseDOM(r, 'div', {'id': 'movie-featured'})
                 r = [(client.parseDOM(i, 'a', ret='href'),
                       re.findall('<b><i>(.+?)</i>', i)) for i in r]
@@ -78,8 +84,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            scraper = cfscrape.create_scraper()
-            r = scraper.get(url).content
+            r = self.scraper.get(url).content
             try:
                 v = re.findall('document.write\(Base64.decode\("(.+?)"\)', r)[0]
                 b64 = base64.b64decode(v)
@@ -101,7 +106,8 @@ class source:
             except:
                 pass
             r = client.parseDOM(r, 'div', {'class': 'server_line'})
-            r = [(client.parseDOM(i, 'a', ret='href')[0], client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in r]
+            r = [(client.parseDOM(i, 'a', ret='href')[0],
+                  client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in r]
             if r:
                 for i in r:
                     try:
@@ -109,7 +115,7 @@ class source:
                         url = i[0]
                         host = client.replaceHTMLCodes(host)
                         host = host.encode('utf-8')
-                        if 'other'in host: continue
+                        if 'other' in host: continue
                         sources.append({
                             'source': host,
                             'quality': 'SD',
@@ -126,10 +132,8 @@ class source:
 
     def resolve(self, url):
         if self.base_link in url:
-            scraper = cfscrape.create_scraper()
-            url = scraper.get(url).content
+            url = self.scraper.get(url).content
             v = re.findall('document.write\(Base64.decode\("(.+?)"\)', url)[0]
             b64 = base64.b64decode(v)
             url = client.parseDOM(b64, 'iframe', ret='src')[0]
         return url
-

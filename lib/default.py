@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import urlparse
+
 from openscrapers import sources_openscrapers
 from openscrapers.modules import control
-from openscrapers import providerSources, providerNames
-
 
 params = dict(urlparse.parse_qsl(sys.argv[2].replace('?', '')))
 action = params.get('action')
 mode = params.get('mode')
 query = params.get('query')
-
 
 
 def ScraperChoice():
@@ -22,7 +20,6 @@ def ScraperChoice():
     module_choice = sourceList[select]
     control.setSetting('module.provider', module_choice)
     control.openSettings('0.1')
-
 
 
 if action == "OpenscrapersSettings":
@@ -42,7 +39,7 @@ elif action == "toggleAll":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All providers = %s' % sourceList,2)
+    #    xbmc.log('All providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -52,7 +49,7 @@ elif action == "toggleAllHosters":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Hoster providers = %s' % sourceList,2)
+    #    xbmc.log('All Hoster providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -62,7 +59,7 @@ elif action == "toggleAllForeign":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Foregin providers = %s' % sourceList,2)
+    #    xbmc.log('All Foregin providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -72,7 +69,7 @@ elif action == "toggleAllSpanish":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Spanish providers = %s' % sourceList,2)
+    #    xbmc.log('All Spanish providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -82,7 +79,7 @@ elif action == "toggleAllGerman":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All German providers = %s' % sourceList,2)
+    #    xbmc.log('All German providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -92,7 +89,7 @@ elif action == "toggleAllGreek":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Greek providers = %s' % sourceList,2)
+    #    xbmc.log('All Greek providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -102,7 +99,7 @@ elif action == "toggleAllPolish":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Polish providers = %s' % sourceList,2)
+    #    xbmc.log('All Polish providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -112,7 +109,7 @@ elif action == "toggleAllPaid":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Paid providers = %s' % sourceList,2)
+    #    xbmc.log('All Paid providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
@@ -122,29 +119,34 @@ elif action == "toggleAllDebrid":
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Debrid providers = %s' % sourceList,2)
+    #    xbmc.log('All Debrid providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
 
 elif action == "toggleAllTorrent":
-    sourceList = []
+    sourcelist = []
     sourceList = sources_openscrapers.torrent_providers
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
-#    xbmc.log('All Torrent providers = %s' % sourceList,2)
+    #    xbmc.log('All Torrent providers = %s' % sourceList,2)
     control.openSettings(query, "script.module.openscrapers")
 
-
 if action == "Defaults":
-    sourceList = ['123hbo','123movieshd','123movieshubz','123123movies','animetoon','cartoonhd','cmovieshd',
-    'cmovieshdbz','cooltvseries','extramovies','flixmy','freefmovies','freeputlockers','gowatchseries','Hdmto','iwaatch',
-    'kattv','mymoviego','mywatchepseries','naturalbd','odb','openloadmovie','plocker','primewire','projectfreetv',
-	'pubfilmonline','putlocker','putlockeronl','reddit','seehd','series9','seriesonline','solarmoviefree','toonget',
-	'tvbox','vidics','watchepisodes','watchfree1','watchseries','watchserieshd','300mbdownload','300mbfilms','bestmoviez',
-	'ddlspot','directdl','ganool123','invictus','rlsbb','scenerls','ultrahd']
+    sourceList = ['123hbo', '123movieshd', '123movieshubz', '123123movies', 'animetoon', 'cartoonhd', 'cmovieshd',
+                  'cmovieshdbz', 'cooltvseries', 'extramovies', 'flixmy', 'freefmovies', 'freeputlockers',
+                  'gowatchseries', 'Hdmto', 'iwaatch',
+                  'kattv', 'mymoviego', 'mywatchepseries', 'naturalbd', 'odb', 'openloadmovie', 'plocker', 'primewire',
+                  'projectfreetv',
+                  'pubfilmonline', 'putlocker', 'putlockeronl', 'reddit', 'seehd', 'series9', 'seriesonline',
+                  'solarmoviefree', 'toonget',
+                  'tvbox', 'vidics', 'watchepisodes', 'watchfree1', 'watchseries', 'watchserieshd', '2ddl', '0day',
+                  '300mbdownload', '300mbfilms', 'bestmoviez',
+                  'ddlspot', 'directdl', 'ganool123', 'mvrls', 'rlsbb', 'scenerls', 'ultrahd', '111ys',
+                  '1337x', 'eztv', 'glodls', 'kickass2',
+                  'limetorrents', 'magnetdl', 'mkvcage', 'piratebay', 'skytorrents', 'torrentapi', 'torrentdownloads',
+                  'yifimovies', 'yifyddl', 'ytsam', 'zoogle']
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])
     control.openSettings(query, "script.module.openscrapers")
-

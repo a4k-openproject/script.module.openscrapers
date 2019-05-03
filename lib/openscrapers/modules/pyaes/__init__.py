@@ -48,5 +48,6 @@
 
 VERSION = [1, 3, 0]
 
-from .aes import AES, AESModeOfOperationCTR, AESModeOfOperationCBC, AESModeOfOperationCFB, AESModeOfOperationECB, AESModeOfOperationOFB, AESModesOfOperation, Counter
+from .aes import AES, AESModeOfOperationCTR, AESModeOfOperationCBC, AESModeOfOperationCFB, AESModeOfOperationECB, \
+    AESModeOfOperationOFB, AESModesOfOperation, Counter
 from .blockfeeder import decrypt_stream, Decrypter, encrypt_stream, Encrypter

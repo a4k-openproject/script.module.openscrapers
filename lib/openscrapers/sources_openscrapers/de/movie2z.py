@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -27,8 +27,8 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -40,7 +40,7 @@ class source:
         self.search_link = 'search-%s.html'
         self.get_link = 'redirect.php?a=m&id=%s'
 
-    def movie(self, imdb, title, localtitle, aliases, year):        
+    def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases))
             if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases))
@@ -51,7 +51,8 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases))
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases))
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
+                [tvshowtitle] + source_utils.aliases_to_array(aliases))
             return url
         except:
             return
@@ -95,7 +96,8 @@ class source:
                     valid, hoster = source_utils.is_host_valid(hoster, hostDict)
                     if not valid: continue
 
-                    sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False,
+                                    'debridonly': False})
 
             return sources
         except:

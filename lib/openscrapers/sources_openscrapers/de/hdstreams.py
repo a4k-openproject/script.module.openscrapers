@@ -9,29 +9,30 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.Blamo
 
+import base64
 import json
+import re
 import urllib
 import urlparse
-import re
-import base64
 
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):
@@ -43,7 +44,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
+                                                                    year)
             return urllib.urlencode({'url': url}) if url else None
         except:
             return
@@ -71,7 +73,7 @@ class source:
             year = year[0] if year else data['year']
 
             url = self.__search([localtvshowtitle] + aliases, year, season)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + aliases,year, season)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + aliases, year, season)
             if not url: return
 
             return urllib.urlencode({'url': url, 'episode': episode})
@@ -97,7 +99,8 @@ class source:
             b = dom_parser.parse_dom(r, 'img', attrs={'class': 'dgvaup'}, req='data-img')[0].attrs['data-img']
 
             if episode:
-                r = dom_parser.parse_dom(r, 'a', attrs={'class': 'btn-stream-ep', 'data-episode': episode}, req=['data-episode', 'data-server'])
+                r = dom_parser.parse_dom(r, 'a', attrs={'class': 'btn-stream-ep', 'data-episode': episode},
+                                         req=['data-episode', 'data-server'])
             else:
                 r = dom_parser.parse_dom(r, 'div', attrs={'id': 'lang-de'})
                 r = dom_parser.parse_dom(r, 'div', attrs={'class': 'movie'})
@@ -107,7 +110,8 @@ class source:
 
             for epi, server in r:
                 try:
-                    x = {'action': aj.get('load_episodes'), 'episode': epi, 'pid': aj.get('postid'), 'server': server, 'nonce': aj.get('nonce'), 'b': b}
+                    x = {'action': aj.get('load_episodes'), 'episode': epi, 'pid': aj.get('postid'), 'server': server,
+                         'nonce': aj.get('nonce'), 'b': b}
                     x = client.request(aj.get('ajax_url'), post=x, XHR=True, referer=url)
                     x = json.loads(x)
 
@@ -120,7 +124,9 @@ class source:
                     valid, host = source_utils.is_host_valid(u, hostDict)
                     if not valid: continue
 
-                    sources.append({'source': host, 'quality': q, 'language': 'de', 'url': u, 'direct': False, 'debridonly': False, 'checkquality': True})
+                    sources.append(
+                        {'source': host, 'quality': q, 'language': 'de', 'url': u, 'direct': False, 'debridonly': False,
+                         'checkquality': True})
                 except:
                     pass
 
@@ -138,7 +144,8 @@ class source:
             t = [cleantitle.get(i) for i in set(titles) if i]
             y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 
-            r = client.request(aj.get('ajax_url'), post={'action': aj.get('search'), 'nonce': aj.get('snonce'), 'query': cleantitle.query(titles[0])})
+            r = client.request(aj.get('ajax_url'), post={'action': aj.get('search'), 'nonce': aj.get('snonce'),
+                                                         'query': cleantitle.query(titles[0])})
 
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'search-result'})
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'search-item-content'})

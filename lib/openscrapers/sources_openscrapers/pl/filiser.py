@@ -1,18 +1,19 @@
 # -*- coding: UTF-8 -*-
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.blamo
 
-import urllib, urlparse
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -29,10 +30,10 @@ class source:
         self.search_link = 'szukaj?q=%s'
         self.episode_link = '-Season-%01d-Episode-%01d'
 
+    def check_titles(self, cleaned_titles, found_titles):
+        return cleaned_titles[0] == cleantitle.get(found_titles[0]) or cleaned_titles[1] == cleantitle.get(
+            found_titles[1])
 
-    def check_titles(self, cleaned_titles, found_titles):        
-        return cleaned_titles[0] == cleantitle.get(found_titles[0]) or cleaned_titles[1] == cleantitle.get(found_titles[1])    
-    
     def do_search(self, title, localtitle, year, is_movie_search):
         try:
             url = urlparse.urljoin(self.base_link, self.search_link)
@@ -44,7 +45,6 @@ class source:
             li_list = []
             for el in result:
                 li_list.extend(client.parseDOM(el, 'li'))
-            
 
             result = [(client.parseDOM(i, 'a', ret='href')[0],
                        client.parseDOM(i, 'div', attrs={'class': 'title'})[0],
@@ -53,7 +53,7 @@ class source:
                        ) for i in li_list]
 
             search_type = 'Film' if is_movie_search else 'Serial'
-            cleaned_titles = [cleantitle.get(title), cleantitle.get(localtitle)]                         
+            cleaned_titles = [cleantitle.get(title), cleantitle.get(localtitle)]
             # filter by name
             result = [x for x in result if self.check_titles(cleaned_titles, [x[2], x[1]])]
             # filter by type
@@ -66,7 +66,7 @@ class source:
             else:
                 return
 
-        except :
+        except:
             return
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -89,7 +89,7 @@ class source:
                 if e == int(episode):
                     return client.parseDOM(i, 'a', attrs={'class': 'episodeNum'}, ret='href')[0]
 
-        except :
+        except:
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -142,7 +142,9 @@ class source:
             elif quality.endswith('1080p'):
                 q = '1080p'
 
-            sources.append({'source': host, 'quality': q, 'language': lang, 'url': data_refs[i], 'info': info, 'direct': False, 'debridonly': False})
+            sources.append(
+                {'source': host, 'quality': q, 'language': lang, 'url': data_refs[i], 'info': info, 'direct': False,
+                 'debridonly': False})
 
         return sources
 
@@ -155,7 +157,7 @@ class source:
             begin = result.index(search_string) + len(search_string)
             end = result.index("'", begin)
 
-            result_url = result[begin:end]                                    
+            result_url = result[begin:end]
             result_url = result_url.replace('#WIDTH', '100')
             result_url = result_url.replace('#HEIGHT', '100')
             return result_url

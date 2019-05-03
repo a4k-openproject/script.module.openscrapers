@@ -23,15 +23,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
+import json
 import re
 import urllib
 import urlparse
-import json
+
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import dom_parser2
-from openscrapers.modules import client
-from openscrapers.modules import cfscrape
 
 
 class source:
@@ -96,7 +95,8 @@ class source:
                 url = {'url': i.attrs['href'], 'data-film': i.attrs['data-film'], 'data-server': i.attrs['data-server'],
                        'data-name': i.attrs['data-name']}
                 url = urllib.urlencode(url)
-                sources.append({'source': i.content, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                sources.append({'source': i.content, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                'debridonly': False})
 
             return sources
         except:
@@ -106,18 +106,21 @@ class source:
         try:
             urldata = urlparse.parse_qs(url)
             urldata = dict((i, urldata[i][0]) for i in urldata)
-            post = {'ipplugins': 1, 'ip_film': urldata['data-film'], 'ip_server': urldata['data-server'], 'ip_name': urldata['data-name'], 'fix': "0"}
-            p1 = self.scraper.get('http://123movieshubz.com/ip.file/swf/plugins/ipplugins.php', post=post, referer=urldata['url'], XHR=True).content
+            post = {'ipplugins': 1, 'ip_film': urldata['data-film'], 'ip_server': urldata['data-server'],
+                    'ip_name': urldata['data-name'], 'fix': "0"}
+            p1 = self.scraper.get('http://123movieshubz.com/ip.file/swf/plugins/ipplugins.php', post=post,
+                                  referer=urldata['url'], XHR=True).content
             p1 = json.loads(p1)
             p2 = self.scraper.get('http://123movieshubz.com/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' % (
-            p1['s'], urldata['data-server'])).content
+                p1['s'], urldata['data-server'])).content
             p2 = json.loads(p2)
-            p3 = self.scraper.get('http://123movieshubz.com/ip.file/swf/ipplayer/api.php?hash=%s' % (p2['hash'])).content
+            p3 = self.scraper.get(
+                'http://123movieshubz.com/ip.file/swf/ipplayer/api.php?hash=%s' % (p2['hash'])).content
             p3 = json.loads(p3)
             n = p3['status']
             if n == False:
                 p2 = self.scraper.get('http://123movieshubz.com/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=1' % (
-                p1['s'], urldata['data-server'])).content
+                    p1['s'], urldata['data-server'])).content
                 p2 = json.loads(p2)
             url = "https:%s" % p2["data"].replace("\/", "/")
             return url

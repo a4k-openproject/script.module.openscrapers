@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -27,8 +27,8 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -42,7 +42,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year, imdb)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year, imdb)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
+                                                                    year, imdb)
             return url
         except:
             return
@@ -50,7 +51,8 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year, imdb)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year, imdb)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
+                [tvshowtitle] + source_utils.aliases_to_array(aliases), year, imdb)
             return url
         except:
             return
@@ -83,7 +85,8 @@ class source:
             r = client.request(urlparse.urljoin(self.base_link, url))
             r = dom_parser.parse_dom(r, 'table', attrs={'class': 'stream_links'})
             r = dom_parser.parse_dom(r, 'tr')
-            r = [(dom_parser.parse_dom(i, 'td'), dom_parser.parse_dom(i, 'td', attrs={'class': 'hide-for-small-only'})) for i in r]
+            r = [(dom_parser.parse_dom(i, 'td'), dom_parser.parse_dom(i, 'td', attrs={'class': 'hide-for-small-only'}))
+                 for i in r]
             r = [(dom_parser.parse_dom(i[0][0], 'a', req='href'), i[1][0].content.lower()) for i in r if i[0] and i[1]]
             r = [(i[0][0].attrs['href'], i[1]) for i in r if i[0]]
 
@@ -91,7 +94,8 @@ class source:
                 valid, hoster = source_utils.is_host_valid(hoster, hostDict)
                 if not valid: continue
 
-                sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False, 'debridonly': False})
+                sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': link, 'direct': False,
+                                'debridonly': False})
 
             return sources
         except:
@@ -119,8 +123,10 @@ class source:
             r = client.request(query)
 
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'movie_cell'})
-            r = [(dom_parser.parse_dom(i, 'div', attrs={'class': 'bottom'}), dom_parser.parse_dom(i, 'div', attrs={'class': 'year'})) for i in r]
-            r = [(dom_parser.parse_dom(i[0], 'a', req=['href', 'title']), re.findall('[(](\d{4})[)]', i[1][0].content)) for i in r if i[0] and i[1]]
+            r = [(dom_parser.parse_dom(i, 'div', attrs={'class': 'bottom'}),
+                  dom_parser.parse_dom(i, 'div', attrs={'class': 'year'})) for i in r]
+            r = [(dom_parser.parse_dom(i[0], 'a', req=['href', 'title']), re.findall('[(](\d{4})[)]', i[1][0].content))
+                 for i in r if i[0] and i[1]]
             r = [(i[0][0].attrs['href'], i[0][0].content, i[1][0]) for i in r if i[0] and i[1]]
             r = [(i[0], i[1].lower(), i[2]) for i in r if i[2] in y]
             r = sorted(r, key=lambda i: int(i[2]), reverse=True)  # with year > no year

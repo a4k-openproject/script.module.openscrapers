@@ -25,13 +25,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib, urlparse, re
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
-
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -45,7 +46,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),year)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
+                                                                    year)
             return url
         except:
             return
@@ -54,7 +56,8 @@ class source:
         try:
 
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
+                [tvshowtitle] + source_utils.aliases_to_array(aliases), year)
             return url
         except:
             return
@@ -88,13 +91,11 @@ class source:
             if (len(box_result) != 0):
                 sources = self.get_links_from_box(box_result, hostDict)
 
-            sources += self.get_from_main_player(r, sources,hostDict)
-
+            sources += self.get_from_main_player(r, sources, hostDict)
 
             return sources
         except:
             return sources
-
 
     def get_from_main_player(self, result, sources, hostDict):
         result_sources = []
@@ -104,26 +105,28 @@ class source:
         links = client.parseDOM(data, 'iframe', ret='src')
         r = client.parseDOM(result, 'a', attrs={'class': 'options'})
 
-
         for i in range(len(r)):
 
             item = r[i].split()
             host = item[-4]
             q = item[-3]
 
-            if 'Latino' in item[-1]: lang, info = 'es', 'LAT'
-            else: lang, info = 'es', None
+            if 'Latino' in item[-1]:
+                lang, info = 'es', 'LAT'
+            else:
+                lang, info = 'es', None
 
             url = links[i]
             if 'megapelistv' in url:
-                url = client.request(url.replace('https://www.','http://'))
+                url = client.request(url.replace('https://www.', 'http://'))
                 url = client.parseDOM(url, 'a', ret='href')[0]
-            else: url = url
+            else:
+                url = url
             if (self.url_not_on_list(url, sources)):
                 valid, host = source_utils.is_host_valid(url, hostDict)
                 result_sources.append(
                     {'source': host, 'quality': q, 'language': lang, 'url': url, 'info': info, 'direct': False,
-                    'debridonly': False})
+                     'debridonly': False})
 
         return result_sources
 
@@ -135,23 +138,23 @@ class source:
 
             url = client.parseDOM(item, 'a', ret='href')[0]
 
-            url = client.request(url.replace('https://www.','http://'))
+            url = client.request(url.replace('https://www.', 'http://'))
 
             url = client.parseDOM(url, 'a', ret='href')[0]
 
-
             data = re.findall('<td>(.+?)</td>', item, re.DOTALL)
 
-            #lang_type = data[2].split()[1]
+            # lang_type = data[2].split()[1]
 
-            if 'HD' in data[1]: q = 'HD'
-            else: q = 'SD'
+            if 'HD' in data[1]:
+                q = 'HD'
+            else:
+                q = 'SD'
 
-            #host = re.findall('">(.+?)\.',data[0], re.DOTALL )[0]
+            # host = re.findall('">(.+?)\.',data[0], re.DOTALL )[0]
             valid, host = source_utils.is_host_valid(url, hostDict)
 
             lang, info = 'es', 'LAT'
-
 
             sources.append(
                 {'source': host, 'quality': q, 'language': lang, 'url': url, 'info': info, 'direct': False,
@@ -159,13 +162,11 @@ class source:
 
         return sources
 
-
     def url_not_on_list(self, url, sources):
         for el in sources:
             if el.get('url') == url:
                 return False
         return True
-
 
     def __search(self, titles, year):
         try:
@@ -193,7 +194,6 @@ class source:
             return
         except:
             return
-
 
     def resolve(self, url):
         return url

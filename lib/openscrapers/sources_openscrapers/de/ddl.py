@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -94,8 +94,12 @@ class source:
 
                 h_url = h_url if pcnt == 1 else 'stack://' + ' , '.join(jLinks)
 
-                try: sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'info' : '' if pcnt == 1 else 'multi-part', 'url': h_url, 'direct': False, 'debridonly': False})
-                except: pass
+                try:
+                    sources.append(
+                        {'source': hoster, 'quality': 'SD', 'language': 'de', 'info': '' if pcnt == 1 else 'multi-part',
+                         'url': h_url, 'direct': False, 'debridonly': False})
+                except:
+                    pass
 
             return sources
         except:

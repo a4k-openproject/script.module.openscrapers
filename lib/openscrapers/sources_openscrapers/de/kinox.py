@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -28,8 +28,8 @@ import urlparse
 
 from openscrapers.modules import cache
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -37,16 +37,16 @@ class source:
         self.priority = 1
         self.language = ['de']
         self.domains = ['kinox.to', 'kinox.ag', 'kinox.tv', 'kinox.me', 'kinox.am', 'kinox.nu', 'kinox.pe', 'kinox.sg']
-        self._base_link = None
+        self.base_link = None
         self.search_link = '/Search.html?q=%s'
         self.get_links_epi = '/aGET/MirrorByEpisode/?Addr=%s&SeriesID=%s&Season=%s&Episode=%s'
         self.mirror_link = '/aGET/Mirror/%s&Hoster=%s&Mirror=%s'
 
     @property
     def base_link(self):
-        if not self._base_link:
-            self._base_link = cache.get(self.__get_base_url, 120, 'http://%s' % self.domains[0])
-        return self._base_link
+        if not self.base_link:
+            self.base_link = cache.get(self.__get_base_url, 120, 'http://%s' % self.domains[0])
+        return self.base_link
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -113,8 +113,12 @@ class source:
                 for x in range(0, int(mirrors)):
                     url = self.mirror_link % (u['id'], u['Hoster'], x + 1)
                     if season and episode: url += "&Season=%s&Episode=%s" % (season, episode)
-                    try: sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False, 'debridonly': False})
-                    except: pass
+                    try:
+                        sources.append(
+                            {'source': hoster, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False,
+                             'debridonly': False})
+                    except:
+                        pass
 
             return sources
         except:
@@ -144,7 +148,8 @@ class source:
             r = client.request(urlparse.urljoin(self.base_link, self.search_link % imdb))
             r = dom_parser.parse_dom(r, 'table', attrs={'id': 'RsltTableStatic'})
             r = dom_parser.parse_dom(r, 'tr')
-            r = [(dom_parser.parse_dom(i, 'a', req='href'), dom_parser.parse_dom(i, 'img', attrs={'alt': 'language'}, req='src')) for i in r]
+            r = [(dom_parser.parse_dom(i, 'a', req='href'),
+                  dom_parser.parse_dom(i, 'img', attrs={'alt': 'language'}, req='src')) for i in r]
             r = [(i[0][0].attrs['href'], i[0][0].content, i[1][0].attrs['src']) for i in r if i[0] and i[1]]
             r = [(i[0], i[1], re.findall('.+?(\d+)\.', i[2])) for i in r]
             r = [(i[0], i[1], i[2][0] if len(i[2]) > 0 else '0') for i in r]

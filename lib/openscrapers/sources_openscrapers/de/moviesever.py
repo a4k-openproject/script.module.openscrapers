@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -28,9 +28,8 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import directstream
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -46,7 +45,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
+                                                                    year)
             return url
         except:
             return
@@ -65,12 +65,15 @@ class source:
             rels = dom_parser.parse_dom(r, 'nav', attrs={'class': 'player'})
             rels = dom_parser.parse_dom(rels, 'ul', attrs={'class': 'idTabs'})
             rels = dom_parser.parse_dom(rels, 'li')
-            rels = [(dom_parser.parse_dom(i, 'a', attrs={'class': 'options'}, req='href'), dom_parser.parse_dom(i, 'img', req='src')) for i in rels]
-            rels = [(i[0][0].attrs['href'][1:], re.findall('/flags/(\w+)\.png$', i[1][0].attrs['src'])) for i in rels if i[0] and i[1]]
+            rels = [(dom_parser.parse_dom(i, 'a', attrs={'class': 'options'}, req='href'),
+                     dom_parser.parse_dom(i, 'img', req='src')) for i in rels]
+            rels = [(i[0][0].attrs['href'][1:], re.findall('/flags/(\w+)\.png$', i[1][0].attrs['src'])) for i in rels if
+                    i[0] and i[1]]
             rels = [i[0] for i in rels if len(i[1]) > 0 and i[1][0].lower() == 'de']
 
             r = [dom_parser.parse_dom(r, 'div', attrs={'id': i}) for i in rels]
-            r = [(re.findall('link"?\s*:\s*"(.+?)"', ''.join([x.content for x in i])), dom_parser.parse_dom(i, 'iframe', attrs={'class': 'metaframe'}, req='src')) for i in r]
+            r = [(re.findall('link"?\s*:\s*"(.+?)"', ''.join([x.content for x in i])),
+                  dom_parser.parse_dom(i, 'iframe', attrs={'class': 'metaframe'}, req='src')) for i in r]
             r = [i[0][0] if i[0] else i[1][0].attrs['src'] for i in r if i[0] or i[1]]
 
             for i in r:
@@ -89,7 +92,9 @@ class source:
 
                     urls, host, direct = source_utils.check_directstreams(i, host)
 
-                    for x in urls: sources.append({'source': host, 'quality': x['quality'], 'language': 'de', 'url': x['url'], 'direct': direct, 'debridonly': False})
+                    for x in urls: sources.append(
+                        {'source': host, 'quality': x['quality'], 'language': 'de', 'url': x['url'], 'direct': direct,
+                         'debridonly': False})
                 except:
                     pass
 
@@ -105,8 +110,10 @@ class source:
         hash = hash.replace("!BeF", "R")
         hash = hash.replace("@jkp", "Ax")
         hash += '=' * (-len(hash) % 4)
-        try: return base64.b64decode(hash)
-        except: return
+        try:
+            return base64.b64decode(hash)
+        except:
+            return
 
     def __search(self, titles, year):
         try:
@@ -119,7 +126,8 @@ class source:
             r = client.request(query)
 
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'details'})
-            r = [(dom_parser.parse_dom(i, 'div', attrs={'class': 'title'}), dom_parser.parse_dom(i, 'span', attrs={'class': 'year'})) for i in r]
+            r = [(dom_parser.parse_dom(i, 'div', attrs={'class': 'title'}),
+                  dom_parser.parse_dom(i, 'span', attrs={'class': 'year'})) for i in r]
             r = [(dom_parser.parse_dom(i[0][0], 'a', req='href'), i[1][0].content) for i in r if i[0] and i[1]]
             r = [(i[0][0].attrs['href'], client.replaceHTMLCodes(i[0][0].content), i[1]) for i in r if i[0]]
             r = sorted(r, key=lambda i: int(i[2]), reverse=True)  # with year > no year

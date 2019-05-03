@@ -25,8 +25,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re, requests
+import re
 
+import requests
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 
@@ -66,7 +67,8 @@ class source:
         try:
             sources = []
             quality = source_utils.check_url(url)
-            sources.append({'source': 'Direct', 'quality': quality, 'language': 'en', 'url': url, 'direct': True, 'debridonly': False})
+            sources.append({'source': 'Direct', 'quality': quality, 'language': 'en', 'url': url, 'direct': True,
+                            'debridonly': False})
             return sources
         except:
             return

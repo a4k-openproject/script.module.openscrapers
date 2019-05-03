@@ -16,38 +16,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Addon Name: OpenScrapers Module
-# Addon id: script.module.openscrapers
-
 from openscrapers.modules import log_utils
-from openscrapers.modules import control
 
 try:
     import resolveurl
-    debrid_resolvers = [resolver() for resolver in resolveurl.relevant_resolvers(order_matters=True) if resolver.isUniversal()]
+
+    debrid_resolvers = [resolver() for resolver in resolveurl.relevant_resolvers(order_matters=True) if
+                        resolver.isUniversal()]
     if len(debrid_resolvers) == 0:
         # Support Rapidgator accounts! Unfortunately, `sources.py` assumes that rapidgator.net is only ever
         # accessed via a debrid service, so we add rapidgator as a debrid resolver and everything just works.
         # As a bonus(?), rapidgator links will be highlighted just like actual debrid links
-        debrid_resolvers = [resolver() for resolver in resolveurl.relevant_resolvers(order_matters=True,include_universal=False) if 'rapidgator.net' in resolver.domains]
+        debrid_resolvers = [resolver() for resolver in
+                            resolveurl.relevant_resolvers(order_matters=True, include_universal=False) if
+                            'rapidgator.net' in resolver.domains]
 except:
     debrid_resolvers = []
 
 
-def status(torrent=False):
+def status():
     try:
         import xbmc
-        debrid_check = debrid_resolvers != []
-        if debrid_check is True:
-            if torrent:
-                enabled = control.setting('torrent.enabled')
-                if enabled == '' or enabled.lower() == 'true':
-                    return True
-                else:
-                    return False
-        return debrid_check
     except:
         return True
+    debrid_check = debrid_resolvers != []
+    return debrid_check
+
 
 def resolver(url, debrid):
     try:

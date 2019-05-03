@@ -19,11 +19,11 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cache
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -31,14 +31,9 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['movie4k.is']
-        self._base_link = 'https://movie4kto.st/'
+        self.base_link = 'https://movie4kto.st/'
         self.search_link = '/movies.php?list=search&search=%s'
-
-    @property
-    def base_link(self):
-        if not self._base_link:
-            self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
-        return self._base_link
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -57,7 +52,7 @@ class source:
 
             url = urlparse.urljoin(self.base_link, url)
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
             r = r.replace('\\"', '"')
 
             links = dom_parser.parse_dom(r, 'tr', attrs={'id': 'tablemoviesindex2'})
@@ -76,7 +71,8 @@ class source:
                     url = urlparse.urljoin(self.base_link, url)
                     url = url.encode('utf-8')
 
-                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
                 except:
                     pass
 
@@ -88,7 +84,7 @@ class source:
         try:
             h = urlparse.urlparse(url.strip().lower()).netloc
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
             r = r.rsplit('"underplayer"')[0].rsplit("'underplayer'")[0]
 
             u = re.findall('\'(.+?)\'', r) + re.findall('\"(.+?)\"', r)
@@ -108,15 +104,19 @@ class source:
             t = [cleantitle.get(i) for i in set(titles) if i]
             y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 
-            r = client.request(q)
+            r = self.scraper.get(q).content
 
             r = dom_parser.parse_dom(r, 'tr', attrs={'id': re.compile('coverPreview.+?')})
-            r = [(dom_parser.parse_dom(i, 'a', req='href'), dom_parser.parse_dom(i, 'div', attrs={'style': re.compile('.+?')}), dom_parser.parse_dom(i, 'img', req='src')) for i in r]
+            r = [(dom_parser.parse_dom(i, 'a', req='href'),
+                  dom_parser.parse_dom(i, 'div', attrs={'style': re.compile('.+?')}),
+                  dom_parser.parse_dom(i, 'img', req='src')) for i in r]
             r = [(i[0][0].attrs['href'].strip(), i[0][0].content.strip(), i[1], i[2]) for i in r if i[0] and i[2]]
-            r = [(i[0], i[1], [x.content for x in i[2] if x.content.isdigit() and len(x.content) == 4], i[3]) for i in r]
+            r = [(i[0], i[1], [x.content for x in i[2] if x.content.isdigit() and len(x.content) == 4], i[3]) for i in
+                 r]
             r = [(i[0], i[1], i[2][0] if i[2] else '0', i[3]) for i in r]
             r = [i for i in r if any('us_flag' in x.attrs['src'] for x in i[3])]
-            r = [(i[0], i[1], i[2], [re.findall('(\d+)', x.attrs['src']) for x in i[3] if 'smileys' in x.attrs['src']]) for i in r]
+            r = [(i[0], i[1], i[2], [re.findall('(\d+)', x.attrs['src']) for x in i[3] if 'smileys' in x.attrs['src']])
+                 for i in r]
             r = [(i[0], i[1], i[2], [x[0] for x in i[3] if x]) for i in r]
             r = [(i[0], i[1], i[2], int(i[3][0]) if i[3] else 0) for i in r]
             r = sorted(r, key=lambda x: x[3])[::-1]
@@ -136,7 +136,7 @@ class source:
             for i in match2[:5]:
                 try:
                     if match: url = match[0]; break
-                    r = client.request(urlparse.urljoin(self.base_link, i))
+                    r = self.scraper.get.get(urlparse.urljoin(self.base_link, i)).content
                     r = re.findall('(tt\d+)', r)
                     if imdb in r: url = i; break
                 except:
@@ -151,7 +151,7 @@ class source:
             for domain in self.domains:
                 try:
                     url = 'http://%s' % domain
-                    r = client.request(url, limit=1, timeout='10')
+                    r = self.scraper.get(url, limit=1, timeout='10').content
                     r = dom_parser.parse_dom(r, 'meta', attrs={'name': 'author'}, req='content')
                     if r and 'movie4k.to' in r[0].attrs.get('content').lower():
                         return url

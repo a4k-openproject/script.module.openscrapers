@@ -29,10 +29,16 @@ import json
 import re
 import traceback
 import urllib
-
 import urlparse
-from openscrapers.modules import cfscrape, cleantitle, client, directstream, \
-    dom_parser, jsunfuck, log_utils, source_utils
+
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import directstream
+from openscrapers.modules import dom_parser
+from openscrapers.modules import jsunfuck
+from openscrapers.modules import log_utils
+from openscrapers.modules import source_utils
 
 CODE = '''def retA():
     class Infix:
@@ -274,7 +280,7 @@ class source:
 
             vGlobals = {"__builtins__": None, '__name__': __name__, 'str': str, 'Exception': Exception}
             vLocals = {'param': None}
-            exec (CODE % script.replace('+', '|x|'), vGlobals, vLocals)
+            exec(CODE % script.replace('+', '|x|'), vGlobals, vLocals)
             data = vLocals['param'].decode('string_escape')
             x = re.search('''_x=['"]([^"']+)''', data).group(1)
             y = re.search('''_y=['"]([^"']+)''', data).group(1)

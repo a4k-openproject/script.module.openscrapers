@@ -9,25 +9,29 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @tantrumdev wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @tantrumdev wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # -Cleaned and Checked on 10-27-2018 by JewBMX
 
-import re,urllib,urlparse,hashlib,random,string,json,base64,sys,time
+import base64
+import json
+import re
+import time
+import urllib
+import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import cache
 from openscrapers.modules import directstream
 from openscrapers.modules import jsunfuck
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
 
 CODE = '''def retA():
     class Infix:
@@ -50,18 +54,20 @@ CODE = '''def retA():
     return %s
 param = retA()'''
 
+
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['solarmoviez.ru','solarmovie.mrunlock.pw']
-        self.base_link = 'https://solarmoviez.ru'
+        self.domains = ['solarmoviez.ru', 'solarmovie.mrunlock.pw']
+        self.base_link = 'https://solarmovie.to'
         self.search_link = '/movie/search/%s.html'
         self.info_link = '/ajax/movie_get_info/%s.html'
         self.server_link = '/ajax/v4_movie_episodes/%s'
         self.embed_link = '/ajax/movie_embed/%s'
         self.token_link = '/ajax/movie_token?eid=%s&mid=%s&_=%s'
         self.source_link = '/ajax/movie_sources/%s?x=%s&y=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def matchAlias(self, title, aliases):
         try:
@@ -89,7 +95,6 @@ class source:
         except:
             return
 
-
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if url == None: return
@@ -106,7 +111,7 @@ class source:
             title = cleantitle.normalize(title)
             search = '%s Season %01d' % (title, int(season))
             url = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.getsearch(search)))
-            r = self.s.get(url, headers=headers).content
+            r = self.scraper.get(url, headers=headers).content
             r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
             r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
             r = [(i[0], i[1], re.findall('(.*?)\s+-\s+Season\s+(\d)', i[1])) for i in r]
@@ -120,27 +125,28 @@ class source:
         try:
             title = cleantitle.normalize(title)
             url = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.getsearch(title)))
-            r = self.s.get(url, headers=headers).content
+            r = self.scraper.get(url, headers=headers).content
             r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
             r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
             r = [(i[0], i[1], re.findall('(\d+)', i[0])[0]) for i in r]
             results = []
             for i in r:
                 try:
-                    info = client.request(urlparse.urljoin(self.base_link, self.info_link % i[2]), headers=headers, timeout='15')
+                    info = client.request(urlparse.urljoin(self.base_link, self.info_link % i[2]), headers=headers,
+                                          timeout='15')
                     y = re.findall('<div\s+class="jt-info">(\d{4})', info)[0]
                     if self.matchAlias(i[1], aliases) and (year == y):
                         url = i[0]
                         break
-                    #results.append([i[0], i[1], re.findall('<div\s+class="jt-info">(\d{4})', info)[0]])
+                    # results.append([i[0], i[1], re.findall('<div\s+class="jt-info">(\d{4})', info)[0]])
                 except:
                     url = None
                     pass
 
-            #try:
+            # try:
             #    r = [(i[0], i[1], i[2][0]) for i in results if len(i[2]) > 0]
             #    url = [i[0] for i in r if self.matchAlias(i[1], aliases) and (year == i[2])][0]
-            #except:
+            # except:
             #    url = None
             #    pass
 
@@ -159,11 +165,11 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             aliases = eval(data['aliases'])
-            mozhdr = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'}
+            mozhdr = {
+                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'}
             headers = mozhdr
             headers['X-Requested-With'] = 'XMLHttpRequest'
-            
-            self.s = cfscrape.create_scraper()
+
             if 'tvshowtitle' in data:
                 episode = int(data['episode'])
                 url = self.searchShow(data['tvshowtitle'], data['season'], aliases, headers)
@@ -173,15 +179,15 @@ class source:
 
             headers['Referer'] = url
             ref_url = url
-            mid = re.findall('-(\d*)\.',url)[0]
-            data = {'id':mid}
-            r = self.s.post(url, headers=headers)
+            mid = re.findall('-(\d*)\.', url)[0]
+            data = {'id': mid}
+            r = self.scraper.post(url, headers=headers)
             try:
                 u = urlparse.urljoin(self.base_link, self.server_link % mid)
-                r = self.s.get(u, headers=mozhdr).content
+                r = self.scraper.get(u, headers=mozhdr).content
                 r = json.loads(r)['html']
-                rl = client.parseDOM(r, 'div', attrs = {'class': 'pas-list'})
-                rh = client.parseDOM(r, 'div', attrs = {'class': 'pas-header'})
+                rl = client.parseDOM(r, 'div', attrs={'class': 'pas-list'})
+                rh = client.parseDOM(r, 'div', attrs={'class': 'pas-header'})
                 ids = client.parseDOM(rl, 'li', ret='data-id')
                 servers = client.parseDOM(rl, 'li', ret='data-server')
                 labels = client.parseDOM(rl, 'a', ret='title')
@@ -189,30 +195,32 @@ class source:
                 rrr = zip(client.parseDOM(rh, 'li', ret='data-id'), client.parseDOM(rh, 'li', ret='class'))
                 types = {}
                 for rr in rrr:
-                    types[rr[0]] = rr[1] 
-                               
+                    types[rr[0]] = rr[1]
+
                 for eid in r:
                     try:
                         try:
-                            ep = re.findall('episode.*?(\d+).*?',eid[2].lower())[0]
+                            ep = re.findall('episode.*?(\d+).*?', eid[2].lower())[0]
                         except:
                             ep = 0
                         if (episode == 0) or (int(ep) == episode):
-                            t = str(int(time.time()*1000))
+                            t = str(int(time.time() * 1000))
                             quali = source_utils.get_release_quality(eid[2])[0]
                             if 'embed' in types[eid[1]]:
                                 url = urlparse.urljoin(self.base_link, self.embed_link % (eid[0]))
-                                xml = self.s.get(url, headers=headers).content
+                                xml = self.scraperget(url, headers=headers).content
                                 url = json.loads(xml)['src']
                                 valid, hoster = source_utils.is_host_valid(url, hostDict)
                                 if not valid: continue
                                 q = source_utils.check_sd_url(url)
                                 q = q if q != 'SD' else quali
-                                sources.append({'source': hoster, 'quality': q, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False })
+                                sources.append(
+                                    {'source': hoster, 'quality': q, 'language': 'en', 'url': url, 'direct': False,
+                                     'debridonly': False})
                                 continue
                             else:
                                 url = urlparse.urljoin(self.base_link, self.token_link % (eid[0], mid, t))
-                            script = self.s.get(url, headers=headers).content
+                            script = self.scraper.get(url, headers=headers).content
                             if '$_$' in script:
                                 params = self.uncensored1(script)
                             elif script.startswith('[]') and script.endswith('()'):
@@ -227,7 +235,7 @@ class source:
                             length = 0
                             count = 0
                             while length == 0 and count < 11:
-                                r = self.s.get(u, headers=headers).text
+                                r = self.scraper.get(u, headers=headers).text
                                 length = len(r)
                                 if length == 0: count += 1
                             uri = None
@@ -239,18 +247,20 @@ class source:
                                     uri = [uri['file']]
                                 except:
                                     continue
-                            
+
                             for url in uri:
                                 if 'googleapis' in url:
                                     q = source_utils.check_sd_url(url)
-                                    sources.append({'source': 'gvideo', 'quality': q, 'language': 'en', 'url': url, 'direct': True, 'debridonly': False})
+                                    sources.append(
+                                        {'source': 'gvideo', 'quality': q, 'language': 'en', 'url': url, 'direct': True,
+                                         'debridonly': False})
                                     continue
 
                                 valid, hoster = source_utils.is_host_valid(url, hostDict)
-                                #urls, host, direct = source_utils.check_directstreams(url, hoster)
-                                q = quali                        
+                                # urls, host, direct = source_utils.check_directstreams(url, hoster)
+                                q = quali
                                 if valid:
-                                    #for z in urls:
+                                    # for z in urls:
                                     if hoster == 'gvideo':
                                         direct = True
                                         try:
@@ -258,10 +268,15 @@ class source:
                                         except:
                                             pass
                                         url = directstream.google(url, ref=ref_url)
-                                    else: direct = False
-                                    sources.append({'source': hoster, 'quality': q, 'language': 'en', 'url': url, 'direct': direct, 'debridonly': False})                             
+                                    else:
+                                        direct = False
+                                    sources.append(
+                                        {'source': hoster, 'quality': q, 'language': 'en', 'url': url, 'direct': direct,
+                                         'debridonly': False})
                                 else:
-                                    sources.append({'source': 'CDN', 'quality': q, 'language': 'en', 'url': url, 'direct': True, 'debridonly': False})
+                                    sources.append(
+                                        {'source': 'CDN', 'quality': q, 'language': 'en', 'url': url, 'direct': True,
+                                         'debridonly': False})
                     except:
                         pass
             except:
@@ -285,7 +300,8 @@ class source:
             return
 
     def uncensored(a, b):
-        x = '' ; i = 0
+        x = '';
+        i = 0
         for i, y in enumerate(a):
             z = b[i % len(b) - 1]
             y = int(ord(str(y)[0])) + int(ord(str(z)[0]))
@@ -305,7 +321,7 @@ class source:
 
             vGlobals = {"__builtins__": None, '__name__': __name__, 'str': str, 'Exception': Exception}
             vLocals = {'param': None}
-            exec (CODE % script.replace('+', '|x|'), vGlobals, vLocals)
+            exec(CODE % script.replace('+', '|x|'), vGlobals, vLocals)
             data = vLocals['param'].decode('string_escape')
             x = re.search('''_x=['"]([^"']+)''', data).group(1)
             y = re.search('''_y=['"]([^"']+)''', data).group(1)

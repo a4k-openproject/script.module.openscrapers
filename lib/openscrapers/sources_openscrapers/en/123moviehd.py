@@ -23,8 +23,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re, requests
+import re
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 
@@ -36,6 +37,7 @@ class source:
         self.domains = ['123moviehd.cc']
         self.base_link = 'https://123moviehd.cc'
         self.search_link = '/%s-%s/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -49,7 +51,7 @@ class source:
         try:
             sources = []
             hostDict = hostprDict + hostDict
-            r = requests.get(url).content
+            r = self.scraper.get(url).content
             try:
                 qual = re.compile('class="quality">(.+?)<').findall(r)
                 for i in qual:
@@ -62,7 +64,8 @@ class source:
                     if 'youtube' in url:
                         continue
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
             except:
                 return
         except Exception:

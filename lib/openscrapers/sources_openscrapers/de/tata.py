@@ -9,29 +9,30 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.Blamo
 
+import base64
 import json
 import re
 import urllib
 import urlparse
-import base64
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):
@@ -51,7 +52,8 @@ class source:
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
-            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'aliases': aliases, 'year': year}
+            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle,
+                   'aliases': aliases, 'year': year}
             url = urllib.urlencode(url)
             return url
         except:
@@ -99,16 +101,23 @@ class source:
                 base_url = re.sub('index\.m3u8\?token=[\w\-]+[^/$]*', '', result)
 
                 r = client.request(result, headers=headers)
-                r = [(i[0], i[1]) for i in re.findall('#EXT-X-STREAM-INF:.*?RESOLUTION=\d+x(\d+)[^\n]+\n([^\n]+)', r, re.DOTALL) if i]
+                r = [(i[0], i[1]) for i in
+                     re.findall('#EXT-X-STREAM-INF:.*?RESOLUTION=\d+x(\d+)[^\n]+\n([^\n]+)', r, re.DOTALL) if i]
                 r = [(source_utils.label_to_quality(i[0]), i[1] + source_utils.append_headers(headers)) for i in r]
-                r = [{'quality': i[0], 'url': base_url+i[1]} for i in r]
-                for i in r: sources.append({'source': 'CDN', 'quality': i['quality'], 'language': 'de', 'url': i['url'], 'direct': True, 'debridonly': False})
+                r = [{'quality': i[0], 'url': base_url + i[1]} for i in r]
+                for i in r: sources.append(
+                    {'source': 'CDN', 'quality': i['quality'], 'language': 'de', 'url': i['url'], 'direct': True,
+                     'debridonly': False})
             elif result:
                 result = [i.get('link_mp4') for i in result]
                 result = [i for i in result if i]
                 for i in result:
-                    try: sources.append({'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'], 'language': 'de', 'url': i, 'direct': True, 'debridonly': False})
-                    except: pass
+                    try:
+                        sources.append(
+                            {'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'], 'language': 'de',
+                             'url': i, 'direct': True, 'debridonly': False})
+                    except:
+                        pass
 
             return sources
         except:
@@ -127,8 +136,10 @@ class source:
 
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'container'})
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 'ml-item-content'})
-            r = [(dom_parser.parse_dom(i, 'a', attrs={'class': 'ml-image'}, req='href'), dom_parser.parse_dom(i, 'ul', attrs={'class': 'item-params'})) for i in r]
-            r = [(i[0][0].attrs['href'], re.findall('calendar.+?>.+?(\d{4})', ''.join([x.content for x in i[1]]))) for i in r if i[0] and i[1]]
+            r = [(dom_parser.parse_dom(i, 'a', attrs={'class': 'ml-image'}, req='href'),
+                  dom_parser.parse_dom(i, 'ul', attrs={'class': 'item-params'})) for i in r]
+            r = [(i[0][0].attrs['href'], re.findall('calendar.+?>.+?(\d{4})', ''.join([x.content for x in i[1]]))) for i
+                 in r if i[0] and i[1]]
             r = [(i[0], i[1][0] if len(i[1]) > 0 else '0') for i in r]
             r = sorted(r, key=lambda i: int(i[1]), reverse=True)  # with year > no year
             r = [i[0] for i in r if i[1] in y][0]
@@ -155,12 +166,15 @@ class source:
                 _url = dom_parser.parse_dom(i, 'a', attrs={'class': 'ml-image'}, req='href')[0].attrs['href']
 
                 _title = re.sub('<.+?>|</.+?>', '', dom_parser.parse_dom(i, 'h6')[0].content).strip()
-                try: _title = re.search('(.*?)\s(?:staf+el|s)\s*(\d+)', _title, re.I).group(1)
-                except: pass
+                try:
+                    _title = re.search('(.*?)\s(?:staf+el|s)\s*(\d+)', _title, re.I).group(1)
+                except:
+                    pass
 
                 _season = '0'
 
-                _year = re.findall('calendar.+?>.+?(\d{4})', ''.join([x.content for x in dom_parser.parse_dom(i, 'ul', attrs={'class': 'item-params'})]))
+                _year = re.findall('calendar.+?>.+?(\d{4})', ''.join(
+                    [x.content for x in dom_parser.parse_dom(i, 'ul', attrs={'class': 'item-params'})]))
                 _year = _year[0] if len(_year) > 0 else '0'
 
                 if season > 0:
