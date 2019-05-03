@@ -106,7 +106,7 @@ class source:
             if 'tvshowtitle' in data:
                 ep = data['episode']
                 url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (
-                self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
+                    self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
                 r = client.request(url, headers=headers, timeout='10', output='geturl')
 
                 if url == None:
