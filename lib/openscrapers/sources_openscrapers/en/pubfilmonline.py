@@ -63,7 +63,7 @@ class source:
             # Go over search results and find their sources
             for result_link in result_links:
                 html = scraper.get(result_link).content
-                soup = BeautifulSoup(html)
+                soup = BeautifulSoup(html, "html.parser")
                 javascripts = soup.findAll("script", {"type": "text/javascript"})
                 # Lets keep going until we find the one we need
                 ids_b64s = []
