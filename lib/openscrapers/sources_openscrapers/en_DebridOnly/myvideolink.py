@@ -27,6 +27,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -38,8 +39,9 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['myvideolinks.net', 'iwantmyshow.tk']
-        self.base_link = 'http://myvideolinks.net/'
+        self.base_link = 'http://myvideolinks.net'
         self.search_link = '/?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -71,24 +73,26 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None: return sources
-            if debrid.status() == False: raise Exception()
+            if url is None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (
                 data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+                int(data['episode'])) if 'tvshowtitle' in data else '%s' % (data['imdb'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-            s = client.request(self.base_link)
+            s = self.scraper.get(self.base_link).content
             s = re.findall('\'(http.+?)\'', s) + re.findall('\"(http.+?)\"', s)
             s = [i for i in s if urlparse.urlparse(self.base_link).netloc in i and len(i.strip('/').split('/')) > 3]
             s = s[0] if s else urlparse.urljoin(self.base_link, 'vv')
             s = s.strip('/')
             url = s + self.search_link % urllib.quote_plus(query)
-            r = client.request(url)
+            r = self.scraper.get(url).content
             r = client.parseDOM(r, 'h2')
             l = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
             r = [(i[0], i[1], re.sub('(\.|\(|\[|\s)(\d{4}|3D)(\.|\)|\]|\s|)(.+|)', '', i[1]),
@@ -108,22 +112,30 @@ class source:
             for post in posts:
                 try:
                     t = post[0]
-                    u = client.request(post[1])
+                    u = self.scraper.get(post[1]).content
                     u = re.findall('"(http.+?)"', u) + re.findall('"(http.+?)"', u)
                     u = [i for i in u if not '/embed/' in i]
                     u = [i for i in u if not 'youtube' in i]
                     items += [(t, i) for i in u]
                 except:
                     pass
+
+            seen_urls = set()
             for item in items:
                 try:
                     name = item[0]
                     name = client.replaceHTMLCodes(name)
                     t = re.sub('(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*|3D)(\.|\)|\]|\s|)(.+|)', '', name)
-                    if not cleantitle.get(t) == cleantitle.get(title): raise Exception()
+                    if not cleantitle.get(t) == cleantitle.get(title):
+                        raise Exception()
                     y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', name)[-1].upper()
-                    if not y == hdlr: raise Exception()
+                    if not y == hdlr:
+                        raise Exception()
                     url = item[1]
+
+                    if url in seen_urls:
+                        continue
+                    seen_urls.add(url)
 
                     quality, info = source_utils.get_release_quality(url, name)
                     try:
@@ -147,7 +159,8 @@ class source:
                 except:
                     pass
             check = [i for i in sources if not i['quality'] == 'CAM']
-            if check: sources = check
+            if check:
+                sources = check
             return sources
         except:
             return
