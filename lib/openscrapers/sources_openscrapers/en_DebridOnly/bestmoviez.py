@@ -38,7 +38,7 @@ class source:
         self.domains = ['best-moviez.ws']
         self.base_link = 'http://www.best-moviez.ws'
         self.search_link = '/%s'
-        self.scraper = cfscrape.create()
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -79,14 +79,10 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-            title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
-            hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-
             query = '%s s%02de%02d' % (
                 data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+                int(data['episode'])) if 'tvshowtitle' in data else '%s' % (
+                data['title'])
             query = re.sub('[\\\\:;*?"<>|/ \+\']+', '-', query)
 
             url = self.search_link % urllib.quote_plus(query)
@@ -96,8 +92,6 @@ class source:
             r = client.parseDOM(r, "div", attrs={'class': 'entry-content'})[0]
             r = re.sub('shareaholic-canvas.+', '', r, flags=re.DOTALL)
 
-            a_txt = ''
-            a_url = ''
             a_txt = client.parseDOM(r, "a", attrs={'href': '.+?'})
             a_url = client.parseDOM(r, "a", ret="href")
             r = re.sub('<a .+?</a>', '', r, flags=re.DOTALL)
