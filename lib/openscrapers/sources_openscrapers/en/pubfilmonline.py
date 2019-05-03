@@ -53,7 +53,7 @@ class source:
             url = urlparse.urljoin(self.base_link, searchlink)
 
             html = self.scraper.get(url).content  # Get the HTML for the page
-            soup = BeautifulSoup(html)
+            soup = BeautifulSoup(html, "html.parser")
             # Find all search results and add to array
             results = soup.findAll("div", {"class": "result-item"})
             result_links = []
