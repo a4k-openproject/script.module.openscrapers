@@ -24,8 +24,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib, urlparse, re
+import re
+import urllib
+import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -36,9 +39,9 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['filmxy.me']
-        self.base_link = 'https://www.filmxy.one/'
+        self.base_link = 'https://www.filmxy.ws/'
         self.search_link = 'search/%s/feed/rss2/'
-        self.post = 'https://cdn.filmxy.one/asset/json/posts.json'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -60,11 +63,10 @@ class source:
             tit = cleantitle.geturl(title + ' ' + year)
             query = urlparse.urljoin(self.base_link, tit)
 
-           
-            r = client.request(query, referer=self.base_link, redirect=True)
+            r = self.scraper.get(query, referer=self.base_link, redirect=True).content
             if not data['imdb'] in r:
                 return sources
-       
+
             links = []
 
             try:

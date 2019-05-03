@@ -1,4 +1,12 @@
 OpenScrapers Module Changelog:
+0.0.1.2
+- Module fixes
+- cfscrape update
+- Code reformatting
+- optimized imports
+- scraper updates
+- dead scrapers moved
+
 0.0.1.0
 - Module import line fixes
 

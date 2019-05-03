@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -22,10 +22,15 @@
 # Addon Provider: Mr.Blamo
 
 
-import re,urllib,urlparse,json
+import json
+import re
+import urllib
+import urlparse
+
 from openscrapers.modules import client
 from openscrapers.modules import control
 from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):
@@ -42,7 +47,8 @@ class source:
         self.api = control.setting('pron.api')
         self.debrid = control.setting('pron.download')
         if self.debrid == 'true': self.types = ['stream', 'download']
-        self.extensions = ['mp4', 'mpg', 'mpeg', 'mp2', 'm4v', 'm2v', 'mkv', 'avi', 'flv', 'asf', '3gp', '3g2', 'wmv', 'mov', 'qt', 'webm', 'vob', '']
+        self.extensions = ['mp4', 'mpg', 'mpeg', 'mp2', 'm4v', 'm2v', 'mkv', 'avi', 'flv', 'asf', '3gp', '3g2', 'wmv',
+                           'mov', 'qt', 'webm', 'vob', '']
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -97,7 +103,7 @@ class source:
 
             hostDict = hostprDict + hostDict
 
-            iterations = self.streamLimit/self.streamIncrease
+            iterations = self.streamLimit / self.streamIncrease
             last = self.streamLimit - (iterations * self.streamIncrease)
             if not last:
                 iterations = iterations - 1
@@ -116,7 +122,7 @@ class source:
                     results = client.request(urlNew)
                     results = json.loads(results)
 
-                    apistatus  = results['status']
+                    apistatus = results['status']
                     if apistatus != 'success': break
 
                     results = results['result']
@@ -142,7 +148,9 @@ class source:
                         info.append(jsonName)
                         info = '|'.join(info)
 
-                        sources.append({'source' : jsonHoster, 'quality':  quality, 'language' : jsonLanguage, 'url' : jsonLink, 'info': info, 'direct' : False, 'debridonly' : False})
+                        sources.append(
+                            {'source': jsonHoster, 'quality': quality, 'language': jsonLanguage, 'url': jsonLink,
+                             'info': info, 'direct': False, 'debridonly': False})
                         added = True
 
                     if not added:
@@ -153,7 +161,7 @@ class source:
             return sources
 
     def resolve(self, url):
-      return url
+        return url
 
     def extensionValid(self, extension):
         extension = extension.replace('.', '').replace(' ', '').lower()

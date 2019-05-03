@@ -1,11 +1,20 @@
+import json
 import os
+import random
 import sys
 import threading
 import time
-import urllib
-import json
+import traceback
+
 import requests
-import random
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 sys.path.append(os.path.join(os.path.curdir, 'lib'))
 
@@ -14,7 +23,7 @@ arguments = {}
 for i in sys.argv:
     try:
         i = i.split('=')
-        arguments.update({i[0]:i[1]})
+        arguments.update({i[0]: i[1]})
     except:
         pass
 
@@ -49,7 +58,7 @@ print('Running %s tests' % no_tests)
 # Test information
 movie_meta = []
 episode_meta = []
-trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664' # Soz Not Soz ExodusRedux
+trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664'  # Soz Not Soz ExodusRedux
 
 trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % no_tests
 trakt_shows_url = 'https://api.trakt.tv/shows/popular?extended=full&limit=%s' % no_tests
@@ -75,10 +84,9 @@ else:
     resp = json.loads(resp.text)
 
     for show in resp:
-
         episodes = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
         episodes = json.loads(episodes.text)
-        episodes = [episode for season in episodes for episode in season['episodes']]
+        episodes = [episode for season in episodes for episode in season['episodes'] if season['number'] != 0]
         random.shuffle(episodes)
         episode = episodes[0]
         print('Adding Episode: %s - S%sE%s' % (show['title'], episode['season'], episode['number']))
@@ -87,7 +95,6 @@ else:
                              'year': show['year'], 'imdb': episode['ids']['imdb'], 'tvdb': episode['ids']['tvdb'],
                              'title': episode['title'], 'premiered': '', 'season': episode['season'],
                              'episode': episode['number']})
-
 
 RUNNING_PROVIDERS = []
 TOTAL_SOURCES = []
@@ -113,6 +120,37 @@ hosts = [u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'thevide
          u'clicknupload.me', u'userscloud.com', u'ulozto.net', u'easybytez.com']
 
 
+def domain_analysis(domain_name):
+    result = {'domain_status': 'None', 'domain_protocol': '', 'domain_name': '', 'domain_http_enabled': '',
+              'cloudflare_enabled': '', 'cloudflare_captcha_enabled': '', 'cloudflare_antibot_enabled': ''}
+    try:
+        resp = requests.get(domain_name)
+        result['domain_status'] = resp.status_code
+        parsed_url = urlparse(resp.url)
+        cookie_domain = None
+
+        result['domain_protocol'] = parsed_url.scheme
+        result['domain_name'] = parsed_url.netloc
+
+        for d in resp.cookies.list_domains():
+            if d.startswith(".") and d in ("." + parsed_url.netloc):
+                cookie_domain = d
+                break
+
+        cloudflare_cookie = resp.cookies.get("__cfduid", "", domain=cookie_domain)
+        result['cloudflare_enabled'] = cloudflare_cookie is not None
+        if resp.headers.get('Server', '').startswith('cloudflare'):
+            if b'/cdn-cgi/l/chk_captcha' in resp.content:
+                result['cloudflare_captcha_enabled'] = True
+            elif resp.status_code == 503:
+                result['cloudflare_antibot_enabled'] = True
+
+        result['domain_status'] = resp.status_code
+    except Exception:
+        result['domain_status'] = 'Error'
+    return result
+
+
 def worker_thread(provider_name, provider_source):
     global RUNNING_PROVIDERS
     global TOTAL_SOURCES
@@ -122,30 +160,44 @@ def worker_thread(provider_name, provider_source):
     RUNNING_PROVIDERS.append(provider_name)
     try:
         # Confirm Provider contains the movie function
-        if not getattr(provider_source, test_mode, False):
-            RUNNING_PROVIDERS.remove(provider_name)
-            return
+        if getattr(provider_source, test_mode, False):
+            analysis = {}
 
-        if not getattr(provider_source, 'unit_test', False):
+            # Run analysis on the domains
+            if not hasattr(provider_source, 'base_link'):
+                print('Warning: provider %s is missing base_link property' % provider_name)
+            else:
+                analysis = domain_analysis(provider_source.base_link)
+
+                if analysis['domain_status'] is not 'Offline' \
+                        and not hasattr(provider_source, 'scraper') \
+                        and ('cloudflare_enabled' in analysis and analysis['cloudflare_enabled']):
+                    print('Warning: provider %s is missing a CF scraper but CF cookie is detected' % provider_name)
+
+            if hasattr(provider_source, 'base_link') \
+                    and (('domain_status' not in analysis) or (analysis['domain_status'] is 'Offline')):
+                print('Warning: Error while fetching domains for provider %s' % provider_name)
+
             if test_mode == 'movie':
                 test_objects = movie_meta
-            else:
+            elif test_mode == 'episode':
                 test_objects = episode_meta
+            else:
+                RUNNING_PROVIDERS.remove(provider_name)
+                return
 
             provider_results = []
             url = []
             start_time = time.time()
-            current_meta = {}
-            for i in test_objects:
-                if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE: break
 
-                print('')
-                print('%s: Now testing -> %s' % (provider_name.upper(), i))
-                print('')
+            for i in test_objects:
+                if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
+                    break
+
                 start_time = time.time()
                 if len(provider_results) != 0:
                     break
-                # Run movie Call
+                # Prepare test by fetching url
                 if test_mode == 'movie':
                     url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
                     if url is None:
@@ -157,14 +209,16 @@ def worker_thread(provider_name, provider_source):
                     if url is None:
                         continue
 
-                    url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'], i['season'],
+                    url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'],
+                                                  i['season'],
                                                   i['episode'])
                     if url is None:
                         continue
                 else:
-                    raise Exception('wrong test type dumbass')
+                    RUNNING_PROVIDERS.remove(provider_name)
+                    return
 
-                # Run source call
+                # Execute source method to gather urls
                 url = provider_source.sources(url, hosts, [])
                 if url is None:
                     continue
@@ -174,38 +228,21 @@ def worker_thread(provider_name, provider_source):
                         TOTAL_SOURCES += url
                     else:
                         continue
-            if url is None: url = []
+            if url is None:
+                url = []
             # Gather time analytics
             runtime = time.time() - start_time
-
-            PASSED_PROVIDERS.append((provider_name, url, runtime))
-        else:
-            start_time = time.time()
-            # Provider has unit test entry point, run provider with it
-            try:
-                unit_test = provider_source.unit_test('movie', hosts)
-            except Exception as e:
-                FAILED_PROVIDERS.append((provider_name, e))
-                return
-
-            if unit_test is None:
-                FAILED_PROVIDERS.append((provider_name, 'Unit Test Returned None'))
-                return
-            else:
-                TOTAL_SOURCES += unit_test
-
-            runtime = time.time() - start_time
-
-            PASSED_PROVIDERS.append((provider_name, unit_test, runtime))
-
-        RUNNING_PROVIDERS.remove(provider_name)
-
+            PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
     except Exception as e:
-        import traceback
         traceback.print_exc()
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         FAILED_PROVIDERS.append((provider_name, e))
+
+    try:
+        RUNNING_PROVIDERS.remove(provider_name)
+    except:
+        pass
 
 
 if __name__ == '__main__':
@@ -224,13 +261,12 @@ if __name__ == '__main__':
         time.sleep(1)
 
         while len(RUNNING_PROVIDERS) > 0:
-            if TIMEOUT_MODE:
-                if TOTAL_RUNTIME > TIMEOUT: break
+            if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
+                break
             print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
                                                   ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
-            TOTAL_RUNTIME +=1
-
+            TOTAL_RUNTIME += 1
     else:
         print('Please Select a provider:')
         for idx, provider in enumerate(PROVIDER_LIST):
@@ -278,9 +314,13 @@ if __name__ == '__main__':
         print('Total Sources: %s' % len(post_dup))
         print('Total Duplicates: %s' % total_duplicates)
         print('   ')
+        print('Sources quality:')
         print('#################')
-        print('Passed Providers:')
-
+        quality = {}
+        for i in TOTAL_SOURCES:
+            quality.update({i['quality']: quality[i['quality']] + 1 if i['quality'] in quality else 0})
+        for x in quality:
+            print('%s: %s Sources' % (x, quality[x]))
 
         base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
         output_filename = 'results-%s.csv' % time.time()
@@ -289,11 +329,13 @@ if __name__ == '__main__':
             os.makedirs(base_output_path)
 
         with open(os.path.join(base_output_path, output_filename), 'w+') as output:
-            output.write('Provider Name,Number Of Sources,Runtime\n')
+            output.write('Provider Name;Number Of Sources;Runtime;%s\n' %
+                         ';'.join(str(x) for x in PASSED_PROVIDERS[1][3].keys()))
             for i in PASSED_PROVIDERS:
                 try:
                     if i[1] is not None:
-                        output.write('%s,%s,%s\n' % (i[0], len(i[1]), i[2]))
+                        output.write('%s;%s;%s;%s\n' % (
+                            i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
                 except:
                     pass
 

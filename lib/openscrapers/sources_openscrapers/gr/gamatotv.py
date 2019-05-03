@@ -25,15 +25,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib, urlparse, re
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 from openscrapers.modules import trakt
-from openscrapers.modules import tvmaze
-
 
 
 class source:
@@ -47,7 +47,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),year)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
+                                                                    year)
             if not url: url = self.__search(self.search_link + trakt.getMovieTranslation(imdb, 'el'), year)
             return url
         except:
@@ -55,7 +56,7 @@ class source:
 
     def __search(self, titles, year):
         try:
-            query = self.search_link % (urllib.quote_plus(cleantitle.getsearch(titles[0]+' '+year)))
+            query = self.search_link % (urllib.quote_plus(cleantitle.getsearch(titles[0] + ' ' + year)))
 
             query = urlparse.urljoin(self.base_link, query)
 
@@ -100,7 +101,7 @@ class source:
                 if not valid: continue
 
                 sources.append({'source': host, 'quality': quality, 'language': lang, 'url': url, 'info': info,
-                                'direct':False,'debridonly': False})
+                                'direct': False, 'debridonly': False})
 
             return sources
         except:

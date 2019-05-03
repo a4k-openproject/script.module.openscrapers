@@ -26,8 +26,11 @@
 
 '''
 
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -40,6 +43,7 @@ class source:
         self.domains = ['www.ddlspot.com']
         self.base_link = 'http://www.ddlspot.com/'
         self.search_link = 'search/?q=%s&m=1&x=0&y=0'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -89,18 +93,17 @@ class source:
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url).replace('-', '+')
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
             if r == None and 'tvshowtitle' in data:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)
                 url = title
 
-                r = client.request(url)
+                r = self.scraper.get(url).content
 
-            for loopCount in range(0,2):
+            for loopCount in range(0, 2):
                 if loopCount == 1 or (r == None and 'tvshowtitle' in data):
-
-                    r = client.request(url)
+                    r = self.scraper.get(url).content
 
                 posts = client.parseDOM(r, "table", attrs={"class": "download"})
                 hostDict = hostprDict + hostDict
@@ -125,7 +128,7 @@ class source:
 
                     i = str(item)
                     i = self.base_link + i
-                    r = client.request(i)
+                    r = self.scraper.get(i).content
                     u = client.parseDOM(r, "div", attrs={"class": "dl-links"})
                     for t in u:
                         r = re.compile('a href=".+?" rel=".+?">(.+?)<').findall(t)
@@ -133,7 +136,9 @@ class source:
                             if any(x in url for x in ['.rar', '.zip', '.iso']): raise Exception()
                             quality, info = source_utils.get_release_quality(url)
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                 'direct': False, 'debridonly': True})
 
                 except:
                     pass

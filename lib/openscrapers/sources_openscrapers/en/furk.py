@@ -23,9 +23,12 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import requests, json, sys
-from openscrapers.modules import source_utils
+import json
+import sys
+
+import requests
 from openscrapers.modules import control
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -199,7 +202,8 @@ class source:
             for i in files:
                 if 'video' not in i['ct']:
                     pass
-                else: self.files.append(i)
+                else:
+                    self.files.append(i)
 
             url = self.managePack()
 
@@ -255,17 +259,22 @@ class source:
             info = info.replace('channels', 'ch')
             info = ' '.join(info.split())
             return info
-        except: pass
+        except:
+            pass
         try:
-            if any(i in ['hevc', 'h265', 'x265'] for i in fmt): v = 'HEVC'
-            else: v = 'h264'
+            if any(i in ['hevc', 'h265', 'x265'] for i in fmt):
+                v = 'HEVC'
+            else:
+                v = 'h264'
             info = '%.2f GB%s | %s' % (size, q, v)
             return info
-        except: pass
+        except:
+            pass
         try:
             info = '%.2f GB | [I]%s[/I]' % (size, name.replace('.', ' '))
             return info
-        except: pass
+        except:
+            pass
 
     def makeQuery(self, title, season, episode):
         seasEpList = self.seasEpQueryList(season, episode)
@@ -274,4 +283,3 @@ class source:
     def seasEpQueryList(self, season, episode):
         return ['s%02de%02d' % (int(season), int(episode)), '%dx%02d' % (int(season), int(episode)),
                 '%02dx%02d' % (int(season), int(episode))]
-    

@@ -9,8 +9,14 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re,urlparse,urllib,base64
-from openscrapers.modules import cleantitle,client,cfscrape
+import base64
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 
 
 class source:
@@ -22,20 +28,20 @@ class source:
         self.search_link = '/search-movies/%s.html'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             clean_title = cleantitle.geturl(title)
             search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
             search_results = self.scraper.get(search_url).content
             parsed = client.parseDOM(search_results, 'div', {'id': 'movie-featured'})
-            parsed = [(client.parseDOM(i, 'a', ret='href'), re.findall('.+?elease:\s*(\d{4})</', i), re.findall('<b><i>(.+?)</i>', i)) for i in parsed]
-            parsed = [(i[0][0], i[1][0], i[2][0]) for i in parsed if (cleantitle.get(i[2][0]) == cleantitle.get(title) and i[1][0] == year)]
+            parsed = [(client.parseDOM(i, 'a', ret='href'), re.findall('.+?elease:\s*(\d{4})</', i),
+                       re.findall('<b><i>(.+?)</i>', i)) for i in parsed]
+            parsed = [(i[0][0], i[1][0], i[2][0]) for i in parsed if
+                      (cleantitle.get(i[2][0]) == cleantitle.get(title) and i[1][0] == year)]
             url = parsed[0][0]
             return url
         except:
             return
-
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -45,7 +51,6 @@ class source:
         except:
             return
 
-
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if url == None: return
@@ -53,7 +58,7 @@ class source:
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['premiered'], url['season'], url['episode'] = premiered, season, episode
             try:
-                clean_title = cleantitle.geturl(url['tvshowtitle'])+'-season-%d' % int(season)
+                clean_title = cleantitle.geturl(url['tvshowtitle']) + '-season-%d' % int(season)
                 search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
                 search_results = self.scraper.get(search_url).content
                 parsed = client.parseDOM(search_results, 'div', {'id': 'movie-featured'})
@@ -70,7 +75,6 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -84,13 +88,15 @@ class source:
                     host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
-                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'),
+                                    'direct': False, 'debridonly': False})
                 except:
                     pass
             except:
                 pass
             parsed = client.parseDOM(html, 'div', {'class': 'server_line'})
-            parsed = [(client.parseDOM(i, 'a', ret='href')[0], client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in parsed]
+            parsed = [(client.parseDOM(i, 'a', ret='href')[0],
+                       client.parseDOM(i, 'p', attrs={'class': 'server_servername'})[0]) for i in parsed]
             if parsed:
                 for i in parsed:
                     try:
@@ -98,14 +104,15 @@ class source:
                         url = i[0]
                         host = client.replaceHTMLCodes(host)
                         host = host.encode('utf-8')
-                        if 'other'in host: continue
-                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False})
+                        if 'other' in host: continue
+                        sources.append(
+                            {'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'),
+                             'direct': False, 'debridonly': False})
                     except:
                         pass
             return sources
         except:
             return
-
 
     def resolve(self, url):
         if self.base_link in url:
@@ -114,4 +121,3 @@ class source:
             b64 = base64.b64decode(v)
             url = client.parseDOM(b64, 'iframe', ret='src')[0]
         return url
-

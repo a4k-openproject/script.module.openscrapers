@@ -28,7 +28,9 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle, client, dom_parser, log_utils
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import dom_parser
 
 
 class source:
@@ -39,11 +41,12 @@ class source:
         self.base_link = 'https://tvbox.ag/'
         self.search_link = 'search?q=%s'
         self.search_link_movie = 'https://tvbox.ag/movies'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(title).replace('-', '+'))
-            r = client.request(url, cookie='check=2')
+            r = self.scraper.get(url, cookie='check=2').content
             m = dom_parser.parse_dom(r, 'div', attrs={'class': 'masonry'})
             m = dom_parser.parse_dom(m, 'a', req='href')
             m = [(i.attrs['href']) for i in m if i.content == title]
@@ -69,7 +72,7 @@ class source:
             data = dict((i, data[i][0]) for i in data)
             url = urlparse.urljoin(self.base_link, self.search_link %
                                    cleantitle.geturl(data['tvshowtitle']).replace('-', '+'))
-            r = client.request(url, cookie='check=2')
+            r = self.scraper.get(url, cookie='check=2').content
             m = dom_parser.parse_dom(r, 'div', attrs={'class': 'masonry'})
             m = dom_parser.parse_dom(m, 'a', req='href')
             m = [(i.attrs['href']) for i in m if i.content == data['tvshowtitle']]
@@ -85,7 +88,7 @@ class source:
 
             if url is None:
                 return
-            r = client.request(url, cookie='check=2')
+            r = self.scraper.get(url, cookie='check=2').content
 
             m = dom_parser.parse_dom(r, 'table', attrs={'class': 'show_links'})[0]
             links = re.findall('k">(.*?)<.*?f="(.*?)"', m.content)
@@ -101,7 +104,7 @@ class source:
             return sources
 
     def resolve(self, url):
-        r = client.request(url)
+        r = self.scraper.get(url).content
         r = dom_parser.parse_dom(r, 'div', {'class': 'link_under_video'})
         r = dom_parser.parse_dom(r, 'a', req='href')
         return r[0].attrs['href']

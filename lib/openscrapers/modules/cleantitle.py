@@ -15,7 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import re,unicodedata
+import re
+import unicodedata
 
 
 def get(title):
@@ -72,9 +73,11 @@ def query(title):
 
 def normalize(title):
     try:
-        try: return title.decode('ascii').encode("utf-8")
-        except: pass
-        return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if unicodedata.category(c) != 'Mn'))
+        try:
+            return title.decode('ascii').encode("utf-8")
+        except:
+            pass
+        return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if
+                           unicodedata.category(c) != 'Mn'))
     except:
         return title
-

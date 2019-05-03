@@ -27,7 +27,8 @@
 import re
 import traceback
 
-from openscrapers.modules import client, log_utils
+from openscrapers.modules import cfscrape
+from openscrapers.modules import log_utils
 
 
 class source:
@@ -38,6 +39,7 @@ class source:
         self.base_link = 'https://api.odb.to'
         self.movie_link = '/embed?imdb_id=%s'
         self.tv_link = '/embed?imdb_id=%s&s=%s&e=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -72,7 +74,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 match = re.compile('iframe id="odbIframe" src="(.+?)"').findall(r)
                 for url in match:

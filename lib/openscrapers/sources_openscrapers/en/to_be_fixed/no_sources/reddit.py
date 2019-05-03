@@ -8,12 +8,15 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re, urllib, urlparse, json
+import json
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
-from openscrapers.modules import dom_parser2
+
 
 class source:
     def __init__(self):
@@ -32,7 +35,7 @@ class source:
             return url
         except BaseException:
             return
-           
+
     def search(self, title, year):
         try:
             content = []
@@ -47,9 +50,11 @@ class source:
                     if not year in r['title']: raise Exception()
                     content = [(r['title'], r['url'])]
 
-                except BaseException: pass
+                except BaseException:
+                    pass
             return content
-        except BaseException: return
+        except BaseException:
+            return
 
     def sources(self, url, hostDict, hostprDict):
         sources = []
@@ -72,18 +77,23 @@ class source:
                         link = client.parseDOM(data, 'a', ret='href')[0]
                     if 'google' in link:
                         quality, info2 = source_utils.get_release_quality(url[0], link)
-                        sources.append({'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                        sources.append(
+                            {'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': link, 'direct': False,
+                             'debridonly': False})
 
                     else:
                         host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(link.strip().lower()).netloc)[0]
                         if host in hostDict:
                             host = host.encode('utf-8')
                             quality, info2 = source_utils.get_release_quality(url[0], link)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})        
-                except BaseException: pass    
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False,
+                                 'debridonly': False})
+                except BaseException:
+                    pass
             return sources
         except BaseException:
             return sources
-            
+
     def resolve(self, url):
         return url

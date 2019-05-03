@@ -9,25 +9,25 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @tantrumdev wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @tantrumdev wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # -Cleaned and Checked on 10-27-2018 by JewBMX
 
-import re
-import urllib
-import urlparse
-import json
 import base64
+import re
+import urlparse
 
-from openscrapers.modules import client, cleantitle, directstream, dom_parser2
-from openscrapers.modules import debrid
 from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import dom_parser2
+
 
 class source:
     def __init__(self):
@@ -40,7 +40,7 @@ class source:
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            clean_title = cleantitle.geturl(title).replace('-','+')
+            clean_title = cleantitle.geturl(title).replace('-', '+')
             url = urlparse.urljoin(self.base_link, (self.movies_search_path % clean_title))
             r = self.scraper.get(url).content
 
@@ -49,13 +49,14 @@ class source:
             r = [(i[0].attrs['href'], re.search('Release:\s*(\d+)', i[0].content)) for i in r if i]
             r = [(i[0], i[1].groups()[0]) for i in r if i[0] and i[1]]
             r = [(i[0], i[1]) for i in r if i[1] == year]
-            if r[0]: 
+            if r[0]:
                 url = r[0][0]
                 return url
-            else: return
+            else:
+                return
         except Exception:
             return
-            
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         return
 
@@ -80,15 +81,16 @@ class source:
                             'source': host,
                             'quality': 'SD',
                             'language': 'en',
-                            'url': i[0].replace('\/','/'),
+                            'url': i[0].replace('\/', '/'),
                             'direct': False,
                             'debridonly': False
                         })
-                except: pass
+                except:
+                    pass
             return sources
         except Exception:
             return
-            
+
     def resolve(self, url):
         try:
             r = self.scraper.get(url).content

@@ -1,8 +1,15 @@
 # -*- coding: UTF-8 -*-
 # -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
 
-import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,control,debrid,source_utils
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import control
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -14,7 +21,6 @@ class source:
         self.search_link = '/browse-movies/%s/all/all/0/latest'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -23,13 +29,11 @@ class source:
         except Exception:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
             if url is None: return sources
             if debrid.status() is False: raise Exception()
-            if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             query = '%s %s' % (data['title'], data['year'])
@@ -46,7 +50,8 @@ class source:
             for entry in items:
                 try:
                     try:
-                        link, name = re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
+                        link, name = \
+                        re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
                         name = client.replaceHTMLCodes(name)
                         if not cleantitle.get(name) == cleantitle.get(data['title']):
                             continue
@@ -59,7 +64,9 @@ class source:
                     try:
                         entries = client.parseDOM(response, 'div', attrs={'class': 'modal-torrent'})
                         for torrent in entries:
-                            link, name = re.findall('href="magnet:(.+?)" class="magnet-download download-torrent magnet" title="(.+?)"', torrent, re.DOTALL)[0]
+                            link, name = re.findall(
+                                'href="magnet:(.+?)" class="magnet-download download-torrent magnet" title="(.+?)"',
+                                torrent, re.DOTALL)[0]
                             link = 'magnet:%s' % link
                             link = str(client.replaceHTMLCodes(link).split('&tr')[0])
                             quality, info = source_utils.get_release_quality(name, name)
@@ -72,7 +79,9 @@ class source:
                             except Exception:
                                 pass
                             info = ' | '.join(info)
-                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                                 'direct': False, 'debridonly': True})
                     except Exception:
                         continue
                 except Exception:
@@ -81,7 +90,5 @@ class source:
         except Exception:
             return sources
 
-
     def resolve(self, url):
         return url
-

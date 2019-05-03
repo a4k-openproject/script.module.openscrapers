@@ -23,73 +23,68 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,cfscrape,proxy
+import re
+
+from openscrapers.modules import cleantitle, cfscrape
 
 
 class source:
-	def __init__(self):
-		self.priority = 1
-		self.language = ['en']
-		self.domains = ['putlocker.onl']
-		self.base_link = 'https://putlocker.onl'
-		self.tv_link = '/show/%s/season/%s/episode/%s'
-		self.movie_link = '/movie/%s'
-		self.scraper = cfscrape.create_scraper()
+    def __init__(self):
+        self.priority = 1
+        self.language = ['en']
+        self.domains = ['putlocker.onl']
+        self.base_link = 'https://putlocker.onl'
+        self.tv_link = '/show/%s/season/%s/episode/%s'
+        self.movie_link = '/movie/%s'
+        self.scraper = cfscrape.create_scraper()
 
+    def movie(self, imdb, title, localtitle, aliases, year):
+        try:
+            title = cleantitle.geturl(title)
+            url = self.base_link + self.movie_link % title
+            return url
+        except:
+            return
 
-	def movie(self, imdb, title, localtitle, aliases, year):
-		try:
-			title = cleantitle.geturl(title)
-			url = self.base_link + self.movie_link % title
-			return url
-		except:
-			return
+    def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+        try:
+            tvshowtitle = cleantitle.geturl(tvshowtitle)
+            url = tvshowtitle
+            return url
+        except:
+            return
 
+    def episode(self, url, imdb, tvdb, title, premiered, season, episode):
+        try:
+            if not url: return
+            tvshowtitle = url
+            url = self.base_link + self.tv_link % (tvshowtitle, season, episode)
+            return url
+        except:
+            return
 
-	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-		try:
-			tvshowtitle = cleantitle.geturl(tvshowtitle)
-			url = tvshowtitle
-			return url
-		except:
-			return
+    def sources(self, url, hostDict, hostprDict):
+        try:
+            sources = []
+            r = self.scraper.get(url).content
+            try:
+                match = re.compile('<IFRAME.+?SRC=.+?//(.+?)/(.+?)"').findall(r)
+                for host, url in match:
+                    url = 'http://%s/%s' % (host, url)
+                    host = host.replace('www.', '')
+                    sources.append({
+                        'source': host,
+                        'quality': 'SD',
+                        'language': 'en',
+                        'url': url,
+                        'direct': False,
+                        'debridonly': False
+                    })
+            except:
+                return
+        except Exception:
+            return
+        return sources
 
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			tvshowtitle = url
-			url = self.base_link + self.tv_link % (tvshowtitle,season,episode)
-			return url
-		except:
-			return
-
-
-	def sources(self, url, hostDict, hostprDict):
-		try:
-			sources = []
-			r = self.scraper.get(url).content
-			try:
-				match = re.compile('<IFRAME.+?SRC=.+?//(.+?)/(.+?)"').findall(r)
-				for host,url in match: 
-					url = 'http://%s/%s' % (host,url)
-					host = host.replace('www.','')
-					sources.append({
-						'source': host,
-						'quality': 'SD',
-						'language': 'en',
-						'url': url,
-						'direct': False,
-						'debridonly': False
-					})
-			except:
-				return
-		except Exception:
-			return
-		return sources
-
-
-	def resolve(self, url):
-		return url
-
+    def resolve(self, url):
+        return url

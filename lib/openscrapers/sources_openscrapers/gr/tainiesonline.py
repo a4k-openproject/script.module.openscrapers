@@ -25,13 +25,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib, urlparse, re
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
-
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -46,7 +47,7 @@ class source:
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year, 'movies')
             if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(
-                aliases),year, 'movies')
+                aliases), year, 'movies')
             return url
         except:
             return
@@ -78,7 +79,7 @@ class source:
 
             query = urlparse.urljoin(self.base_link, query)
 
-            t = [cleantitle.get(i) for i in set(titles) if i][0] #cleantitle.get(titles[0])
+            t = [cleantitle.get(i) for i in set(titles) if i][0]  # cleantitle.get(titles[0])
 
             r = client.request(query)
 
@@ -118,13 +119,13 @@ class source:
             r = client.request(query)
             links = client.parseDOM(r, 'tr', attrs={'data-id': '\d+'})
             for i in links:
-                url = re.findall( "data-bind=.+?site\(\'([^']+)\'", i, re.DOTALL)[0]
+                url = re.findall("data-bind=.+?site\(\'([^']+)\'", i, re.DOTALL)[0]
                 quality = 'SD'
                 lang, info = 'gr', 'SUB'
                 valid, host = source_utils.is_host_valid(url, hostDict)
 
                 sources.append({'source': host, 'quality': quality, 'language': lang, 'url': url, 'info': info,
-                                'direct':False,'debridonly': False})
+                                'direct': False, 'debridonly': False})
 
             return sources
         except:

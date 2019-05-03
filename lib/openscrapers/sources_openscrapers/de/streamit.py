@@ -9,12 +9,12 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
@@ -28,8 +28,8 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -44,7 +44,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
+                                                                    year)
             return urllib.urlencode({'url': url, 'imdb': re.sub('[^0-9]', '', imdb)}) if url else None
         except:
             return
@@ -52,7 +53,8 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year)
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
+                [tvshowtitle] + source_utils.aliases_to_array(aliases), year)
             return urllib.urlencode({'url': url, 'imdb': re.sub('[^0-9]', '', imdb)}) if url else None
         except:
             return
@@ -94,7 +96,8 @@ class source:
 
             r = [(dom_parser.parse_dom(r, 'div', attrs={'id': i.attrs['id']})) for i in l if i.attrs['id'] == 'deutsch']
             r = [(i[0], dom_parser.parse_dom(i[0], 'option', req='id')) for i in r]
-            r = [(id.attrs['id'], dom_parser.parse_dom(content, 'div', attrs={'id': id.attrs['id']})) for content, ids in r for id in ids]
+            r = [(id.attrs['id'], dom_parser.parse_dom(content, 'div', attrs={'id': id.attrs['id']})) for content, ids
+                 in r for id in ids]
             r = [(re.findall('hd(\d{3,4})', i[0]), dom_parser.parse_dom(i[1], 'a', req='href')) for i in r if i[1]]
             r = [(i[0][0] if i[0] else '0', [x.attrs['href'] for x in i[1]]) for i in r if i[1]]
             r = [(source_utils.label_to_quality(i[0]), i[1]) for i in r]
@@ -113,7 +116,9 @@ class source:
                         valid, host = source_utils.is_host_valid(link, hostDict)
                         if not valid: continue
 
-                        sources.append({'source': host, 'quality': quality, 'language': 'de', 'url': link, 'direct': False, 'debridonly': False, 'checkquality': True})
+                        sources.append(
+                            {'source': host, 'quality': quality, 'language': 'de', 'url': link, 'direct': False,
+                             'debridonly': False, 'checkquality': True})
                     except:
                         pass
 
@@ -129,7 +134,8 @@ class source:
             t = [cleantitle.get(i) for i in set(titles) if i]
             y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 
-            r = client.request(urlparse.urljoin(self.base_link, self.search_link), post=urllib.urlencode({'val': cleantitle.query(titles[0])}), XHR=True)
+            r = client.request(urlparse.urljoin(self.base_link, self.search_link),
+                               post=urllib.urlencode({'val': cleantitle.query(titles[0])}), XHR=True)
             r = dom_parser.parse_dom(r, 'li')
             r = dom_parser.parse_dom(r, 'a', req='href')
             r = [(i.attrs['href'], i.content, re.findall('\((\d{4})', i.content)) for i in r]

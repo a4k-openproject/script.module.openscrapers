@@ -18,16 +18,17 @@
 '''
 import re
 
-from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 
 
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['putlockerr.is','putlockers.movie'] 
+        self.domains = ['putlockerr.is', 'putlockers.movie']
         self.base_link = 'https://putlockerr.is'
         self.search_link = '/embed/%s/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -35,16 +36,17 @@ class source:
             return url
         except:
             return
-		
+
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 match = re.compile('<iframe src="(.+?)://(.+?)/(.+?)"').findall(r)
-                for http,host,url in match: 
-                    url = '%s://%s/%s' % (http,host,url)
-                    sources.append({'source': host,'quality': 'HD','language': 'en','url': url,'direct': False,'debridonly': False})
+                for http, host, url in match:
+                    url = '%s://%s/%s' % (http, host, url)
+                    sources.append({'source': host, 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
             except:
                 return
         except Exception:

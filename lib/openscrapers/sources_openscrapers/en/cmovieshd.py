@@ -24,6 +24,8 @@
 '''
 
 import re
+
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
@@ -35,18 +37,19 @@ class source:
         self.domains = ['cmovieshd.net']
         self.base_link = 'https://cmovieshd.net'
         self.search_link = '/search/?q=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             title = cleantitle.geturl(title).replace('-', '+')
             u = self.base_link + self.search_link % title
-            u = client.request(u)
+            u = self.scraper.get(u).content
             i = client.parseDOM(u, "div", attrs={"class": "movies-list"})
             for r in i:
                 r = re.compile('<a href="(.+?)"').findall(r)
                 for url in r:
                     title = cleantitle.geturl(title).replace("+", "-")
-                    if not title in url:
+                    if title not in url:
                         continue
                     return url
         except:
@@ -67,14 +70,16 @@ class source:
             for i in r:
                 t = re.compile('<a href="(.+?)"').findall(i)
                 for url in t:
-                    t = client.request(url)
+                    t = self.scraper.get(url).content
                     t = client.parseDOM(t, "div", attrs={"id": "content-embed"})
                     for u in t:
                         i = re.findall('src="(.+?)"', u)[0].replace('load_player.html?e=', 'episode/embed/')
-                        i = client.request(i).replace("\\", "")
+                        i = self.scraper.get(i).conent.replace("\\", "")
                         u = re.findall('"(https.+?)"', i)
                         for url in u:
-                            sources.append({'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                            sources.append(
+                                {'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                 'debridonly': False})
 
                 return sources
         except Exception:

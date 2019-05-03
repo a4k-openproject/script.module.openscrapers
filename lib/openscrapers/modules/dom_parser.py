@@ -88,7 +88,8 @@ def __get_dom_elements(item, name, attrs):
 
 def __get_attribs(element):
     attribs = {}
-    for match in re.finditer('''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element):
+    for match in re.finditer(
+            '''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element):
         match = match.groupdict()
         value1 = match.get('value1')
         value2 = match.get('value2')

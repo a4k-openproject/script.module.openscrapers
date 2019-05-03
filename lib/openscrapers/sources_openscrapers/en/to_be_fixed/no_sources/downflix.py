@@ -25,9 +25,8 @@
 """
 
 import re
-import traceback
 
-from openscrapers.modules import cfscrape, cleantitle, directstream, log_utils, source_utils
+from openscrapers.modules import cfscrape, cleantitle, directstream, source_utils
 
 
 class source:
@@ -45,7 +44,7 @@ class source:
             url = self.base_link + self.search_link % (title, year)
             return url
         except Exception:
-            
+
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -65,7 +64,7 @@ class source:
                                 'url': alt_url, 'info': [], 'direct': False, 'debridonly': False})
             return sources
         except Exception:
-            
+
             return
 
     def resolve(self, url):
