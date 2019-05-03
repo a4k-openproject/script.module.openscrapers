@@ -1,4 +1,9 @@
 OpenScrapers Module Changelog:
+0.0.1.5
+- Added new scrapers (ty Nazegnl)
+- fixed bs4 issue in pubfilmonline
+- code cleanup
+
 0.0.1.4
 - added the missing Host505's scraper changes
 - code reformatting
