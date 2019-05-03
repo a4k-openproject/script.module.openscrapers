@@ -30,7 +30,7 @@ import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-
+from openscrapers.modules import source_utils
 
 class source:
     def __init__(self):
@@ -121,29 +121,9 @@ class source:
                     if not cleantitle.get(t) == cleantitle.get(title): raise Exception()
                     y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', name)[-1].upper()
                     if not y == hdlr: raise Exception()
-                    fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*)(\.|\)|\]|\s)', '', name.upper())
-                    fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
-                    fmt = [i.lower() for i in fmt]
-                    if any(i.endswith(('subs', 'sub', 'dubbed', 'dub')) for i in fmt): raise Exception()
-                    if any(i in ['extras'] for i in fmt): raise Exception()
-                    if '2160p' in fmt:
-                        quality = '4K'
-                    elif '4K' in fmt:
-                        quality = '4K'
-                    elif '1080p' in fmt:
-                        quality = '1080p'
-                    elif '720p' in fmt:
-                        quality = '720p'
-                    else:
-                        quality = '720p'
-                    if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt):
-                        quality = 'SCR'
-                    elif any(
-                        i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in
-                        fmt):
-                        quality = 'CAM'
-                    info = []
-                    if '3d' in fmt: info.append('3D')
+                    url = item[1]
+
+                    quality, info = source_utils.get_release_quality(url,name)
                     try:
                         size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', item[2])[-1]
                         div = 1 if size.endswith(('GB', 'GiB')) else 1024
@@ -152,9 +132,7 @@ class source:
                         info.append(size)
                     except:
                         pass
-                    if any(i in ['hevc', 'h265', 'x265'] for i in fmt): info.append('HEVC')
                     info = ' | '.join(info)
-                    url = item[1]
                     if any(x in url for x in ['.rar', '.zip', '.iso']): raise Exception()
                     url = client.replaceHTMLCodes(url)
                     url = url.encode('utf-8')
