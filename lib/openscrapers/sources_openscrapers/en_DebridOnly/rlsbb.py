@@ -75,7 +75,7 @@ class source:
 
             if url is None:
                 return sources
-
+            if debrid.status() == False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -114,9 +114,8 @@ class source:
                 r = self.scraper.get(url).content
 
             for loopCount in range(0, 2):
-                if loopCount == 1 or(
+                if loopCount == 1 or (
                         r is None and 'tvshowtitle' in data):
-
                     premDate = re.sub('[ \.]', '-', data['premiered'])
                     query = re.sub('[\\\\:;*?"<>|/\-\']', '', data['tvshowtitle'])
                     query = query.replace(

@@ -40,11 +40,10 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['scnsrc.me','scenesource.me']
+        self.domains = ['scnsrc.me', 'scenesource.me']
         self.base_link = 'http://www.scnsrc.me/'
         self.search_link = '?s=%s&x=0&y=0'
         self.scraper = cfscrape.create_scraper()
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -56,7 +55,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -64,7 +62,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -76,7 +73,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -92,7 +88,7 @@ class source:
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-            headers = {'Referer':  url}
+            headers = {'Referer': url}
             r = self.scraper.get(url, headers=headers).content
             items = dom_parser2.parse_dom(r, 'h2')
             items = [dom_parser2.parse_dom(i.content, 'a', req=['href']) for i in items]
@@ -102,7 +98,7 @@ class source:
                 try:
                     name = item[0]
                     name = client.replaceHTMLCodes(name)
-                    headers = {'Referer':  url}
+                    headers = {'Referer': url}
                     r = self.scraper.get(item[1], headers=headers).content
                     links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', ])
                     links = [i.attrs['href'] for i in links]
@@ -111,14 +107,19 @@ class source:
                             if hdlr in name:
                                 url = client.replaceHTMLCodes(url)
                                 url = url.encode('utf-8')
-                                if any(x in url for x in ['.part', 'extras', 'subs', 'dubbed', 'dub', 'MULTISUBS', 'sample', 'youtube', 'trailer']) or any(url.endswith(x) for x in ['.rar', '.zip', '.iso', '.sub', '.idx', '.srt']):
+                                if any(x in url for x in
+                                       ['.part', 'extras', 'subs', 'dubbed', 'dub', 'MULTISUBS', 'sample', 'youtube',
+                                        'trailer']) or any(
+                                        url.endswith(x) for x in ['.rar', '.zip', '.iso', '.sub', '.idx', '.srt']):
                                     raise Exception()
                                 quality, info = source_utils.get_release_quality(url, url)
                                 host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
                                 if host in hostDict:
                                     host = client.replaceHTMLCodes(host)
                                     host = host.encode('utf-8')
-                                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                                    sources.append(
+                                        {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                         'direct': False, 'debridonly': True})
                         except:
                             pass
                 except:
@@ -129,7 +130,5 @@ class source:
         except:
             return sources
 
-
     def resolve(self, url):
         return url
-

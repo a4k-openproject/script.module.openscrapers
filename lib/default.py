@@ -134,7 +134,7 @@ elif action == "toggleAllTorrent":
 
 if action == "Defaults":
     sourceList = ['123hbo', '123movieshd', '123movieshubz', '123123movies', 'animetoon', 'cartoonhd', 'cmovieshd',
-                  'cmovieshdbz', 'cooltvseries', 'extramovies', 'flimxy', 'freefmovies', 'freeputlockers',
+                  'cmovieshdbz', 'cooltvseries', 'extramovies', 'filmxy', 'freefmovies', 'freeputlockers',
                   'gowatchseries', 'Hdmto', 'iwaatch',
                   'kattv', 'mymoviego', 'mywatchepseries', 'naturalbd', 'odb', 'openloadmovie', 'plocker', 'primewire',
                   'projectfreetv',
@@ -142,7 +142,7 @@ if action == "Defaults":
                   'solarmoviefree', 'toonget',
                   'tvbox', 'vidics', 'watchepisodes', 'watchfree1', 'watchseries', 'watchserieshd', '2ddl', '0day',
                   '300mbdownload', '300mbfilms', 'bestmoviez',
-                  'ddlspot', 'directdl', 'ganool123', 'mvrls', 'rlsbb', 'scenerls', 'ultrahd', '111ys',
+                  'ddlspot', 'directdl', 'ganool123', 'mvrls', 'rlsbb', 'scenerls', 'scnsrc', 'ultrahd', '111ys',
                   '1337x', 'eztv', 'glodls', 'kickass2',
                   'limetorrents', 'magnetdl', 'mkvcage', 'piratebay', 'skytorrents', 'torrentapi', 'torrentdownloads',
                   'yifimovies', 'yifyddl', 'ytsam', 'zoogle']

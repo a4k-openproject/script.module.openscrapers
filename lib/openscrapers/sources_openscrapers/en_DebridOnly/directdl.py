@@ -20,7 +20,6 @@ from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
 
-
 class source:
     def __init__(self):
         self.priority = 1
@@ -116,7 +115,7 @@ class source:
 
                     try:
                         size = i['size']
-                        size = float(size)/1024
+                        size = float(size) / 1024
                         size = '%.2f GB' % size
                         info.append(size)
                     except:
