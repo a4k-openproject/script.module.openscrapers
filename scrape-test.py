@@ -342,8 +342,8 @@ if __name__ == '__main__':
         for i in PASSED_PROVIDERS:
             try:
                 if i[1] is not None:
-                    output.write('%s;%s;%s;%s\n' % (
-                        i[0], len([] if i[1] is None else i[1]), i[2], ';'.join(str(x) for x in i[3].values())))
+                    output.write('%s,%s,%s,%s\n' % (
+                        i[0], len([] if i[1] is None else i[1]), i[2], ','.join(str(x) for x in i[3].values())))
             except:
                 pass
 
