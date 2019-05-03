@@ -79,7 +79,8 @@ class source:
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
                 data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 

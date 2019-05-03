@@ -32,6 +32,7 @@ from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
+
 class source:
     def __init__(self):
         self.priority = 1
@@ -77,8 +78,9 @@ class source:
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             s = client.request(self.base_link)
             s = re.findall('\'(http.+?)\'', s) + re.findall('\"(http.+?)\"', s)
@@ -123,7 +125,7 @@ class source:
                     if not y == hdlr: raise Exception()
                     url = item[1]
 
-                    quality, info = source_utils.get_release_quality(url,name)
+                    quality, info = source_utils.get_release_quality(url, name)
                     try:
                         size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', item[2])[-1]
                         div = 1 if size.endswith(('GB', 'GiB')) else 1024

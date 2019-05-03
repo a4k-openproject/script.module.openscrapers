@@ -1,4 +1,8 @@
 OpenScrapers Module Changelog:
+0.0.1.4
+- added the missing Host505's scraper changes
+- code reformatting
+
 0.0.1.3
 - added Host505's scraper changes
 - code reformatting

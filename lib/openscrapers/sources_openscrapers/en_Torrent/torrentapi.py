@@ -62,8 +62,9 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s' % data[
-                'imdb']
+                data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s' % \
+                                                                                                              data[
+                                                                                                                  'imdb']
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             token = client.request(self.token)
             token = json.loads(token)["token"]
