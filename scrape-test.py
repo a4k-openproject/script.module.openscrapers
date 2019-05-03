@@ -338,8 +338,8 @@ if __name__ == '__main__':
         os.makedirs(base_output_path)
 
     with open(os.path.join(base_output_path, output_filename + '.csv'), 'w+') as output:
-        output.write('Provider Name;Number Of Sources;Runtime;%s\n' %
-                     ';'.join(str(x) for x in PASSED_PROVIDERS[0][3].keys()))
+        output.write('Provider Name,Number Of Sources,Runtime,%s\n' %
+                     ','.join(str(x) for x in PASSED_PROVIDERS[0][3].keys()))
         for i in PASSED_PROVIDERS:
             try:
                 if i[1] is not None:
@@ -351,10 +351,10 @@ if __name__ == '__main__':
     for i in PASSED_PROVIDERS:
         if len(i[1]) > 0:
             with open(os.path.join(base_output_path, output_filename + '-' + i[0] + '.csv'), 'w+') as output:
-                output.write('%s\n' % ';'.join(str(x) for x in i[1][0].keys()))
+                output.write('%s\n' % ','.join(str(x) for x in i[1][0].keys()))
                 try:
                     if i[1] is not None:
                         for s in i[1]:
-                            output.write('%s\n' % ';'.join(str(x) for x in s.values()))
+                            output.write('%s\n' % ','.join(str(x) for x in s.values()))
                 except:
                     pass
