@@ -198,7 +198,6 @@ def worker_thread(provider_name, provider_source):
                 if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
                     break
 
-                start_time = time.time()
                 if len(provider_results) != 0:
                     break
                 # Prepare test by fetching url
