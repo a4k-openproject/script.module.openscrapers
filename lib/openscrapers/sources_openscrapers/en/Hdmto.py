@@ -39,12 +39,14 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            url = '%s/%s/' % (self.base_link,url)
+            url = '%s/%s/' % (self.base_link, url)
             r = self.scraper.get(url).content
             try:
                 match = re.compile('<iframe.+?src="(.+?)"').findall(r)
                 for url in match:
-                    sources.append({'source': 'Openload.co','quality': '1080p','language': 'en','url': url,'direct': False,'debridonly': False}) 
+                    sources.append(
+                        {'source': 'Openload.co', 'quality': '1080p', 'language': 'en', 'url': url, 'direct': False,
+                         'debridonly': False})
             except:
                 return
         except Exception:

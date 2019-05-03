@@ -44,7 +44,7 @@ class source:
             return url
         except:
             return
- 
+
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if not url: return
@@ -59,9 +59,9 @@ class source:
             sources = []
             r = client.request(url)
             try:
-                data = re.compile("callvalue\('.+?','.+?','(.+?)://(.+?)/(.+?)'\)",re.DOTALL).findall(r)
-                for http,host,url in data:
-                    url = '%s://%s/%s' % (http,host,url)
+                data = re.compile("callvalue\('.+?','.+?','(.+?)://(.+?)/(.+?)'\)", re.DOTALL).findall(r)
+                for http, host, url in data:
+                    url = '%s://%s/%s' % (http, host, url)
                     sources.append({
                         'source': host,
                         'quality': 'SD',
@@ -75,7 +75,6 @@ class source:
             return sources
         except Exception:
             return
-
 
     def resolve(self, url):
         return url

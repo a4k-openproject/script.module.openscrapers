@@ -17,8 +17,8 @@
 
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import dom_parser2
@@ -58,14 +58,13 @@ class source:
             sources = []
             if url is None: return sources
             if debrid.status() is False: raise Exception()
-            if debrid.tor_enabled() is False: raise Exception()
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
             url = self.searchMovie(data['title'], data['year'])
             if url is None: return sources
-            
+
             r = client.request(url)
             data = client.parseDOM(r, 'div', attrs={'class': 'playex'})[0]
             frames = client.parseDOM(data, 'iframe', ret='src')

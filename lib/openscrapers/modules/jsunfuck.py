@@ -62,7 +62,7 @@ class JSUnfuck(object):
         'DUMMY5': '6q',
         'DUMMY6': '4h',
     }
-    
+
     uniqs = {
         '[t+o+S+t+r+i+n+g]': 1,
         '[][f+i+l+t+e+r][c+o+n+s+t+r+u+c+t+o+r](r+e+t+u+r+n+ +e+s+c+a+p+e)()': 2,
@@ -70,10 +70,10 @@ class JSUnfuck(object):
         '[][s+o+r+t][c+o+n+s+t+r+u+c+t+o+r](r+e+t+u+r+n+ +e+s+c+a+p+e)()': 2,
         '[][s+o+r+t][c+o+n+s+t+r+u+c+t+o+r](r+e+t+u+r+n+ +u+n+e+s+c+a+p+e)()': 3,
     }
-    
+
     def __init__(self, js):
         self.js = js
-        
+
     def decode(self, replace_plus=True):
         while True:
             start_js = self.js
@@ -83,22 +83,22 @@ class JSUnfuck(object):
             self.repl_uniqs(self.uniqs)
             if start_js == self.js:
                 break
-    
+
         if replace_plus:
             self.js = self.js.replace('+', '')
         self.js = re.sub('\[[A-Za-z]*\]', '', self.js)
         self.js = re.sub('\[(\d+)\]', '\\1', self.js)
         return self.js
-    
+
     def repl_words(self, words):
         while True:
             start_js = self.js
             for key, value in sorted(words.items(), key=lambda x: len(x[0]), reverse=True):
                 self.js = self.js.replace(key, value)
-    
+
             if self.js == start_js:
                 break
-    
+
     def repl_arrays(self, words):
         for word in sorted(words.values(), key=lambda x: len(x), reverse=True):
             for index in xrange(0, 100):
@@ -107,19 +107,19 @@ class JSUnfuck(object):
                     self.js = self.js.replace('%s[%d]' % (word, index), repl)
                 except:
                     pass
-        
+
     def repl_numbers(self):
         if self.numbers is None:
             self.numbers = self.__gen_numbers()
-            
+
         while True:
             start_js = self.js
             for key, value in sorted(self.numbers.items(), key=lambda x: len(x[0]), reverse=True):
                 self.js = self.js.replace(key, value)
-    
+
             if self.js == start_js:
                 break
-        
+
     def repl_uniqs(self, uniqs):
         for key, value in uniqs.iteritems():
             if key in self.js:
@@ -129,12 +129,12 @@ class JSUnfuck(object):
                     self.__handle_escape(key)
                 elif value == 3:
                     self.__handle_unescape(key)
-                                                
+
     def __handle_tostring(self):
         for match in re.finditer('(\d+)\[t\+o\+S\+t\+r\+i\+n\+g\](\d+)', self.js):
             repl = to_base(match.group(1), match.group(2))
             self.js = self.js.replace(match.group(0), repl)
-    
+
     def __handle_escape(self, key):
         while True:
             start_js = self.js
@@ -142,17 +142,17 @@ class JSUnfuck(object):
             if self.js[offset] == '(' and self.js[offset + 2] == ')':
                 c = self.js[offset + 1]
                 self.js = self.js.replace('%s(%s)' % (key, c), urllib.quote(c))
-            
+
             if start_js == self.js:
                 break
-    
+
     def __handle_unescape(self, key):
         start = 0
         while True:
             start_js = self.js
             offset = self.js.find(key, start)
             if offset == -1: break
-            
+
             offset += len(key)
             expr = ''
             extra = ''
@@ -168,25 +168,25 @@ class JSUnfuck(object):
                 elif c == '%' or c in string.hexdigits:
                     expr += c
                 last_c = c
-                 
+
             if not abort:
                 self.js = self.js.replace(key + extra, urllib.unquote(expr))
-            
+
                 if start_js == self.js:
                     break
             else:
                 start = offset
-        
+
     def __gen_numbers(self):
         n = {'!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]': '9',
              '!+[]+!![]+!![]+!![]+!![]': '5', '!+[]+!![]+!![]+!![]': '4',
              '!+[]+!![]+!![]+!![]+!![]+!![]': '6', '!+[]+!![]': '2',
-             '!+[]+!![]+!![]': '3', '(+![]+([]+[]))': '0', '(+[]+[])': '0', '+[]':'0',
+             '!+[]+!![]+!![]': '3', '(+![]+([]+[]))': '0', '(+[]+[])': '0', '+[]': '0',
              '(+!![]+[])': '1', '!+[]+!![]+!![]+!![]+!![]+!![]+!![]': '7',
              '!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]': '8', '+!![]': '1',
              '[+[]]': '[0]', '!+[]+!+[]': '2', '[+!+[]]': '[1]', '(+20)': '20',
              '[+!![]]': '[1]', '[+!+[]+[+[]]]': '[10]', '+(1+1)': '11'}
-             
+
         for i in xrange(2, 20):
             key = '+!![]' * (i - 1)
             key = '!+[]' + key
@@ -194,27 +194,27 @@ class JSUnfuck(object):
             key += '+[]'
             n['(' + key + ')'] = str(i)
             n['[' + key + ']'] = '[' + str(i) + ']'
-     
+
         for i in xrange(2, 10):
             key = '!+[]+' * (i - 1) + '!+[]'
             n['(' + key + ')'] = str(i)
             n['[' + key + ']'] = '[' + str(i) + ']'
-             
+
             key = '!+[]' + '+!![]' * (i - 1)
             n['[' + key + ']'] = '[' + str(i) + ']'
-                
+
         for i in xrange(0, 10):
             key = '(+(+!+[]+[%d]))' % (i)
             n[key] = str(i + 10)
             key = '[+!+[]+[%s]]' % (i)
             n[key] = '[' + str(i + 10) + ']'
-            
+
         for tens in xrange(2, 10):
             for ones in xrange(0, 10):
                 key = '!+[]+' * (tens) + '[%d]' % (ones)
                 n['(' + key + ')'] = str(tens * 10 + ones)
                 n['[' + key + ']'] = '[' + str(tens * 10 + ones) + ']'
-        
+
         for hundreds in xrange(1, 10):
             for tens in xrange(0, 10):
                 for ones in xrange(0, 10):
@@ -223,7 +223,7 @@ class JSUnfuck(object):
                     key = '(+(' + key
                     n[key] = str(hundreds * 100 + tens * 10 + ones)
         return n
-    
+
     def to_base(n, base, digits="0123456789abcdefghijklmnopqrstuvwxyz"):
         n, base = int(n), int(base)
         if n < base:
@@ -231,29 +231,32 @@ class JSUnfuck(object):
         else:
             return to_base(n // base, base, digits).lstrip(digits[0]) + digits[n % base]
 
-            
+
 def cfunfuck(fuckedup):
     fuck = re.findall(r's,t,o,p,b,r,e,a,k,i,n,g,f,\s*(\w+=).*?:\+?\(?(.*?)\)?\}', fuckedup)
     fucks = re.findall(r'(\w+)\.\w+([\+\-\*\/]=)\+?\(?(.*?)\)?;', fuckedup)
     endunfuck = fuck[0][0].split('=')[0]
     unfuck = JSUnfuck(fuck[0][1]).decode()
     unfuck = re.sub(r'[\(\)]', '', unfuck)
-    unfuck = fuck[0][0]+unfuck
+    unfuck = fuck[0][0] + unfuck
     exec(unfuck)
 
     for fucker in fucks:
         unfucker = JSUnfuck(fucker[2]).decode()
         unfucker = re.sub(r'[\(\)]', '', unfucker)
-        unfucker = fucker[0]+fucker[1]+unfucker
+        unfucker = fucker[0] + fucker[1] + unfucker
         exec(unfucker)
-        
+
     return str(eval(endunfuck))
+
 
 def main():
     with open(sys.argv[1]) as f:
         start_js = f.read()
-    
-    print JSUnfuck(start_js).decode()
+
+    print
+    JSUnfuck(start_js).decode()
+
 
 if __name__ == '__main__':
     sys.exit(main())

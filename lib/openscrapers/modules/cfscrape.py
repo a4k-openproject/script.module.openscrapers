@@ -1,14 +1,18 @@
 import ast
 import logging
 import operator as op
+import os
 import random
 import re
+import ssl
 from collections import OrderedDict
 from copy import deepcopy
 from time import sleep
 
 import requests
+from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.sessions import Session
 
 try:
@@ -54,13 +58,29 @@ DEFAULT_USER_AGENTS = [
 DEFAULT_USER_AGENT = random.choice(DEFAULT_USER_AGENTS)
 
 BUG_REPORT = (
-"Cloudflare may have changed their technique, or there may be a bug in the script.\n\nPlease read https://github.com/Anorov/cloudflare-scrape#updates, then file a bug report at https://github.com/Anorov/cloudflare-scrape/issues.")
+    "Cloudflare may have changed their technique, or there may be a bug in the script.\n\nPlease read https://github.com/Anorov/cloudflare-scrape#updates, then file a bug report at https://github.com/Anorov/cloudflare-scrape/issues.")
+
+
+class CipherSuiteAdapter(HTTPAdapter):
+    def __init__(self, cipherSuite=None, **kwargs):
+        self.cipherSuite = cipherSuite
+        super(CipherSuiteAdapter, self).__init__(**kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        kwargs['ssl_context'] = create_urllib3_context(ciphers=self.cipherSuite)
+        return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
+
+    def proxy_manager_for(self, *args, **kwargs):
+        kwargs['ssl_context'] = create_urllib3_context(ciphers=self.cipherSuite)
+        return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
 
 
 class CloudflareScraper(Session):
     def __init__(self, *args, **kwargs):
         super(CloudflareScraper, self).__init__(*args, **kwargs)
         self.tries = 0
+        self.prev_resp = None
+        self.cipher_suite = None
 
         if "requests" in self.headers["User-Agent"]:
             # Spoof Firefox on Linux if no custom User-Agent has been set
@@ -72,6 +92,33 @@ class CloudflareScraper(Session):
 
         return (is_cloudflare_response and (allow_empty_body or
                                             (b"jschl_vc" in response.content and b"jschl_answer" in response.content)))
+
+    def load_cipher_suite(self):
+        if self.cipher_suite:
+            return self.cipher_suite
+
+        ciphers = [
+            'GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384',
+            'CHACHA20-POLY1305-SHA256',
+            'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256', 'ECDHE-ECDSA-AES256-GCM-SHA384',
+            'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-CHACHA20-POLY1305-SHA256', 'ECDHE-RSA-CHACHA20-POLY1305-SHA256',
+            'ECDHE-RSA-AES128-CBC-SHA', 'ECDHE-RSA-AES256-CBC-SHA', 'RSA-AES128-GCM-SHA256', 'RSA-AES256-GCM-SHA384',
+            'ECDHE-RSA-AES128-GCM-SHA256', 'RSA-AES256-SHA', '3DES-EDE-CBC'
+        ]
+
+        self.cipher_suite = ''
+
+        ctx = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+        ctx.set_ciphers('ALL')
+
+        for cipher in ciphers:
+            try:
+                ctx.set_ciphers(cipher)
+                self.cipher_suite = '{}:{}'.format(self.cipher_suite, cipher).rstrip(':')
+            except ssl.SSLError:
+                pass
+
+        return self.cipher_suite
 
     def request(self, method, url, *args, **kwargs):
         self.headers = (
@@ -87,15 +134,25 @@ class CloudflareScraper(Session):
             )
         )
 
-        resp = super(CloudflareScraper, self).request(method, url, *args, **kwargs)
+        instance = super(CloudflareScraper, self)
+        instance.mount('https://', CipherSuiteAdapter(self.load_cipher_suite()))
+        resp = instance.request(method, url, *args, **kwargs)
 
         if b'why_captcha' in resp.content or b'/cdn-cgi/l/chk_captcha' in resp.content:
-            raise Exception('Cloudflare returned captcha!')
+            exception_message = 'Cloudflare returned captcha!'
+            if self.prev_resp is not None and os.getenv('CI') == 'true':
+                exception_message += '\n' + self.prev_resp.text
+            raise Exception(exception_message)
+
+        self.prev_resp = resp
 
         # Check if Cloudflare anti-bot is on
         if self.is_cloudflare_on(resp):
             if self.tries >= 3:
-                raise Exception('Failed to solve Cloudflare challenge!\n' + resp.text)
+                exception_message = 'Failed to solve Cloudflare challenge!'
+                if os.getenv('CI') == 'true':
+                    exception_message += '\n' + resp.text
+                raise Exception(exception_message)
 
             return self.solve_cf_challenge(resp, **kwargs)
 
@@ -223,7 +280,6 @@ class CloudflareScraper(Session):
                         val_2 = self.parseJSString(subsecs[1])
                     line_val = val_1 / float(val_2)
 
-
                 decryptVal = '%.16f%s%.16f' % (float(decryptVal), sections[0][-1], float(line_val))
                 decryptVal = eval_expr(decryptVal)
 
@@ -242,5 +298,6 @@ class CloudflareScraper(Session):
 
         val = ''.join([str(eval_expr(i)) for i in val])
         return int(val)
+
 
 create_scraper = CloudflareScraper

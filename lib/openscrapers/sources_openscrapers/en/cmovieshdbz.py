@@ -26,10 +26,11 @@
 import re
 
 import requests
-from openscrapers.modules import cleantitle
 from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):
@@ -78,11 +79,14 @@ class source:
                             if 'vidcloud' in url:
                                 continue
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                 'debridonly': False})
                     if 'vidcloud' in url:
                         continue
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
                 return sources
         except:
             import traceback

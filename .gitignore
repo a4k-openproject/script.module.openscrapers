@@ -117,3 +117,11 @@ test.txt
 *.csv
 test-results/en-en_DebridOnly/os-en-and-debrid-episode-scrape-test.txt
 test-results/en-en_DebridOnly/os-en-and-debrid-episode-scrape-test - Copy.txt
+test-results/en-en_DebridOnly/os-en-and-debrid-movie-scrape-test.txt
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/script.module.openscrapers.iml
+.idea/modules.xml
+.idea/misc.xml
+.idea/encodings.xml
+.idea/codeStyles/codeStyleConfig.xml

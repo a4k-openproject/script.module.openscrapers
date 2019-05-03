@@ -27,9 +27,15 @@
 
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import cleantitle, client, debrid, source_utils, cfscrape, dom_parser2, workers
+
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import dom_parser2
+from openscrapers.modules import source_utils
+from openscrapers.modules import workers
 
 
 class source:
@@ -66,8 +72,9 @@ class source:
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
             query = '%s S%02dE%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             url = self.search_link % urllib.quote_plus(query)
@@ -117,11 +124,10 @@ class source:
         except Exception:
             return self._sources
 
-
     def _get_sources(self, item, hostDict):
         try:
             quality, info = source_utils.get_release_quality(item[0], item[1])
-            size = item[2] if item[2] != '0'else item[0]
+            size = item[2] if item[2] != '0' else item[0]
 
             try:
                 size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', size)[-1]

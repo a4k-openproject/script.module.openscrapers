@@ -25,10 +25,11 @@
 
 import json
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client, source_utils
+from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -93,7 +94,8 @@ class source:
                     try:
                         valid, host = source_utils.is_host_valid(url, hostDict)
                         if not valid: raise Exception()
-                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
+                                        'debridonly': False})
                     except BaseException:
                         return sources
 

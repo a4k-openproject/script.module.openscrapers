@@ -23,16 +23,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
+
 from openscrapers.modules import client
-from openscrapers.modules import debrid,source_utils,control
+from openscrapers.modules import control
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
+
 
 class source:
-
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domain = ['1337x.to', '1337x.st', '1337x.ws', '1337x.eu', '1337x.se']
+        self.domain = ['1337x.to', '1337x.is', '1337x.st', '1337x.ws', '1337x.eu', '1337x.se']
         self.base_link = 'https://1337x.to'
         self.search_link = '/search/%s/1/'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
@@ -69,22 +74,18 @@ class source:
         try:
             if url is None: return sources
             if debrid.status() is False: raise Exception()
-			if debrid.tor_enabled() is False: raise Exception()			
+            # if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s s%02de%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-
             r = client.request(url)
-
             try:
                 posts = client.parseDOM(r, 'div', attrs={'class': 'box-info'})
                 for post in posts:
@@ -92,7 +93,7 @@ class source:
                     u = [i for i in data if '/torrent/' in i]
                     for u in u:
                         match = '%s %s' % (title, hdlr)
-                        match = match.replace('+', '-').replace(' ','-').replace(':-', '-').replace('---','-')
+                        match = match.replace('+', '-').replace(' ', '-').replace(':-', '-').replace('---', '-')
                         if not match in u: continue
                         u = self.base_link + u
                         r = client.request(u)
@@ -113,13 +114,14 @@ class source:
                             except BaseException:
                                 pass
                             info = ' | '.join(info)
-                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                                 'direct': False, 'debridonly': True})
             except:
                 return
             return sources
-        except :
+        except:
             return sources
 
     def resolve(self, url):
         return url
-

@@ -12,12 +12,14 @@
 **Created by Tempest**
 """
 
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
 
 
 class source:
@@ -29,7 +31,6 @@ class source:
         self.search_link = '?s=%s'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
@@ -38,7 +39,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -46,7 +46,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -59,23 +58,25 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
             if url == None: return sources
             if debrid.status() is False: raise Exception()
-            if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s s%02de%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-            print query
+            print
+            query
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-            print url
+            print
+            url
             headers = {'Referer': url}
             r = self.scraper.get(url, headers=headers).content
             try:
@@ -98,14 +99,14 @@ class source:
                             except:
                                 pass
                             info = ' | '.join(info)
-                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                                 'direct': False, 'debridonly': True})
             except:
                 return
             return sources
-        except :
+        except:
             return sources
-
 
     def resolve(self, url):
         return url
-

@@ -31,7 +31,8 @@ from openscrapers.modules import client
 
 def google(url):
     try:
-        if any(x in url for x in ['youtube.', 'docid=']): url = 'https://drive.google.com/file/d/%s/view' % re.compile('docid=([\w-]+)').findall(url)[0]
+        if any(x in url for x in ['youtube.', 'docid=']): url = 'https://drive.google.com/file/d/%s/view' % \
+                                                                re.compile('docid=([\w-]+)').findall(url)[0]
         netloc = urlparse.urlparse(url.strip().lower()).netloc
         netloc = netloc.split('.google')[0]
         if netloc == 'docs' or netloc == 'drive':
@@ -98,26 +99,46 @@ def googletag(url, append_height=False):
         quality = quality[0]
     except:
         return []
-    itag_map = {'151': {'quality': 'SD', 'height': 72}, '212': {'quality': 'SD', 'height': 480}, '313': {'quality': '4K', 'height': 2160},
-                '242': {'quality': 'SD', 'height': 240}, '315': {'quality': '4K', 'height': 2160}, '219': {'quality': 'SD', 'height': 480},
-                '133': {'quality': 'SD', 'height': 240}, '271': {'quality': '1440p', 'height': 1440}, '272': {'quality': '4K', 'height': 2160},
-                '137': {'quality': '1080p', 'height': 1080}, '136': {'quality': 'HD', 'height': 720}, '135': {'quality': 'SD', 'height': 480},
-                '134': {'quality': 'SD', 'height': 360}, '82': {'quality': 'SD', 'height': 360}, '83': {'quality': 'SD', 'height': 480},
-                '218': {'quality': 'SD', 'height': 480}, '93': {'quality': 'SD', 'height': 360}, '84': {'quality': 'HD', 'height': 720},
-                '170': {'quality': '1080p', 'height': 1080}, '167': {'quality': 'SD', 'height': 360}, '22': {'quality': 'HD', 'height': 720},
-                '46': {'quality': '1080p', 'height': 1080}, '160': {'quality': 'SD', 'height': 144}, '44': {'quality': 'SD', 'height': 480},
-                '45': {'quality': 'HD', 'height': 720}, '43': {'quality': 'SD', 'height': 360}, '94': {'quality': 'SD', 'height': 480},
-                '5': {'quality': 'SD', 'height': 240}, '6': {'quality': 'SD', 'height': 270}, '92': {'quality': 'SD', 'height': 240},
-                '85': {'quality': '1080p', 'height': 1080}, '308': {'quality': '1440p', 'height': 1440}, '278': {'quality': 'SD', 'height': 144},
-                '78': {'quality': 'SD', 'height': 480}, '302': {'quality': 'HD', 'height': 720}, '303': {'quality': '1080p', 'height': 1080},
-                '245': {'quality': 'SD', 'height': 480}, '244': {'quality': 'SD', 'height': 480}, '247': {'quality': 'HD', 'height': 720},
-                '246': {'quality': 'SD', 'height': 480}, '168': {'quality': 'SD', 'height': 480}, '266': {'quality': '4K', 'height': 2160},
-                '243': {'quality': 'SD', 'height': 360}, '264': {'quality': '1440p', 'height': 1440}, '102': {'quality': 'HD', 'height': 720},
-                '100': {'quality': 'SD', 'height': 360}, '101': {'quality': 'SD', 'height': 480}, '95': {'quality': 'HD', 'height': 720},
-                '248': {'quality': '1080p', 'height': 1080}, '96': {'quality': '1080p', 'height': 1080}, '91': {'quality': 'SD', 'height': 144},
-                '38': {'quality': '4K', 'height': 3072}, '59': {'quality': 'SD', 'height': 480}, '17': {'quality': 'SD', 'height': 144},
-                '132': {'quality': 'SD', 'height': 240}, '18': {'quality': 'SD', 'height': 360}, '37': {'quality': '1080p', 'height': 1080},
-                '35': {'quality': 'SD', 'height': 480}, '34': {'quality': 'SD', 'height': 360}, '298': {'quality': 'HD', 'height': 720},
+    itag_map = {'151': {'quality': 'SD', 'height': 72}, '212': {'quality': 'SD', 'height': 480},
+                '313': {'quality': '4K', 'height': 2160},
+                '242': {'quality': 'SD', 'height': 240}, '315': {'quality': '4K', 'height': 2160},
+                '219': {'quality': 'SD', 'height': 480},
+                '133': {'quality': 'SD', 'height': 240}, '271': {'quality': '1440p', 'height': 1440},
+                '272': {'quality': '4K', 'height': 2160},
+                '137': {'quality': '1080p', 'height': 1080}, '136': {'quality': 'HD', 'height': 720},
+                '135': {'quality': 'SD', 'height': 480},
+                '134': {'quality': 'SD', 'height': 360}, '82': {'quality': 'SD', 'height': 360},
+                '83': {'quality': 'SD', 'height': 480},
+                '218': {'quality': 'SD', 'height': 480}, '93': {'quality': 'SD', 'height': 360},
+                '84': {'quality': 'HD', 'height': 720},
+                '170': {'quality': '1080p', 'height': 1080}, '167': {'quality': 'SD', 'height': 360},
+                '22': {'quality': 'HD', 'height': 720},
+                '46': {'quality': '1080p', 'height': 1080}, '160': {'quality': 'SD', 'height': 144},
+                '44': {'quality': 'SD', 'height': 480},
+                '45': {'quality': 'HD', 'height': 720}, '43': {'quality': 'SD', 'height': 360},
+                '94': {'quality': 'SD', 'height': 480},
+                '5': {'quality': 'SD', 'height': 240}, '6': {'quality': 'SD', 'height': 270},
+                '92': {'quality': 'SD', 'height': 240},
+                '85': {'quality': '1080p', 'height': 1080}, '308': {'quality': '1440p', 'height': 1440},
+                '278': {'quality': 'SD', 'height': 144},
+                '78': {'quality': 'SD', 'height': 480}, '302': {'quality': 'HD', 'height': 720},
+                '303': {'quality': '1080p', 'height': 1080},
+                '245': {'quality': 'SD', 'height': 480}, '244': {'quality': 'SD', 'height': 480},
+                '247': {'quality': 'HD', 'height': 720},
+                '246': {'quality': 'SD', 'height': 480}, '168': {'quality': 'SD', 'height': 480},
+                '266': {'quality': '4K', 'height': 2160},
+                '243': {'quality': 'SD', 'height': 360}, '264': {'quality': '1440p', 'height': 1440},
+                '102': {'quality': 'HD', 'height': 720},
+                '100': {'quality': 'SD', 'height': 360}, '101': {'quality': 'SD', 'height': 480},
+                '95': {'quality': 'HD', 'height': 720},
+                '248': {'quality': '1080p', 'height': 1080}, '96': {'quality': '1080p', 'height': 1080},
+                '91': {'quality': 'SD', 'height': 144},
+                '38': {'quality': '4K', 'height': 3072}, '59': {'quality': 'SD', 'height': 480},
+                '17': {'quality': 'SD', 'height': 144},
+                '132': {'quality': 'SD', 'height': 240}, '18': {'quality': 'SD', 'height': 360},
+                '37': {'quality': '1080p', 'height': 1080},
+                '35': {'quality': 'SD', 'height': 480}, '34': {'quality': 'SD', 'height': 360},
+                '298': {'quality': 'HD', 'height': 720},
                 '299': {'quality': '1080p', 'height': 1080}, '169': {'quality': 'HD', 'height': 720}}
     if quality in itag_map:
         quality = itag_map[quality]
@@ -127,6 +148,7 @@ def googletag(url, append_height=False):
             return [{'quality': quality['quality'], 'url': url}]
     else:
         return []
+
 
 def googlepass(url):
     try:
@@ -237,5 +259,3 @@ def yandex(url):
         return url
     except:
         return
-
-

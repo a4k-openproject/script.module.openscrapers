@@ -9,24 +9,24 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 #######################################################################
- # ----------------------------------------------------------------------------
- # "THE BEER-WARE LICENSE" (Revision 42):
- # @Daddy_Blamo wrote this file.  As long as you retain this notice you
- # can do whatever you want with this stuff. If we meet some day, and you think
- # this stuff is worth it, you can buy me a beer in return. - Muad'Dib
- # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# @Daddy_Blamo wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
+# ----------------------------------------------------------------------------
 #######################################################################
 
 # Addon Name: Placenta
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.Blamo
 
+import HTMLParser
 import itertools
 import re
 import urllib
-
-import HTMLParser
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import dom_parser
@@ -52,7 +52,8 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases))
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases))
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
+                [tvshowtitle] + source_utils.aliases_to_array(aliases))
             return url
         except:
             return
@@ -87,7 +88,7 @@ class source:
             options1 = dom_parser.parse_dom(r, 'li', attrs={'class': 'STPb'})
             options2 = dom_parser.parse_dom(r, 'div', attrs={'class': 'TPlayerTb'})
 
-            for o1,o2 in itertools.izip(options1,options2):
+            for o1, o2 in itertools.izip(options1, options2):
                 if 'trailer' in o1[1].lower():
                     continue
 
@@ -104,7 +105,8 @@ class source:
                 valid, hoster = source_utils.is_host_valid(url, hostDict)
                 if not valid: continue
 
-                sources.append({'source': hoster, 'quality': quality, 'language': 'de', 'url': url, 'direct': False, 'debridonly': False})
+                sources.append({'source': hoster, 'quality': quality, 'language': 'de', 'url': url, 'direct': False,
+                                'debridonly': False})
 
             return sources
         except:
