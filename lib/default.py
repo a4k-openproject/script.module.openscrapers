@@ -134,7 +134,7 @@ elif action == "toggleAllTorrent":
 
 if action == "Defaults":
     sourceList = ['123hbo', '123movieshd', '123movieshubz', '123123movies', 'animetoon', 'cartoonhd', 'cmovieshd',
-                  'cmovieshdbz', 'cooltvseries', 'extramovies', 'flixmy', 'freefmovies', 'freeputlockers',
+                  'cmovieshdbz', 'cooltvseries', 'extramovies', 'flimxy', 'freefmovies', 'freeputlockers',
                   'gowatchseries', 'Hdmto', 'iwaatch',
                   'kattv', 'mymoviego', 'mywatchepseries', 'naturalbd', 'odb', 'openloadmovie', 'plocker', 'primewire',
                   'projectfreetv',

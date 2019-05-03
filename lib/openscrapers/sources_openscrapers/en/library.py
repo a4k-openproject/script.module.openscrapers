@@ -115,7 +115,7 @@ class source:
 
                 r = control.jsonrpc(
                     '{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["file"], "tvshowid": %s }, "id": 1}' % (
-                    str(season), str(episode), str(r['tvshowid'])))
+                        str(season), str(episode), str(r['tvshowid'])))
                 r = unicode(r, 'utf-8', errors='ignore')
                 r = json.loads(r)['result']['episodes']
 

@@ -4,6 +4,7 @@
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
+import StringIO
 import cProfile
 import json
 import os
@@ -11,7 +12,6 @@ import pstats
 import time
 from datetime import datetime
 
-import StringIO
 from openscrapers.modules import control
 
 try:
