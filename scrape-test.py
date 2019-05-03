@@ -190,7 +190,6 @@ def worker_thread(provider_name, provider_source):
                 RUNNING_PROVIDERS.remove(provider_name)
                 return
 
-            print(test_objects)
             provider_results = []
             url = []
             start_time = time.time()
