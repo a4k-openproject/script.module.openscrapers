@@ -42,7 +42,7 @@ test_mode = arguments.get('test_mode', 'movie')
 
 TIMEOUT_MODE = arguments.get('timeout_mode', False)
 
-no_tests = arguments.get('number_of_tests', '10')
+no_tests = int(arguments.get('number_of_tests', '10'))
 
 if TIMEOUT_MODE in ['true', 'True', 'y']:
     no_tests = 1
@@ -60,7 +60,7 @@ movie_meta = []
 episode_meta = []
 trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664'  # Soz Not Soz ExodusRedux
 
-trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % no_tests
+trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % (no_tests - 1)
 trakt_shows_url = 'https://api.trakt.tv/shows/popular?extended=full&limit=%s' % no_tests
 trakt_episodes_url = 'https://api.trakt.tv/shows/%s/seasons?extended=episodes'
 
@@ -74,7 +74,12 @@ if test_mode == 'movie':
     resp = requests.get(trakt_movies_url, headers=trakt_headers)
     resp = json.loads(resp.text)
 
+    movie_meta.append({'imdb': u'tt1270797', 'title': u'Venom', 'localtitle': u'Venom',
+                       'year': str(2018), 'aliases': []})
+
     for movie in resp:
+        if movie['title'] == 'Venom':
+            continue
         print('Adding Movie: %s' % movie['title'])
         movie_meta.append({'imdb': movie['ids']['imdb'], 'title': movie['title'], 'localtitle': movie['title'],
                            'year': str(movie['year']), 'aliases': []})
@@ -185,6 +190,7 @@ def worker_thread(provider_name, provider_source):
                 RUNNING_PROVIDERS.remove(provider_name)
                 return
 
+            print(test_objects)
             provider_results = []
             url = []
             start_time = time.time()
