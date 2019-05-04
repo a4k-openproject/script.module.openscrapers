@@ -75,7 +75,6 @@ class source:
             self._sources = []
             if url is None: return self._sources
             if debrid.status() is False: raise Exception()
-            # if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
