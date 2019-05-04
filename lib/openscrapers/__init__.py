@@ -12,7 +12,7 @@ except:
     pass
 
 
-def sources(specified_folders=None):
+def sources(specified_folders=None, debug=False):
     try:
         sourceDict = []
         if __addon__ is not None:
@@ -31,7 +31,9 @@ def sources(specified_folders=None):
                 try:
                     module = loader.find_module(module_name).load_module(module_name)
                     sourceDict.append((module_name, module.source()))
-                except:
+                except Exception as e:
+                    if debug:
+                        print('Error:Loading module: %s | %s ' % (module_name, e))
                     pass
         return enabledHosters(sourceDict)
     except:

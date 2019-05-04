@@ -41,7 +41,7 @@ class source:
         self.search_link = '/api/search/%s/?apikey=%s&getmeta=0&query=%s&count=%d&from=%d'
         self.types = ['stream']
         self.streamLimit = control.setting('pron.limit')
-        if self.streamLimit == '': self.streamLimit = 100
+        self.streamLimit = self.streamLimit if self.streamLimit is '' else 100
         self.streamLimit = int(self.streamLimit)
         self.streamIncrease = 100
         self.api = control.setting('pron.api')

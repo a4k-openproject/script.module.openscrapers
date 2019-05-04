@@ -57,10 +57,8 @@ class source:
                                                      fdb['sezon'], fdb['odcinek'])
             debug = 1;
             return result
-        except Exception, e:
-            print
-            str(e)
-
+        except Exception as e:
+            print(str(e))
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             result = {}
@@ -75,9 +73,8 @@ class source:
             result['more'] = self.create_search_more(tvshowtitle, localtvshowtitle, year, str(fdb['sp']),
                                                      str(fdb['filmid']), fdb['sezon'], fdb['odcinek'])
             return result
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
             return result
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -120,9 +117,8 @@ class source:
                             return {'sp': fdbsp, 'filmid': fdbfilmid, 'sezon': season, 'odcinek': episode}
                 except:
                     pass
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
 
     def get_filmweb_data(self, type_url, title, localtitle, year):
         try:
@@ -170,9 +166,8 @@ class source:
                     if title_clean == found_clean or local_clean == found_clean:
                         return {'href': href, 'id': id}
                     return {'href': href, 'id': id}
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
 
     def get_info_from_others(self, sources):
         infos = []

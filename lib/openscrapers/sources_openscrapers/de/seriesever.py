@@ -124,7 +124,8 @@ class source:
                             if '/old/seframer.php' in url: url = self.__get_old_url(url)
 
                             if 'keepup' in url:
-                            # needs to be fixed (keepup.gq)
+                                # needs to be fixed (keepup.gq)
+                                continue
                             elif self.domains[0] in url:
                                 url = re.search('(?<=id=).*$', url).group()
                                 url = 'https://drive.google.com/file/d/' + url

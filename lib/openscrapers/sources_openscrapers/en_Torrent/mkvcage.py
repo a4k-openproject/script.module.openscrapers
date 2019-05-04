@@ -72,12 +72,8 @@ class source:
                 int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
                 data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-            print
-            query
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-            print
-            url
             headers = {'Referer': url}
             r = self.scraper.get(url, headers=headers).content
             try:

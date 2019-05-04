@@ -34,7 +34,7 @@ folders = arguments.get('folders', None)
 if folders is not None:
     folders = folders.split(',')
 else:
-    folders = ['en', 'en_DebridOnly']
+    folders = None
 
 test_type = int(arguments.get('test_type', 1))
 
@@ -52,7 +52,7 @@ else:
 
 from lib import openscrapers
 
-print('Testing Folders: %s' % ' | '.join(folders))
+print('Testing Folders: %s' % (' | '.join(folders if folders is not None else ['All'])))
 print('Running %s tests' % no_tests)
 
 # Test information
@@ -103,7 +103,7 @@ else:
 
 RUNNING_PROVIDERS = []
 TOTAL_SOURCES = []
-PROVIDER_LIST = openscrapers.sources(folders)
+PROVIDER_LIST = openscrapers.sources(folders, True)
 FAILED_PROVIDERS = []
 PASSED_PROVIDERS = []
 workers = []
@@ -330,7 +330,7 @@ if __name__ == '__main__':
     for x in quality:
         print('%s: %s Sources' % (x, quality[x]))
 
-    base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
+    base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders if folders is not None else ['All']))
     output_filename = 'results-%s' % time.time()
 
     if not os.path.exists(base_output_path):

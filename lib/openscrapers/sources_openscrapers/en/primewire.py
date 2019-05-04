@@ -48,7 +48,7 @@ class source:
         self.base_link = 'https://www4.primewire.ac/'
         self.moviesearch_link = '?keywords=%s&type=movie'
         self.tvsearch_link = '?keywords=%s&type=tv'
-        self.scraper = cfscrape.create_scrper()
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

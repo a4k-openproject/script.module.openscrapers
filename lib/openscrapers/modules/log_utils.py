@@ -38,10 +38,8 @@ def log(msg, level=LOGNOTICE):
     except:
         return
     if xbmc:
-        print
-        DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled)
-        print
-        DEBUGPREFIX + ' Debug Log?: ' + str(debug_log)
+        print(DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled))
+        print(DEBUGPREFIX + ' Debug Log?: ' + str(debug_log))
     if not control.setting('addon_debug') == 'true':
         return
     try:
@@ -56,8 +54,7 @@ def log(msg, level=LOGNOTICE):
                 line = '[%s %s] %s: %s' % (datetime.now().date(), str(datetime.now().time())[:8], DEBUGPREFIX, msg)
                 f.write(line.rstrip('\r\n') + '\n')
         else:
-            print
-            '%s: %s' % (DEBUGPREFIX, msg)
+            print('%s: %s' % (DEBUGPREFIX, msg))
     except Exception as e:
         try:
             xbmc.log('Logging Failure: %s' % (e), level)
