@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from openscrapers.modules import control
 from openscrapers.modules import log_utils
 
 try:
@@ -34,13 +35,20 @@ except:
     debrid_resolvers = []
 
 
-def status():
+def status(torrent=False):
     try:
         import xbmc
+        debrid_check = debrid_resolvers != []
+        if debrid_check is True:
+            if torrent:
+                enabled = control.setting('torrent.enabled')
+                if enabled == '' or enabled.lower() == 'true':
+                    return True
+                else:
+                    return False
+        return debrid_check
     except:
         return True
-    debrid_check = debrid_resolvers != []
-    return debrid_check
 
 
 def resolver(url, debrid):

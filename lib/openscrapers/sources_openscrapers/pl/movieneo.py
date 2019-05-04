@@ -62,9 +62,8 @@ class source:
                     if word in result and year in result:
                         return [urlparse.urljoin(self.base_link, movieneourl), result]
                     continue
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
             return
 
     def sources(self, url, hostDict, hostprDict):

@@ -62,7 +62,7 @@ class source:
 
             # Go over search results and find their sources
             for result_link in result_links:
-                html = scraper.get(result_link).content
+                html = self.scraper.get(result_link).content
                 soup = BeautifulSoup(html, "html.parser")
                 javascripts = soup.findAll("script", {"type": "text/javascript"})
                 # Lets keep going until we find the one we need
@@ -87,7 +87,7 @@ class source:
                     'id': the_id,
                     'data': b64_string
                 }
-                html = scraper.post(urlparse.urljoin(self.base_link, '/wp-content/plugins/apiplayer/load.php'),
+                html = self.scraper.post(urlparse.urljoin(self.base_link, '/wp-content/plugins/apiplayer/load.php'),
                                     data=post).content
                 soup = BeautifulSoup(html, 'html.parser')
                 javascripts = soup.findAll("script", {"type": "text/javascript"})

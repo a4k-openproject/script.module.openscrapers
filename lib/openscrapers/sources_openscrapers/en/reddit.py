@@ -8,10 +8,14 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
+import json
 import re
+import urllib
+import urlparse
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -23,57 +27,73 @@ class source:
                           'https://www.reddit.com/r/fullmoviesonvimeo/',
                           'https://www.reddit.com/r/fullmoviesongoogle/']
         self.search_link = 'search.json?q=%s+%s&restrict_sr=1'
-        self.domains = ['reddit.com']
-        self.base_link = 'https://www.reddit.com/user/nbatman/m/streaming2/search?q=%s&restrict_sr=on'
-        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            title = cleantitle.geturl(title)
-            title = title.replace('-', '+')
-            query = '%s+%s' % (title, year)
-            url = self.base_link % query
+            url = {'imdb': imdb, 'title': title, 'year': year, 'aliases': aliases}
+            url = urllib.urlencode(url)
             return url
-        except:
+        except BaseException:
+            return
+
+    def search(self, title, year):
+        try:
+            content = []
+            for link in self.base_link:
+                try:
+                    query = urlparse.urljoin(link, self.search_link % (urllib.quote(title), year))
+                    r = client.request(query)
+                    r = json.loads(r)
+                    r = r['data']['children'][0]['data']
+
+                    if not cleantitle.get_simple(r['title'].split(year)[0]) == cleantitle.get(title): raise Exception()
+                    if not year in r['title']: raise Exception()
+                    content = [(r['title'], r['url'])]
+
+                except BaseException:
+                    pass
+            return content
+        except BaseException:
             return
 
     def sources(self, url, hostDict, hostprDict):
+        sources = []
         try:
-            sources = []
-            r = self.scraper.get(url).content
-            try:
-                match = re.compile(
-                    'class="search-title may-blank" >(.+?)</a>.+?<span class="search-result-icon search-result-icon-external"></span><a href="(.+?)://(.+?)/(.+?)" class="search-link may-blank" >').findall(
-                    r)
-                for info, http, host, ext in match:
-                    if '2160' in info:
-                        quality = '4K'
-                    elif '1080' in info:
-                        quality = '1080p'
-                    elif '720' in info:
-                        quality = 'HD'
-                    elif '480' in info:
-                        quality = 'SD'
+            if url is None: return sources
+
+            data = urlparse.parse_qs(url)
+            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+            urls = self.search(data['title'], data['year'])
+
+            for url in urls:
+                try:
+                    link = client.replaceHTMLCodes(url[1])
+                    link = link.encode('utf-8')
+                    if link in sources: continue
+                    if 'snahp' in link:
+                        data = client.request(link)
+                        data = client.parseDOM(data, 'center')
+                        data = [i for i in data if 'Hidden Link' in i][0]
+                        link = client.parseDOM(data, 'a', ret='href')[0]
+                    if 'google' in link:
+                        quality, info2 = source_utils.get_release_quality(url[0], link)
+                        sources.append(
+                            {'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': link, 'direct': False,
+                             'debridonly': False})
+
                     else:
-                        quality = 'SD'
-                    url = '%s://%s/%s' % (http, host, ext)
-                    if 'google' in host: host = 'GDrive'
-                    if 'Google' in host: host = 'GDrive'
-                    if 'GOOGLE' in host: host = 'GDrive'
-                    sources.append({
-                        'source': host,
-                        'quality': quality,
-                        'language': 'en',
-                        'url': url,
-                        'info': info,
-                        'direct': False,
-                        'debridonly': False
-                    })
-            except:
-                return
-        except Exception:
-            return
-        return sources
+                        host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(link.strip().lower()).netloc)[0]
+                        if host in hostDict:
+                            host = host.encode('utf-8')
+                            quality, info2 = source_utils.get_release_quality(url[0], link)
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False,
+                                 'debridonly': False})
+                except BaseException:
+                    pass
+            return sources
+        except BaseException:
+            return sources
 
     def resolve(self, url):
         return url

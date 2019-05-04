@@ -22,6 +22,7 @@
 # Addon Provider: Mr.blamo
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
@@ -35,6 +36,7 @@ class source:
         self.base_link = 'http://ekino-tv.pl'
         self.search_link = '/search/'
         self.resolve_link = '/watch/f/%s/%s'
+        self.scraper = cfscrape.create_scraper()
 
     def search(self, title, localtitle, year, search_type):
         try:
@@ -47,7 +49,7 @@ class source:
 
     def do_search(self, search_string, title, localtitle, year, search_type):
         url = urlparse.urljoin(self.base_link, self.search_link)
-        r = client.request(url, redirect=False, post={'search_field': search_string})
+        r = self.scraper.post(url, data={'search_field': search_string})
         r = client.parseDOM(r, 'div', attrs={'class': 'movies-list-item'})
 
         local_simple = cleantitle.get(localtitle)
@@ -85,7 +87,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         url = urlparse.urljoin(self.base_link, url)
-        r = client.request(url)
+        r = self.scraper.get(url).content
         r = client.parseDOM(r, 'div', attrs={'id': 'list-series'})[0]
         p = client.parseDOM(r, 'p')
         index = p.index('Sezon ' + season)
@@ -115,7 +117,7 @@ class source:
         sources = []
         try:
             if url == None: return sources
-            r = client.request(urlparse.urljoin(self.base_link, url), redirect=False)
+            r = self.scraper.get(urlparse.urljoin(self.base_link, url))
             rows = client.parseDOM(r, 'ul', attrs={'class': 'players'})[0]
             rows = client.parseDOM(rows, 'li')
             rows.pop()
@@ -147,7 +149,7 @@ class source:
             host = splitted[1]
             video_id = splitted[3]
             transl_url = urlparse.urljoin(self.base_link, self.resolve_link) % (host, video_id)
-            result = client.request(transl_url, redirect=False, cookie="prch=true")
+            result = self.scraper.get(transl_url, allow_redirects=False, headers = {'cookie':"prch=true"})
             scripts = client.parseDOM(result, 'script')
             for script in scripts:
                 if 'var url' in script:

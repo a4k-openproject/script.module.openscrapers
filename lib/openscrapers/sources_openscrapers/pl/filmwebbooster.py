@@ -15,6 +15,7 @@
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -35,6 +36,7 @@ class source:
         self.filmdb = 'http://www.filmdb.pl'
         self.filmweb_search = '/search?q=%s&startYear=%s&endYear=%s&startRate=&endRate=&startCount=&endCount='
         self.filmdb_search = '/ajax.php'
+        self.scraper = cfscrape.create_scraper()
 
     def create_search_more(self, title, localtitle, year, sp, filmid, season, episode):
         if localtitle == 'Vikings':
@@ -55,11 +57,9 @@ class source:
             fdb = self.get_filmdb_data('film', 'film', title, localtitle, year)
             result['more'] = self.create_search_more(title, localtitle, year, str(fdb['sp']), fdb['filmid'],
                                                      fdb['sezon'], fdb['odcinek'])
-            debug = 1;
             return result
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -75,9 +75,8 @@ class source:
             result['more'] = self.create_search_more(tvshowtitle, localtvshowtitle, year, str(fdb['sp']),
                                                      str(fdb['filmid']), fdb['sezon'], fdb['odcinek'])
             return result
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
             return result
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -105,7 +104,7 @@ class source:
                     result = r.text
                     hrefs = client.parseDOM(result, 'a', ret='href')
                     for href in hrefs:
-                        result = client.request(self.filmdb + str(href))
+                        result = self.scraper.get(self.filmdb + str(href)).content
                         fdbtitle = client.parseDOM(result, 'input', ret='value')[0]
                         fdbsubtitle = client.parseDOM(result, 'input', ret='value')[1]
                         fdbyear = client.parseDOM(result, 'input', ret='value')[2]
@@ -120,9 +119,8 @@ class source:
                             return {'sp': fdbsp, 'filmid': fdbfilmid, 'sezon': season, 'odcinek': episode}
                 except:
                     pass
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
 
     def get_filmweb_data(self, type_url, title, localtitle, year):
         try:
@@ -130,10 +128,9 @@ class source:
                 localtitle = 'Wikingowie'
             titles = {localtitle, title}
             for item in titles:
-                from urllib2 import Request, urlopen
                 url = urlparse.urljoin(self.film_web, self.filmweb_search)
                 url = url % (urllib.quote_plus(item), year, year)
-                result = client.request(url)
+                result = self.scraper.get(url).content
                 id = ''
                 rows = client.parseDOM(result, 'div', attrs={'class': 'ad__page-wrapper'})
                 if not rows:
@@ -147,11 +144,6 @@ class source:
                 local_clean = cleantitle.get(localtitle)
                 title_clean = cleantitle.get(title)
                 if not rows:
-                    url = urlparse.urljoin(self.film_web, self.filmweb_search)
-                    url = url % (type_url, urllib.quote_plus(cleantitle.query(localtitle)), year, year)
-                    q = Request(url)
-                    a = urlopen(q)
-                    result = a.read()
                     rows = client.parseDOM(rows, 'div', attrs={'id': 'searchResult'})
                     try:
                         id = client.parseDOM(rows, 'data', ret='data-id')[0]
@@ -161,7 +153,6 @@ class source:
                     local_clean = cleantitle.get(localtitle)
                     title_clean = cleantitle.get(title)
                 for row in rows:
-                    row2 = row
                     row2 = client.parseDOM(row, 'div', attrs={'class': 'filmPreview__originalTitle'})
                     if not row2:
                         row2 = client.parseDOM(row, 'h3', attrs={'class': 'filmPreview__title'})
@@ -170,9 +161,8 @@ class source:
                     if title_clean == found_clean or local_clean == found_clean:
                         return {'href': href, 'id': id}
                     return {'href': href, 'id': id}
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
 
     def get_info_from_others(self, sources):
         infos = []
@@ -192,7 +182,7 @@ class source:
                 search_url = url['url']
                 post = url['post']
                 referer = urlparse.urljoin(self.film_web, post['urlstrony'])
-                result = client.request(search_url, post=post, referer=referer)
+                result = self.scraper.post(search_url, data=post, headers={'referer': referer}).content
                 if not result.startswith('http'):
                     return sources
 
@@ -211,7 +201,7 @@ class source:
                 pass
             search_more_post = url['more']
             # search_url = urlparse.urljoin(self.base_link, self.search_more)
-            result = client.request(self.base_link2, post=search_more_post)
+            result = self.scraper.post(self.base_link2, data=search_more_post).content
             provider = client.parseDOM(result, 'option', ret='value')
             links = client.parseDOM(result, 'div', ret='data')
             wersja = client.parseDOM(result, 'div', attrs={'class': 'wersja'})

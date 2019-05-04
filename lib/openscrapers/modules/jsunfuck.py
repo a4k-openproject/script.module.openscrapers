@@ -254,8 +254,7 @@ def main():
     with open(sys.argv[1]) as f:
         start_js = f.read()
 
-    print
-    JSUnfuck(start_js).decode()
+    print(JSUnfuck(start_js).decode())
 
 
 if __name__ == '__main__':
