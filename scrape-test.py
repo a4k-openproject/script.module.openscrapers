@@ -190,32 +190,32 @@ def worker_thread(provider_name, provider_source):
                 RUNNING_PROVIDERS.remove(provider_name)
                 return
 
-            provider_results = []
             url = []
             start_time = time.time()
 
             for i in test_objects:
-                if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
+                if TIMEOUT_MODE and TOTAL_RUNTIME > TIMEOUT:
                     break
 
-                if len(provider_results) != 0:
-                    break
                 # Prepare test by fetching url
                 if test_mode == 'movie':
                     url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
                     if url is None:
+                        print('Warning provider (%s) returned none from movie method' % provider_name)
                         continue
 
                 elif test_mode == 'episode':
                     url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
                                                  i['localtvshowtitle'], i['aliases'], i['year'])
                     if url is None:
+                        print('Warning provider (%s) returned none from tvshow method' % provider_name)
                         continue
 
                     url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'],
                                                   i['season'],
                                                   i['episode'])
                     if url is None:
+                        print('Warning provider (%s) returned none from episode method' % provider_name)
                         continue
                 else:
                     RUNNING_PROVIDERS.remove(provider_name)
@@ -224,12 +224,13 @@ def worker_thread(provider_name, provider_source):
                 # Execute source method to gather urls
                 url = provider_source.sources(url, hosts, [])
                 if url is None:
+                    print('Warning provider (%s) returned none from episode sources' % provider_name)
                     continue
                 else:
                     if len(url) > 0:
-                        provider_results = url
                         TOTAL_SOURCES += url
                     else:
+                        print('Warning provider (%s) returned no sources' % provider_name)
                         continue
             if url is None:
                 url = []

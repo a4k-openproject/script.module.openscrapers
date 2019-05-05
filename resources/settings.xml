@@ -76,6 +76,7 @@
         <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="true"/>
         <setting id="provider.watchseriessi" type="bool" label="WATCHSERIESSI" default="true"/>
         <setting id="provider.watchserieshd" type="bool" label="WATCHSERIESHD" default="true"/>
+        <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="true"/>
     </category>
 
     <!-- Providers/Foreign-2 -->
