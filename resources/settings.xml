@@ -37,8 +37,8 @@
         <setting id="provider.cartoonwire" type="bool" label="CARTOONWIRE" default="true"/>
         <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="true"/>
         <setting id="provider.cmovieshdbz" type="bool" label="CMOVIESHDBZ" default="true"/>
-        <setting id="provider.cooltvseries" type="bool" label="COOLTVSERIES" default="true"/>
         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/>
+        <setting id="provider.cooltvseries" type="bool" label="COOLTVSERIES" default="true"/>
         <setting id="provider.extramovies" type="bool" label="EXTRAMOVIES" default="true"/>
         <setting id="provider.filepursuit" type="bool" label="FILEPURSUIT" default="false"/>
         <setting id="provider.filmxy" type="bool" label="FILMXY" default="true"/>
@@ -47,7 +47,7 @@
         <setting id="provider.furk" type="bool" label="FURK" default="false"/>
         <setting id="provider.gostream" type="bool" label="GOSTREAM" default="false"/>
         <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true"/>
-        <setting id="provider.Hdmto" type="bool" label="HDMTO" default="true"/>
+        <setting id="provider.hdmto" type="bool" label="HDMTO" default="true"/>
         <setting id="provider.iwaatch" type="bool" label="IWAATCH" default="true"/>
         <setting id="provider.kattv" type="bool" label="KATTV" default="true"/>
         <setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
@@ -74,8 +74,8 @@
         <setting id="provider.watchepisodes" type="bool" label="WATCHEPISODES" default="true"/>
         <setting id="provider.watchfree1" type="bool" label="WATCHFREE1" default="true"/>
         <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="true"/>
-        <setting id="provider.watchseriessi" type="bool" label="WATCHSERIESSI" default="true"/>
         <setting id="provider.watchserieshd" type="bool" label="WATCHSERIESHD" default="true"/>
+        <setting id="provider.watchseriessi" type="bool" label="WATCHSERIESSI" default="true"/>
         <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="true"/>
     </category>
 
@@ -103,7 +103,6 @@
         <setting label="Enable All German Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&setting=true&query=2.15)"/>
         <setting type="sep"/>
-        <setting id="provider.allucde" type="bool" label="ALLUC" default="false"/>
         <setting id="provider.animeloads" type="bool" label="ANIMELOADS" default="false"/>
         <setting id="provider.cine" type="bool" label="CINE" default="false"/>
         <setting id="provider.cinenator" type="bool" label="CINENATOR" default="false"/>
@@ -130,10 +129,9 @@
         <setting id="provider.pureanime" type="bool" label="PUREANIME" default="false"/>
         <setting id="provider.serienstream" type="bool" label="SERIENSTREAM" default="false"/>
         <setting id="provider.seriesever" type="bool" label="SERIESEVER" default="false"/>
-        <setting id="provider.stream-to" type="bool" label="STREAM-TO" default="false"/>
         <setting id="provider.streamdream" type="bool" label="STREAMDREAM" default="false"/>
-        <setting id="provider.streamflix" type="bool" label="STREAMFLIX" default="false"/>
         <setting id="provider.streamit" type="bool" label="STREAMIT" default="false"/>
+        <setting id="provider.streamto" type="bool" label="STREAM-TO" default="false"/>
         <setting id="provider.tata" type="bool" label="TATA" default="false"/>
         <setting id="provider.video4k" type="bool" label="VIDEO$NUMBER[4]K" default="false"/>
         <setting id="provider.view4u" type="bool" label="VIEW4U" default="false"/>
