@@ -10,7 +10,6 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import re
-import traceback
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
