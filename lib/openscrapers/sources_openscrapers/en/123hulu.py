@@ -72,7 +72,7 @@ class source:
                 url = r[0][0]
             except:
                 pass
-            data = scraper.get(url).content
+            data = self.scraper.get(url).content
             data = client.parseDOM(data, 'div', attrs={'id': 'details'})
             data = zip(client.parseDOM(data, 'a'), client.parseDOM(data, 'a', ret='href'))
             url = [(i[0], i[1]) for i in data if i[0] == str(int(episode))]

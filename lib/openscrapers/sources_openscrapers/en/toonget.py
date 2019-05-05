@@ -42,11 +42,12 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if not url: return
-            if season == '1':
-                url = self.base_link + '/' + url + '-episode-' + episode
+            if url is None:
+                return
+            if str(season) == '1':
+                url = '%s/%s-episode-%s' % (self.base_link, url, episode)
             else:
-                url = self.base_link + '/' + url + '-season-' + season + '-episode-' + episode
+                url = '%s/%s-season-%s-episode-%s' % (self.base_link, url, season, episode)
             return url
         except:
             return

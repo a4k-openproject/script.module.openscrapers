@@ -51,7 +51,7 @@ class source:
         try:
             sources = []
             scraper = cfscrape.create_scraper()
-            r = scraper.get(url).content
+            r = self.scraper.get(url).content
             try:
                 qual = re.compile('class="quality">(.+?)<').findall(r)
                 for i in qual:

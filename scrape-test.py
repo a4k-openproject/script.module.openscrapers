@@ -224,13 +224,11 @@ def worker_thread(provider_name, provider_source):
                 # Execute source method to gather urls
                 url = provider_source.sources(url, hosts, [])
                 if url is None:
-                    print('Warning provider (%s) returned none from episode sources' % provider_name)
                     continue
                 else:
                     if len(url) > 0:
                         TOTAL_SOURCES += url
                     else:
-                        print('Warning provider (%s) returned no sources' % provider_name)
                         continue
             if url is None:
                 url = []
