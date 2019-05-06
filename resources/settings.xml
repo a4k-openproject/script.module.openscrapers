@@ -210,7 +210,8 @@
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=false&query=4.0)"/>
         <setting label="Enable All Torrent Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=true&query=4.1)"/>
-        <setting id="torrent.min.seeders" type="slider" label="Minimum Seeders" default="1" range="1,100" option="int"/>
+		<setting id="torrent.enabled" type="bool" label="Enable Torrent Scrapers" default="true" visible = "false" />
+		<setting id="torrent.min.seeders" type="slider" label="Minimum Seeders" default="1" range="1,100" option="int"/>
         <setting type="sep"/>
         <setting id="provider.111ys" type="bool" label="$NUMBER[111]YS" default="true"/>
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="true"/>
@@ -222,7 +223,7 @@
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true"/>
         <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true"/>
-        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="true"/>
+        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="false"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
         <setting id="provider.yifimovies" type="bool" label="YIFYMOVIES" default="true"/>
