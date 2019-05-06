@@ -181,7 +181,7 @@ class source:
             ref_url = url
             mid = re.findall('-(\d*)\.', url)[0]
             data = {'id': mid}
-            r = self.scraper.post(url, headers=headers)
+            r = self.scraper.post(url, headers=headers).content
             try:
                 u = urlparse.urljoin(self.base_link, self.server_link % mid)
                 r = self.scraper.get(u, headers=mozhdr).content

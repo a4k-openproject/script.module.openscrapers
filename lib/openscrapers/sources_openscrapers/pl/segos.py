@@ -71,9 +71,8 @@ class source:
                     if simply_name == segostitle or simply_name2 == segostitle:
                         return urlparse.urljoin(self.base_link, segosurl)
                     continue
-        except Exception, e:
-            print
-            str(e)
+        except Exception as e:
+            print(str(e))
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):

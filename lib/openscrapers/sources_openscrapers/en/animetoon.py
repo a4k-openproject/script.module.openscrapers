@@ -41,37 +41,35 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if not url: return
-            if season == '1':
-                url = self.base_link + '/' + url + '-episode-' + episode
+            if url is None:
+                return
+            if str(season) == '1':
+                url = '%s/%s-episode-%s' % (self.base_link, url, episode)
             else:
-                url = self.base_link + '/' + url + '-season-' + season + '-episode-' + episode
+                url = '%s/%s-season-%s-episode-%s' % (self.base_link, url, season, episode)
             return url
         except:
             return
 
     def sources(self, url, hostDict, hostprDict):
+        sources = []
         try:
-            sources = []
-            r = self.request.get(url).content
-            try:
-                match = re.compile('<div><iframe src="(.+?)"').findall(r)
+            r = self.scraper.get(url).content
+            match = re.compile('<div><iframe src="(.+?)"').findall(r)
+            for url in match:
+                host = url.split('//')[1].replace('www.', '')
+                host = host.split('/')[0].split('.')[0].title()
+                quality = source_utils.check_sd_url(url)
+                r = self.scraper.get(url).content
+                if 'http' in url:
+                    match = re.compile("url: '(.+?)',").findall(r)
+                else:
+                    match = re.compile('file: "(.+?)",').findall(r)
                 for url in match:
-                    host = url.split('//')[1].replace('www.', '')
-                    host = host.split('/')[0].split('.')[0].title()
-                    quality = source_utils.check_sd_url(url)
-                    r = self.request.get(url).content
-                    if 'http' in url:
-                        match = re.compile("url: '(.+?)',").findall(r)
-                    else:
-                        match = re.compile('file: "(.+?)",').findall(r)
-                    for url in match:
-                        sources.append(
-                            {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-                             'debridonly': False})
-            except:
-                return
-        except Exception:
+                    sources.append(
+                        {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                         'debridonly': False})
+        except:
             return
         return sources
 

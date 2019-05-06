@@ -274,8 +274,7 @@ def _find_cache_version():
         if not os.path.exists(versionFile): f = open(versionFile, 'w'); f.close()
     except Exception as e:
         import xbmc
-        print
-        'OpenScrapers Data Path Does not Exist. Creating Folder....'
+        print('OpenScrapers Data Path Does not Exist. Creating Folder....')
         ad_folder = xbmc.translatePath('special://home/userdata/addon_data/plugin.video.openscrapers')
         os.makedirs(ad_folder)
     try:

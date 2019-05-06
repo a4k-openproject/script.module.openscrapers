@@ -34,7 +34,7 @@ folders = arguments.get('folders', None)
 if folders is not None:
     folders = folders.split(',')
 else:
-    folders = ['en', 'en_DebridOnly']
+    folders = None
 
 test_type = int(arguments.get('test_type', 1))
 
@@ -52,7 +52,7 @@ else:
 
 from lib import openscrapers
 
-print('Testing Folders: %s' % ' | '.join(folders))
+print('Testing Folders: %s' % (' | '.join(folders if folders is not None else ['All'])))
 print('Running %s tests' % no_tests)
 
 # Test information
@@ -103,7 +103,7 @@ else:
 
 RUNNING_PROVIDERS = []
 TOTAL_SOURCES = []
-PROVIDER_LIST = openscrapers.sources(folders)
+PROVIDER_LIST = openscrapers.sources(folders, True)
 FAILED_PROVIDERS = []
 PASSED_PROVIDERS = []
 workers = []
@@ -190,32 +190,32 @@ def worker_thread(provider_name, provider_source):
                 RUNNING_PROVIDERS.remove(provider_name)
                 return
 
-            provider_results = []
             url = []
             start_time = time.time()
 
             for i in test_objects:
-                if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
+                if TIMEOUT_MODE and TOTAL_RUNTIME > TIMEOUT:
                     break
 
-                if len(provider_results) != 0:
-                    break
                 # Prepare test by fetching url
                 if test_mode == 'movie':
                     url = provider_source.movie(i['imdb'], i['title'], i['localtitle'], i['aliases'], i['year'])
                     if url is None:
+                        print('Warning provider (%s) returned none from movie method' % provider_name)
                         continue
 
                 elif test_mode == 'episode':
                     url = provider_source.tvshow(i['show_imdb'], i['show_tvdb'], i['tvshowtitle'],
                                                  i['localtvshowtitle'], i['aliases'], i['year'])
                     if url is None:
+                        print('Warning provider (%s) returned none from tvshow method' % provider_name)
                         continue
 
                     url = provider_source.episode(url, i['imdb'], i['tvdb'], i['title'], i['premiered'],
                                                   i['season'],
                                                   i['episode'])
                     if url is None:
+                        print('Warning provider (%s) returned none from episode method' % provider_name)
                         continue
                 else:
                     RUNNING_PROVIDERS.remove(provider_name)
@@ -227,7 +227,6 @@ def worker_thread(provider_name, provider_source):
                     continue
                 else:
                     if len(url) > 0:
-                        provider_results = url
                         TOTAL_SOURCES += url
                     else:
                         continue
@@ -330,7 +329,7 @@ if __name__ == '__main__':
     for x in quality:
         print('%s: %s Sources' % (x, quality[x]))
 
-    base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders))
+    base_output_path = os.path.join(os.getcwd(), 'test-results', '-'.join(folders if folders is not None else ['All']))
     output_filename = 'results-%s' % time.time()
 
     if not os.path.exists(base_output_path):

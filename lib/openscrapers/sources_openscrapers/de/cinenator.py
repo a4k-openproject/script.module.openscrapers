@@ -25,8 +25,8 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
 from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
 
@@ -38,6 +38,7 @@ class source:
         self.domains = ['cinenator.com']
         self.base_link = 'http://www.cinenator.com'
         self.search_link = '/?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -63,12 +64,12 @@ class source:
                 return
 
             url = urlparse.urljoin(self.base_link, url)
-            url = client.request(url, output='geturl')
+            url = self.scraper.get(url).url
 
             if season == 1 and episode == 1:
                 season = episode = ''
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
             r = dom_parser.parse_dom(r, 'ul', attrs={'class': 'episodios'})
             r = dom_parser.parse_dom(r, 'a', attrs={'href': re.compile('[^\'"]*%s' % ('-%sx%s' % (season, episode)))})[
                 0].attrs['href']
@@ -86,7 +87,7 @@ class source:
 
             url = urlparse.urljoin(self.base_link, url)
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
 
             rel = dom_parser.parse_dom(r, 'div', attrs={'id': 'info'})
             rel = dom_parser.parse_dom(rel, 'div', attrs={'itemprop': 'description'})
@@ -121,7 +122,7 @@ class source:
     def resolve(self, url):
         try:
             if self.base_link in url:
-                r = client.request(url)
+                r = self.scraper.get(url).content
                 r = dom_parser.parse_dom(r, 'div', attrs={'class': 'cupe'})
                 r = dom_parser.parse_dom(r, 'div', attrs={'class': 'reloading'})
                 url = dom_parser.parse_dom(r, 'a', req='href')[0].attrs['href']
@@ -138,7 +139,7 @@ class source:
             t = [cleantitle.get(i) for i in set(titles) if i]
             y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 
-            r = client.request(query)
+            r = self.scraper.get(query).content
 
             r = dom_parser.parse_dom(r, 'article')
             r = [(dom_parser.parse_dom(i, 'div', attrs={'class': 'title'}),

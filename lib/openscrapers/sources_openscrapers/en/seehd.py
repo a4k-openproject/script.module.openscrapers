@@ -60,7 +60,7 @@ class source:
         try:
             sources = []
             scraper = cfscrape.create_scraper()
-            r = scraper.get(url).content
+            r = self.scraper.get(url).content
             try:
                 match = re.compile('<iframe.+?src="(.+?)://(.+?)/(.+?)"').findall(r)
                 for http, host, url in match:

@@ -6,6 +6,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -18,6 +19,7 @@ class source:
         self.domains = ['yifyddl.movie']
         self.base_link = 'https://yifyddl.movie/'
         self.search_link = '/movie/%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -32,13 +34,12 @@ class source:
             sources = []
             if url is None: return sources
             if debrid.status() is False: raise Exception()
-            # if debrid.tor_enabled() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             query = '%s %s' % (data['title'], data['year'])
             url = self.search_link % urllib.quote(query)
             url = urlparse.urljoin(self.base_link, url).replace('%20', '-')
-            html = client.request(url)
+            html = self.scraper(url).content
             try:
                 results = client.parseDOM(html, 'div', attrs={'class': 'ava1'})
             except:

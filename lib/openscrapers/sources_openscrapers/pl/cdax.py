@@ -25,6 +25,7 @@
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -38,6 +39,7 @@ class source:
 
         self.base_link = 'http://cdax.online/'
         self.search_link = '/?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         return self.search(localtitle, year, 'movies')
@@ -48,7 +50,7 @@ class source:
 
             query = self.search_link % urllib.quote_plus(cleantitle.query(localtitle))
             query = urlparse.urljoin(self.base_link, query)
-            result = client.request(query)
+            result = self.scraper.get(query).content
 
             result = client.parseDOM(result, 'div', attrs={'class': 'result-item'})
             for x in result:
@@ -68,7 +70,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            result = client.request(url)
+            result = self.scraper.get(url).content
             seasons = client.parseDOM(result, 'div', attrs={'class': 'se-c'})
             for season_data in seasons:
                 season_no = client.parseDOM(season_data, 'div', attrs={'class': 'se-q'})[0]
@@ -100,7 +102,7 @@ class source:
         try:
 
             if url == None: return sources
-            result = client.request(url)
+            result = self.scraper.get(url).content
 
             result = client.parseDOM(result, 'div', attrs={'id': 'downloads'})[0]
             rows = client.parseDOM(result, 'tr')
@@ -112,7 +114,8 @@ class source:
                     host = host.rpartition('=')[-1]
                     link = client.parseDOM(cols[0], 'a', ret='href')[0]
                     valid, host = source_utils.is_host_valid(host, hostDict)
-                    if not valid: continue
+                    if not valid:
+                        continue
 
                     q = 'SD'
                     if 'Wysoka' in cols[1]: q = 'HD'
@@ -130,4 +133,4 @@ class source:
             return sources
 
     def resolve(self, url):
-        return client.request(url, output='geturl')
+        return url
