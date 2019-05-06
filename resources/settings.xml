@@ -65,7 +65,7 @@
         <setting id="provider.putlockeronl" type="bool" label="PUTLOCKERONL" default="true"/>
         <setting id="provider.reddit" type="bool" label="REDDIT" default="true"/>
         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/>
-        <setting id="provider.series9" type="bool" label="SERIES9" default="true"/>
+        <setting id="provider.series9" type="bool" label="SERIES9" default="false"/>
         <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/>
         <setting id="provider.solarmoviefree" type="bool" label="SOLARMOVIEFREE" default="true"/>
         <setting id="provider.toonget" type="bool" label="TOONGET" default="true"/>
