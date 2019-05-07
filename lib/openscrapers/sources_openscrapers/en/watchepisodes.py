@@ -27,6 +27,7 @@ import json
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -39,6 +40,7 @@ class source:
         self.domains = ['watchepisodes.com', 'watchepisodes.unblocked.pl']
         self.base_link = 'http://www.watchepisodes4.com/'
         self.search_link = 'search/ajax_search?q=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -74,7 +76,7 @@ class source:
 
             query = urllib.quote_plus(cleantitle.getsearch(title))
             surl = urlparse.urljoin(self.base_link, self.search_link % query)
-            r = client.request(surl, XHR=True)
+            r = self.scraper.get(surl).content
             r = json.loads(r)
             r = r['series']
             for i in r:
@@ -82,20 +84,25 @@ class source:
                 if not cleantitle.get(title) == cleantitle.get(tit): raise Exception()
                 slink = i['seo']
                 slink = urlparse.urljoin(self.base_link, slink)
-
-                r = client.request(slink)
+                r = self.scraper.get(slink).content
                 if not data['imdb'] in r: raise Exception()
                 data = client.parseDOM(r, 'div', {'class': 'el-item\s*'})
                 epis = [client.parseDOM(i, 'a', ret='href')[0] for i in data if i]
                 epis = [i for i in epis if hdlr in i.lower()][0]
-                r = client.request(epis)
+                r = self.scraper.get(epis).content
                 links = client.parseDOM(r, 'a', ret='data-actuallink')
+                seen_urls = set()
                 for url in links:
+                    if url in seen_urls:
+                        continue
+                    seen_urls.add(url)
                     try:
+                        quality, info = source_utils.get_release_quality(url)
                         valid, host = source_utils.is_host_valid(url, hostDict)
-                        if not valid: raise Exception()
-                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
-                                        'debridonly': False})
+                        if not valid:
+                            raise Exception()
+                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                        'direct': False, 'debridonly': False})
                     except BaseException:
                         return sources
 
