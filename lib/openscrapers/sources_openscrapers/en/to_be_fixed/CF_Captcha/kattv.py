@@ -42,7 +42,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['kat.tv']
-        self.base_link = 'http://www1.kat.tv'
+        self.base_link = ''
         self.search_link = '/search-movies/%s.html'
         self.scraper = cfscrape.create_scraper()
 
@@ -60,6 +60,7 @@ class source:
             url = r[0][0]
             return url
         except Exception:
+            print(search_url)
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
