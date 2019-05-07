@@ -112,7 +112,7 @@ class source:
                 for slink in slinks:
                     try:
                         if 'vidnode.net/streaming.php' in slink:
-                            r = self.scraper.get('https:%s' % slink)
+                            r = self.scraper.get('https:%s' % slink).content
                             clinks = re.findall(r'sources:\[(.*?)\]', r)[0]
                             clinks = re.findall(r'file:\s*\'(http[^\']+)\',label:\s*\'(\d+)', clinks)
                             for clink in clinks:

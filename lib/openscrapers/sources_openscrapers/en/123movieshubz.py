@@ -74,7 +74,6 @@ class source:
                     url = i.attrs['href']
             return url
         except Exception as e:
-            print(e)
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -110,7 +109,7 @@ class source:
             post = {'ipplugins': 1, 'ip_film': urldata['data-film'], 'ip_server': urldata['data-server'],
                     'ip_name': urldata['data-name'], 'fix': "0"}
             p1 = self.scraper.post('http://123movieshubz.com/ip.file/swf/plugins/ipplugins.php', data=post,
-                                  headers={'referer':urldata['url']}).content
+                                  headers={'referer': urldata['url']}).content
             p1 = json.loads(p1)
             p2 = self.scraper.get('http://123movieshubz.com/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' % (
                 p1['s'], urldata['data-server'])).content

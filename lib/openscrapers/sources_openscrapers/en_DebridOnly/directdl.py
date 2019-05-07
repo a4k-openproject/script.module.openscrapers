@@ -62,18 +62,6 @@ class source:
         except:
             return
 
-    def request(self, url, post=None, cookie=None, referer=None, output='', close=True):
-        try:
-            headers = {'Accept': '*/*'}
-            if not cookie == None: headers['Cookie'] = cookie
-            if not referer == None: headers['Referer'] = referer
-            result = self.scraper.get(url, post=post, headers=headers, output=output, close=close).content
-            result = result.decode('iso-8859-1').encode('utf-8')
-            result = urllib.unquote_plus(result)
-            return result
-        except:
-            return
-
     def directdl_cache(self, url):
         try:
             url = urlparse.urljoin(base64.b64decode(self.b_link), url)
@@ -87,8 +75,11 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None: return sources
-            if debrid.status() == False: raise Exception()
+            hostDict = hostprDict + hostDict
+            if url is None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             try:
@@ -105,11 +96,13 @@ class source:
                 links = result = []
             for i in result:
                 try:
-                    if not cleantitle.get(t) == cleantitle.get(i['showName']): raise Exception()
+                    if not cleantitle.get(t) == cleantitle.get(i['showName']):
+                        raise Exception()
                     y = i['release']
                     y = re.compile('[\.|\(|\[|\s](\d{4}|S\d*E\d*)[\.|\)|\]|\s]').findall(y)[-1]
                     y = y.upper()
-                    if not any(x == y for x in f): raise Exception()
+                    if not any(x == y for x in f):
+                        raise Exception()
                     quality = i['quality']
                     quality, info = source_utils.get_release_quality(quality)
 
@@ -125,17 +118,18 @@ class source:
                     url = i['links']
                     # for x in url.keys(): links.append({'url': url[x], 'quality': quality, 'info': info})
                     links = []
-                    for x in url.keys(): links.append({'url': url[x], 'quality': quality})
+                    for x in url.keys():
+                        links.append({'url': url[x], 'quality': quality})
                     for link in links:
                         try:
                             url = link['url']
                             quality2 = link['quality']
-                            # url = url[1]
-                            # url = link
-                            if len(url) > 1: raise Exception()
+                            if len(url) > 1:
+                                raise Exception()
                             url = url[0].encode('utf-8')
                             host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
-                            if not host in hostprDict: raise Exception()
+                            if host not in hostDict:
+                                raise Exception()
                             host = host.encode('utf-8')
                             sources.append(
                                 {'source': host, 'quality': quality2, 'language': 'en', 'url': url, 'info': info,
@@ -155,8 +149,8 @@ class source:
             if not b in base64.b64decode(self.b_link): return url
             u, p, h = url.split('|')
             r = urlparse.parse_qs(h)['Referer'][0]
-            c = self.request(r, output='cookie', close=False)
-            result = self.request(u, post=p, referer=r, cookie=c)
+            c = self.scraper.get(r)
+            result = self.scraper.post(u, data=p, headers={'referer': r}, cookies=c.cookies)
             url = result.split('url=')
             url = [urllib.unquote_plus(i.strip()) for i in url]
             url = [i for i in url if i.startswith('http')]

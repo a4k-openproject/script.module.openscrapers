@@ -67,7 +67,7 @@ class source:
             for alias in aliases:
                 url = '%s/show/%s/season/%01d/episode/%01d' % (
                     self.base_link, cleantitle.geturl(title), int(season), int(episode))
-                result = self.scraper.get(url, headers=headers).status
+                result = self.scraper.get(url, headers=headers).status_code
                 if not result == 200 and url != self.base_link: break
             return url
         except:
@@ -77,12 +77,12 @@ class source:
         try:
             for alias in aliases:
                 url = '%s/film/%s' % (self.base_link, cleantitle.geturl(alias['title']))
-                result = self.scraper.get(url, headers=headers).status
+                result = self.scraper.get(url, headers=headers).status_code
                 if not result == 200 and url != self.base_link: break
             if url is None:
                 for alias in aliases:
                     url = '%s/film/%s-%s' % (self.base_link, cleantitle.geturl(alias['title']), year)
-                    result = self.scraper.get(url, headers=headers).status
+                    result = self.scraper.get(url, headers=headers).status_code
                     if not result == 200 and url != self.base_link: break
             return url
         except:
