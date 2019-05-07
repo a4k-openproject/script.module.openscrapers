@@ -43,7 +43,8 @@ class source:
                 return url
             else:
                 return
-        except Exception:
+        except Exception as e:
+            print(e)
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
