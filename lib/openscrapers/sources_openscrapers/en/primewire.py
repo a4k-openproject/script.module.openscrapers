@@ -54,7 +54,7 @@ class source:
         try:
             query = self.moviesearch_link % urllib.quote_plus((title))
             query = urlparse.urljoin(self.base_link, query.lower())
-            result = self.scraper.get(query, referer=self.base_link).content
+            result = self.scraper.get(query, headers={'referer': self.base_link}).content
 
             result = client.parseDOM(result, 'div', attrs={'class': 'index_item.+?'})
 
@@ -75,7 +75,7 @@ class source:
                 cleantitle.query(tvshowtitle))
             query = urlparse.urljoin(self.base_link, query.lower())
 
-            result = self.scraper.get(query).content
+            result = self.scraper.get(query, headers={'referer': self.base_link}).content
             result = client.parseDOM(
                 result, 'div', attrs={
                     'class': 'index_item.+?'})
@@ -118,7 +118,7 @@ class source:
 
             url = urlparse.urljoin(self.base_link, url) if not url.startswith('http') else url
 
-            result = self.scraper.get(url).content
+            result = self.scraper.get(url, headers={'referer': self.base_link}).content
             links = client.parseDOM(result, 'tbody')
 
             for i in links:

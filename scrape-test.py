@@ -60,7 +60,8 @@ movie_meta = []
 episode_meta = []
 trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664'  # Soz Not Soz ExodusRedux
 
-trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % (no_tests - 1)
+trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % \
+                   (no_tests if no_tests == 1 else no_tests - 1)
 trakt_shows_url = 'https://api.trakt.tv/shows/popular?extended=full&limit=%s' % no_tests
 trakt_episodes_url = 'https://api.trakt.tv/shows/%s/seasons?extended=episodes'
 

@@ -28,6 +28,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -41,6 +42,7 @@ class source:
         self.domains = ['300mbdownload']
         self.base_link = 'https://www.300mbdownload.club'
         self.search_link = '/search/%s/feed/rss2/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -72,20 +74,22 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None: return sources
-            if debrid.status() is False: raise Exception()
+            if url == None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (
                 data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+                int(data['episode'])) if 'tvshowtitle' in data else '%s' % (
+                data['title'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-            html = client.request(url)
+            html = self.scraper.get(url).content
             posts = client.parseDOM(html, 'item')
             hostDict = hostprDict + hostDict
             items = []

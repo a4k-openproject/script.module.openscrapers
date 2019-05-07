@@ -151,7 +151,7 @@ class source:
             for domain in self.domains:
                 try:
                     url = 'http://%s' % domain
-                    r = self.scraper.get(url, limit=1, timeout='10').content
+                    r = self.scraper.get(url, timeout='10').content
                     r = dom_parser.parse_dom(r, 'meta', attrs={'name': 'author'}, req='content')
                     if r and 'movie4k.to' in r[0].attrs.get('content').lower():
                         return url

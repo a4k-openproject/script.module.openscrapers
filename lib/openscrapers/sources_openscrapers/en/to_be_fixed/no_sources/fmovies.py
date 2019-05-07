@@ -107,8 +107,8 @@ class source:
             urldata = dict((i, urldata[i][0]) for i in urldata)
             post = {'ipplugins': 1, 'ip_film': urldata['data-film'], 'ip_server': urldata['data-server'],
                     'ip_name': urldata['data-name'], 'fix': "0"}
-            p1 = self.scraper.get('http://fmovies.sc/ip.file/swf/plugins/ipplugins.php', post=post,
-                                  referer=urldata['url'], XHR=True).content
+            p1 = self.scraper.post('http://fmovies.sc/ip.file/swf/plugins/ipplugins.php', data=post,
+                                  headers={'referer':urldata['url']}).content
             p1 = json.loads(p1)
             p2 = self.scraper.get('http://fmovies.sc/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' % (
                 p1['s'], urldata['data-server'])).content

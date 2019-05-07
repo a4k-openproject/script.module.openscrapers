@@ -14,6 +14,7 @@
 import json
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import dom_parser2
@@ -27,13 +28,14 @@ class source:
         self.domains = ['watchepisodeseries.com', 'watchepisodeseries.unblocked.cx']
         self.base_link = 'http://www.watchepisodeseries.com/'
         self.search_link = '/home/search?q=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             simple_title = cleantitle.get_simple(tvshowtitle)
             tvshowtitle = cleantitle.geturl(tvshowtitle).replace('-', '+')
             search_url = urlparse.urljoin(self.base_link, self.search_link % tvshowtitle)
-            r = client.request(search_url)
+            r = self.scraper.get(search_url).content
             r = json.loads(r)['series']
             r = [(urlparse.urljoin(self.base_link, i['seo_name'])) for i in r if
                  simple_title == cleantitle.get_simple(i['original_name'])]
@@ -46,8 +48,9 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
-            r = client.request(url)
+            if url is None:
+                return
+            r = self.scraper.get(url).content
             r = dom_parser2.parse_dom(r, 'div', {'class': 'el-item'})
             r = [(dom_parser2.parse_dom(i, 'div', {'class': 'season'}), \
                   dom_parser2.parse_dom(i, 'div', {'class': 'episode'}), \
@@ -78,8 +81,9 @@ class source:
             vidcloud_limit = 1
             vev_limit = 1
             flix555_limit = 1
-            if url == None: return sources
-            r = client.request(url)
+            if url is None:
+                return sources
+            r = self.scraper.get(url).content
             r = dom_parser2.parse_dom(r, 'div', {'class': 'll-item'})
             r = [(dom_parser2.parse_dom(i, 'a', req='href'), \
                   dom_parser2.parse_dom(i, 'div', {'class': 'notes'})) \
@@ -155,7 +159,7 @@ class source:
                         else:
                             flix555_limit -= 1
                     info = []
-                    quality, info = source_utils.get_release_quality(i[2], i[2])
+                    quality, info = source_utils.get_release_quality(i[1], i[2])
                     info = ' | '.join(info)
                     if results_limit < 1:
                         continue

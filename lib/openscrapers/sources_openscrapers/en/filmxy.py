@@ -63,7 +63,7 @@ class source:
             tit = cleantitle.geturl(title + ' ' + year)
             query = urlparse.urljoin(self.base_link, tit)
 
-            r = self.scraper.get(query, params={'referer': self.base_link}).content
+            r = self.scraper.get(query, headers={'referer': self.base_link}).content
             if not data['imdb'] in r:
                 return sources
 
