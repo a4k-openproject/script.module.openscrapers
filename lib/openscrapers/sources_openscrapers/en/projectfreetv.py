@@ -25,8 +25,9 @@
 
 import re
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -36,6 +37,7 @@ class source:
         self.domains = ['my-project-free.tv']
         self.base_link = 'https://www8.project-free-tv.ag/'
         self.search_link = '/episode/%s-season-%s-episode-%s'
+        self.scraper = cfscrape.create_scraper()
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -47,7 +49,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if not url: return
+            if not url:
+                return
             tvshowtitle = url
             url = self.base_link + self.search_link % (tvshowtitle, int(season), int(episode))
             return url
@@ -57,16 +60,18 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 data = re.compile("callvalue\('.+?','.+?','(.+?)://(.+?)/(.+?)'\)", re.DOTALL).findall(r)
                 for http, host, url in data:
                     url = '%s://%s/%s' % (http, host, url)
+                    quality, info = source_utils.get_release_quality(url)
                     sources.append({
                         'source': host,
-                        'quality': 'SD',
+                        'quality': quality,
                         'language': 'en',
                         'url': url,
+                        'info': info,
                         'direct': False,
                         'debridonly': False
                     })
