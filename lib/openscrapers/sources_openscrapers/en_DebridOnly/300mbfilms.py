@@ -28,6 +28,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -41,6 +42,7 @@ class source:
         self.domains = ['300mbfilms.co']
         self.base_link = 'https://www.300mbfilms.co/'
         self.search_link = '/search/%s/feed/rss2/'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -60,7 +62,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None: return
+            if url is None:
+                return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -72,8 +75,10 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url is None: return sources
-            if debrid.status() is False: raise Exception()
+            if url is None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -85,7 +90,7 @@ class source:
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-            r = client.request(url)
+            r = self.scraper.get(url).content
             posts = client.parseDOM(r, 'item')
             hostDict = hostprDict + hostDict
             items = []
@@ -143,19 +148,19 @@ class source:
         urls = []
         try:
             if url is None: return
-            r = client.request(url)
+            r = self.scraper.get(url).content
             r = client.parseDOM(r, 'div', attrs={'class': 'entry'})
             r = client.parseDOM(r, 'a', ret='href')
             r1 = [(i) for i in r if 'money' in i][0]
-            r = client.request(r1)
+            r = self.scraper.get(r1).content
             r = client.parseDOM(r, 'div', attrs={'id': 'post-\d+'})[0]
             if 'enter the password' in r:
                 plink = client.parseDOM(r, 'form', ret='action')[0]
                 post = {'post_password': '300mbfilms', 'Submit': 'Submit'}
-                send_post = client.request(plink, post=post, output='cookie')
-                link = client.request(r1, cookie=send_post)
+                result = self.scraper.post(plink, data=post)
+                link = self.scraper.get(r1, cookies=result.cookies).content
             else:
-                link = client.request(r1)
+                link = self.scraper.get(r1).content
             link = re.findall('<strong>Single(.+?)</tr', link, re.DOTALL)[0]
             link = client.parseDOM(link, 'a', ret='href')
             link = [(i.split('=')[-1]) for i in link]
