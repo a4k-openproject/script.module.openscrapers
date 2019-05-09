@@ -62,22 +62,42 @@ BUG_REPORT = (
 
 
 class CipherSuiteAdapter(HTTPAdapter):
-    def __init__(self, cipherSuite=None, **kwargs):
-        self.cipherSuite = cipherSuite
+    def __init__(self, cipher_suite=None, **kwargs):
+        self.cipher_suite = cipher_suite
         super(CipherSuiteAdapter, self).__init__(**kwargs)
 
+        if hasattr(ssl, 'PROTOCOL_TLS'):
+            self.ssl_context = create_urllib3_context(
+                ssl_version=getattr(ssl, 'PROTOCOL_TLSv1_3', ssl.PROTOCOL_TLSv1_2),
+                ciphers=self.cipher_suite
+            )
+        else:
+            self.ssl_context = create_urllib3_context(ssl_version=ssl.PROTOCOL_TLSv1)
+
     def init_poolmanager(self, *args, **kwargs):
-        kwargs['ssl_context'] = create_urllib3_context(ciphers=self.cipherSuite)
+        kwargs['ssl_context'] = create_urllib3_context(ciphers=self.cipher_suite)
         return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
 
     def proxy_manager_for(self, *args, **kwargs):
-        kwargs['ssl_context'] = create_urllib3_context(ciphers=self.cipherSuite)
+        kwargs['ssl_context'] = create_urllib3_context(ciphers=self.cipher_suite)
         return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
 
 
 class CloudflareScraper(Session):
     def __init__(self, *args, **kwargs):
         super(CloudflareScraper, self).__init__(*args, **kwargs)
+        self.headers = (
+            OrderedDict(
+                [
+                    ('User-Agent', self.headers['User-Agent']),
+                    ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
+                    ('Accept-Language', 'en-US,en;q=0.5'),
+                    ('Accept-Encoding', 'gzip, deflate'),
+                    ('Connection', 'close'),
+                    ('Upgrade-Insecure-Requests', '1')
+                ]
+            )
+        )
         self.tries = 0
         self.prev_resp = None
         self.cipher_suite = None
@@ -97,42 +117,35 @@ class CloudflareScraper(Session):
         if self.cipher_suite:
             return self.cipher_suite
 
-        ciphers = [
-            'GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384',
-            'CHACHA20-POLY1305-SHA256',
-            'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256', 'ECDHE-ECDSA-AES256-GCM-SHA384',
-            'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-CHACHA20-POLY1305-SHA256', 'ECDHE-RSA-CHACHA20-POLY1305-SHA256',
-            'ECDHE-RSA-AES128-CBC-SHA', 'ECDHE-RSA-AES256-CBC-SHA', 'RSA-AES128-GCM-SHA256', 'RSA-AES256-GCM-SHA384',
-            'ECDHE-RSA-AES128-GCM-SHA256', 'RSA-AES256-SHA', '3DES-EDE-CBC'
-        ]
-
         self.cipher_suite = ''
 
-        ctx = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-        ctx.set_ciphers('ALL')
+        if hasattr(ssl, 'PROTOCOL_TLS'):
+            ciphers = [
+                'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256', 'ECDHE-ECDSA-AES256-GCM-SHA384',
+                'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-CHACHA20-POLY1305-SHA256',
+                'ECDHE-RSA-CHACHA20-POLY1305-SHA256',
+                'ECDHE-RSA-AES128-CBC-SHA', 'ECDHE-RSA-AES256-CBC-SHA', 'RSA-AES128-GCM-SHA256',
+                'RSA-AES256-GCM-SHA384',
+                'ECDHE-RSA-AES128-GCM-SHA256', 'RSA-AES256-SHA', '3DES-EDE-CBC'
+            ]
 
-        for cipher in ciphers:
-            try:
-                ctx.set_ciphers(cipher)
-                self.cipher_suite = '{}:{}'.format(self.cipher_suite, cipher).rstrip(':')
-            except ssl.SSLError:
-                pass
+            if hasattr(ssl, 'PROTOCOL_TLSv1_3'):
+                ciphers.insert(0,
+                               ['GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384',
+                                'CHACHA20-POLY1305-SHA256'])
+
+            ctx = ssl.SSLContext(getattr(ssl, 'PROTOCOL_TLSv1_3', ssl.PROTOCOL_TLSv1_2))
+
+            for cipher in ciphers:
+                try:
+                    ctx.set_ciphers(cipher)
+                    self.cipher_suite = '{}:{}'.format(self.cipher_suite, cipher).rstrip(':')
+                except ssl.SSLError:
+                    pass
 
         return self.cipher_suite
 
     def request(self, method, url, *args, **kwargs):
-        self.headers = (
-            OrderedDict(
-                [
-                    ('User-Agent', self.headers['User-Agent']),
-                    ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
-                    ('Accept-Language', 'en-US,en;q=0.5'),
-                    ('Accept-Encoding', 'gzip, deflate'),
-                    ('Connection', 'close'),
-                    ('Upgrade-Insecure-Requests', '1')
-                ]
-            )
-        )
 
         instance = super(CloudflareScraper, self)
         instance.mount('https://', CipherSuiteAdapter(self.load_cipher_suite()))
