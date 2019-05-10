@@ -17,7 +17,7 @@ import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import dom_parser2
+from openscrapers.modules import dom_parser
 
 
 class source:
@@ -34,8 +34,8 @@ class source:
             clean_title = cleantitle.geturl(title).replace('-', '+')
             url = urlparse.urljoin(self.base_link, (self.search_link % clean_title))
             r = self.scraper.get(url).content
-            r = dom_parser2.parse_dom(r, 'div', {'id': 'movie-featured'})
-            r = [dom_parser2.parse_dom(i, 'a', req=['href']) for i in r if i]
+            r = dom_parser.parse_dom(r, 'div', {'id': 'movie-featured'})
+            r = [dom_parser.parse_dom(i, 'a', req=['href']) for i in r if i]
             r = [(i[0].attrs['href'], re.search('Release:\s*(\d+)', i[0].content)) for i in r if i]
             r = [(i[0], i[1].groups()[0]) for i in r if i[0] and i[1]]
             r = [(i[0], i[1]) for i in r if i[1] == year]

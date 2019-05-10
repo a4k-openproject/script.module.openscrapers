@@ -4,7 +4,6 @@ import random
 import sys
 import threading
 import time
-import traceback
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -63,7 +62,7 @@ trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd166
 trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % \
                    (no_tests if no_tests == 1 else no_tests - 1)
 trakt_shows_url = 'https://api.trakt.tv/shows/popular?extended=full&limit=%s' % no_tests
-trakt_episodes_url = 'https://api.trakt.tv/shows/%s/seasons?extended=episodes'
+trakt_episodes_url = 'https://api.trakt.tv/shows/%s/seasons?extended=full,episodes'
 
 print('######################################')
 print('GETTING META FROM TRAKT ....')
@@ -90,16 +89,18 @@ else:
     resp = json.loads(resp.text)
 
     for show in resp:
-        episodes = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
-        episodes = json.loads(episodes.text)
-        episodes = [episode for season in episodes for episode in season['episodes'] if season['number'] != 0]
+        seasons = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
+        seasons = json.loads(seasons.text)
+        episodes = [episode for season in seasons for episode in season['episodes'] if season['number'] != 0]
         random.shuffle(episodes)
         episode = episodes[0]
+
         print('Adding Episode: %s - S%sE%s' % (show['title'], episode['season'], episode['number']))
         episode_meta.append({'show_imdb': show['ids']['imdb'], 'show_tvdb': show['ids']['tvdb'],
                              'tvshowtitle': show['title'], 'localtvshowtitle': show['title'], 'aliases': [],
-                             'year': show['year'], 'imdb': episode['ids']['imdb'], 'tvdb': episode['ids']['tvdb'],
-                             'title': episode['title'], 'premiered': '', 'season': episode['season'],
+                             'year': show['year'], 'imdb': episode['ids']['imdb'],
+                             'tvdb': episode['ids']['tvdb'], 'title': episode['title'],
+                             'premiered': seasons[episode['season']]['first_aired'], 'season': episode['season'],
                              'episode': episode['number']})
 
 RUNNING_PROVIDERS = []
@@ -111,19 +112,41 @@ workers = []
 TOTAL_RUNTIME = 0
 TIMEOUT = 10
 
-hosts = [u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'thevideo.me', u'filesmonster.com',
-         u'youtube.com', u'icerbox.com', u'nitroflare.com', u'1fichier.com', u'docs.google.com', u'mediafire.com',
-         u'hitfile.net', u'2shared.com', u'rapidvideo.com', u'filerio.com', u'extmatrix.com', u'datafile.com',
-         u'solidfiles.com', u'dl.free.fr', u'inclouddrive.com', u'zippyshare.com', u'unibytes.com', u'flashx.tv',
-         u'canalplus.fr', u'redbunker.net', u'nowvideo.club', u'dailymotion.com', u'load.to', u'uploaded.net',
-         u'scribd.com', u'big4shared.com', u'rockfile.eu', u'uptobox.com', u'filesabc.com', u'streamcherry.com',
-         u'isra.cloud', u'filefactory.com', u'youporn.com', u'oboom.com', u'vimeo.com', u'real-debrid.com',
-         u'redtube.com', u'file.al', u'faststore.org', u'soundcloud.com', u'gigapeta.com', u'share-online.biz',
-         u'datei.to', u'datafilehost.com', u'depositfiles.com', u'rutube.ru', u'upstore.net', u'salefiles.com',
-         u'streamango.com', u'cbs.com', u'worldbytez.com', u'turbobit.net', u'mega.co.nz', u'tusfiles.net',
-         u'uploadc.com', u'wipfiles.net', u'hulkshare.com', u'rarefile.net', u'sendspace.com', u'vidoza.net',
-         u'alfafile.net', u'keep2share.cc', u'yunfile.com', u'vidlox.tv', u'catshare.net', u'vk.com',
-         u'clicknupload.me', u'userscloud.com', u'ulozto.net', u'easybytez.com']
+hosts = [u'adultswim.com', u'aliez.me', u'amazon.com', u'ani-stream.com', u'anyfiles.pl', u'bestream.tv',
+         u'blazefile.co', u'castamp.com', u'cda.pl', u'www.cda.pl', u'ebd.cda.pl', u'clicknupload.com',
+         u'clicknupload.me', u'clicknupload.link', u'clicknupload.org', u'clipwatching.com', u'cloud.mail.ru',
+         u'cloudvideo.tv', u'daclips.in', u'daclips.com', u'dailymotion.com', u'datemule.co', u'datemule.com',
+         u'downace.com', u'entervideo.net', u'estream.to', u'estream.nu', u'estream.xyz', u'facebook.com',
+         u'fastplay.sx', u'fastplay.cc', u'fastplay.to', u'fembed.com', u'24hd.club', u'vcdn.io', u'fileholic.com',
+         u'filepup.net', u'flashx.tv', u'flashx.to', u'flashx.sx', u'flashx.bz', u'flashx.cc', u'flix555.com',
+         u'gamovideo.com', u'gofile.io', u'googlevideo.com', u'googleusercontent.com', u'get.google.com',
+         u'gorillavid.in', u'gorillavid.com', u'gounlimited.to', u'grifthost.com', u'h265.se', u'hdvid.tv',
+         u'hugefiles.net', u'hugefiles.cc', u'hxload.co', u'hxload.io', u'indavideo.hu', u'irshare.net', u'jetload.tv',
+         u'khatriuploads.com', u'stream.lewd.host', u'disk.yandex.ru', u'yadi.sk', u'mail.ru', u'my.mail.ru',
+         u'm.my.mail.ru', u'videoapi.my.mail.ru', u'api.video.mail.ru', u'megamp4.net', u'megamp4.us',
+         u'mehlizmovies.com', u'mehlizmovies.is', u'mehlizmovieshd.com', u'movdivx.com', u'divxme.com',
+         u'streamflv.com', u'movierulz.pro', u'movpod.net', u'movpod.in', u'mp4upload.com', u'mycloud.to', u'mcloud.to',
+         u'mystream.la', u'mystream.to', u'myupload.co', u'myvi.ru', u'nxload.com', u'ok.ru', u'odnoklassniki.ru',
+         u'oneload.co', u'oneload.com', u'openload.io', u'openload.co', u'oload.tv', u'oload.stream', u'oload.win',
+         u'oload.download', u'oload.info', u'oload.icu', u'oload.fun', u'openload.pw', u'playedto.me', u'playwire.com',
+         u'powvideo.net', u'powvideo.cc', u'putload.tv', u'shitmovie.com', u'putvid.com', u'rapidgator.net', u'rg.to',
+         u'rapidvideo.com', u'rutube.ru', u'videos.sapo.pt','speedvid.net', u'speedvideo.net', u'ssfiles.com',
+         u'streamable.com', u'streamango.com', u'streamcherry.com', u'fruitstreams.com', u'fruitadblock.net',
+         u'fruithosted.net', u'fruithosts.net', u'streamcloud.eu', u'streamcloud.co', u'streame.net', u'stream.moe',
+         u'streamplay.to', u'streamplay.club', u'streamplay.top', u'streamplay.me', u'superitu.com', u'syfy.com',
+         u'thevid.net', u'thevid.tv', u'tocloud.co', u'toltsd-fel.tk', u'toltsd-fel.xyz', u'trollvid.net',
+         u'trollvid.io', u'mp4edge.com', u'tubitv.com', u'tudou.com', u'tune.pk', u'tune.video', u'tusfiles.net',
+         u'tvlogy.to', u'twitch.tv', u'unitplay.net', u'upfiles.pro', u'uptobox.com', u'uptostream.com',
+         u'userscloud.com', u'usersfiles.com', u'ustream.tv', u'veehd.com', u'veoh.com', u'verystream.com', u'vev.io',
+         u'vidbob.com', u'vidbom.com', u'vidcloud.co', u'loadvid.online', u'vcstream.to', u'videa.hu', u'videakid.hu',
+         u'videoapne.co', u'thevideobee.to', u'videohost2.com', u'videowood.tv', u'byzoo.org', u'playpanda.net',
+         u'videozoo.me', u'videowing.me', u'easyvideo.me', u'play44.net', u'playbb.me', u'video44.net',
+         u'videozupload.net', u'vidlox.tv', u'vidlox.me', u'vidmad.net', u'tamildrive.com', u'vidnode.net',
+         u'vidorg.net', u'vidoza.net', u'vidstore.me', u'vidstreaming.io', u'vidto.me', u'vidto.se', u'vidup.me',
+         u'vidup.tv', u'vidwatch3.me', u'vidwatch.me', u'vidzi.tv', u'vidzi.nu', u'vimeo.com', u'vivo.sx', u'vk.com',
+         u'vkprime.com', u'vkspeed.com', u'speedwatch.us', u'vshare.io', u'vshare.eu', u'waaw.tv', u'hqq.watch',
+         u'netu.tv', u'hqq.tv', u'waaw1.tv', u'watchvideo.us', u'watchvideo2.us', u'watchvideo3.us', u'weshare.me',
+         u'xstreamcdn.com', u'yourupload.com', u'yucache.net', u'youtube.com', u'youtu.be', u'youtube-nocookie.com']
 
 
 def domain_analysis(domain_name):
@@ -237,7 +260,7 @@ def worker_thread(provider_name, provider_source):
             runtime = time.time() - start_time
             PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
     except Exception as e:
-        traceback.print_exc()
+
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
         FAILED_PROVIDERS.append((provider_name, e))
@@ -267,7 +290,7 @@ if __name__ == '__main__':
             if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
                 break
             print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
-                                                  ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
+                                                 ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
             TOTAL_RUNTIME += 1
     else:

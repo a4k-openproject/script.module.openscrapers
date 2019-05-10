@@ -29,30 +29,30 @@ class source:
         self.language = ['en']
         self.domains = ['www.bnwmovies.com']
         self.base_link = 'http://www.bnwmovies.com/'
-        self.search_link = '%s/search?q=bnwmovies.com+%s+%s'
-        self.scraper = cfscrape.create_scraper(0)
+        self.search_link = '%s?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             scrape = title.lower().replace(' ', '+').replace(':', '')
 
-            start_url = self.search_link % (self.base_link, scrape, year)
-            html = self.scraper.get(start_url).content
+            start_url = self.search_link % (self.base_link, scrape)
+            html = self.scraper.get(start_url, headers={'referer': start_url}).content
             results = re.compile('href="(.+?)"', re.DOTALL).findall(html)
+
             for url in results:
                 if self.base_link in url:
                     if 'webcache' in url:
+                        continue
+                    if 'rss' in url:
                         continue
                     if cleantitle.get(title) in cleantitle.get(url):
                         chkhtml = self.scraper.get(url).content
                         chktitle = re.compile('<title.+?>(.+?)</title>', re.DOTALL).findall(chkhtml)[0]
                         if cleantitle.get(title) in cleantitle.get(chktitle):
-                            if year in chktitle:
-                                return url
+                            return url
             return
         except:
-            failure = traceback.format_exc()
-            log_utils.log('BNWMovies - Exception: \n' + str(failure))
             return
 
     def sources(self, url, hostDict, hostprDict):

@@ -34,7 +34,7 @@ import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import dom_parser2
+from openscrapers.modules import dom_parser
 
 
 class source:
@@ -51,8 +51,8 @@ class source:
             clean_title = cleantitle.geturl(title)
             search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
             r = self.scraper.get(search_url).content
-            r = dom_parser2.parse_dom(r, 'li', {'class': 'item'})
-            r = [(dom_parser2.parse_dom(i, 'a', attrs={'class': 'title'}),
+            r = dom_parser.parse_dom(r, 'li', {'class': 'item'})
+            r = [(dom_parser.parse_dom(i, 'a', attrs={'class': 'title'}),
                   re.findall('status-year">(\d{4})</div', i.content, re.DOTALL)[0]) for i in r if i]
             r = [(i[0][0].attrs['href'], re.findall('(.+?)</b><br', i[0][0].content, re.DOTALL)[0], i[1]) for i in r if
                  i]
@@ -81,9 +81,9 @@ class source:
                 clean_title = cleantitle.geturl(url['tvshowtitle']) + '-season-%d' % int(season)
                 search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
                 r = self.scraper.get(search_url).content
-                r = dom_parser2.parse_dom(r, 'li', {'class': 'item'})
-                r = [(dom_parser2.parse_dom(i, 'a', attrs={'class': 'title'}),
-                      dom_parser2.parse_dom(i, 'div', attrs={'class': 'status'})[0]) for i in r if i]
+                r = dom_parser.parse_dom(r, 'li', {'class': 'item'})
+                r = [(dom_parser.parse_dom(i, 'a', attrs={'class': 'title'}),
+                      dom_parser.parse_dom(i, 'div', attrs={'class': 'status'})[0]) for i in r if i]
                 r = [(i[0][0].attrs['href'], re.findall('(.+?)</b><br', i[0][0].content, re.DOTALL)[0],
                       re.findall('(\d+)', i[1].content)[0]) for i in r if i]
                 r = [(i[0], i[1].split(':')[0], i[2]) for i in r
