@@ -56,7 +56,7 @@ class source:
             url = r[0][0]
 
             return url
-        except Exception:
+        except Exception as e:
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
@@ -81,12 +81,13 @@ class source:
                 r = client.parseDOM(r, 'div', {'id': 'movie-featured'})
                 r = [(client.parseDOM(i, 'a', ret='href'),
                       re.findall('<b><i>(.+?)</i>', i)) for i in r]
+
                 r = [(i[0][0], i[1][0]) for i in r if
                      cleantitle.get(i[1][0]) == cleantitle.get(clean_title)]
                 url = r[0][0]
             except:
                 pass
-            data = client.request(url)
+            data = self.scraper.get(url).content
             data = client.parseDOM(data, 'div', attrs={'id': 'details'})
             data = zip(client.parseDOM(data, 'a'), client.parseDOM(data, 'a', ret='href'))
             url = [(i[0], i[1]) for i in data if i[0] == str(int(episode))]
@@ -146,7 +147,7 @@ class source:
 
     def resolve(self, url):
         if self.base_link in url:
-            url = client.request(url)
+            url = self.scraper.get(url).content
             v = re.findall('document.write\(Base64.decode\("(.+?)"\)', url)[0]
             b64 = base64.b64decode(v)
             url = client.parseDOM(b64, 'iframe', ret='src')[0]

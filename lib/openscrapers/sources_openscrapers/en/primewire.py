@@ -36,7 +36,7 @@ from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import cfscrape
 from openscrapers.modules import source_utils
-from openscrapers.modules import dom_parser2 as dom
+from openscrapers.modules import dom_parser as dom
 from openscrapers.modules import jsunpack
 
 
@@ -52,7 +52,7 @@ class source:
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            query = self.moviesearch_link % urllib.quote_plus((title))
+            query = self.moviesearch_link % urllib.quote_plus(title)
             query = urlparse.urljoin(self.base_link, query.lower())
             result = self.scraper.get(query, headers={'referer': self.base_link}).content
 
@@ -66,7 +66,8 @@ class source:
             url = client.replaceHTMLCodes(result)
             url = url.encode('utf-8')
             return url
-        except Exception:
+        except Exception as e:
+            print(e)
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):

@@ -24,8 +24,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['freeputlockers.org']
-        self.base_link = 'http://freeputlockers.org'
+        self.domains = ['fmovies.sc']
+        self.base_link = 'http://www4.fmovies.sc'
         self.search_link = '/search/%s+%s.html'
         self.scraper = cfscrape.create_scraper()
 

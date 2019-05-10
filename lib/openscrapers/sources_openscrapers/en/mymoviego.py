@@ -18,7 +18,7 @@ import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import dom_parser2
+from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
 
 
@@ -36,8 +36,8 @@ class source:
             clean_title = cleantitle.geturl(title).replace('-', '+')
             url = urlparse.urljoin(self.base_link, (self.search_link % clean_title))
             r = self.scraper.get(url).content
-            r = dom_parser2.parse_dom(r, 'div', {'id': 'movie-featured'})
-            r = [dom_parser2.parse_dom(i, 'a', req=['href']) for i in r if i]
+            r = dom_parser.parse_dom(r, 'div', {'id': 'movie-featured'})
+            r = [dom_parser.parse_dom(i, 'a', req=['href']) for i in r if i]
             r = [(i[0].attrs['href'], re.search('Release:\s*(\d+)', i[0].content)) for i in r if i]
             r = [(i[0], i[1].groups()[0]) for i in r if i[0] and i[1]]
             r = [(i[0], i[1]) for i in r if i[1] == year]
@@ -59,7 +59,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['premiered'], url['season'], url['episode'] = premiered, season, episode
@@ -86,13 +87,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            openload_limit = 1
-            vshare_limit = 1
-            flashx_limit = 1
-            thevideobee_limit = 1
-            entervideo_limit = 1
-            megamp4_limit = 1
-            vidtodo_limit = 1
+
             r = self.scraper.get(url).content
             try:
                 v = re.findall('document.write\(Base64.decode\("(.+?)"\)', r)[0]
@@ -122,41 +117,6 @@ class source:
                         host = client.replaceHTMLCodes(host)
                         host = host.encode('utf-8')
                         valid, host = source_utils.is_host_valid(host, hostDict)
-                        if 'openload' in host:
-                            if openload_limit < 1:
-                                continue
-                            else:
-                                openload_limit -= 1
-                        if 'vshare' in host:
-                            if vshare_limit < 1:
-                                continue
-                            else:
-                                vshare_limit -= 1
-                        if 'flashx' in host:
-                            if flashx_limit < 1:
-                                continue
-                            else:
-                                flashx_limit -= 1
-                        if 'thevideobee' in host:
-                            if thevideobee_limit < 1:
-                                continue
-                            else:
-                                thevideobee_limit -= 1
-                        if 'entervideo' in host:
-                            if entervideo_limit < 1:
-                                continue
-                            else:
-                                entervideo_limit -= 1
-                        if 'megamp4' in host:
-                            if megamp4_limit < 1:
-                                continue
-                            else:
-                                megamp4_limit -= 1
-                        if 'vidtodo' in host:
-                            if vidtodo_limit < 1:
-                                continue
-                            else:
-                                vidtodo_limit -= 1
                         if valid:
                             sources.append(
                                 {'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'),

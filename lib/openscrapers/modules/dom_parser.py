@@ -100,7 +100,8 @@ def __get_attribs(element):
 
 
 def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
-    if attrs is None: attrs = {}
+    if attrs is None:
+        attrs = {}
     name = name.strip()
     if isinstance(html, unicode) or isinstance(html, DomMatch):
         html = [html]
