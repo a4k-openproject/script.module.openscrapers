@@ -86,11 +86,12 @@ class source:
                 r = control.jsonrpc(
                     '{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "originaltitle", "file"]}, "id": 1}' % years)
                 r = unicode(r, 'utf-8', errors='ignore')
-                r = json.loads(r)['result']['movies']
-
-                r = [i for i in r if
-                     str(i['imdbnumber']) in ids or title in [cleantitle.get(i['title'].encode('utf-8')),
-                                                              cleantitle.get(i['originaltitle'].encode('utf-8'))]]
+                r = json.loads(r)['result']
+                if 'movies' in r: r = r['movies']
+                else:
+                    return sources
+				
+                r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get(i['title'].encode('utf-8')), cleantitle.get(i['originaltitle'].encode('utf-8'))]]
                 r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')][0]
 
                 r = control.jsonrpc(
@@ -107,7 +108,10 @@ class source:
                 r = control.jsonrpc(
                     '{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title"]}, "id": 1}' % years)
                 r = unicode(r, 'utf-8', errors='ignore')
-                r = json.loads(r)['result']['tvshows']
+                r = json.loads(r)['result']
+                if 'tvshows' in r: r = r['tvshows']
+                else:
+                    return sources
 
                 r = [i for i in r if
                      str(i['imdbnumber']) in ids or title in [cleantitle.get(i['title'].encode('utf-8')),

@@ -261,8 +261,8 @@ def _is_cache_valid(cached_time, cache_timeout):
 
 def cache_version_check():
     if _find_cache_version():
-        cache_clear();
-        cache_clear_meta();
+        cache_clear()
+        cache_clear_meta()
         cache_clear_providers()
         control.infoDialog(control.lang(32057).encode('utf-8'), sound=True, icon='INFO')
 
@@ -271,11 +271,13 @@ def _find_cache_version():
     import os
     versionFile = os.path.join(control.dataPath, 'cache.v')
     try:
-        if not os.path.exists(versionFile): f = open(versionFile, 'w'); f.close()
+        if not os.path.exists(versionFile):
+            f = open(versionFile, 'w')
+            f.close()
     except Exception as e:
         import xbmc
         print('OpenScrapers Data Path Does not Exist. Creating Folder....')
-        ad_folder = xbmc.translatePath('special://home/userdata/addon_data/plugin.video.openscrapers')
+        ad_folder = xbmc.translatePath('special://home/userdata/addon_data/script.module.openscrapers')
         os.makedirs(ad_folder)
     try:
         with open(versionFile, 'rb') as fh:
