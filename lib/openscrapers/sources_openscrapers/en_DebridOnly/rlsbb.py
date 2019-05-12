@@ -79,9 +79,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['rlsbb.ru']
-        self.base_link = 'http://rlsbb.ru'
-        self.searchbase_link = 'http://search.rlsbb.ru'
-        self.search_cookie = 'serach_mode=rlsbb'
+        self.base_link = 'http://search.rlsbb.ru'
         self.search_link = '/lib/search%s?phrase=%s&pindex=1&code=%s&rand=0.7736787998237127'
         self.scraper = cfscrape.create_scraper()
 
@@ -141,16 +139,15 @@ class source:
             query = query.replace(" ", "-")
 
             query = urllib.quote_plus(query)
-            url = '%s/?s=%s&submit=Find' % (self.base_link, query)
 
-            resp = self.scraper.get(url)
+            resp = self.scraper.get(self.base_link)
 
-            capture = re.findall(r'<script id="rlsbb_script" data-code-rlsbb="(\d*)" .*? src="(.*?)"><', resp.text)[0]
+            capture = re.findall(r'<script id="rlsbb_script" data-code-rlsbb="(\d*)" .*? src="(.*?)"><', resp.content)[0]
             rlsbb_code = capture[0]
             script_url = capture[1]
 
             resp = self.scraper.get(script_url)
-            location_code = re.findall(r'\'/lib/search\' (.*?);', resp.text)[0]
+            location_code = re.findall(r'\'/lib/search\' (.*?);', resp.content)[0]
 
             location_maths = re.findall(r'( \(.*?\) )| (\'.*?\') |\+ (\d*) \+|(\'\d*.php\')', location_code)
 
@@ -158,9 +155,10 @@ class source:
 
             location_builder = parseJSString(location_maths)
 
-            url = '%s%s' % (self.searchbase_link, self.search_link % (location_builder, query, rlsbb_code))
+            url = '%s%s' % (self.base_link, self.search_link % (location_builder, query, rlsbb_code))
 
             r = self.scraper.get(url).content
+            print(r)
 
             try:
                 results = json.loads(r)['results']
@@ -177,9 +175,6 @@ class source:
             post_urls = []
 
             for post in results:
-
-                if 'old' in post['domain']:
-                    continue
                 capture = re.findall(regex, post['post_title'].lower())
                 capture = [i for i in capture if len(i) > 1]
                 if len(capture) >= 1:
@@ -241,7 +236,8 @@ class source:
             if check:
                 sources = check
             return sources
-        except:
+        except Exception as e:
+            print(e)
             return sources
 
     def resolve(self, url):
