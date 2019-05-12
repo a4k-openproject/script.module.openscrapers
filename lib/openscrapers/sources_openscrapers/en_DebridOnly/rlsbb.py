@@ -158,7 +158,6 @@ class source:
             url = '%s%s' % (self.base_link, self.search_link % (location_builder, query, rlsbb_code))
 
             r = self.scraper.get(url).content
-            print(r)
 
             try:
                 results = json.loads(r)['results']

@@ -29,8 +29,8 @@ import unicodedata
 import urlparse
 
 from openscrapers.modules import cache
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
@@ -44,6 +44,7 @@ class source:
         self.base_link = 'https://sezonlukdizi.org/'
         self.search_link = '/js/series1.js'
         self.video_link = '/ajax/dataEmbed.asp'
+        self.scraper = cfscrape.create_scraper()
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -59,17 +60,16 @@ class source:
     def sezonlukdizi_tvcache(self):
         try:
             url = urlparse.urljoin(self.base_link, self.search_link)
-
-            result = client.request(url, redirect=False)
+            result = self.scraper.get(url).content
 
             if not result:
-                r = client.request(self.base_link)
+                r = self.scraper.get(self.base_link).content
                 r = \
                     dom_parser.parse_dom(r, 'script',
                                          attrs={'type': 'text/javascript', 'src': re.compile('.*/js/dizi.*')},
                                          req='src')[0]
                 url = urlparse.urljoin(self.base_link, r.attrs['src'])
-                result = client.request(url)
+                result = self.scraper.get(url).content
 
             result = re.compile('{(.+?)}').findall(result)
             result = [
@@ -106,10 +106,10 @@ class source:
                 return sources
 
             url = urlparse.urljoin(self.base_link, url)
-            c = client.request(url, output='cookie')
-            result = client.request(url)
 
-            result = re.sub(r'[^\x00-\x7F]+', ' ', result)
+            result = self.scraper.get(url)
+            c = result.cookies
+            result = re.sub(r'[^\x00-\x7F]+', ' ', result.content)
 
             pages = dom_parser.parse_dom(result, 'div', attrs={'class': 'item'}, req='data-id')
             pages = [i.attrs['data-id'] for i in pages]
@@ -118,21 +118,25 @@ class source:
                 try:
                     url = urlparse.urljoin(self.base_link, self.video_link)
 
-                    result = client.request(url, post={'id': page}, cookie=c)
-                    if not result: continue
+                    result = self.scraper.post(url, data={'id': page}, cookies=c).content
+                    if not result:
+                        continue
 
                     url = dom_parser.parse_dom(result, 'iframe', req='src')[0].attrs['src']
-                    if url.startswith('//'): url = 'http:' + url
-                    if url.startswith('/'): url = urlparse.urljoin(self.base_link, url)
+                    if url.startswith('//'):
+                        url = 'http:' + url
+                    if url.startswith('/'):
+                        url = urlparse.urljoin(self.base_link, url)
 
                     valid, host = source_utils.is_host_valid(url, hostDict)
                     if valid: sources.append(
                         {'source': host, 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False,
                          'debridonly': False})
 
-                    if '.asp' not in url: continue
+                    if '.asp' not in url:
+                        continue
 
-                    result = client.request(url, cookie=c)
+                    result = self.scraper.get(url, cookies=c)
 
                     try:
                         url = dom_parser.parse_dom(result, 'iframe', req='src')[0].attrs['src']
