@@ -208,6 +208,7 @@
         <setting id="provider.sceneddl" type="bool" label="SCENEDDL" default="true"/>
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true"/>
         <setting id="provider.scnsrc" type="bool" label="SCNSRC" default="true"/>
+        <setting id="provider.series9" type="bool" label="SERIES9" default="false"/>
         <setting id="provider.tvdownload" type="bool" label="TVDOWNLOAD" default="true"/>
         <setting id="provider.ultrahd" type="bool" label="ULTRAHD" default="true"/>
     </category>
