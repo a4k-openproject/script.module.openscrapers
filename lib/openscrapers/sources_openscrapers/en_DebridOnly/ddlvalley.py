@@ -32,7 +32,7 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser2
+from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
 
 
@@ -91,8 +91,8 @@ class source:
             url = urlparse.urljoin(self.base_link, url)
             headers = {'Referer': url}
             r = self.scraper.get(url, headers=headers).content
-            items = dom_parser2.parse_dom(r, 'h2')
-            items = [dom_parser2.parse_dom(i.content, 'a', req=['href', 'rel', 'data-wpel-link']) for i in items]
+            items = dom_parser.parse_dom(r, 'h2')
+            items = [dom_parser.parse_dom(i.content, 'a', req=['href', 'rel', 'data-wpel-link']) for i in items]
             items = [(i[0].content, i[0].attrs['href']) for i in items]
             hostDict = hostprDict + hostDict
             for item in items:
@@ -105,7 +105,7 @@ class source:
                     url = item[1]
                     headers = {'Referer': url}
                     r = self.scraper.get(url, headers=headers).content
-                    links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', 'data-wpel-link'])
+                    links = dom_parser.parse_dom(r, 'a', req=['href', 'rel', 'data-wpel-link'])
                     links = [i.attrs['href'] for i in links]
                     for url in links:
                         try:

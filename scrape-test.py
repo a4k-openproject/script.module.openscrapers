@@ -60,9 +60,10 @@ movie_meta = []
 episode_meta = []
 trakt_api_key = 'c1d7d1519b5d70158fc568c42b8c7a39b4f73a73e17e25c0e85152a542cd1664'  # Soz Not Soz ExodusRedux
 
-trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % (no_tests - 1)
+trakt_movies_url = 'https://api.trakt.tv/movies/popular?extended=full&limit=%s' % \
+                   (no_tests if no_tests == 1 else no_tests - 1)
 trakt_shows_url = 'https://api.trakt.tv/shows/popular?extended=full&limit=%s' % no_tests
-trakt_episodes_url = 'https://api.trakt.tv/shows/%s/seasons?extended=episodes'
+trakt_episodes_url = 'https://api.trakt.tv/shows/%s/seasons?extended=full,episodes'
 
 print('######################################')
 print('GETTING META FROM TRAKT ....')
@@ -89,16 +90,19 @@ else:
     resp = json.loads(resp.text)
 
     for show in resp:
-        episodes = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
-        episodes = json.loads(episodes.text)
-        episodes = [episode for season in episodes for episode in season['episodes'] if season['number'] != 0]
+        seasons = requests.get(trakt_episodes_url % show['ids']['trakt'], headers=trakt_headers)
+        seasons = json.loads(seasons.text)
+        episodes = [episode for season in seasons  if 'episodes' in season for episode in season['episodes'] if
+                    season['number'] != 0]
         random.shuffle(episodes)
         episode = episodes[0]
+
         print('Adding Episode: %s - S%sE%s' % (show['title'], episode['season'], episode['number']))
         episode_meta.append({'show_imdb': show['ids']['imdb'], 'show_tvdb': show['ids']['tvdb'],
                              'tvshowtitle': show['title'], 'localtvshowtitle': show['title'], 'aliases': [],
-                             'year': show['year'], 'imdb': episode['ids']['imdb'], 'tvdb': episode['ids']['tvdb'],
-                             'title': episode['title'], 'premiered': '', 'season': episode['season'],
+                             'year': show['year'], 'imdb': episode['ids']['imdb'],
+                             'tvdb': episode['ids']['tvdb'], 'title': episode['title'],
+                             'premiered': seasons[int(episode['season'])-1]['first_aired'], 'season': episode['season'],
                              'episode': episode['number']})
 
 RUNNING_PROVIDERS = []
@@ -110,19 +114,52 @@ workers = []
 TOTAL_RUNTIME = 0
 TIMEOUT = 10
 
-hosts = [u'4shared.com', u'openload.co', u'rapidgator.net', u'sky.fm', u'thevideo.me', u'filesmonster.com',
-         u'youtube.com', u'icerbox.com', u'nitroflare.com', u'1fichier.com', u'docs.google.com', u'mediafire.com',
-         u'hitfile.net', u'2shared.com', u'rapidvideo.com', u'filerio.com', u'extmatrix.com', u'datafile.com',
-         u'solidfiles.com', u'dl.free.fr', u'inclouddrive.com', u'zippyshare.com', u'unibytes.com', u'flashx.tv',
-         u'canalplus.fr', u'redbunker.net', u'nowvideo.club', u'dailymotion.com', u'load.to', u'uploaded.net',
-         u'scribd.com', u'big4shared.com', u'rockfile.eu', u'uptobox.com', u'filesabc.com', u'streamcherry.com',
-         u'isra.cloud', u'filefactory.com', u'youporn.com', u'oboom.com', u'vimeo.com', u'real-debrid.com',
-         u'redtube.com', u'file.al', u'faststore.org', u'soundcloud.com', u'gigapeta.com', u'share-online.biz',
-         u'datei.to', u'datafilehost.com', u'depositfiles.com', u'rutube.ru', u'upstore.net', u'salefiles.com',
-         u'streamango.com', u'cbs.com', u'worldbytez.com', u'turbobit.net', u'mega.co.nz', u'tusfiles.net',
-         u'uploadc.com', u'wipfiles.net', u'hulkshare.com', u'rarefile.net', u'sendspace.com', u'vidoza.net',
-         u'alfafile.net', u'keep2share.cc', u'yunfile.com', u'vidlox.tv', u'catshare.net', u'vk.com',
-         u'clicknupload.me', u'userscloud.com', u'ulozto.net', u'easybytez.com']
+hosts = [u'1fichier.com', u'24hd.club', u'2shared.com', u'4shared.com', u'adultswim.com', u'alfafile.net', u'aliez.me',
+         u'amazon.com', u'ani-stream.com', u'anyfiles.pl', u'api.video.mail.ru', u'bestream.tv', u'big4shared.com',
+         u'blazefile.co', u'byzoo.org', u'canalplus.fr', u'castamp.com', u'catshare.net', u'cbs.com', u'cda.pl',
+         u'clicknupload.com', u'clicknupload.link', u'clicknupload.me', u'clicknupload.me', u'clicknupload.org',
+         u'clipwatching.com', u'cloud.mail.ru', u'cloudvideo.tv', u'daclips.com', u'daclips.in', u'dailymotion.com',
+         u'datafile.com', u'datafilehost.com', u'datei.to', u'datemule.co', u'datemule.com', u'depositfiles.com',
+         u'disk.yandex.ru', u'divxme.com', u'dl.free.fr', u'docs.google.com', u'downace.com', u'easybytez.com',
+         u'easyvideo.me', u'ebd.cda.pl', u'entervideo.net', u'estream.nu', u'estream.to', u'estream.xyz',
+         u'extmatrix.com', u'facebook.com', u'fastplay.cc', u'fastplay.sx', u'fastplay.to', u'faststore.org',
+         u'fembed.com', u'file.al', u'filefactory.com', u'fileholic.com', u'filepup.net', u'filerio.com',
+         u'filesabc.com', u'filesmonster.com', u'flashx.bz', u'flashx.cc', u'flashx.sx', u'flashx.to',
+         u'flashx.tv', u'flashx.tv', u'flix555.com', u'fruitadblock.net', u'fruithosted.net', u'fruithosts.net',
+         u'fruitstreams.com', u'gamovideo.com', u'get.google.com', u'gigapeta.com', u'gofile.io',
+         u'googleusercontent.com', u'googlevideo.com', u'gorillavid.com', u'gorillavid.in', u'gounlimited.to',
+         u'grifthost.com', u'h265.se', u'hdvid.tv', u'hitfile.net', u'hqq.tv', u'hqq.watch', u'hugefiles.cc',
+         u'hugefiles.net', u'hulkshare.com', u'hxload.co', u'hxload.io', u'icerbox.com', u'inclouddrive.com',
+         u'indavideo.hu', u'irshare.net', u'isra.cloud', u'jetload.tv', u'keep2share.cc', u'khatriuploads.com',
+         u'load.to', u'loadvid.online', u'm.my.mail.ru', u'mail.ru', u'mcloud.to', u'mediafire.com', u'mega.co.nz',
+         u'megamp4.net', u'megamp4.us', u'mehlizmovies.com', u'mehlizmovies.is', u'mehlizmovieshd.com', u'movdivx.com',
+         u'movierulz.pro', u'movpod.in', u'movpod.net', u'mp4edge.com', u'mp4upload.com', u'my.mail.ru', u'mycloud.to',
+         u'mystream.la', u'mystream.to', u'myupload.co', u'myvi.ru', u'netu.tv', u'nitroflare.com', u'nowvideo.club',
+         u'nxload.com', u'oboom.com', u'odnoklassniki.ru', u'ok.ru', u'oload.download', u'oload.fun', u'oload.icu',
+         u'oload.info', u'oload.stream', u'oload.tv', u'oload.win', u'oneload.co', u'oneload.com', u'openload.co',
+         u'openload.io', u'openload.pw', u'play44.net', u'playbb.me', u'playedto.me', u'playpanda.net', u'playwire.com',
+         u'powvideo.cc', u'powvideo.net', u'putload.tv', u'putvid.com', u'rapidgator.net', u'rapidvideo.com',
+         u'rarefile.net', u'real-debrid.com', u'redbunker.net', u'redtube.com', u'rg.to', u'rockfile.eu', u'rutube.ru',
+         u'salefiles.com', u'scribd.com', u'sendspace.com', u'share-online.biz', u'shitmovie.com', u'sky.fm',
+         u'solidfiles.com', u'soundcloud.com', u'speedvid.net', u'speedvideo.net', u'speedwatch.us', u'ssfiles.com',
+         u'stream.lewd.host', u'stream.moe', u'streamable.com', u'streamango.com', u'streamcherry.com',
+         u'streamcloud.co', u'streamcloud.eu', u'streame.net', u'streamflv.com', u'streamplay.club', u'streamplay.me',
+         u'streamplay.to', u'streamplay.top', u'superitu.com', u'syfy.com', u'tamildrive.com', u'thevid.net',
+         u'thevid.tv', u'thevideo.me', u'thevideobee.to', u'tocloud.co', u'toltsd-fel.tk', u'toltsd-fel.xyz',
+         u'trollvid.io', u'trollvid.net', u'tubitv.com', u'tudou.com', u'tune.pk', u'tune.video', u'turbobit.net',
+         u'tusfiles.net', u'tusfiles.net', u'tvlogy.to', u'twitch.tv', u'ulozto.net', u'unibytes.com',
+         u'unitplay.net', u'upfiles.pro', u'uploadc.com', u'uploaded.net', u'upstore.net', u'uptobox.com',
+         u'uptostream.com', u'userscloud.com', u'usersfiles.com', u'ustream.tv', u'vcdn.io', u'vcstream.to',
+         u'veehd.com', u'veoh.com', u'verystream.com', u'vev.io', u'vidbob.com', u'vidbom.com', u'vidcloud.co',
+         u'videa.hu', u'videakid.hu', u'video44.net', u'videoapi.my.mail.ru', u'videoapne.co', u'videohost2.com',
+         u'videos.sapo.pt', u'videowing.me', u'videowood.tv', u'videozoo.me', u'videozupload.net', u'vidlox.me',
+         u'vidlox.tv', u'vidmad.net', u'vidnode.net', u'vidorg.net', u'vidoza.net', u'vidoza.net', u'vidstore.me',
+         u'vidstreaming.io', u'vidto.me', u'vidto.se', u'vidup.me', u'vidup.tv', u'vidwatch.me', u'vidwatch3.me',
+         u'vidzi.nu', u'vidzi.tv', u'vimeo.com', u'vivo.sx', u'vk.com', u'vkprime.com', u'vkspeed.com', u'vshare.eu',
+         u'vshare.io', u'waaw.tv', u'waaw1.tv', u'watchvideo.us', u'watchvideo2.us', u'watchvideo3.us', u'weshare.me',
+         u'wipfiles.net', u'worldbytez.com', u'www.cda.pl', u'xstreamcdn.com', u'yadi.sk', u'youporn.com',
+         u'yourupload.com', u'youtu.be', u'youtube.com', u'youtube-nocookie.com', u'yucache.net', u'yunfile.com',
+         u'zippyshare.com']
 
 
 def domain_analysis(domain_name):
@@ -151,7 +188,7 @@ def domain_analysis(domain_name):
                 result['cloudflare_antibot_enabled'] = True
 
         result['domain_status'] = resp.status_code
-    except Exception:
+    except:
         result['domain_status'] = 'Error'
     return result
 
@@ -190,7 +227,7 @@ def worker_thread(provider_name, provider_source):
                 RUNNING_PROVIDERS.remove(provider_name)
                 return
 
-            url = []
+            sources = []
             start_time = time.time()
 
             for i in test_objects:
@@ -222,25 +259,24 @@ def worker_thread(provider_name, provider_source):
                     return
 
                 # Execute source method to gather urls
-                url = provider_source.sources(url, hosts, [])
-                if url is None:
+                result = provider_source.sources(url, hosts, [])
+                if result is None:
                     continue
                 else:
-                    if len(url) > 0:
-                        TOTAL_SOURCES += url
+                    if len(result) > 0:
+                        TOTAL_SOURCES += result
+                        sources += result
                     else:
                         continue
-            if url is None:
-                url = []
+            if sources is None:
+                sources = []
             # Gather time analytics
             runtime = time.time() - start_time
-            PASSED_PROVIDERS.append((provider_name, url, runtime, analysis))
-    except Exception as e:
-        traceback.print_exc()
+            PASSED_PROVIDERS.append((provider_name, sources, runtime, analysis))
+    except Exception:
         RUNNING_PROVIDERS.remove(provider_name)
         # Appending issue provider to failed providers
-        FAILED_PROVIDERS.append((provider_name, e))
-
+        FAILED_PROVIDERS.append((provider_name, traceback.format_exc()))
     try:
         RUNNING_PROVIDERS.remove(provider_name)
     except:
@@ -266,7 +302,7 @@ if __name__ == '__main__':
             if TOTAL_RUNTIME > TIMEOUT and TIMEOUT_MODE:
                 break
             print('Running Providers [%s]: %s' % (len(RUNNING_PROVIDERS),
-                                                  ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
+                                                 ' | '.join([i.upper() for i in RUNNING_PROVIDERS])))
             time.sleep(1)
             TOTAL_RUNTIME += 1
     else:
@@ -276,7 +312,7 @@ if __name__ == '__main__':
 
         while True:
             try:
-                choice = int(raw_input())
+                choice = int(input())
                 provider = PROVIDER_LIST[choice]
                 break
             except ValueError:
@@ -309,10 +345,6 @@ if __name__ == '__main__':
         print('Total Failed Providers: %s' % len(FAILED_PROVIDERS))
         print('Skipped Providers: %s' % (len(PROVIDER_LIST) - (len(PASSED_PROVIDERS) + len(FAILED_PROVIDERS))))
 
-    elif test_type == 0:
-        all_sources = PASSED_PROVIDERS[0][1]
-        if all_sources is None:
-            all_sources = []
     pre_dup = TOTAL_SOURCES
     post_dup = {}
     for i in TOTAL_SOURCES:
@@ -335,24 +367,25 @@ if __name__ == '__main__':
     if not os.path.exists(base_output_path):
         os.makedirs(base_output_path)
 
-    with open(os.path.join(base_output_path, output_filename + '.csv'), 'w+') as output:
-        output.write('Provider Name,Number Of Sources,Runtime,%s\n' %
-                     ','.join(str(x) for x in PASSED_PROVIDERS[0][3].keys()))
-        for i in PASSED_PROVIDERS:
-            try:
-                if i[1] is not None:
-                    output.write('%s,%s,%s,%s\n' % (
-                        i[0], len([] if i[1] is None else i[1]), i[2], ','.join(str(x) for x in i[3].values())))
-            except:
-                pass
-
-    for i in PASSED_PROVIDERS:
-        if len(i[1]) > 0:
-            with open(os.path.join(base_output_path, output_filename + '-' + i[0] + '.csv'), 'w+') as output:
-                output.write('%s\n' % ','.join(str(x) for x in i[1][0].keys()))
+    if len(PASSED_PROVIDERS) > 0:
+        with open(os.path.join(base_output_path, output_filename + '.csv'), 'w+') as output:
+            output.write('Provider Name,Number Of Sources,Runtime,%s\n' %
+                         (','.join(str(x) for x in list(PASSED_PROVIDERS[0][3].keys()))))
+            for i in PASSED_PROVIDERS:
                 try:
                     if i[1] is not None:
-                        for s in i[1]:
-                            output.write('%s\n' % ','.join(str(x) for x in s.values()))
+                        output.write('%s,%s,%s,%s\n' % (
+                            i[0], len([] if i[1] is None else i[1]), i[2], ','.join(str(x) for x in list(i[3].values()))))
                 except:
                     pass
+
+        for i in PASSED_PROVIDERS:
+            if len(i[1]) > 0:
+                with open(os.path.join(base_output_path, output_filename + '-' + i[0] + '.csv'), 'w+') as output:
+                    output.write('%s\n' % ','.join(str(x) for x in list(i[1][0].keys())))
+                    try:
+                        if i[1] is not None:
+                            for s in i[1]:
+                                output.write('%s\n' % ','.join(str(x) for x in list(s.values())))
+                    except:
+                        pass

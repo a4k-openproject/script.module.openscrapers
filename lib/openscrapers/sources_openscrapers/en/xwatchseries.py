@@ -16,13 +16,11 @@
     Originally created by others.
 '''
 import re
-import traceback
 import urlparse
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import log_utils
 from openscrapers.modules import proxy
 
 
@@ -45,7 +43,6 @@ class source:
             r = [(i[0][0], i[1][0], i[2][0]) for i in r if i[0] and i[1] and i[2]]
             return r[0][0]
         except:
-            traceback.print_exc()
             return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -76,8 +73,6 @@ class source:
 
             return url[0][0]
         except:
-            failure = traceback.format_exc()
-            log_utils.log('XWatchSeries - Exception: \n' + str(failure))
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -111,8 +106,6 @@ class source:
 
             return sources
         except:
-            failure = traceback.format_exc()
-            log_utils.log('XWatchSeries - Exception: \n' + str(failure))
             return sources
 
     def resolve(self, url):

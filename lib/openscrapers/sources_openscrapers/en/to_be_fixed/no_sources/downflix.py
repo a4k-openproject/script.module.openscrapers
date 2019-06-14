@@ -26,7 +26,10 @@
 
 import re
 
-from openscrapers.modules import cfscrape, cleantitle, directstream, source_utils
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import directstream
+from openscrapers.modules import source_utils
 
 
 class source:

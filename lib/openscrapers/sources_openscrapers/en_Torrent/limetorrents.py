@@ -29,9 +29,9 @@ import urllib
 import urlparse
 
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client2 as client
+from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser2
+from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
 from openscrapers.modules import workers
 
@@ -109,7 +109,7 @@ class source:
             posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
             posts = client.parseDOM(posts, 'tr')
             for post in posts:
-                data = dom_parser2.parse_dom(post, 'a', req='href')[1]
+                data = dom_parser.parse_dom(post, 'a', req='href')[1]
                 link = urlparse.urljoin(self.base_link, data.attrs['href'])
                 name = data.content
                 t = name.split(self.hdlr)[0]

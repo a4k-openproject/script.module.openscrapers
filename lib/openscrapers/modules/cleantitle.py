@@ -20,7 +20,8 @@ import unicodedata
 
 
 def get(title):
-    if title is None: return
+    if title is None:
+        return
     try:
         title = title.encode('utf-8')
     except:
@@ -33,7 +34,8 @@ def get(title):
 
 
 def geturl(title):
-    if title is None: return
+    if title is None:
+        return
     title = str(title)
     title = title.lower()
     title = title.translate(None, ':*?"\'\.<>|&!,')

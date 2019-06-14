@@ -32,7 +32,7 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser2
+from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
 
 
@@ -96,8 +96,8 @@ class source:
             headers = {'Referer': self.base_link}
             r = self.scraper.get(url, headers=headers).content
 
-            search_results = dom_parser2.parse_dom(r, 'h2')
-            search_results = [dom_parser2.parse_dom(i.content, 'a', req=['href']) for i in search_results]
+            search_results = dom_parser.parse_dom(r, 'h2')
+            search_results = [dom_parser.parse_dom(i.content, 'a', req=['href']) for i in search_results]
             search_results = [(i[0].content, i[0].attrs['href']) for i in search_results]
 
             items = []
@@ -105,7 +105,7 @@ class source:
                 try:
                     headers = {'Referer': url}
                     r = self.scraper.get(search_result[1], headers=headers).content
-                    links = dom_parser2.parse_dom(r, 'a', req=['href', 'rel', ])
+                    links = dom_parser.parse_dom(r, 'a', req=['href', 'rel', ])
                     links = [i.attrs['href'] for i in links]
                     for url in links:
                         try:

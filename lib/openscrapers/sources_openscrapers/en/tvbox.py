@@ -46,15 +46,15 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(title).replace('-', '+'))
-            r = self.scraper.get(url, cookie='check=2').content
+            r = self.scraper.get(url, headers={'cookie': 'check=2'}).content
             m = dom_parser.parse_dom(r, 'div', attrs={'class': 'masonry'})
             m = dom_parser.parse_dom(m, 'a', req='href')
             m = [(i.attrs['href']) for i in m if i.content == title]
             if m is not None:
                 url = urlparse.urljoin(self.base_link, m[0])
             return url
-        except Exception:
-            return
+        except:
+            return None
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -72,14 +72,14 @@ class source:
             data = dict((i, data[i][0]) for i in data)
             url = urlparse.urljoin(self.base_link, self.search_link %
                                    cleantitle.geturl(data['tvshowtitle']).replace('-', '+'))
-            r = self.scraper.get(url, cookie='check=2').content
+            r = self.scraper.get(url, headers={'cookie': 'check=2'}).content
             m = dom_parser.parse_dom(r, 'div', attrs={'class': 'masonry'})
             m = dom_parser.parse_dom(m, 'a', req='href')
             m = [(i.attrs['href']) for i in m if i.content == data['tvshowtitle']]
             query = '%s/season-%s/episode-%s/' % (m[0], season, episode)
             url = urlparse.urljoin(self.base_link, query)
             return url
-        except Exception:
+        except:
             return
 
     def sources(self, url, hostDict, hostprDict):
@@ -88,7 +88,7 @@ class source:
 
             if url is None:
                 return
-            r = self.scraper.get(url, cookie='check=2').content
+            r = self.scraper.get(url, headers={'cookie': 'check=2'}).content
 
             m = dom_parser.parse_dom(r, 'table', attrs={'class': 'show_links'})[0]
             links = re.findall('k">(.*?)<.*?f="(.*?)"', m.content)

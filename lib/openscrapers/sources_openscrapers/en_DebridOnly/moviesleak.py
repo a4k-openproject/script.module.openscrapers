@@ -33,7 +33,7 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser2
+from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
 from openscrapers.modules import workers
 
@@ -143,9 +143,9 @@ class source:
 
             try:
                 r = client.parseDOM(data, 'li', attrs={'class': 'elemento'})
-                r = [(dom_parser2.parse_dom(i, 'a', req='href')[0],
-                      dom_parser2.parse_dom(i, 'img', req='alt')[0],
-                      dom_parser2.parse_dom(i, 'span', {'class': 'd'})[0]) for i in r]
+                r = [(dom_parser.parse_dom(i, 'a', req='href')[0],
+                      dom_parser.parse_dom(i, 'img', req='alt')[0],
+                      dom_parser.parse_dom(i, 'span', {'class': 'd'})[0]) for i in r]
                 urls = [('http:' + i[0].attrs['href'] if not i[0].attrs['href'].startswith('http') else
                          i[0].attrs['href'], i[1].attrs['alt'], i[2].content) for i in r if i[0] and i[1]]
 
@@ -178,7 +178,7 @@ class source:
         if 'hideurl' in url:
             data = self.scraper.get(url).content
             data = client.parseDOM(data, 'div', attrs={'class': 'row'})
-            url = [dom_parser2.parse_dom(i, 'a', req='href')[0] for i in data]
+            url = [dom_parser.parse_dom(i, 'a', req='href')[0] for i in data]
             url = [i.attrs['href'] for i in url if 'direct me' in i.content][0]
             return url
         else:

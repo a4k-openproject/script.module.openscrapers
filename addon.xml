@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.1.6" provider-name="Addons4Kodi">
+<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.1.7" provider-name="Addons4Kodi">
     <requires>
-        <import addon="xbmc.python" version="2.1.0" />
+        <import addon="xbmc.python" version="2.25.0" />
         <import addon="script.module.beautifulsoup4"/>
+		<import addon="script.module.js2py"/>
     </requires>
     <extension point="xbmc.python.module" library="lib" />
     <extension point="xbmc.python.pluginsource" library="lib/default.py">
         <provides>executable</provides>
-    </extension>
+    </extension> 
         <extension point="xbmc.addon.metadata">
             <platform>all</platform>
             <summary lang="en">OpenScrapers Module</summary>

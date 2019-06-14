@@ -11,7 +11,9 @@
 
 import re
 
-from openscrapers.modules import client, cleantitle, source_utils
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -21,6 +23,7 @@ class source:
         self.domains = ['watchseries.fi', 'watchseries.si']  # old  watchseries.sk
         self.base_link = 'http://watchseries.si'
         self.search_link = '/series/%s/season/%s/episode/%s/'
+        self.scraper = cfscrape.create_scraper()
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -40,18 +43,17 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = client.request(url)
+            r = self.scraper.get(url).content
             try:
                 match = re.compile('href="(.+?)" rel="noindex\,nofollow">Watch This Link</a>').findall(r)
                 for url in match:
-                    r = client.request(url)
+                    r = self.scraper.get(url).content
                     match = re.compile(
                         '<a href="(.+?)://(.+?)/(.+?)"><button class="wpb\_button  wpb\_btn\-primary wpb\_regularsize"> Click Here To Play</button> </a>').findall(
                         r)
                     for http, host, url in match:
                         url = '%s://%s/%s' % (http, host, url)
-                        info = source_utils.check_url(url)
-                        quality = source_utils.check_url(url)
+                        quality, info = source_utils.get_release_quality(url)
                         valid, host = source_utils.is_host_valid(host, hostDict)
                         if valid:
                             sources.append(

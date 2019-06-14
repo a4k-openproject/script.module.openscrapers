@@ -12,7 +12,8 @@
 import base64
 import re
 
-from openscrapers.modules import cleantitle, cfscrape
+from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
 
 
 class source:

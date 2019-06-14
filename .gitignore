@@ -126,3 +126,15 @@ test-results/en-en_DebridOnly/os-en-and-debrid-movie-scrape-test.txt
 .idea/encodings.xml
 .idea/codeStyles/codeStyleConfig.xml
 test-results/en_torrent/os-torrents-movie-scrape-test.txt
+test-results/en-en_DebridOnly/temp
+test-results/en_DebridOnly/temp
+test-results/en_torrent/os-torrents-episode-scrape-test.txt
+test-results/scrapertest-egg/Ep Test/egg-episode-scrapetest.txt
+test-results/scrapertest-egg/Movie Test/egg-movie-scrapetest.txt
+test-results/scrapertest-scrubs/Ep/scrubs-episode-scrapetest.txt
+test-results/scrapertest-scrubs/Movie/scrubs-movie-scrapetest.txt
+test-results/scrapertest-yoda/Ep/yoda-episode-scrapetest.txt
+test-results/scrapertest-yoda/Movie/yoda-movie-scrapetest.txt
+test-results/temp
+test-results/en_DebridOnly/temp
+test-results/temp

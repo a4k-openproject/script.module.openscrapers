@@ -20,7 +20,6 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import directstream
-from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
 
 
@@ -77,22 +76,24 @@ class source:
     def searchMovie(self, title, year):
         title = cleantitle.normalize(title)
         url = self.search_link % cleantitle.geturl(title)
-        r = self.scraper.get(url, params ={'link_web': self.base_link}).content
+        r = self.scraper.get(url, params={'link_web': self.base_link}).content
         r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
         r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
         results = [(i[0], i[1], re.findall('\((\d{4})', i[1])) for i in r]
         try:
             r = [(i[0], i[1], i[2][0]) for i in results if len(i[2]) > 0]
-            url = [i[0] for i in r if cleantitle.get(i[1]) == cleantitle.get(title) and (year == i[2])][0]
+            url = [i[0] for i in r if cleantitle.get(i[1]).endswith(cleantitle.get(title)) and (year == i[2])][0]
         except:
             url = None
-            log_utils.log('series9 - Exception: \n' + str(traceback.format_exc()))
             pass
 
-        if (url == None):
-            url = [i[0] for i in results if cleantitle.get(i[1]) == cleantitle.get(title)][0]
+        try:
+            if url is None:
+                url = [i[0] for i in results if cleantitle.get(i[1]).endswith(cleantitle.get(title))][0]
+        except:
+            url = None
+            pass
 
-        url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
         return url
 
     def sources(self, url, hostDict, hostprDict):

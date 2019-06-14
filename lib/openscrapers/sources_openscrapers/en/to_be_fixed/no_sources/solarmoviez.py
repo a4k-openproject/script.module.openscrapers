@@ -235,9 +235,10 @@ class source:
                             length = 0
                             count = 0
                             while length == 0 and count < 11:
-                                r = self.scraper.get(u, headers=headers).text
+                                r = self.scraper.get(u, headers=headers).content
                                 length = len(r)
-                                if length == 0: count += 1
+                                if length == 0:
+                                    count += 1
                             uri = None
                             uri = json.loads(r)['playlist'][0]['sources']
                             try:
