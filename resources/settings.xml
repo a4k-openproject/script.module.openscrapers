@@ -83,7 +83,6 @@
         <setting id="provider.timewatch" type="bool" label="TIMEWATCH" default="true"/>
         <setting id="provider.toonget" type="bool" label="TOONGET" default="true"/>
         <setting id="provider.tvbox" type="bool" label="TVBOX" default="true"/>
-        <setting id="provider.vidics" type="bool" label="VIDICS" default="false"/>
         <setting id="provider.wannahd" type="bool" label="WANNAHD" default="true"/>
         <setting id="provider.watchepisodes" type="bool" label="WATCHEPISODES" default="true"/>
         <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="true"/>
