@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+# -Cleaned and Checked on 05-06-2019 by JewBMX in Scrubs.
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -8,13 +9,10 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-# -Cleaned and Checked on 04-15-2019 by JewBMX in Scrubs.
-# Made on 02-04-2019 because it doesnt match the usual hdpopcorns scraper.
-
 import re
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 from openscrapers.modules import source_utils
 
 
@@ -22,9 +20,9 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['hdpopcorns.eu']
-        self.base_link = 'https://hdpopcorns.eu'
-        self.scraper = cfscrape.create_scraper()
+        self.domains = ['gostream-123.com']
+        self.base_link = 'http://gostream-123.com'
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -34,41 +32,27 @@ class source:
         except:
             return
 
-    def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-        try:
-            url = cleantitle.geturl(tvshowtitle)
-            return url
-        except:
-            return
-
-    def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-        try:
-            if not url: return
-            tvshowtitle = url
-            url = self.base_link + '/episode/%s-season-%s-episode-%s/' % (tvshowtitle, season, episode)
-            return url
-        except:
-            return
 
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = self.scraper.get(url).ontent
+            if url == None:
+                return sources
+            r = client.request(url)
             try:
-                match = re.compile('<iframe src=".+?//(.+?)/(.+?)"').findall(r)
-                for host, url in match:
-                    url = 'https://%s/%s' % (host, url)
-                    quality, info = source_utils.get_release_quality(url)
-                    host = host.replace('www.', '')
-                    valid, host = source_utils.is_host_valid(host, hostDict)
+                match = re.compile('<iframe .+? src="(.+?)"').findall(r)
+                for url in match:
+                    quality = source_utils.check_url(url)
+                    valid, host = source_utils.is_host_valid(url, hostDict)
                     if valid:
-                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-                                        'direct': False, 'debridonly': False})
+                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False}) 
             except:
                 return
         except Exception:
             return
         return sources
 
+
     def resolve(self, url):
         return url
+

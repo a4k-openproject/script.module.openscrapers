@@ -35,6 +35,7 @@ from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
+
 class source(object):
     def __init__(self):
         self.priority = 1

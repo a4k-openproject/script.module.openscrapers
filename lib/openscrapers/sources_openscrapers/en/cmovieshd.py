@@ -25,7 +25,6 @@
 
 import re
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
@@ -37,19 +36,18 @@ class source:
         self.domains = ['cmovieshd.net']
         self.base_link = 'https://cmovieshd.net'
         self.search_link = '/search/?q=%s'
-        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             title = cleantitle.geturl(title).replace('-', '+')
             u = self.base_link + self.search_link % title
-            u = self.scraper.get(u).content
+            u = client.request(u)
             i = client.parseDOM(u, "div", attrs={"class": "movies-list"})
             for r in i:
                 r = re.compile('<a href="(.+?)"').findall(r)
                 for url in r:
                     title = cleantitle.geturl(title).replace("+", "-")
-                    if title not in url:
+                    if not title in url:
                         continue
                     return url
         except:
@@ -70,16 +68,14 @@ class source:
             for i in r:
                 t = re.compile('<a href="(.+?)"').findall(i)
                 for url in t:
-                    t = self.scraper.get(url).content
+                    t = client.request(url)
                     t = client.parseDOM(t, "div", attrs={"id": "content-embed"})
                     for u in t:
                         i = re.findall('src="(.+?)"', u)[0].replace('load_player.html?e=', 'episode/embed/')
-                        i = self.scraper.get(i).conent.replace("\\", "")
+                        i = client.request(i).replace("\\", "")
                         u = re.findall('"(https.+?)"', i)
                         for url in u:
-                            sources.append(
-                                {'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-                                 'debridonly': False})
+                            sources.append({'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
 
                 return sources
         except Exception:

@@ -69,7 +69,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=episode timeout_mode=false number_of_tests=50 > test-results\en-en_DebridOnly\os-en-and-debrid-episode-scrape-test.txt
+scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\en-en_DebridOnly\os-en-and-debrid-episode-scrape-test.txt
 GOTO Retest
 
 :OS-Foreign
@@ -111,7 +111,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=episode timeout_mode=false number_of_tests=50 > test-results\de,es,gr,pl\os-foreign-episode-scrape-test.txt
+scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\de,es,gr,pl\os-foreign-episode-scrape-test.txt
 GOTO Retest
 
 :OS-Torrents
@@ -153,7 +153,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=en_Torrent test_type=1 test_mode=episode timeout_mode=false number_of_tests=50 > test-results\en_Torrent\os-torrents-episode-scrape-test.txt
+scrape-test.py folders=en_Torrent test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\en_Torrent\os-torrents-episode-scrape-test.txt
 GOTO Retest
 
 :Egg
@@ -195,7 +195,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=scrapertest-egg test_type=1 test_mode=episode timeout_mode=false number_of_tests=50 > test-results\scrapertest-egg\egg-episode-scrapetest.txt
+scrape-test.py folders=scrapertest-egg test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\scrapertest-egg\egg-episode-scrapetest.txt
 GOTO Retest
 
 :Yoda
@@ -237,7 +237,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=scrapertest-yoda test_type=1 test_mode=episode timeout_mode=false number_of_tests=50 > test-results\scrapertest-yoda\yoda-episode-scrapetest.txt
+scrape-test.py folders=scrapertest-yoda test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\scrapertest-yoda\yoda-episode-scrapetest.txt
 GOTO Retest
 
 :Scrubs
@@ -279,7 +279,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=scrapertest-scrubs test_type=1 test_mode=episode timeout_mode=false number_of_tests=50 > test-results\scrapertest-scrubs\scrubs-episode-scrapetest.txt)
+scrape-test.py folders=scrapertest-scrubs test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\scrapertest-scrubs\scrubs-episode-scrapetest.txt)
 GOTO Retest
 
 :Retest

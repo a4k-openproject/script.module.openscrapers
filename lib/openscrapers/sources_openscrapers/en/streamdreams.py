@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 03-17-2019 by JewBMX in Scrubs.
+# -Cleaned and Checked on 06-08-2019 by JewBMX in Scrubs.
+# Created by Tempest
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -9,10 +10,9 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-import re
-
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 from openscrapers.modules import source_utils
 
 
@@ -20,20 +20,21 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.genre_filter = ['animation', 'anime']
-        self.domains = ['pokemonfire.com']
-        self.base_link = 'https://www.pokemonfire.com'
-        self.movie_link = '/movies/%s'
-        self.tv_link = '/episodes/%s-season-%s-episode-%s/'
-        self.scraper = cfscrape.create_scraper(0)
+        self.domains = ['streamdreams.org']
+        self.base_link = 'https://streamdreams.org'
+        self.search_movie = '/movies/%s'
+        self.search_tv = '/shows/%s'
+        self.scraper = cfscrape.create_scraper()
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            ctitle = cleantitle.geturl(title)
-            url = self.base_link + self.movie_link % (ctitle)
+            title = cleantitle.geturl(title)
+            url = self.base_link + self.search_movie % title
             return url
         except:
             return
+
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -42,34 +43,42 @@ class source:
         except:
             return
 
+
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if not url: return
-            url = self.base_link + self.tv_link % (url, season, episode)
+            url = self.base_link + self.search_tv % url
+            url = url + '?session=%s&episode=%s' % (season, episode)
             return url
         except:
             return
 
+
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            r = self.scraper.get(url).content
-            try:
-                match = re.compile('<iframe class="metaframe rptss" src="https\://veohb\.net/(.+?)"').findall(r)
+            hostDict = hostprDict + hostDict
+            headers = {'Referer': url}
+            r = self.scraper.get(url, headers=headers).content
+            u = client.parseDOM(r, "span", attrs={"class": "movie_version_link"})
+            for t in u:
+                match = client.parseDOM(t, 'a', ret='data-href')
                 for url in match:
-                    url = 'https://veohb.net/' + url
-                    info = source_utils.check_url(url)
-                    quality = source_utils.check_url(url)
-                    sources.append({'source': 'veohb', 'quality': quality, 'language': 'en', 'info': info, 'url': url,
-                                    'direct': False, 'debridonly': False})
-            except:
-                return
-        except Exception:
-            return
-        return sources
+                    if 'BDRip' in url:
+                        quality = '720p'
+                    elif 'HD' in url:
+                        quality = '720p'
+                    else:
+                        quality = 'SD'
+                    valid, host = source_utils.is_host_valid(url, hostDict)
+                    if valid:
+                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+            return sources
+        except:
+            return sources
+
 
     def resolve(self, url):
-        r = self.scraper.get(url).content
-        match = re.compile('<source src="(.+?)"').findall(r)
-        for url in match:
-            return url
+        return url
+
+
