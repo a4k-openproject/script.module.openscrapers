@@ -55,7 +55,6 @@
         <setting id="provider.gostream123" type="bool" label="GOSTREAM123" default="true"/>
         <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true"/>
         <setting id="provider.hdmto" type="bool" label="HDMTO" default="true"/>
-        <setting id="provider.iwaatch" type="bool" label="IWAATCH" default="true"/>
         <setting id="provider.iwannawatch" type="bool" label="IWANNAWATCH" default="true"/>
         <setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
         <setting id="provider.movie4kis" type="bool" label="MOVIE4KIS" default="true"/>
@@ -231,7 +230,6 @@
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true"/>
         <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true"/>
-        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="true"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
         <setting id="provider.yifimovies" type="bool" label="YIFYMOVIES" default="true"/>
