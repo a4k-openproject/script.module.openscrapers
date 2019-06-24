@@ -55,7 +55,7 @@
         <setting id="provider.gostream123" type="bool" label="GOSTREAM123" default="true"/>
         <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true"/>
         <setting id="provider.hdmto" type="bool" label="HDMTO" default="true"/>
-        <setting id="provider.iwannawatch" type="bool" label="IWANNAWATCH" default="true"/>
+        <setting id="provider.iwannawatch" type="bool" label="IWANNAWATCH" default="disable"/>
         <setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
         <setting id="provider.movie4kis" type="bool" label="MOVIE4KIS" default="true"/>
         <setting id="provider.moviesonline" type="bool" label="MOVIESONLINE" default="false"/>
@@ -69,7 +69,7 @@
         <setting id="provider.playmovies" type="bool" label="PLAYMOVIES" default="true"/>
         <setting id="provider.primewire" type="bool" label="PRIMEWIRE" default="true"/>
         <setting id="provider.projectfreetv" type="bool" label="PROJECTFREETV" default="true"/>
-        <setting id="provider.pubfilmonline" type="bool" label="PUBFILMONLINE" default="true"/>
+        <setting id="provider.pubfilmonline" type="bool" label="PUBFILMONLINE" default="disable"/>
         <setting id="provider.putlocker" type="bool" label="PUTLOCKER" default="true"/>
         <setting id="provider.putlockeronl" type="bool" label="PUTLOCKERONL" default="true"/>
         <setting id="provider.reddit" type="bool" label="REDDIT" default="true"/>
@@ -81,8 +81,8 @@
         <setting id="provider.streamdreams" type="bool" label="STREAMDREAMS" default="true"/>
         <setting id="provider.timewatch" type="bool" label="TIMEWATCH" default="true"/>
         <setting id="provider.toonget" type="bool" label="TOONGET" default="true"/>
-        <setting id="provider.tvbox" type="bool" label="TVBOX" default="true"/>
-        <setting id="provider.wannahd" type="bool" label="WANNAHD" default="true"/>
+        <setting id="provider.tvbox" type="bool" label="TVBOX" default="disable"/>
+        <setting id="provider.wannahd" type="bool" label="WANNAHD" default="disable"/>
         <setting id="provider.watchepisodes" type="bool" label="WATCHEPISODES" default="true"/>
         <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="true"/>
         <setting id="provider.watchserieshd" type="bool" label="WATCHSERIESHD" default="true"/>
