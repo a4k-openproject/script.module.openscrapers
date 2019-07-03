@@ -38,7 +38,6 @@
         <setting id="provider.cartoonhd" type="bool" label="CARTOONHD" default="true"/>
         <setting id="provider.cartoonwire" type="bool" label="CARTOONWIRE" default="true"/>
         <setting id="provider.cmovies" type="bool" label="CMOVIES" default="true"/>
-        <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="true"/>
         <setting id="provider.cmovieshdbz" type="bool" label="CMOVIESHDBZ" default="true"/>
         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/>
         <setting id="provider.cooltvseries" type="bool" label="COOLTVSERIES" default="true"/>
