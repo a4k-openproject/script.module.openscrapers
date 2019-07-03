@@ -12,9 +12,14 @@
 
 import re
 import urllib
+
 import urlparse
-from openscrapers.modules import cleantitle, debrid, source_utils, workers
-from openscrapers.modules import client, dom_parser as dom
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import dom_parser as dom
+from openscrapers.modules import source_utils
+from openscrapers.modules import workers
 
 
 class source:

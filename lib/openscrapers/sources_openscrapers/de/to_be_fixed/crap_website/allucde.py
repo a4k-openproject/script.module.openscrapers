@@ -25,8 +25,8 @@
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import client
 from openscrapers.modules import control
 from openscrapers.modules import source_utils

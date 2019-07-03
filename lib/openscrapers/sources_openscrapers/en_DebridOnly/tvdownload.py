@@ -12,10 +12,10 @@
 # Fixed by Tempest
 
 import re
-import requests
 import urllib
-import urlparse
 
+import requests
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid

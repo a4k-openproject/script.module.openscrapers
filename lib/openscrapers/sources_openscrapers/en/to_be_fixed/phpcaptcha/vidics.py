@@ -24,10 +24,10 @@
 '''
 
 import re
-import requests
-import xbmc
 from datetime import datetime
 
+import requests
+import xbmc
 from bs4 import BeautifulSoup
 from openscrapers.modules.client import randomagent
 

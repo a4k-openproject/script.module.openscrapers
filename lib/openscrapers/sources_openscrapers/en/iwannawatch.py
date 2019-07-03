@@ -10,9 +10,9 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import re
+
 import requests
 import urlparse
-
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 

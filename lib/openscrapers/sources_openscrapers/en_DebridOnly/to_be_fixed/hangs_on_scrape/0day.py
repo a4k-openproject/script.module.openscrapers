@@ -17,8 +17,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid

@@ -11,8 +11,8 @@
 # -Cleaned and Checked on 05-06-2019 by JewBMX in Scrubs.
 
 import re
-import requests
 
+import requests
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 

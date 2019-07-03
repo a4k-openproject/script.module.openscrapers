@@ -24,8 +24,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import re, urllib, urlparse
-from openscrapers.modules import client, cleantitle, debrid, source_utils
+import re
+import urllib
+
+import urlparse
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:

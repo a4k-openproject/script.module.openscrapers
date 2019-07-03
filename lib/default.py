@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import urlparse
-
 from openscrapers import sources_openscrapers
 from openscrapers.modules import control
 
