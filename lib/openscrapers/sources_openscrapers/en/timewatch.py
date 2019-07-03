@@ -44,12 +44,17 @@ class source:
         try:
             search_id = title.lower()
             url = urlparse.urljoin(self.base_link, self.search_link)
-            url = url % (search_id.replace(':', '%3A').replace(',', '%2C').replace('&', '%26').replace("'", '%27').replace(' ', '+').replace('...', ' '))
+            url = url % (
+                search_id.replace(':', '%3A').replace(',', '%2C').replace('&', '%26').replace("'", '%27').replace(' ',
+                                                                                                                  '+').replace(
+                    '...', ' '))
             search_results = self.scraper.get(url).content
-            match = re.compile('<div data-movie-id=.+?href="(.+?)".+?oldtitle="(.+?)"',re.DOTALL).findall(search_results)
+            match = re.compile('<div data-movie-id=.+?href="(.+?)".+?oldtitle="(.+?)"', re.DOTALL).findall(
+                search_results)
             for movie_url, movie_title in match:
                 clean_title = cleantitle.get(title)
-                movie_title = movie_title.replace('&#8230', ' ').replace('&#038', ' ').replace('&#8217', ' ').replace('...', ' ')
+                movie_title = movie_title.replace('&#8230', ' ').replace('&#038', ' ').replace('&#8217', ' ').replace(
+                    '...', ' ')
                 clean_movie_title = cleantitle.get(movie_title)
                 if clean_movie_title in clean_title:
                     return movie_url
@@ -62,12 +67,13 @@ class source:
             sources = []
             if url == None: return sources
             html = self.scraper.get(url).content
-            links = re.compile('id="linkplayer.+?href="(.+?)"',re.DOTALL).findall(html)
+            links = re.compile('id="linkplayer.+?href="(.+?)"', re.DOTALL).findall(html)
             for link in links:
                 quality, info = source_utils.get_release_quality(link, url)
                 host = link.split('//')[1].replace('www.', '')
                 host = host.split('/')[0].split('.')[0].title()
-                sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False,
+                                'debridonly': False})
             return sources
         except:
             return sources

@@ -149,7 +149,7 @@ class source:
             host = splitted[1]
             video_id = splitted[3]
             transl_url = urlparse.urljoin(self.base_link, self.resolve_link) % (host, video_id)
-            result = self.scraper.get(transl_url, allow_redirects=False, headers = {'cookie':"prch=true"})
+            result = self.scraper.get(transl_url, allow_redirects=False, headers={'cookie': "prch=true"})
             scripts = client.parseDOM(result, 'script')
             for script in scripts:
                 if 'var url' in script:

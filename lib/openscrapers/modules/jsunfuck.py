@@ -239,13 +239,13 @@ def cfunfuck(fuckedup):
     unfuck = JSUnfuck(fuck[0][1]).decode()
     unfuck = re.sub(r'[\(\)]', '', unfuck)
     unfuck = fuck[0][0] + unfuck
-    exec (unfuck)
+    exec(unfuck)
 
     for fucker in fucks:
         unfucker = JSUnfuck(fucker[2]).decode()
         unfucker = re.sub(r'[\(\)]', '', unfucker)
         unfucker = fucker[0] + fucker[1] + unfucker
-        exec (unfucker)
+        exec(unfucker)
 
     return str(eval(endunfuck))
 

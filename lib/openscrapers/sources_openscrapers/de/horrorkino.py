@@ -82,7 +82,7 @@ class source:
             y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 
             r = self.scraper.post(urlparse.urljoin(self.base_link, self.search_link),
-                               data={'query': cleantitle.query(titles[0])})
+                                  data={'query': cleantitle.query(titles[0])})
 
             r = dom_parser.parse_dom(r, 'li', attrs={'class': 'entTd'})
             r = dom_parser.parse_dom(r, 'div', attrs={'class': 've-screen'}, req='title')

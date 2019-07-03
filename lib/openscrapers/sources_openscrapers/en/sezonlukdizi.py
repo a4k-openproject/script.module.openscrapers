@@ -61,14 +61,19 @@ class source:
 
             if not result:
                 r = client.request(self.base_link)
-                r = dom_parser.parse_dom(r, 'script', attrs={'type': 'text/javascript', 'src': re.compile('.*/js/dizi.*')}, req='src')[0]
+                r = \
+                dom_parser.parse_dom(r, 'script', attrs={'type': 'text/javascript', 'src': re.compile('.*/js/dizi.*')},
+                                     req='src')[0]
                 url = urlparse.urljoin(self.base_link, r.attrs['src'])
                 result = client.request(url)
 
             result = re.compile('{(.+?)}').findall(result)
-            result = [(re.findall('u\s*:\s*(?:\'|\")(.+?)(?:\'|\")', i), re.findall('d\s*:\s*(?:\'|\")(.+?)(?:\',|\")', i)) for i in result]
+            result = [
+                (re.findall('u\s*:\s*(?:\'|\")(.+?)(?:\'|\")', i), re.findall('d\s*:\s*(?:\'|\")(.+?)(?:\',|\")', i))
+                for i in result]
             result = [(i[0][0], i[1][0]) for i in result if len(i[0]) > 0 and len(i[1]) > 0]
-            result = [(re.compile('/diziler(/.+?)(?://|\.|$)').findall(i[0]), re.sub('&#\d*;', '', i[1])) for i in result]
+            result = [(re.compile('/diziler(/.+?)(?://|\.|$)').findall(i[0]), re.sub('&#\d*;', '', i[1])) for i in
+                      result]
             result = [(i[0][0] + '/', cleantitle.query(self.lat2asc(i[1]))) for i in result if len(i[0]) > 0]
 
             return result
@@ -126,7 +131,9 @@ class source:
                                      'direct': True, 'debridonly': False})
 
                         else:
-                            sources.append({'source': host, 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                            sources.append(
+                                {'source': host, 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False,
+                                 'debridonly': False})
 
                     if '.asp' not in url: continue
 
@@ -140,21 +147,32 @@ class source:
                             if host == 'gvideo':
                                 ginfo = directstream.google(url)
                                 for g in ginfo:
-                                    sources.append({'source': host, 'quality': g['quality'], 'language': 'en', 'url': g['url'], 'direct': True, 'debridonly': False})
+                                    sources.append(
+                                        {'source': host, 'quality': g['quality'], 'language': 'en', 'url': g['url'],
+                                         'direct': True, 'debridonly': False})
                             else:
-                                sources.append({'source': host, 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
-                    except BaseException: pass
+                                sources.append(
+                                    {'source': host, 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False,
+                                     'debridonly': False})
+                    except BaseException:
+                        pass
 
                     captions = re.search('''["']?kind["']?\s*:\s*(?:\'|\")captions(?:\'|\")''', result)
                     if not captions: continue
 
-                    matches = [(match[0], match[1]) for match in re.findall('''["']?label\s*["']?\s*[:=]\s*["']?(?P<label>[^"',]+)["']?(?:[^}\]]+)["']?\s*file\s*["']?\s*[:=,]?\s*["'](?P<url>[^"']+)''', result, re.DOTALL | re.I)]
-                    matches += [(match[1], match[0]) for match in re.findall('''["']?\s*file\s*["']?\s*[:=,]?\s*["'](?P<url>[^"']+)(?:[^}>\]]+)["']?\s*label\s*["']?\s*[:=]\s*["']?(?P<label>[^"',]+)''', result, re.DOTALL | re.I)]
+                    matches = [(match[0], match[1]) for match in re.findall(
+                        '''["']?label\s*["']?\s*[:=]\s*["']?(?P<label>[^"',]+)["']?(?:[^}\]]+)["']?\s*file\s*["']?\s*[:=,]?\s*["'](?P<url>[^"']+)''',
+                        result, re.DOTALL | re.I)]
+                    matches += [(match[1], match[0]) for match in re.findall(
+                        '''["']?\s*file\s*["']?\s*[:=,]?\s*["'](?P<url>[^"']+)(?:[^}>\]]+)["']?\s*label\s*["']?\s*[:=]\s*["']?(?P<label>[^"',]+)''',
+                        result, re.DOTALL | re.I)]
 
                     result = [(source_utils.label_to_quality(x[0]), x[1].replace('\/', '/')) for x in matches]
                     result = [(i[0], i[1]) for i in result if not i[1].endswith('.vtt')]
 
-                    for quality, url in result: sources.append({'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': url, 'direct': True, 'debridonly': False})
+                    for quality, url in result: sources.append(
+                        {'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': url, 'direct': True,
+                         'debridonly': False})
                 except BaseException:
                     pass
 

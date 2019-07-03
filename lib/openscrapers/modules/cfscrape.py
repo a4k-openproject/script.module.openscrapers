@@ -126,10 +126,12 @@ class CloudflareScraper(Session):
                 'RSA-AES128-GCM-SHA256', 'RSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES128-GCM-SHA256',
                 'RSA-AES256-SHA', '3DES-EDE-CBC'
             ]
- 
+
             if hasattr(ssl, 'PROTOCOL_TLSv1_3'):
-                ciphers.insert(0, ['GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384', 'CHACHA20-POLY1305-SHA256'])
- 
+                ciphers.insert(0,
+                               ['GREASE_3A', 'GREASE_6A', 'AES128-GCM-SHA256', 'AES256-GCM-SHA256', 'AES256-GCM-SHA384',
+                                'CHACHA20-POLY1305-SHA256'])
+
             ctx = ssl.SSLContext(getattr(ssl, 'PROTOCOL_TLSv1_3', ssl.PROTOCOL_TLSv1_2))
 
             for cipher in ciphers:
@@ -310,5 +312,3 @@ class CloudflareScraper(Session):
 
 
 create_scraper = CloudflareScraper
-
-

@@ -27,8 +27,8 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en']
-        self.domains = ['www.skytorrents.lol']
+        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+        self.domains = ['skytorrents.lol']
         self.base_link = 'https://www.skytorrents.lol/'
         self.search_link = '?query=%s'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
@@ -70,38 +70,36 @@ class source:
                 raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
+                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
-
             r = client.request(url)
-
             try:
                 posts = client.parseDOM(r, 'tbody', attrs={'id': 'results'})
                 for post in posts:
                     link = re.findall('a href="(magnet:.+?)" title="(.+?)"', post, re.DOTALL)
                     for url, data in link:
-                        if hdlr not in data:
+                        if not hdlr in data:
                             continue
                         url = url.split('&tr')[0]
+                        if url in str(sources):
+                            continue
                         quality, info = source_utils.get_release_quality(data)
                         if any(x in url for x in ['FRENCH', 'Ita', 'italian', 'TRUEFRENCH', '-lat-', 'Dublado']):
                             continue
                         info = ' | '.join(info)
-                        sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                        sources.append(
+                            {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                             'direct': False, 'debridonly': True})
             except:
                 return
             return sources
-        except :
+        except:
             return sources
 
     def resolve(self, url):
         return url
-

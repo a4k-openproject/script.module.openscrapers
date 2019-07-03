@@ -96,9 +96,8 @@ class source:
 
                 r = client.request(url)
 
-            for loopCount in range(0,2):
+            for loopCount in range(0, 2):
                 if loopCount == 1 or (r == None and 'tvshowtitle' in data):
-
                     r = client.request(url)
 
                 posts = client.parseDOM(r, "div", attrs={"class": "postpage_movie_download"})
@@ -111,7 +110,8 @@ class source:
                             try:
                                 name = str(i)
                                 items.append(name)
-                                print items
+                                print
+                                items
                             except:
                                 pass
                     except:
@@ -143,7 +143,9 @@ class source:
                                 quality = 'SD'
                             info = ' | '.join(info)
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                 'direct': False, 'debridonly': True})
 
                 except:
                     pass

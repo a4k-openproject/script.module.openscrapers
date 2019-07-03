@@ -51,8 +51,8 @@ class source:
     def __init__(self):
         self.priority = 0
         self.language = ['en']
-        self.domains = ['extramovies.trade', 'extramovies.guru', 'extramovies.wiki'] # http://extramovies.ind.in/
-        self.base_link = 'http://extramovies.wiki' # Dead  extramovies.host
+        self.domains = ['extramovies.trade', 'extramovies.guru', 'extramovies.wiki']  # http://extramovies.ind.in/
+        self.base_link = 'http://extramovies.wiki'  # Dead  extramovies.host
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
 
@@ -92,7 +92,6 @@ class source:
             log_utils.log('ExtraMovies - Exception: \n' + str(failure))
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -114,7 +113,9 @@ class source:
                         for ep_url in regex:
                             if sea_epi in ep_url:
                                 quality, info = source_utils.get_release_quality(url, url)
-                                sources.append({'source': 'CDN', 'quality': quality, 'language': 'en', 'info': info, 'url': ep_url, 'direct': False, 'debridonly': False})
+                                sources.append(
+                                    {'source': 'CDN', 'quality': quality, 'language': 'en', 'info': info, 'url': ep_url,
+                                     'direct': False, 'debridonly': False})
             else:
                 html = self.scraper.get(url).content
                 match = re.compile('<div class="thumbnail".+?href="(.+?)" title="(.+?)"', re.DOTALL).findall(html)
@@ -131,7 +132,8 @@ class source:
                                     pass
                                 valid, host = source_utils.is_host_valid(link, self.hostDict)
                                 if valid:
-                                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': link, 'direct': False, 'debridonly': False})
+                                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info,
+                                                    'url': link, 'direct': False, 'debridonly': False})
             return sources
         except Exception:
             failure = traceback.format_exc()

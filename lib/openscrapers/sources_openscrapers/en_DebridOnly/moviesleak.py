@@ -107,11 +107,10 @@ class source:
         except Exception:
             return self._sources
 
-
     def _get_sources(self, item, hostDict):
         try:
             quality, info = source_utils.get_release_quality(item[0], item[1])
-            size = item[2] if item[2] != '0'else item[0]
+            size = item[2] if item[2] != '0' else item[0]
             try:
                 size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', size)[-1]
                 div = 1 if size.endswith(('GB', 'GiB')) else 1024
@@ -123,8 +122,10 @@ class source:
             data = self.scraper.get(item[1]).content
             try:
                 r = client.parseDOM(data, 'li', attrs={'class': 'elemento'})
-                r = [(dom_parser.parse_dom(i, 'a', req='href')[0], dom_parser.parse_dom(i, 'img', req='alt')[0], dom_parser.parse_dom(i, 'span', {'class': 'd'})[0]) for i in r]
-                urls = [('http:' + i[0].attrs['href'] if not i[0].attrs['href'].startswith('http') else i[0].attrs['href'], i[1].attrs['alt'], i[2].content) for i in r if i[0] and i[1]]
+                r = [(dom_parser.parse_dom(i, 'a', req='href')[0], dom_parser.parse_dom(i, 'img', req='alt')[0],
+                      dom_parser.parse_dom(i, 'span', {'class': 'd'})[0]) for i in r]
+                urls = [('http:' + i[0].attrs['href'] if not i[0].attrs['href'].startswith('http') else i[0].attrs[
+                    'href'], i[1].attrs['alt'], i[2].content) for i in r if i[0] and i[1]]
                 for url, host, qual in urls:
                     try:
                         if any(x in url for x in ['.rar', '.zip', '.iso', ':Upcoming']):
@@ -139,7 +140,9 @@ class source:
                         quality, info = source_utils.get_release_quality(qual, quality)
                         info.append('HEVC')
                         info = ' | '.join(info)
-                        self._sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                        self._sources.append(
+                            {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                             'direct': False, 'debridonly': True})
                     except Exception:
                         pass
             except Exception:

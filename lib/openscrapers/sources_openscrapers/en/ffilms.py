@@ -25,7 +25,6 @@ class source:
         self.movie_link = '/%s-%s'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             title = cleantitle.geturl(title)
@@ -33,7 +32,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         sources = []
@@ -44,12 +42,11 @@ class source:
             match = re.compile('src="//ok\.ru/videoembed/(.+?)"').findall(r)
             for vid in match:
                 url = 'https://ok.ru/videoembed/' + vid
-                sources.append({ 'source': 'ok', 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False })
+                sources.append({'source': 'ok', 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False,
+                                'debridonly': False})
         except Exception:
             return
         return sources
 
-
     def resolve(self, url):
         return url
-

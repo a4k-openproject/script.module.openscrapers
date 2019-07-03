@@ -26,7 +26,6 @@ class source:
         self.search_tv = '/shows/%s'
         self.scraper = cfscrape.create_scraper()
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             title = cleantitle.geturl(title)
@@ -35,14 +34,12 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = cleantitle.geturl(tvshowtitle)
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -52,7 +49,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -72,13 +68,12 @@ class source:
                         quality = 'SD'
                     valid, host = source_utils.is_host_valid(url, hostDict)
                     if valid:
-                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                        sources.append(
+                            {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                             'debridonly': False})
             return sources
         except:
             return sources
 
-
     def resolve(self, url):
         return url
-
-

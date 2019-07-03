@@ -20,12 +20,11 @@ from openscrapers.modules import client, dom_parser as dom
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru'] # Old  1337x.se  1337x.eu  1337x.ws
+        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']  # Old  1337x.se  1337x.eu  1337x.ws
         self.domains = ['1337x.to', '1337x.st', '1337x.is']
         self.base_link = 'https://1337x.to/'
         self.tvsearch = 'https://1337x.to/sort-category-search/%s/TV/seeders/desc/1/'
         self.moviesearch = 'https://1337x.to/sort-category-search/%s/Movies/seeders/desc/1/'
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -35,7 +34,6 @@ class source:
         except:
             return
 
-
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -43,7 +41,6 @@ class source:
             return url
         except:
             return
-
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -57,7 +54,6 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             self._sources = []
@@ -69,7 +65,8 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
+                'year']
             query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
                 if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
@@ -92,7 +89,6 @@ class source:
             return self._sources
         except BaseException:
             return self._sources
-
 
     def _get_items(self, url):
         try:
@@ -125,7 +121,6 @@ class source:
         except BaseException:
             return self.items
 
-
     def _get_sources(self, item):
         try:
             name = item[0]
@@ -136,12 +131,11 @@ class source:
             data = client.parseDOM(data, 'a', ret='href')
             url = [i for i in data if 'magnet:' in i][0]
             url = url.split('&tr')[0]
-            self._sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+            self._sources.append(
+                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False,
+                 'debridonly': True})
         except BaseException:
             pass
 
-
     def resolve(self, url):
         return url
-
-

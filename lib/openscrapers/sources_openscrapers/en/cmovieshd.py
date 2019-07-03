@@ -75,7 +75,9 @@ class source:
                         i = client.request(i).replace("\\", "")
                         u = re.findall('"(https.+?)"', i)
                         for url in u:
-                            sources.append({'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                            sources.append(
+                                {'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                 'debridonly': False})
 
                 return sources
         except Exception:

@@ -23,19 +23,19 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['movie4k.pe'] # domain list at bottom of page.
+        self.domains = ['movie4k.pe']  # domain list at bottom of page.
         self.base_link = 'http://movie4k.pe'
         self.search_link = '/movies.php?list=search&search=%s'
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search(imdb, [localtitle] + source_utils.aliases_to_array(aliases), year)
-            if not url and title != localtitle: url = self.__search(imdb, [title] + source_utils.aliases_to_array(aliases), year)
+            if not url and title != localtitle: url = self.__search(imdb,
+                                                                    [title] + source_utils.aliases_to_array(aliases),
+                                                                    year)
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         sources = []
@@ -58,13 +58,13 @@ class source:
                     url = client.replaceHTMLCodes(url)
                     url = urlparse.urljoin(self.base_link, url)
                     url = url.encode('utf-8')
-                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': False})
                 except:
                     pass
             return sources
         except:
             return sources
-
 
     def resolve(self, url):
         try:
@@ -79,7 +79,6 @@ class source:
         except:
             return
 
-
     def __search(self, imdb, titles, year):
         try:
             q = self.search_link % urllib.quote_plus(cleantitle.query(titles[0]))
@@ -88,12 +87,16 @@ class source:
             y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
             r = client.request(q, timeout='10')
             r = dom_parser.parse_dom(r, 'tr', attrs={'id': re.compile('coverPreview.+?')})
-            r = [(dom_parser.parse_dom(i, 'a', req='href'), dom_parser.parse_dom(i, 'div', attrs={'style': re.compile('.+?')}), dom_parser.parse_dom(i, 'img', req='src')) for i in r]
+            r = [(dom_parser.parse_dom(i, 'a', req='href'),
+                  dom_parser.parse_dom(i, 'div', attrs={'style': re.compile('.+?')}),
+                  dom_parser.parse_dom(i, 'img', req='src')) for i in r]
             r = [(i[0][0].attrs['href'].strip(), i[0][0].content.strip(), i[1], i[2]) for i in r if i[0] and i[2]]
-            r = [(i[0], i[1], [x.content for x in i[2] if x.content.isdigit() and len(x.content) == 4], i[3]) for i in r]
+            r = [(i[0], i[1], [x.content for x in i[2] if x.content.isdigit() and len(x.content) == 4], i[3]) for i in
+                 r]
             r = [(i[0], i[1], i[2][0] if i[2] else '0', i[3]) for i in r]
             r = [i for i in r if any('us_flag' in x.attrs['src'] for x in i[3])]
-            r = [(i[0], i[1], i[2], [re.findall('(\d+)', x.attrs['src']) for x in i[3] if 'smileys' in x.attrs['src']]) for i in r]
+            r = [(i[0], i[1], i[2], [re.findall('(\d+)', x.attrs['src']) for x in i[3] if 'smileys' in x.attrs['src']])
+                 for i in r]
             r = [(i[0], i[1], i[2], [x[0] for x in i[3] if x]) for i in r]
             r = [(i[0], i[1], i[2], int(i[3][0]) if i[3] else 0) for i in r]
             r = sorted(r, key=lambda x: x[3])[::-1]
@@ -118,37 +121,35 @@ class source:
         except:
             return
 
-
-#http://movie4k.pe/
+# http://movie4k.pe/
 # -Clean
 
 # http://movie4k.lol/
 # -CFscrape
 
-#http://movie4k.tv/
+# http://movie4k.tv/
 # -CFscrape, redirects to: https://movie4k.lol/
 
-#http://movie2k.cm/
+# http://movie2k.cm/
 # -CFscrape
 
-#http://movie4k.me/
+# http://movie4k.me/
 # -CFscrape
 
-#http://movie4k.sg/
+# http://movie4k.sg/
 # -CFscrape
 
-#http://movie4k.sh/
+# http://movie4k.sh/
 # -CFscrape
 
-#https://movie.to/
+# https://movie.to/
 # -CFscrape
 
-#https://movie4k.am/
+# https://movie4k.am/
 # -CFscrape
 
-#https://movie4k.org/
+# https://movie4k.org/
 # -CFscrape
 
-#https://movie4k.io/
+# https://movie4k.io/
 # -Dead
-

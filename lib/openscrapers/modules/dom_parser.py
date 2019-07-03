@@ -63,7 +63,7 @@ def __get_dom_elements(item, name, attrs):
             value_is_regex = isinstance(value, re_type)
             value_is_str = isinstance(value, basestring)
             pattern = '''(<{tag}[^>]*\s{key}=(?P<delim>['"])(.*?)(?P=delim)[^>]*>)'''.format(tag=name, key=key)
-            re_list = re.findall(pattern, item, re.M | re. S | re.I)
+            re_list = re.findall(pattern, item, re.M | re.S | re.I)
             if value_is_regex:
                 this_list = [r[0] for r in re_list if re.match(value, r[2])]
             else:
@@ -73,7 +73,7 @@ def __get_dom_elements(item, name, attrs):
                 has_space = (value_is_regex and ' ' in value.pattern) or (value_is_str and ' ' in value)
                 if not has_space:
                     pattern = '''(<{tag}[^>]*\s{key}=([^\s/>]*)[^>]*>)'''.format(tag=name, key=key)
-                    re_list = re.findall(pattern, item, re.M | re. S | re.I)
+                    re_list = re.findall(pattern, item, re.M | re.S | re.I)
                     if value_is_regex:
                         this_list = [r[0] for r in re_list if re.match(value, r[1])]
                     else:

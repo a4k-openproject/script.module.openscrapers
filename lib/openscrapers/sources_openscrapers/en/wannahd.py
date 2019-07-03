@@ -92,7 +92,7 @@ class source:
                             sources.append(
                                 {'source': 'GVIDEO', 'quality': quality, 'language': 'en', 'url': link, 'direct': True,
                                  'debridonly': False})
-                            
+
                     except Exception:
                         pass
 
@@ -106,12 +106,9 @@ class source:
                             {'source': host, 'quality': 'HD', 'language': 'en', 'url': frame, 'direct': False,
                              'debridonly': False})
 
-
             return sources
         except Exception:
             return sources
 
     def resolve(self, url):
         return url
-
-
