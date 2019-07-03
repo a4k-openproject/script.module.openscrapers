@@ -10,9 +10,9 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import re
+
 import requests
 import urlparse
-
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 
@@ -27,15 +27,15 @@ class source:
         self.base_link = 'https://www.iwannawatch.is'
         self.search_link = '/wp-admin/admin-ajax.php?action=bunyad_live_search&query=%s'
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             search_id = cleantitle.getsearch(title)
             url = urlparse.urljoin(self.base_link, self.search_link)
-            url = url  % (search_id.replace(' ', '+').replace('-', '+').replace('++', '+'))
-            headers = {'User-Agent':User_Agent}
-            search_results = requests.get(url,headers=headers,timeout=10).content
-            match = re.compile('<li>.+?<a href="(.+?)".+?title="(.+?)".+?<a href=.+?>(.+?)<',re.DOTALL).findall(search_results)
+            url = url % (search_id.replace(' ', '+').replace('-', '+').replace('++', '+'))
+            headers = {'User-Agent': User_Agent}
+            search_results = requests.get(url, headers=headers, timeout=10).content
+            match = re.compile('<li>.+?<a href="(.+?)".+?title="(.+?)".+?<a href=.+?>(.+?)<', re.DOTALL).findall(
+                search_results)
             for row_url, row_title, release in match:
                 if cleantitle.get(title) in cleantitle.get(row_title):
                     if year in str(release):
@@ -44,29 +44,30 @@ class source:
         except:
             return
 
-
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
             if url == None:
                 return sources
-            headers = {'User-Agent':User_Agent}
-            html = requests.get(url,headers=headers,timeout=10).content
+            headers = {'User-Agent': User_Agent}
+            html = requests.get(url, headers=headers, timeout=10).content
             try:
-                qual = re.compile('<div class="cf">.+?class="quality">(.+?)</td>',re.DOTALL).findall(html)
+                qual = re.compile('<div class="cf">.+?class="quality">(.+?)</td>', re.DOTALL).findall(html)
                 for i in qual:
                     quality = source_utils.check_url(i)
-                links = re.compile('li class=.+?data-href="(.+?)"',re.DOTALL).findall(html)
+                links = re.compile('li class=.+?data-href="(.+?)"', re.DOTALL).findall(html)
                 for link in links:
                     if 'http' not in link:
-                        link = 'http:'+link
-                    host = link.split('//')[1].replace('www.','')
+                        link = 'http:' + link
+                    host = link.split('//')[1].replace('www.', '')
                     host = host.split('/')[0].split('.')[0].title()
                     valid, host = source_utils.is_host_valid(host, hostDict)
                     if link in str(sources):
                         continue
                     if valid:
-                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                        sources.append(
+                            {'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False,
+                             'debridonly': False})
                 return sources
             except:
                 return
@@ -74,7 +75,5 @@ class source:
             return
         return sources
 
-
     def resolve(self, url):
         return url
-

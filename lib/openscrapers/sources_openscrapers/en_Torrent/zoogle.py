@@ -26,8 +26,8 @@
 
 import re
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import control
@@ -38,7 +38,7 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en']
+        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
         self.domains = ['zooqle.com']
         self.base_link = 'https://zooqle.com'
         self.search_link = '/search?q=%s'
@@ -62,7 +62,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None: return
+            if url is None:
+                return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -74,17 +75,18 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url is None: return sources
-            if debrid.status() is False: raise Exception()
+            if url is None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             category = '+category%3ATV' if 'tvshowtitle' in data else '+category%3AMovies'
             query = '%s S%02dE%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url) + str(category)
@@ -92,7 +94,7 @@ class source:
             html = html.replace('&nbsp;', ' ')
             try:
                 results = \
-                    client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
+                client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
             except Exception:
                 return sources
             rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
@@ -120,6 +122,8 @@ class source:
                     try:
                         link = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
                         link = str(client.replaceHTMLCodes(link).split('&tr')[0])
+                        if link in str(sources):
+                            continue
                     except Exception:
                         continue
                     quality, info = source_utils.get_release_quality(name, name)
@@ -142,7 +146,7 @@ class source:
                 sources = check
             return sources
         except Exception:
-            return self._sources
+            return sources
 
     def resolve(self, url):
         return url

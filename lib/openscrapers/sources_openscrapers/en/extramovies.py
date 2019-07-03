@@ -27,8 +27,8 @@ import base64
 import re
 import traceback
 import urllib
-import urlparse
 
+import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import log_utils
@@ -51,8 +51,8 @@ class source:
     def __init__(self):
         self.priority = 0
         self.language = ['en']
-        self.domains = ['extramovies.trade', 'extramovies.host']
-        self.base_link = 'http://extramovies.guru'
+        self.domains = ['extramovies.trade', 'extramovies.guru', 'extramovies.wiki']  # http://extramovies.ind.in/
+        self.base_link = 'http://extramovies.wiki'  # Dead  extramovies.host
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
 
@@ -64,7 +64,7 @@ class source:
             return url
         except Exception:
             failure = traceback.format_exc()
-            log_utils.log('ExtraMovie - Exception: \n' + str(failure))
+            log_utils.log('ExtraMovies - Exception: \n' + str(failure))
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
@@ -75,7 +75,7 @@ class source:
             return url
         except Exception:
             failure = traceback.format_exc()
-            log_utils.log('ExtraMovie - Exception: \n' + str(failure))
+            log_utils.log('ExtraMovies - Exception: \n' + str(failure))
             return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -89,73 +89,55 @@ class source:
             return url
         except Exception:
             failure = traceback.format_exc()
-            log_utils.log('ExtraMovie - Exception: \n' + str(failure))
+            log_utils.log('ExtraMovies - Exception: \n' + str(failure))
             return
-
-    def filter_host(self, host):
-        if host not in ['openload.co', 'yourupload.com', 'streamango.com', 'rapidvideo.com', 'uptobox.com',
-                        'clicknupload.org']:
-            return False
-        return True
 
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-
+            self.hostDict = hostDict + hostprDict
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
             url = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.query(title)))
-
             if 'tvshowtitle' in data:
                 html = self.scraper.get(url).content
-
                 match = re.compile('class="post-item.+?href="(.+?)" title="(.+?)"', re.DOTALL).findall(html)
                 for url, item_name in match:
                     if cleantitle.getsearch(title).lower() in cleantitle.getsearch(item_name).lower():
                         season_url = '%02d' % int(data['season'])
                         episode_url = '%02d' % int(data['episode'])
                         sea_epi = 'S%sE%s' % (season_url, episode_url)
-
                         result = self.scraper.get(url).content
                         regex = re.compile('href="(.+?)"', re.DOTALL).findall(result)
                         for ep_url in regex:
                             if sea_epi in ep_url:
-                                quality, info = source_utils.get_release_quality(url)
-                                sources.append({'source': 'CDN', 'quality': quality, 'language': 'en',
-                                                'url': ep_url, 'direct': False, 'debridonly': False})
+                                quality, info = source_utils.get_release_quality(url, url)
+                                sources.append(
+                                    {'source': 'CDN', 'quality': quality, 'language': 'en', 'info': info, 'url': ep_url,
+                                     'direct': False, 'debridonly': False})
             else:
                 html = self.scraper.get(url).content
                 match = re.compile('<div class="thumbnail".+?href="(.+?)" title="(.+?)"', re.DOTALL).findall(html)
-
                 for url, item_name in match:
                     if cleantitle.getsearch(title).lower() in cleantitle.getsearch(item_name).lower():
-                        quality, info = source_utils.get_release_quality(url)
+                        quality, info = source_utils.get_release_quality(url, url)
                         result = self.scraper.get(url).content
                         regex = re.compile('href="/download.php.+?link=(.+?)"', re.DOTALL).findall(result)
-
                         for link in regex:
                             if 'server=' not in link:
                                 try:
                                     link = base64.b64decode(link)
                                 except Exception:
                                     pass
-                                try:
-                                    host = link.split('//')[1].replace('www.', '')
-                                    host = host.split('/')[0].lower()
-                                except Exception:
-                                    pass
-                                if not self.filter_host(host):
-                                    continue
-                                sources.append({'source': host, 'quality': quality, 'language': 'en',
-                                                'url': link, 'direct': False, 'debridonly': False})
-
+                                valid, host = source_utils.is_host_valid(link, self.hostDict)
+                                if valid:
+                                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info,
+                                                    'url': link, 'direct': False, 'debridonly': False})
             return sources
         except Exception:
             failure = traceback.format_exc()
-            log_utils.log('ExtraMovie - Exception: \n' + str(failure))
+            log_utils.log('ExtraMovies - Exception: \n' + str(failure))
             return sources
 
     def resolve(self, url):

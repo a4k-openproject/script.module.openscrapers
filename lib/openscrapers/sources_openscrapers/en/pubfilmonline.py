@@ -11,8 +11,8 @@
 import json
 import re
 import urllib
-import urlparse
 
+import urlparse
 from bs4 import BeautifulSoup
 from openscrapers.modules import cfscrape
 from openscrapers.modules import log_utils
@@ -88,7 +88,7 @@ class source:
                     'data': b64_string
                 }
                 html = self.scraper.post(urlparse.urljoin(self.base_link, '/wp-content/plugins/apiplayer/load.php'),
-                                    data=post).content
+                                         data=post).content
                 soup = BeautifulSoup(html, 'html.parser')
                 javascripts = soup.findAll("script", {"type": "text/javascript"})
                 links_qual = []

@@ -10,7 +10,6 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import urlparse
-
 from bs4 import BeautifulSoup
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
@@ -22,11 +21,10 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['movie4k.is'] # Old  movie4k.ws
+        self.domains = ['movie4k.is']  # Old  movie4k.ws
         self.base_link = 'https://www1.movie4k.is'
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
-
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -34,7 +32,6 @@ class source:
             return url
         except:
             return
-
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -51,20 +48,19 @@ class source:
             r = self.scraper.get(r, headers=h)
             r = BeautifulSoup(r.content, 'html.parser')
             quality = r.find('span', {'class': 'calidad2'}).text
-            url = r.find('div', {'class':'movieplay'}).find('iframe')['src']
+            url = r.find('div', {'class': 'movieplay'}).find('iframe')['src']
             if not quality in ['1080p', '720p']:
                 quality = 'SD'
             valid, host = source_utils.is_host_valid(url, hostDict)
             if valid:
-                sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                'debridonly': False})
             return sources
         except:
             return sources
-
 
     def resolve(self, url):
         try:
             return url
         except:
             return
-
