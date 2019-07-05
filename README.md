@@ -52,7 +52,7 @@ Add the following line to the `sources.py` file:
 
 Add it right after the line that says:
 
-`from resources.lib.modules import thexem`
+`import re
 
 You will also need to change a few lines in the def `getConstants(self)` function in `sources.py` file:
 
