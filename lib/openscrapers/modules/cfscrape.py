@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 
+import copy
+import os
 import random
 import re
-import ssl
-import copy
 import time
-import os
 from collections import OrderedDict
 
-from requests.sessions import Session
 from requests.adapters import HTTPAdapter
 from requests.compat import urlparse, urlunparse
 from requests.exceptions import RequestException
-
+from requests.sessions import Session
 from urllib3.util.ssl_ import create_urllib3_context, DEFAULT_CIPHERS
 
-from .user_agents import USER_AGENTS
 from .cfscrape_solver import solve_challenge
+from .user_agents import USER_AGENTS
 
 __version__ = "2.0.7"
 
@@ -76,6 +74,7 @@ class CloudflareAdapter(HTTPAdapter):
 class CloudflareError(RequestException):
     pass
 
+
 class CloudflareScraper(Session):
     def __init__(self, *args, **kwargs):
         self.tries = 0
@@ -97,17 +96,17 @@ class CloudflareScraper(Session):
     @staticmethod
     def is_cloudflare_iuam_challenge(resp, allow_empty_body=False):
         return (
-            resp.status_code in (503, 429)
-            and resp.headers.get("Server", "").startswith("cloudflare")
-            and (allow_empty_body or (b"jschl_vc" in resp.content and b"jschl_answer" in resp.content))
+                resp.status_code in (503, 429)
+                and resp.headers.get("Server", "").startswith("cloudflare")
+                and (allow_empty_body or (b"jschl_vc" in resp.content and b"jschl_answer" in resp.content))
         )
 
     @staticmethod
     def is_cloudflare_captcha_challenge(resp):
         return (
-            resp.status_code == 403
-            and resp.headers.get("Server", "").startswith("cloudflare")
-            and b"/cdn-cgi/l/chk_captcha" in resp.content
+                resp.status_code == 403
+                and resp.headers.get("Server", "").startswith("cloudflare")
+                and b"/cdn-cgi/l/chk_captcha" in resp.content
         )
 
     def request(self, method, url, *args, **kwargs):
@@ -134,8 +133,8 @@ class CloudflareScraper(Session):
     def cloudflare_is_bypassed(self, url, resp=None):
         cookie_domain = ".{}".format(urlparse(url).netloc)
         return (
-            self.cookies.get("cf_clearance", None, domain=cookie_domain) or
-            (resp and resp.cookies.get("cf_clearance", None, domain=cookie_domain))
+                self.cookies.get("cf_clearance", None, domain=cookie_domain) or
+                (resp and resp.cookies.get("cf_clearance", None, domain=cookie_domain))
         )
 
     def handle_captcha_challenge(self):
@@ -206,5 +205,6 @@ class CloudflareScraper(Session):
             )
             return self.request(method, redirect_url, **original_kwargs)
         return self.request(method, redirect.headers["Location"], **original_kwargs)
-		
+
+
 create_scraper = CloudflareScraper

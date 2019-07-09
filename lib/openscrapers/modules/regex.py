@@ -477,7 +477,7 @@ def get_unwise(str_eval):
     page_value = ""
     try:
         ss = "w,i,s,e=(" + str_eval + ')'
-        exec(ss)
+        exec (ss)
         page_value = unwise_func(w, i, s, e)
     except:
         traceback.print_exc(file=sys.stdout)
@@ -562,7 +562,7 @@ def unpack(sJavascript, iteration=1, totaliterations=2):
     if sJavascript.startswith('var _0xcb8a='):
         aSplit = sJavascript.split('var _0xcb8a=')
         ss = "myarray=" + aSplit[1].split("eval(")[0]
-        exec(ss)
+        exec (ss)
         a1 = 62
         c1 = int(aSplit[1].split(",62,")[1].split(',')[0])
         p1 = myarray[0]
@@ -581,7 +581,7 @@ def unpack(sJavascript, iteration=1, totaliterations=2):
         p1, a1, c1, k1 = ('', '0', '0', '')
 
         ss = "p1,a1,c1,k1=('" + aSplit[1].split(".spli")[0] + ')'
-        exec(ss)
+        exec (ss)
     k1 = k1.split('|')
     aSplit = aSplit[1].split("))'")
 
@@ -736,13 +736,13 @@ def doEval(fun_call, page_data, Cookie_Jar, m):
     try:
         py_file = 'import ' + fun_call.split('.')[0]
         #        print py_file,sys.path
-        exec(py_file)
+        exec (py_file)
     #        print 'done'
     except:
         # print 'error in import'
         traceback.print_exc(file=sys.stdout)
     #    print 'ret_val='+fun_call
-    exec('ret_val=' + fun_call)
+    exec ('ret_val=' + fun_call)
     #    print ret_val
     # exec('ret_val=1+1')
     try:

@@ -25,8 +25,8 @@
 
 import re
 import unicodedata
-
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import directstream
@@ -62,8 +62,9 @@ class source:
             if not result:
                 r = client.request(self.base_link)
                 r = \
-                dom_parser.parse_dom(r, 'script', attrs={'type': 'text/javascript', 'src': re.compile('.*/js/dizi.*')},
-                                     req='src')[0]
+                    dom_parser.parse_dom(r, 'script',
+                                         attrs={'type': 'text/javascript', 'src': re.compile('.*/js/dizi.*')},
+                                         req='src')[0]
                 url = urlparse.urljoin(self.base_link, r.attrs['src'])
                 result = client.request(url)
 

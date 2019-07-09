@@ -71,7 +71,7 @@ def get_gan_url(title):
     if title == None:
         return
     title = title.lower()
-    title = title.replace('-','+')
+    title = title.replace('-', '+')
     title = title.replace(' + ', '+-+')
     title = title.replace(' ', '%20')
     return title
@@ -121,14 +121,13 @@ def normalize(title):
             return title.decode('ascii').encode("utf-8")
         except:
             pass
-        return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if unicodedata.category(c) != 'Mn'))
+        return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if
+                           unicodedata.category(c) != 'Mn'))
     except:
         return title
 
 
 def clean_search_query(url):
-    url = url.replace('-','+')
+    url = url.replace('-', '+')
     url = url.replace(' ', '+')
     return url
-
-

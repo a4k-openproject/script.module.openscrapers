@@ -23,8 +23,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -79,7 +80,9 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s s%02de%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             url = self.search_link % urllib.quote_plus(query)
@@ -106,13 +109,14 @@ class source:
                             except:
                                 pass
                             info = ' | '.join(info)
-                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                                 'direct': False, 'debridonly': True})
             except:
                 return
             return sources
-        except :
+        except:
             return sources
 
     def resolve(self, url):
         return url
-

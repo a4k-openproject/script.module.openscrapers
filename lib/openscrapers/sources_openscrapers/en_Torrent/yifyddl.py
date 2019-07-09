@@ -23,7 +23,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -67,7 +69,8 @@ class source:
                 log_utils.log('YIFYDLL - Exception: \n' + str(failure))
                 return sources
             for torrent in results:
-                link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent, re.DOTALL)
+                link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent,
+                                  re.DOTALL)
                 for link, name in link:
                     link = str(client.replaceHTMLCodes(link).split('&tr')[0])
                     quality, info = source_utils.get_release_quality(name, name)
@@ -80,7 +83,9 @@ class source:
                     except Exception:
                         pass
                     info = ' | '.join(info)
-                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append(
+                        {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                         'direct': False, 'debridonly': True})
 
             return sources
         except:

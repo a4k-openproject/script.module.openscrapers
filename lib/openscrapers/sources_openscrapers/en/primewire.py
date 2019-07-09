@@ -23,17 +23,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
 import urllib
 import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser as dom
-from openscrapers.modules import cfscrape
 from openscrapers.modules import jsunpack
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -56,8 +54,9 @@ class source:
 
             result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
             result = [(i.attrs['href']) for i in result if
-                      cleantitle.get(title) == cleantitle.get(re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '',
-                        i.attrs['title'], flags=re.I))][0]
+                      cleantitle.get(title) == cleantitle.get(
+                          re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '',
+                                 i.attrs['title'], flags=re.I))][0]
             url = client.replaceHTMLCodes(result)
             url = url.encode('utf-8')
             return url
@@ -122,7 +121,7 @@ class source:
             links = client.parseDOM(links, 'tbody')
 
             for i in links:
-                try: 
+                try:
                     data = [
                         (client.parseDOM(i, 'a', ret='href')[0],
                          client.parseDOM(i, 'span', attrs={'class': 'version_host'})[0])][0]
@@ -189,4 +188,3 @@ class source:
             return link
         except Exception:
             return
-

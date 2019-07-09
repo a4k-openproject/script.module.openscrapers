@@ -19,8 +19,8 @@
 
 import re
 import traceback
-
 import urlparse
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import log_utils

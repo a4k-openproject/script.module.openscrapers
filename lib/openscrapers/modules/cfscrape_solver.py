@@ -1,13 +1,15 @@
 import ast
-import re
 import operator as op
+import re
 
 operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
              ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,
              ast.USub: op.neg}
 
+
 def eval_expr(expr):
     return eval_(ast.parse(expr, mode='eval').body)
+
 
 def eval_(node):
     if isinstance(node, ast.Num):  # <number>
@@ -19,6 +21,7 @@ def eval_(node):
     else:
         raise TypeError(node)
 
+
 def parseJSString(s):
     offset = 1 if s[0] == '+' else 0
     val = s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0')[offset:]
@@ -29,6 +32,7 @@ def parseJSString(s):
 
     val = ''.join([str(eval_expr(i)) for i in val])
     return int(val)
+
 
 def solve_challenge(body, domain):
     delay = int(re.compile("\}, ([\d]+)\);", re.MULTILINE).findall(body)[0]) / 1000
@@ -92,7 +96,6 @@ def solve_challenge(body, domain):
                 else:
                     val_2 = parseJSString(subsecs[1])
                 line_val = val_1 / float(val_2)
-
 
             decryptVal = '%.16f%s%.16f' % (float(decryptVal), sections[0][-1], float(line_val))
             decryptVal = eval_expr(decryptVal)

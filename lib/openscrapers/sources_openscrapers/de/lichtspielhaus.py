@@ -21,12 +21,12 @@
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.Blamo
 
+import HTMLParser
 import itertools
 import re
 import urllib
-
-import HTMLParser
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import dom_parser

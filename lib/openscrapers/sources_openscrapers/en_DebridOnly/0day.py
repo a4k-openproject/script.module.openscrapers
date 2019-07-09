@@ -23,11 +23,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import cfscrape
 from openscrapers.modules import source_utils
 
 
@@ -95,9 +97,8 @@ class source:
 
                 r = self.scraper.get(url).content
 
-            for loopCount in range(0,2):
+            for loopCount in range(0, 2):
                 if loopCount == 1 or (r == None and 'tvshowtitle' in data):
-
                     r = self.scraper.get(url).content
 
                 posts = client.parseDOM(r, "h2")
@@ -133,7 +134,9 @@ class source:
                             if any(x in url for x in ['.rar', '.zip', '.iso']): raise Exception()
                             quality, info = source_utils.get_release_quality(url)
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                            sources.append(
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                 'direct': False, 'debridonly': True})
 
                 except:
                     pass
@@ -146,4 +149,3 @@ class source:
 
     def resolve(self, url):
         return url
-

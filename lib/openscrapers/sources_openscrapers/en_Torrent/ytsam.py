@@ -11,8 +11,8 @@
 
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import control
@@ -61,7 +61,7 @@ class source:
                 try:
                     try:
                         link, name = \
-                        re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
+                            re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
                         name = client.replaceHTMLCodes(name)
                         if not cleantitle.get(name) == cleantitle.get(data['title']):
                             continue

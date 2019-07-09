@@ -11,8 +11,8 @@
 
 import re
 import traceback
-
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import log_utils

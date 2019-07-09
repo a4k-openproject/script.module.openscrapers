@@ -25,13 +25,11 @@
 
 import re
 import urllib
-
 import urlparse
-from openscrapers.modules import cfscrape
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import source_utils
 
 
 class source:
@@ -165,7 +163,8 @@ class source:
                         quality = 'SD'
                     if any(i in ['dvdscr', 'r5', 'r6'] for i in fmt):
                         quality = 'SCR'
-                    elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in fmt):
+                    elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i
+                             in fmt):
                         quality = 'CAM'
 
                     info = []
@@ -176,7 +175,7 @@ class source:
                     try:
                         size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', item[2])[-1]
                         div = 1 if size.endswith(('GB', 'GiB')) else 1024
-                        size = float(re.sub('[^0-9|/.|/,]', '', size))/div
+                        size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
                         size = '%.2f GB' % size
                         info.append(size)
                     except Exception:

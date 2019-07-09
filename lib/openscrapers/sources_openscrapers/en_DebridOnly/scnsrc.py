@@ -26,15 +26,14 @@
 import re
 import urllib
 import urlparse
-import requests
 
+import requests
 from openscrapers.modules import cleantitle
-from openscrapers.modules import workers
-from openscrapers.modules import source_utils
-from openscrapers.modules import log_utils
-from openscrapers.modules import dom_parser
-from openscrapers.modules import debrid
 from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
+from openscrapers.modules import workers
 
 
 class source:
@@ -93,13 +92,12 @@ class source:
             query = cleantitle.geturl(query)
             url = urlparse.urljoin(self.base_link, query)
 
-
             shell = requests.Session()
 
             headers = {
                 'Referer': url,
                 'User-Agent':
-                'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0'}
+                    'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0'}
             r = shell.get(url, headers=headers)
             r = r.headers['Location']
             r = shell.get(r).content
@@ -136,7 +134,7 @@ class source:
                     continue
                 if any(x in url for x in ['.rar.', '.zip.', '.iso.']) or any(
                         url.endswith(x) for x in ['.rar', '.zip', '.iso']):
-                            raise Exception()
+                    raise Exception()
                 valid, host = source_utils.is_host_valid(url, self.hostDict)
                 if not valid:
                     continue

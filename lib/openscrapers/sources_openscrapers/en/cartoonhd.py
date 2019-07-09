@@ -23,13 +23,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
+import base64
+import json
 import re
+import time
 import urllib
 import urlparse
-import json
-import base64
-import time
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -77,7 +76,8 @@ class source:
     def searchShow(self, title, season, episode, aliases, headers):
         try:
             for alias in aliases:
-                url = '%s/show/%s/season/%01d/episode/%01d' % (self.base_link, cleantitle.geturl(title), int(season), int(episode))
+                url = '%s/show/%s/season/%01d/episode/%01d' % (
+                self.base_link, cleantitle.geturl(title), int(season), int(episode))
                 url = client.request(url, headers=headers, output='geturl', timeout='10')
                 if not url is None and url != self.base_link:
                     break
@@ -143,8 +143,10 @@ class source:
             except:
                 pass
 
-            try: auth = re.findall('__utmx=(.+)', cookie)[0].split(';')[0]
-            except: auth = 'false'
+            try:
+                auth = re.findall('__utmx=(.+)', cookie)[0].split(';')[0]
+            except:
+                auth = 'false'
             auth = 'Bearer %s' % urllib.unquote_plus(auth)
             headers['Authorization'] = auth
             headers['Referer'] = url

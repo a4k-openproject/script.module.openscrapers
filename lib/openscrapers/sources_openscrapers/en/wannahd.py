@@ -27,8 +27,8 @@
 import json
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client

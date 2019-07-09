@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 import urlparse
+
 from bs4 import BeautifulSoup
 from openscrapers.modules import cfscrape
 from openscrapers.modules import source_utils

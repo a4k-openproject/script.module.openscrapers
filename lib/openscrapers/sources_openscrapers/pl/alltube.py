@@ -25,8 +25,8 @@
 import base64
 import json
 import re
-
 import urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
@@ -166,7 +166,7 @@ class source:
             _myFun = compile(tmp, '', 'exec')
             vGlobals = {"__builtins__": None, 'len': len, 'list': list, 'ord': ord, 'range': range}
             vLocals = {'abc': ''}
-            exec(_myFun in vGlobals, vLocals)
+            exec (_myFun in vGlobals, vLocals)
             myFun1 = vLocals['abc']
 
             data = client.request(urlparse.urljoin(self.base_link, '/jsverify.php?op=tag'), cookie=mycookie)

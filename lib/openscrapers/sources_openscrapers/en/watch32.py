@@ -23,13 +23,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib, urlparse, re, json, requests
+import json
+import re
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils
 from openscrapers.modules import dom_parser
 from openscrapers.modules import jsunpack
+from openscrapers.modules import source_utils
+
 
 class source:
     def __init__(self):
@@ -87,7 +91,8 @@ class source:
                     pass
             for item in items:
                 try:
-                    r = client.request(item[0]) if item[0].startswith('http') else client.request(urlparse.urljoin(self.base_link, item[0]))
+                    r = client.request(item[0]) if item[0].startswith('http') else client.request(
+                        urlparse.urljoin(self.base_link, item[0]))
 
                     qual = client.parseDOM(r, 'h1')[0]
                     quality = source_utils.get_release_quality(item[1], qual)[0]
@@ -133,5 +138,3 @@ class source:
                 return url
         except BaseException:
             return url
-
-
