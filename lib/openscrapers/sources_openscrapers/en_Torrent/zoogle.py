@@ -84,14 +84,17 @@ class source:
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             category = '+category%3ATV' if 'tvshowtitle' in data else '+category%3AMovies'
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s S%02dE%02d' % (
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url) + str(category)
             html = client.request(url)
             html = html.replace('&nbsp;', ' ')
             try:
-                results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
+                results = \
+                client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
             except Exception:
                 return sources
             rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
@@ -110,7 +113,8 @@ class source:
                     if not y == hdlr:
                         continue
                     try:
-                        seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0])
+                        seeders = int(
+                            re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0])
                     except Exception:
                         continue
                     if self.min_seeders > seeders:
@@ -132,7 +136,9 @@ class source:
                     except Exception:
                         pass
                     info = ' | '.join(info)
-                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append(
+                        {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                         'direct': False, 'debridonly': True})
                 except Exception:
                     continue
             check = [i for i in sources if not i['quality'] == 'CAM']

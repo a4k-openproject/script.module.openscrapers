@@ -25,11 +25,9 @@
 """
 
 import re
-import re
 import urllib
 
 import urlparse
-from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import control
@@ -40,20 +38,11 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
-        self.domains = ['eztv.io', 'eztv.yt']
-        self._base_link = None # Old 'eztv.re', 'eztv.ag', 'eztv.it', 'eztv.ch'
+        self.language = ['en']
+        self.domains = ['eztv.io']
+        self.base_link = 'https://eztv.io'
         self.search_link = '/search/%s'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
-        # Down  eztv.wf  eztv.tf
-
-
-    @property
-    def base_link(self):
-        if not self._base_link:
-            self._base_link = cache.get(self.__get_base_url, 120, 'http://%s' % self.domains[0])
-        return self._base_link
-
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -84,8 +73,12 @@ class source:
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
-                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s S%02dE%02d' % (
+                data['tvshowtitle'],
+                int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'],
+                data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|<|>|\|)', ' ', query)
             url = self.search_link % (urllib.quote_plus(query).replace('+', '-'))
             url = urlparse.urljoin(self.base_link, url)
@@ -108,8 +101,6 @@ class source:
                         derka = re.findall('href="magnet:(.+?)" class="magnet" title="(.+?)"', columns[2], re.DOTALL)[0]
                         name = derka[1]
                         link = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
-                        if link in str(sources):
-                            continue
                         t = name.split(hdlr)[0]
                         if not cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(title):
                             continue
@@ -134,7 +125,9 @@ class source:
                     except Exception:
                         pass
                     info = ' | '.join(info)
-                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append(
+                        {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                         'direct': False, 'debridonly': True})
                 except Exception:
                     continue
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -143,23 +136,6 @@ class source:
             return sources
         except Exception:
             return sources
-
-
-    def __get_base_url(self, fallback):
-        try:
-            for domain in self.domains:
-                try:
-                    url = 'http://%s' % domain
-                    result = client.request(url, limit=1, timeout='5')
-                    result = re.findall('<meta property="og:title" content="(.+?)"', result, re.DOTALL)[0]
-                    if result and 'EZTV' in result:
-                        return url
-                except:
-                    pass
-        except:
-            pass
-        return fallback
-
 
     def resolve(self, url):
         return url

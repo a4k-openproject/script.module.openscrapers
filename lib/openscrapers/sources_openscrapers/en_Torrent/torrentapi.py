@@ -21,7 +21,7 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+        self.language = ['en']
         self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&{2}'
         self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&{2}'
         self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
@@ -60,8 +60,10 @@ class source:
             if debrid.status() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
-                if 'tvshowtitle' in data else '%s' % data['imdb']
+            query = '%s S%02dE%02d' % (
+                data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s' % \
+                                                                                                              data[
+                                                                                                                  'imdb']
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             token = client.request(self.token)
             token = json.loads(token)["token"]
@@ -79,9 +81,8 @@ class source:
                 info = ' | '.join(info)
                 url = file["download"]
                 url = url.split('&tr')[0]
-                if url in str(sources):
-                    continue
-                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                'direct': False, 'debridonly': True})
             return sources
         except BaseException:
             return sources

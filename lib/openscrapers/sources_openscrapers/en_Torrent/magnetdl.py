@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+        self.language = ['en']
         self.domains = ['magnetdl.com']
         self.base_link = 'https://www.magnetdl.com'
         self.search_link = '/{0}/{1}'
@@ -60,8 +60,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None:
-                return
+            if url is None: return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -73,8 +72,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url is None:
-                return sources
+            if url is None: return sources
             if debrid.status() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -92,19 +90,15 @@ class source:
                 post = post.replace('&nbsp;', ' ')
                 name = client.parseDOM(post, 'a', ret='title')[1]
                 t = name.split(hdlr)[0]
-                if not cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(title):
-                    continue
+                if not cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(title): continue
                 try:
                     y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
                 except BaseException:
                     y = re.findall('[\.|\(|\[|\s\_|\-](\d{4})[\.|\)|\]|\s\_|\-]', name, re.I)[-1].upper()
-                if not y == hdlr:
-                    continue
+                if not y == hdlr: continue
                 links = client.parseDOM(post, 'a', ret='href')
                 magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
                 url = magnet.split('&tr')[0]
-                if url in str(sources):
-                    continue
                 quality, info = source_utils.get_release_quality(name, name)
                 try:
                     size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
@@ -115,7 +109,8 @@ class source:
                     size = '0'
                 info.append(size)
                 info = ' | '.join(info)
-                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                                'direct': False, 'debridonly': True})
             return sources
         except BaseException:
             return sources

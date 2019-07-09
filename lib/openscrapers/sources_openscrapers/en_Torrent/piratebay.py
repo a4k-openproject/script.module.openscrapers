@@ -41,9 +41,11 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
-        self.domains = ['pirateproxy.live', 'thepiratebay.fun', 'thepiratebay.asia', 'tpb.party', 'thepiratebay3.org', 'thepiratebayz.org', 'thehiddenbay.com', 'piratebay.live', 'thepiratebay.zone']
-        self._base_link = None # Old  ['tpb.cool', 'thepiratebay.fail', 'openpirate.org', 'piratebay.icu', 'thepiratebay.fyi', 'thepirate.fun', 'thepiratebay.press']
+        self.language = ['en']
+        self.domains = ['pirateproxy.live', 'thepiratebay.org', 'thepiratebay.fun', 'thepiratebay.asia', 'tpb.party',
+                        'thepiratebay3.org', 'thepiratebayz.org', 'thehiddenbay.com', 'piratebay.live',
+                        'thepiratebay.zone']
+        self._base_link = None
         self.search_link = '/s/?q=%s&page=0&&video=on&orderby=99'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
 
@@ -69,6 +71,7 @@ class source:
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         if debrid.status() is False:
             return
+
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
             url = urllib.urlencode(url)
@@ -105,8 +108,10 @@ class source:
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
-                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+            query = '%s S%02dE%02d' % (
+                data['tvshowtitle'], int(data['season']),
+                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+                data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
@@ -141,8 +146,6 @@ class source:
                     try:
                         link = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', entry, re.DOTALL)[0])
                         link = str(client.replaceHTMLCodes(link).split('&tr')[0])
-                        if link in str(sources):
-                            continue
                     except Exception:
                         continue
                     quality, info = source_utils.get_release_quality(name, name)
@@ -155,7 +158,9 @@ class source:
                     except Exception:
                         pass
                     info = ' | '.join(info)
-                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                    sources.append(
+                        {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                         'direct': False, 'debridonly': True})
                 except Exception:
                     continue
             check = [i for i in sources if not i['quality'] == 'CAM']
@@ -170,7 +175,7 @@ class source:
             for domain in self.domains:
                 try:
                     url = 'https://%s' % domain
-                    result = client.request(url, limit=1, timeout='5')
+                    result = client.request(url, limit=1, timeout='10')
                     result = re.findall('<input type="submit" title="(.+?)"', result, re.DOTALL)[0]
                     if result and 'Pirate Search' in result:
                         return url
@@ -178,6 +183,7 @@ class source:
                     pass
         except Exception:
             pass
+
         return fallback
 
     def resolve(self, url):
