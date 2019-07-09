@@ -20,7 +20,7 @@
 # Addon Name: Placenta
 # Addon id: plugin.video.placenta
 # Addon Provider: Mr.Blamo
-
+import base64
 import re
 import urllib
 import urlparse
@@ -148,7 +148,6 @@ class source:
 
     def resolve(self, url):
         try:
-            return al()._resolve(url)
         except:
             return
 

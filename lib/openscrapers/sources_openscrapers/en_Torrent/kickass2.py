@@ -27,11 +27,11 @@ import re
 import urllib
 import urlparse
 
-from resources.lib.modules import cleantitle
-from resources.lib.modules import client
-from resources.lib.modules import debrid
-from resources.lib.modules import source_utils
-from resources.lib.modules import workers
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
+from openscrapers.modules import workers
 
 
 class source:

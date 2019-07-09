@@ -144,3 +144,4 @@ test-results/scrapertest-scrubs/temp
 test-results/scrapetest-scrubs/scrubs-episode-scrapetest.txt)
 test-results/scrapetest-scrubs/scrubs-movie-scrapetest.txt
 test-results/scrapetest-scrubs/temp
+.idea/inspectionProfiles/Project_Default.xml
