@@ -52,8 +52,7 @@ class source:
             for entry in items:
                 try:
                     try:
-                        link, name = \
-                        re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
+                        link, name = re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
                         name = client.replaceHTMLCodes(name)
                         if not cleantitle.get(name) == cleantitle.get(data['title']):
                             continue
@@ -66,9 +65,7 @@ class source:
                     try:
                         entries = client.parseDOM(response, 'div', attrs={'class': 'modal-torrent'})
                         for torrent in entries:
-                            link, name = re.findall(
-                                'href="magnet:(.+?)" class="magnet-download download-torrent magnet" title="(.+?)"',
-                                torrent, re.DOTALL)[0]
+                            link, name = re.findall('href="magnet:(.+?)" class="magnet-download download-torrent magnet" title="(.+?)"', torrent, re.DOTALL)[0]
                             link = 'magnet:%s' % link
                             link = str(client.replaceHTMLCodes(link).split('&tr')[0])
                             if link in str(sources):
@@ -83,9 +80,7 @@ class source:
                             except Exception:
                                 pass
                             info = ' | '.join(info)
-                            sources.append(
-                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
-                                 'direct': False, 'debridonly': True})
+                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
                     except Exception:
                         continue
                 except Exception:

@@ -25,9 +25,9 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en']
-        self.domains = ['mkvcage.ws']
-        self.base_link = 'https://www.mkvcage.ws/'
+        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+        self.domains = ['mkvcage.cc', 'mkvcage.fun']
+        self.base_link = 'https://www.mkvcage.fun/'
         self.search_link = '?s=%s'
         self.scraper = cfscrape.create_scraper()
 
@@ -49,7 +49,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url == None:
+                return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -61,16 +62,15 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url == None: return sources
+            if url == None:
+                return sources
             if debrid.status() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s s%02de%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
+                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
@@ -86,6 +86,8 @@ class source:
                         r = client.parseDOM(r, 'div', attrs={'class': 'clearfix entry-content'})
                         for t in r:
                             link = re.findall('a class="buttn magnet" href="(.+?)"', t)[0]
+                            if link in str(sources):
+                                continue
                             quality, info = source_utils.get_release_quality(u)
                             try:
                                 size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:gb|gib|mb|mib))', str(data))[-1]
@@ -96,9 +98,7 @@ class source:
                             except:
                                 pass
                             info = ' | '.join(info)
-                            sources.append(
-                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
-                                 'direct': False, 'debridonly': True})
+                            sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
             except:
                 return
             return sources

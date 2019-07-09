@@ -40,9 +40,7 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
-        self.domains = ['kickass2.cc', 'kickass2.how', 'kickasst.org', 'kickasstorrents.id', 'thekat.cc', 'thekat.ch',
-                        'kickasstorrents.bz', 'kkickass.com', 'kkat.net', 'kickasst.net', 'kickasshydra.net',
-                        'kickasshydra.org', 'kickass-kat.com']
+        self.domains = ['kickass2.cc', 'kickass2.how', 'kickasst.org', 'kickasstorrents.id', 'thekat.cc', 'thekat.ch', 'kickasstorrents.bz', 'kkickass.com', 'kkat.net', 'kickasst.net', 'kickasshydra.net', 'kickasshydra.org', 'kickass-kat.com']
         self._base_link = None
         self.search = '/usearch/{0}'
 
@@ -91,8 +89,7 @@ class source:
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-                'year']
+            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
                 if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
@@ -146,9 +143,7 @@ class source:
             quality, info = source_utils.get_release_quality(url, name)
             info.append(item[2])
             info = ' | '.join(info)
-            self._sources.append(
-                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False,
-                 'debridonly': True})
+            self._sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
         except BaseException:
             pass
 

@@ -116,8 +116,7 @@ class source:
                     size = '0'
                 info.append(size)
                 info = ' | '.join(info)
-                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-                                'direct': False, 'debridonly': True})
+                sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
             return sources
         except BaseException:
             return sources

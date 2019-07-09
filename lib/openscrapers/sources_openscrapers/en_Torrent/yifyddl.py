@@ -15,7 +15,7 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en']
+        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
         self.domains = ['yifyddl.movie']
         self.base_link = 'https://yifyddl.movie/'
         self.search_link = '/movie/%s'
@@ -32,7 +32,8 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url is None: return sources
+            if url is None:
+                return sources
             if debrid.status() is False: raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -45,10 +46,11 @@ class source:
             except:
                 return sources
             for torrent in results:
-                link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent,
-                                  re.DOTALL)
+                link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent, re.DOTALL)
                 for link, name in link:
                     link = str(client.replaceHTMLCodes(link).split('&tr')[0])
+                    if link in str(sources):
+                        continue
                     quality, info = source_utils.get_release_quality(name, name)
                     try:
                         size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', torrent)[-1]
@@ -59,9 +61,7 @@ class source:
                     except Exception:
                         pass
                     info = ' | '.join(info)
-                    sources.append(
-                        {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
-                         'direct': False, 'debridonly': True})
+                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info, 'direct': False, 'debridonly': True})
             return sources
         except:
             return
