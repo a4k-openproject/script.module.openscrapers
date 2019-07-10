@@ -161,6 +161,7 @@ class source:
                 {'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False,
                  'debridonly': True})
         except BaseException:
+            return
 
     def __get_base_url(self, fallback):
         try:
