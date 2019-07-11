@@ -1,20 +1,54 @@
 # -*- coding: utf-8 -*-
 
-import copy
-import os
 import random
 import re
+import ssl
+import copy
 import time
+import os
 from collections import OrderedDict
 
+from requests.sessions import Session
 from requests.adapters import HTTPAdapter
 from requests.compat import urlparse, urlunparse
 from requests.exceptions import RequestException
-from requests.sessions import Session
+
 from urllib3.util.ssl_ import create_urllib3_context, DEFAULT_CIPHERS
 
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36"
+]
+
 from .cfscrape_solver import solve_challenge
-from .user_agents import USER_AGENTS
 
 __version__ = "2.0.7"
 
@@ -74,7 +108,6 @@ class CloudflareAdapter(HTTPAdapter):
 class CloudflareError(RequestException):
     pass
 
-
 class CloudflareScraper(Session):
     def __init__(self, *args, **kwargs):
         self.tries = 0
@@ -96,17 +129,17 @@ class CloudflareScraper(Session):
     @staticmethod
     def is_cloudflare_iuam_challenge(resp, allow_empty_body=False):
         return (
-                resp.status_code in (503, 429)
-                and resp.headers.get("Server", "").startswith("cloudflare")
-                and (allow_empty_body or (b"jschl_vc" in resp.content and b"jschl_answer" in resp.content))
+            resp.status_code in (503, 429)
+            and resp.headers.get("Server", "").startswith("cloudflare")
+            and (allow_empty_body or (b"jschl_vc" in resp.content and b"jschl_answer" in resp.content))
         )
 
     @staticmethod
     def is_cloudflare_captcha_challenge(resp):
         return (
-                resp.status_code == 403
-                and resp.headers.get("Server", "").startswith("cloudflare")
-                and b"/cdn-cgi/l/chk_captcha" in resp.content
+            resp.status_code == 403
+            and resp.headers.get("Server", "").startswith("cloudflare")
+            and b"/cdn-cgi/l/chk_captcha" in resp.content
         )
 
     def request(self, method, url, *args, **kwargs):
@@ -133,8 +166,8 @@ class CloudflareScraper(Session):
     def cloudflare_is_bypassed(self, url, resp=None):
         cookie_domain = ".{}".format(urlparse(url).netloc)
         return (
-                self.cookies.get("cf_clearance", None, domain=cookie_domain) or
-                (resp and resp.cookies.get("cf_clearance", None, domain=cookie_domain))
+            self.cookies.get("cf_clearance", None, domain=cookie_domain) or
+            (resp and resp.cookies.get("cf_clearance", None, domain=cookie_domain))
         )
 
     def handle_captcha_challenge(self):
@@ -186,8 +219,11 @@ class CloudflareScraper(Session):
         cloudflare_kwargs["allow_redirects"] = False
 
         # Cloudflare requires a delay before solving the challenge
-        time.sleep(max(delay - (time.time() - start_time), 0))
-
+        if not self.delay:
+            time.sleep(max(delay - (time.time() - start_time), 0))
+        else:
+            time.sleep(self.delay)
+			
         # Send the challenge response and handle the redirect manually
         redirect = self.request(method, submit_url, **cloudflare_kwargs)
         redirect_location = urlparse(redirect.headers["Location"])
@@ -206,5 +242,5 @@ class CloudflareScraper(Session):
             return self.request(method, redirect_url, **original_kwargs)
         return self.request(method, redirect.headers["Location"], **original_kwargs)
 
-
+		
 create_scraper = CloudflareScraper
