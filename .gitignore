@@ -138,3 +138,10 @@ test-results/scrapertest-yoda/Movie/yoda-movie-scrapetest.txt
 test-results/temp
 test-results/en_DebridOnly/temp
 test-results/temp
+test-results/en_Torrent/test1/os-torrents-movie-scrape-test.txt
+test-results/en_Torrent/test1/os-torrents-episode-scrape-test.txt
+test-results/scrapertest-scrubs/temp
+test-results/scrapetest-scrubs/scrubs-episode-scrapetest.txt)
+test-results/scrapetest-scrubs/scrubs-movie-scrapetest.txt
+test-results/scrapetest-scrubs/temp
+.idea/inspectionProfiles/Project_Default.xml

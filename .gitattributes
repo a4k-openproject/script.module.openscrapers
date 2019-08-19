@@ -1,0 +1,9 @@
+* text=auto
+* text eol=lf
+
+*.py text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.txt binary

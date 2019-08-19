@@ -27,8 +27,8 @@
 import json
 import re
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -40,7 +40,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['wannahd.us']
-        self.base_link = 'http://www.wannahd.top'
+        self.base_link = 'http://www.wannahd.one'
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
 

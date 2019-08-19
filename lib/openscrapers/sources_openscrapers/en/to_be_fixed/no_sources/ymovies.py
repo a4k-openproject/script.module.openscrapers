@@ -29,8 +29,8 @@ import json
 import re
 import traceback
 import urllib
-
 import urlparse
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -280,7 +280,7 @@ class source:
 
             vGlobals = {"__builtins__": None, '__name__': __name__, 'str': str, 'Exception': Exception}
             vLocals = {'param': None}
-            exec(CODE % script.replace('+', '|x|'), vGlobals, vLocals)
+            exec (CODE % script.replace('+', '|x|'), vGlobals, vLocals)
             data = vLocals['param'].decode('string_escape')
             x = re.search('''_x=['"]([^"']+)''', data).group(1)
             y = re.search('''_y=['"]([^"']+)''', data).group(1)
