@@ -32,7 +32,7 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser
+from openscrapers.modules import dom_parser2
 from openscrapers.modules import source_utils
 from openscrapers.modules import workers
 
@@ -59,7 +59,7 @@ class source:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
             url = urllib.urlencode(url)
             return url
-        except BaseException:
+        except Exception:
             return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -77,10 +77,11 @@ class source:
     def search(self, title, year):
         try:
             url = urlparse.urljoin(self.base_link, self.search_link % (urllib.quote_plus(title)))
-            r = self.scraper.get(url).content
-            r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
-            r = dom_parser.parse_dom(r.content, 'li')
-            r = [(dom_parser.parse_dom(i, 'a', {'class': 'title'})) for i in r]
+            headers = {'User-Agent': client.agent()}
+            r = self.scraper.get(url, headers=headers).content
+            r = dom_parser2.parse_dom(r, 'div', {'class': 'list_items'})[0]
+            r = dom_parser2.parse_dom(r.content, 'li')
+            r = [(dom_parser2.parse_dom(i, 'a', {'class': 'title'})) for i in r]
             r = [(i[0].attrs['href'], i[0].content) for i in r]
             r = [(urlparse.urljoin(self.base_link, i[0])) for i in r if
                  cleantitle.get(title) in cleantitle.get(i[1]) and year in i[1]]
@@ -112,12 +113,13 @@ class source:
             imdb = data['imdb']
 
             url = self.search(title, hdlr)
-            r = self.scraper.get(url).content
+            headers = {'User-Agent': client.agent()}
+            r = self.scraper.get(url, headers=headers).content
             if hdlr2 == '':
-                r = dom_parser.parse_dom(r, 'ul', {'id': 'releases'})[0]
+                r = dom_parser2.parse_dom(r, 'ul', {'id': 'releases'})[0]
             else:
-                r = dom_parser.parse_dom(r, 'ul', {'id': 'episodes'})[0]
-            r = dom_parser.parse_dom(r.content, 'a', req=['href'])
+                r = dom_parser2.parse_dom(r, 'ul', {'id': 'episodes'})[0]
+            r = dom_parser2.parse_dom(r.content, 'a', req=['href'])
             r = [(i.content, urlparse.urljoin(self.base_link, i.attrs['href'])) for i in r if
                  i and i.content != 'Watch']
             if hdlr2 != '':
@@ -140,9 +142,10 @@ class source:
 
     def _get_sources(self, name, url):
         try:
-            r = self.scraper.get(url).content
+            headers = {'User-Agent': client.agent()}
+            r = self.scraper.get(url, headers=headers).content
             name = client.replaceHTMLCodes(name)
-            l = dom_parser.parse_dom(r, 'div', {'class': 'ppu2h'})
+            l = dom_parser2.parse_dom(r, 'div', {'class': 'ppu2h'})
             s = ''
             for i in l:
                 s += i.content

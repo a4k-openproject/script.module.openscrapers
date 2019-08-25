@@ -35,8 +35,8 @@ CHOICE /C 12 /M "Enter your choice:"
 IF ERRORLEVEL 2 GOTO OS-En-Deb-Episode
 IF ERRORLEVEL 1 GOTO OS-En-Deb-Movie
 
-:: Example cmd for movie test: scrape-test.py folders= test_type=1 test_mode=movie timeout_mode=false number_of_tests=50
-:: Example cmd for episode test: scrape-test.py folders= test_type=1 test_mode=movie timeout_mode=false number_of_tests=50
+:: Example cmd for movie test: python scrape-test.py folders= test_type=1 test_mode=movie timeout_mode=false number_of_tests=15
+:: Example cmd for episode test: python scrape-test.py folders= test_type=1 test_mode=movie timeout_mode=false number_of_tests=15
 
 :OS-En-Deb-Movie
 CLS
@@ -50,7 +50,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=movie timeout_mode=false number_of_tests=50 > test-results\en-en_DebridOnly\os-en-and-debrid-movie-scrape-test.txt
+python scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=movie timeout_mode=false number_of_tests=15 > test-results\en-en_DebridOnly\os-en-and-debrid-movie-scrape-test.txt
 GOTO Retest
 
 :OS-En-Deb-Episode
@@ -65,7 +65,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\en-en_DebridOnly\os-en-and-debrid-episode-scrape-test.txt
+python scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=episode timeout_mode=false number_of_tests=15 > test-results\en-en_DebridOnly\os-en-and-debrid-episode-scrape-test.txt
 GOTO Retest
 
 :OS-Foreign
@@ -92,7 +92,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=movie timeout_mode=false number_of_tests=50 > test-results\de,es,gr,pl\os-foreign-movie-scrape-test.txt
+python scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=movie timeout_mode=false number_of_tests=15 > test-results\de,es,gr,pl\os-foreign-movie-scrape-test.txt
 GOTO Retest
 
 :OS-Foreign-Episode
@@ -107,7 +107,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\de,es,gr,pl\os-foreign-episode-scrape-test.txt
+python scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=episode timeout_mode=false number_of_tests=15 > test-results\de,es,gr,pl\os-foreign-episode-scrape-test.txt
 GOTO Retest
 
 :OS-Torrents
@@ -134,7 +134,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=en_Torrent test_type=1 test_mode=movie timeout_mode=false number_of_tests=50 > test-results\en_Torrent\os-torrents-movie-scrape-test.txt
+python scrape-test.py folders=en_Torrent test_type=1 test_mode=movie timeout_mode=false number_of_tests=15 > test-results\en_Torrent\os-torrents-movie-scrape-test.txt
 GOTO Retest
 
 :OS-Torrents-Episode
@@ -149,7 +149,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=en_Torrent test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\en_Torrent\os-torrents-episode-scrape-test.txt
+python scrape-test.py folders=en_Torrent test_type=1 test_mode=episode timeout_mode=false number_of_tests=15 > test-results\en_Torrent\os-torrents-episode-scrape-test.txt
 GOTO Retest
 
 :Scrubs
@@ -176,7 +176,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=scrapetest-scrubs test_type=1 test_mode=movie timeout_mode=false number_of_tests=50 > test-results\scrapetest-scrubs\scrubs-movie-scrapetest.txt
+python scrape-test.py folders=scrapetest-scrubs test_type=1 test_mode=movie timeout_mode=false number_of_tests=15 > test-results\scrapetest-scrubs\scrubs-movie-scrapetest.txt
 GOTO Retest
 
 :Scrubs-Episode
@@ -191,7 +191,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-scrape-test.py folders=scrapetest-scrubs test_type=1 test_mode=episode timeout_mode=false number_of_tests=20 > test-results\scrapetest-scrubs\scrubs-episode-scrapetest.txt)
+python scrape-test.py folders=scrapetest-scrubs test_type=1 test_mode=episode timeout_mode=false number_of_tests=15 > test-results\scrapetest-scrubs\scrubs-episode-scrapetest.txt)
 GOTO Retest
 
 :Retest

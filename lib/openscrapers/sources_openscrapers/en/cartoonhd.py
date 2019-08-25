@@ -77,7 +77,7 @@ class source:
         try:
             for alias in aliases:
                 url = '%s/show/%s/season/%01d/episode/%01d' % (
-                self.base_link, cleantitle.geturl(title), int(season), int(episode))
+                    self.base_link, cleantitle.geturl(title), int(season), int(episode))
                 url = client.request(url, headers=headers, output='geturl', timeout='10')
                 if not url is None and url != self.base_link:
                     break

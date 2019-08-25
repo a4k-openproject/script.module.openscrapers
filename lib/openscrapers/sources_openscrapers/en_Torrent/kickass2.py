@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
 
-#  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
-#  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
-#  .##.....#.##.....#.##......####..#.##......##......##.....#..##...##.##.....#.##......##.....#.##......
-#  .##.....#.########.######..##.##.#..######.##......########.##.....#.########.######..########..######.
-#  .##.....#.##.......##......##..###.......#.##......##...##..########.##.......##......##...##........##
-#  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
-#  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
-
 '''
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,20 +19,20 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import control
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
-from openscrapers.modules import workers
 
 
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['kickass2.cc', 'kickass2.how', 'kickasstorrents.bz', 'kkickass.com', 'kkat.net',
-                        'kickass-kat.com', 'kickasst.net', 'kickasst.org', 'kickasstorrents.id', 'thekat.cc',
-                        'thekat.ch']
+        self.domains = ['kickass.vc', 'kickasstorrents.bz', 'kkickass.com', 'kkat.net', 'kickass-kat.com',
+                        'kickasst.net', 'kickasst.org', 'kickasstorrents.id', 'thekat.cc', 'thekat.ch']
         self._base_link = None
         self.search_link = '/usearch/%s'
         self.min_seeders = int(control.setting('torrent.min.seeders'))
@@ -52,116 +44,134 @@ class source:
         return self._base_link
 
     def movie(self, imdb, title, localtitle, aliases, year):
+        if debrid.status(True) is False:
+            return
+
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
             url = urllib.urlencode(url)
             return url
-        except BaseException:
+        except Exception:
             return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+        if debrid.status(True) is False:
+            return
+
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
             url = urllib.urlencode(url)
             return url
-        except BaseException:
+        except Exception:
             return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
+        if debrid.status(True) is False:
+            return
+
         try:
-            if url is None: return
+            if url is None:
+                return
 
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
             url = urllib.urlencode(url)
             return url
-        except BaseException:
+        except Exception:
             return
 
     def sources(self, url, hostDict, hostprDict):
         try:
-            self._sources = []
-            self.items = []
+            sources = []
             if url is None:
-                return self._sources
-
-            if debrid.status() is False:
-                raise Exception()
+                return sources
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-            self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-                'year']
+            title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+
+            hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
             query = '%s S%02dE%02d' % (
-                data['tvshowtitle'], int(data['season']),
+                data['tvshowtitle'],
+                int(data['season']),
                 int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
-            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
-            url = self.search.format(urllib.quote(query))
+                data['title'],
+                data['year'])
+            query = re.sub('(\\\|/| -|:|;|\*|\?|"|<|>|\|)', ' ', query)
+            url = self.search_link % urllib.quote_plus(query)
+            url = urlparse.urljoin(self.base_link, url)
 
-            self._get_items(url)
-            self.hostDict = hostDict + hostprDict
-            threads = []
-            for i in self.items:
-                threads.append(workers.Thread(self._get_sources, i))
-            [i.start() for i in threads]
-            [i.join() for i in threads]
+            html = client.request(url)
 
-            return self._sources
-        except BaseException:
-            return self._sources
+            html = html.replace('&nbsp;', ' ')
 
-    def _get_items(self, url):
-        try:
-            headers = {'User-Agent': client.agent()}
-            r = client.request(url, headers=headers)
-            posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
+            try:
+                rows = client.parseDOM(html, 'tr', attrs={'id': 'torrent_latest_torrents'})
+            except Exception:
+                return sources
+            if rows is None:
+                return sources
 
-            for post in posts:
-                data = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
-                link = urllib.unquote(data).decode('utf8').replace('https://mylink.me.uk/?url=', '')
-                name = urllib.unquote_plus(re.search('dn=([^&]+)', link).groups()[0])
-                t = name.split(self.hdlr)[0]
-
-                if not cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(self.title): continue
+            for entry in rows:
 
                 try:
-                    y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
-                except BaseException:
-                    y = re.findall('[\.|\(|\[|\s\_|\-](\d{4})[\.|\)|\]|\s\_|\-]', name, re.I)[-1].upper()
-                if not y == self.hdlr: continue
+                    try:
+                        name = re.findall('class="cellMainLink">(.+?)</a>', entry, re.DOTALL)[0]
+                        name = client.replaceHTMLCodes(name)
+                        # t = re.sub('(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*|3D)(\.|\)|\]|\s|)(.+|)', '', name, flags=re.I)
+                        if not cleantitle.get(title) in cleantitle.get(name):
+                            continue
+                    except Exception:
+                        continue
 
-                try:
-                    size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-                    div = 1 if size.endswith('GB') else 1024
-                    size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-                    size = '%.2f GB' % size
-                except BaseException:
-                    size = '0'
+                    try:
+                        y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
+                    except Exception:
+                        y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', name, re.I)[-1].upper()
+                    if not y == hdlr:
+                        continue
 
-                self.items.append((name, link, size))
+                    try:
+                        seeders = int(re.findall('<td class="green center">(.+?)</td>', entry, re.DOTALL)[0])
+                    except Exception:
+                        continue
+                    if self.min_seeders > seeders:
+                        continue
 
-            return self.items
-        except BaseException:
-            return self.items
+                    try:
+                        link = 'magnet%s' % (re.findall('url=magnet(.+?)"', entry, re.DOTALL)[0])
+                        link = str(urllib.unquote(link).decode('utf8').split('&tr')[0])
+                    except Exception:
+                        continue
 
-    def _get_sources(self, item):
-        try:
-            name = item[0]
-            url = item[1]
-            quality, info = source_utils.get_release_quality(url, name)
-            info.append(item[2])
-            info = ' | '.join(info)
+                    quality, info = source_utils.get_release_quality(name, name)
 
-            self._sources.append(
-                {'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False,
-                 'debridonly': True})
-        except BaseException:
-            return
+                    try:
+                        size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
+                        div = 1 if size.endswith(('GB', 'GiB')) else 1024
+                        size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+                        size = '%.2f GB' % size
+                        info.append(size)
+                    except Exception:
+                        pass
+
+                    info = ' | '.join(info)
+
+                    sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en',
+                                    'url': link, 'info': info, 'direct': False, 'debridonly': True})
+                except Exception:
+                    continue
+
+            check = [i for i in sources if not i['quality'] == 'CAM']
+            if check:
+                sources = check
+
+            return sources
+        except Exception:
+            return sources
 
     def __get_base_url(self, fallback):
         try:
@@ -176,6 +186,8 @@ class source:
                     pass
         except Exception:
             pass
+
+        return fallback
 
     def resolve(self, url):
         return url

@@ -21,8 +21,12 @@
 # THE SOFTWARE.
 
 
-from .aes import AESBlockModeOfOperation, AESSegmentModeOfOperation, AESStreamModeOfOperation
-from .util import append_PKCS7_padding, strip_PKCS7_padding, to_bufferable
+from .aes import AESBlockModeOfOperation
+from .aes import AESSegmentModeOfOperation
+from .aes import AESStreamModeOfOperation
+from .util import append_PKCS7_padding
+from .util import strip_PKCS7_padding
+from .util import to_bufferable
 
 
 # First we inject three functions to each of the modes of operations
