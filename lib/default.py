@@ -133,17 +133,21 @@ elif action == "toggleAllTorrent":
     control.openSettings(query, "script.module.openscrapers")
 
 if action == "Defaults":
-    sourceList = ['1putlocker', '123movieshubz', '123123movies', 'animetoon', 'azmovie',
-                  'cartoonhd', 'cmovieshdbz', 'extramovies', 'fmoviesio', 'freefmovies', 'freeputlockers',
-                  'gowatchseries', 'hdbest', 'hdmto', 'hdonline', 'iwaatch', 'iwannawatch',
-                  'movie4kis', 'myhdpopcorn', 'mymovie4k', 'mywatchepseries', 'primewire',
-                  'projectfreetv', 'putlockeronl', 'reddit', 'seehd', 'seriesonline', 'sezonlukdizi',
-                  'sharemovies', 'solarmoviefree', 'streamdreams', 'timewatch', 'toonget',
-                  'tvbox', 'wannahd', 'watch32', 'watchepisodes', 'watchserieshd', 'xwatchseries',
-                  '0day', '2ddl', '300mbdownload', '300mbfilms', 'ddlspot', 'directdl', 'filmxy',
-                  'moviesleak', 'mvrls', 'myvideolink', 'rlsbb', 'scenerls', 'scenerlscom', 'scnsrc',
-                  'tvdownload', 'ultrahd', '1337x', 'eztv', 'glodls', 'kickass2', 'limetorrents',
-                  'magnetdl', 'mkvcage', 'piratebay', 'torrentapi', 'torrentdownloads', 'yifyddl',
+    sourceList = ['1putlocker', '123movieshubz', 'animetoon', 'azmovie', 'bnwmovies',
+                  'cartoonhd', 'cmovieshd', 'coolmoviezone', 'deepmovie', 'divxcrawler', 'extramovies', 'fmoviesio',
+                  'freefmovies',
+                  'gomoviesink', 'gowatchseries', 'hdmto', 'hdpopcorneu', 'iwaatch', 'iwannawatch',
+                  'library', 'movie4kis', 'mycouchtuner', 'myhdpopcorn', 'onlineseries', 'primewire',
+                  'projectfreetv', 'putlockerfree', 'putlockeronl', 'seehd', 'series9', 'seriesonline', 'sezonlukdizi',
+                  'sharemovies', 'solarmoviefree', 'streamdreams', 'swatchseries', 'timewatch', 'toonget',
+                  'tvbox', 'watchepisodes', 'watchserieshd', 'wnmnt', 'xwatchseries', 'yesmoviesgg',
+                  '2ddl', '300mbdownload', '300mbfilms', 'ddlspot', 'directdl', 'ganool',
+                  'maxrls', 'moviesleak', 'mvrls', 'myvideolink', 'rapidmoviez', 'rlsbb', 'sceneddl', 'scenerls',
+                  'scenerlscom', 'ultrahd',
+                  'warezmovies', '1337x', 'btdb', 'btscene', 'digbt', 'doublr', 'eztv', 'glodls', 'kickass2',
+                  'limetorrents',
+                  'magnetdl', 'mkvcage', 'piratebay', 'skytorrents', 'torrentapi', 'torrentdownloads', 'yify',
+                  'yifyddl',
                   'ytsam', 'zoogle']
     for i in sourceList:
         source_setting = 'provider.' + i

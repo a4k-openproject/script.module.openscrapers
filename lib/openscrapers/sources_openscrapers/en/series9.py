@@ -26,7 +26,6 @@ class source:
         self.base_link = 'https://series9.to'
         self.search_link = '/movie/search/%s'
 
-
     def matchAlias(self, title, aliases):
         try:
             for alias in aliases:
@@ -35,7 +34,6 @@ class source:
         except:
             return False
 
-
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             aliases.append({'country': 'us', 'title': title})
@@ -43,8 +41,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            return  
-
+            return
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -53,8 +50,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            return  
-
+            return
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -66,8 +62,7 @@ class source:
             url = urllib.urlencode(url)
             return url
         except:
-            return  
-
+            return
 
     def searchShow(self, title, season, aliases, headers):
         try:
@@ -83,8 +78,7 @@ class source:
             url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
             return url
         except:
-            return  
-
+            return
 
     def searchMovie(self, title, year, aliases, headers):
         try:
@@ -105,8 +99,7 @@ class source:
             url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
             return url
         except:
-            return  
-
+            return
 
     def sources(self, url, hostDict, hostprDict):
         try:
@@ -119,7 +112,8 @@ class source:
             headers = {}
             if 'tvshowtitle' in data:
                 ep = data['episode']
-                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
+                url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (
+                self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
                 r = client.request(url, headers=headers, timeout='10', output='geturl')
                 if url == None:
                     url = self.searchShow(data['tvshowtitle'], data['season'], aliases, headers)
@@ -142,7 +136,8 @@ class source:
                     r = re.findall('(https:.*?redirector.*?)[\'\"]', r)
                     for i in r:
                         try:
-                            sources.append({'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'], 'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
+                            sources.append({'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'],
+                                            'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
                         except:
                             pass
                 else:
@@ -152,17 +147,16 @@ class source:
                             raise Exception()
                         host = client.replaceHTMLCodes(host)
                         host = host.encode('utf-8')
-                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': link, 'direct': False,
+                                        'debridonly': False})
                     except:
                         pass
             return sources
         except:
             return sources
 
-
     def resolve(self, url):
         if "google" in url:
             return directstream.googlepass(url)
         else:
             return url
-

@@ -35,7 +35,7 @@ def get(title):
 
 
 def get_title(title):
-    if title == None:
+    if title is None:
         return
     try:
         title = title.encode('utf-8')
@@ -50,7 +50,7 @@ def get_title(title):
 
 
 def geturl(title):
-    if title == None:
+    if title is None:
         return
     title = title.lower()
     title = title.translate(None, ':*?"\'\.<>|&!,')
@@ -61,14 +61,14 @@ def geturl(title):
 
 
 def get_url(title):
-    if title == None:
+    if title is None:
         return
     title = title.replace(' ', '%20')
     return title
 
 
 def get_gan_url(title):
-    if title == None:
+    if title is None:
         return
     title = title.lower()
     title = title.replace('-', '+')
@@ -109,7 +109,7 @@ def query(title):
 
 
 def get_query(title):
-    if title == None:
+    if title is None:
         return
     title = title.replace(' ', '.').replace(':', '').replace('.-.', '.').replace('\'', '')
     return title
@@ -121,13 +121,8 @@ def normalize(title):
             return title.decode('ascii').encode("utf-8")
         except:
             pass
+
         return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if
                            unicodedata.category(c) != 'Mn'))
     except:
         return title
-
-
-def clean_search_query(url):
-    url = url.replace('-', '+')
-    url = url.replace(' ', '+')
-    return url

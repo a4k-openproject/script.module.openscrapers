@@ -15,7 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from openscrapers.modules import cfscrape
+import re
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -25,59 +26,42 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['streamdreams.org']
-        self.base_link = 'https://streamdreams.org'
-        self.search_movie = '/movies/!!-%s/'
-        self.search_tv = '/shows/!!-%s/'
-        self.scraper = cfscrape.create_scraper()
+        self.domains = ['yesmovies.gg']
+        self.base_link = 'https://yesmovies.gg'
+        self.search_link = '/film/%s/watching.html?ep=0'
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            title = cleantitle.geturl(title)
-            url = self.base_link + self.search_movie % title
-            return url
-        except:
-            return
-
-    def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-        try:
-            tvtitle = cleantitle.geturl(tvshowtitle)
-            url = self.base_link + self.search_tv % tvtitle
-            return url
-        except:
-            return
-
-    def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-        try:
-            if not url:
-                return
-            url = url + '?session=%s&episode=%s' % (season, episode)
+            title = cleantitle.geturl(title).replace('--', '-')
+            url = self.base_link + self.search_link % title
             return url
         except:
             return
 
     def sources(self, url, hostDict, hostprDict):
-        sources = []
         try:
-            if url is None:
+            sources = []
+            if url == None:
                 return sources
             hostDict = hostprDict + hostDict
-            headers = {'Referer': url}
-            r = self.scraper.get(url, headers=headers).content
-            u = client.parseDOM(r, "span", attrs={"class": "movie_version_link"})
+            r = client.request(url)
+            qual = re.compile('class="quality">(.+?)<').findall(r)
+            for i in qual:
+                quality = source_utils.check_url(i)
+                info = i
+            u = client.parseDOM(r, "div", attrs={"class": "pa-main anime_muti_link"})
             for t in u:
-                match = client.parseDOM(t, 'a', ret='data-href')
-                for url in match:
-                    if url in str(sources):
+                u = re.findall('data-video="(.+?)"', t)
+                for url in u:
+                    if 'vidcloud' in url:
                         continue
-                    quality, info = source_utils.get_release_quality(url, url)
                     valid, host = source_utils.is_host_valid(url, hostDict)
                     if valid:
                         sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url,
                                         'direct': False, 'debridonly': False})
-            return sources
+                return sources
         except:
-            return sources
+            return
 
     def resolve(self, url):
         return url

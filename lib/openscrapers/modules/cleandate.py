@@ -39,10 +39,12 @@ def iso_2_utc(iso_ts):
         tz = None
     if ts.find('.') > -1:
         ts = ts[:ts.find('.')]
+
     try:
         d = datetime.datetime.strptime(ts, '%Y-%m-%dT%H:%M:%S')
     except TypeError:
         d = datetime.datetime(*(time.strptime(ts, '%Y-%m-%dT%H:%M:%S')[0:6]))
+
     dif = datetime.timedelta()
     if tz:
         hours, minutes = tz.split(':')
@@ -59,5 +61,4 @@ def iso_2_utc(iso_ts):
         seconds = delta.total_seconds()  # works only on 2.7
     except:
         seconds = delta.seconds + delta.days * 24 * 3600  # close enough
-    return secondselta.seconds + delta.days * 24 * 3600  # close enough
     return seconds

@@ -36,9 +36,9 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['www.mkvcage.ws']
-        self.base_link = 'https://www.mkvcage.fun/'
-        self.search_link = '?s=%s'
+        self.domains = ['sceneddl.online']
+        self.base_link = 'http://www.sceneddl.me'
+        self.search_link = '/?s=%s'
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -58,7 +58,9 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None: return
+            if url is None:
+                return
+
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -68,53 +70,70 @@ class source:
             return
 
     def sources(self, url, hostDict, hostprDict):
-        sources = []
         try:
-            if url is None: return sources
-            if debrid.status() is False: raise Exception()
+            sources = []
+
+            if url is None:
+                return sources
+
+            if debrid.status() is False:
+                raise Exception()
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s s%02de%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
-            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+            query = '%s S%02dE%02d' % (
+                data['tvshowtitle'], int(data['season']), int(data['episode'])) \
+                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
 
             url = self.search_link % urllib.quote_plus(query)
-            url = urlparse.urljoin(self.base_link, url)
+            url = urlparse.urljoin(self.base_link, url).replace('-', '+')
 
             r = client.request(url)
+            if r is None and 'tvshowtitle' in data:
+                season = re.search('S(.*?)E', hdlr)
+                season = season.group(1)
+                url = title
 
-            try:
-                posts = client.parseDOM(r, 'h2', attrs={'class': 'entry-title'})
+                r = client.request(url)
+
+            for loopCount in range(0, 2):
+                if loopCount == 1 or (r is None and 'tvshowtitle' in data):
+                    r = client.request(url)
+
+                posts = client.parseDOM(r, "h2", attrs={"class": "entry-title"})
+                hostDict = hostprDict + hostDict
+                items = []
                 for post in posts:
-                    data = client.parseDOM(post, 'a', ret='href')
-                    for u in data:
-                        r = client.request(u)
-                        r = client.parseDOM(r, 'div', attrs={'class': 'clearfix entry-content'})
-                        for t in r:
-                            link = re.findall('a class="buttn magnet" href="(.+?)"', t)[0]
-                            quality, info = source_utils.get_release_quality(u)
-                            try:
-                                size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:gb|gib|mb|mib))', str(data))[-1]
-                                div = 1 if size.endswith(('gb')) else 1024
-                                size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-                                size = '%.2f gb' % size
-                                info.append(size)
-                            except:
-                                pass
-                            info = ' | '.join(info)
+                    try:
+                        u = client.parseDOM(post, 'a', ret='href')
+                        for i in u:
+                            name = str(i)
+                            items.append(name)
+                    except:
+                        pass
+
+                if len(items) > 0: break
+
+            for item in items:
+                try:
+                    i = str(item)
+                    r = client.request(i)
+                    u = client.parseDOM(r, "div", attrs={"class": "entry-content"})
+                    for t in u:
+                        r = client.parseDOM(t, 'a', ret='href')
+                        for url in r:
+                            if '.rar' in url:
+                                continue
+                            quality, info = source_utils.get_release_quality(url)
+                            valid, host = source_utils.is_host_valid(url, hostDict)
                             sources.append(
-                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
                                  'direct': False, 'debridonly': True})
-            except:
-                return
+                except:
+                    pass
             return sources
         except:
             return sources

@@ -27,6 +27,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -36,9 +37,9 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['www.mkvcage.ws']
-        self.base_link = 'https://www.mkvcage.fun/'
-        self.search_link = '?s=%s'
+        self.domains = ['btscene.today']
+        self.base_link = 'http://btscene.today/'
+        self.search_link = 'search?q=%s'
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -58,7 +59,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None: return
+            if url is None:
+                return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
             url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -70,9 +72,10 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url is None: return sources
-            if debrid.status() is False: raise Exception()
-
+            if url is None:
+                return sources
+            if debrid.status() is False:
+                raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -81,38 +84,37 @@ class source:
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
             query = '%s s%02de%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
+            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
+            data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url)
 
-            r = client.request(url)
-
             try:
-                posts = client.parseDOM(r, 'h2', attrs={'class': 'entry-title'})
+                r = client.request(url)
+                posts = client.parseDOM(r, 'tr')
                 for post in posts:
-                    data = client.parseDOM(post, 'a', ret='href')
-                    for u in data:
-                        r = client.request(u)
-                        r = client.parseDOM(r, 'div', attrs={'class': 'clearfix entry-content'})
-                        for t in r:
-                            link = re.findall('a class="buttn magnet" href="(.+?)"', t)[0]
-                            quality, info = source_utils.get_release_quality(u)
-                            try:
-                                size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:gb|gib|mb|mib))', str(data))[-1]
-                                div = 1 if size.endswith(('gb')) else 1024
-                                size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-                                size = '%.2f gb' % size
-                                info.append(size)
-                            except:
-                                pass
-                            info = ' | '.join(info)
-                            sources.append(
-                                {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
-                                 'direct': False, 'debridonly': True})
+                    link = re.findall('a title="Download Torrent Magnet" href="(magnet:.+?)"', post, re.DOTALL)
+                    try:
+                        size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+                        div = 1 if size.endswith('GB') else 1024
+                        size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+                        size = '%.2f GB' % size
+                    except BaseException:
+                        size = '0'
+                    for url in link:
+                        if hdlr not in url:
+                            continue
+                        url = url.split('&tr')[0]
+                        quality, info = source_utils.get_release_quality(url)
+                        if any(x in url for x in ['FRENCH', 'Ita', 'italian', 'TRUEFRENCH', '-lat-', 'Dublado']):
+                            continue
+                        info.append(size)
+                        info = ' | '.join(info)
+                        sources.append(
+                            {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                             'direct': False, 'debridonly': True})
             except:
                 return
             return sources

@@ -86,7 +86,7 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             hdlr2 = 'season-%01d-episode-%01d' % (
-            int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ''
+                int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ''
             imdb = data['imdb']
 
             content = 'episode' if 'tvshowtitle' in data else 'movie'
