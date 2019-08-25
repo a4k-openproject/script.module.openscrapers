@@ -31,11 +31,11 @@
         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="true"/>
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="true"/>
         <setting id="provider.azmovie" type="bool" label="AZMOVIE" default="true"/>	
-        <setting id="provider.bnwmovies" type="bool" label="AZMOVIE" default="true"/>
+        <setting id="provider.bnwmovies" type="bool" label="BNWMOVIES" default="true"/>
         <setting id="provider.cartoonhd" type="bool" label="CARTOONHD" default="true"/>
         <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="true"/>
         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/>
-        <setting id="provider.deepmovie" type="bool" label="deepmovie" default="true"/>
+        <setting id="provider.deepmovie" type="bool" label="DEEPMOVIE" default="true"/>
         <setting id="provider.divxcrawler" type="bool" label="DIVXCRAWLER" default="true"/>
         <setting id="provider.extramovies" type="bool" label="EXTRAMOVIES" default="true"/>
         <setting id="provider.fmoviesio" type="bool" label="FMOVIESIO" default="true"/>
@@ -210,7 +210,7 @@
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true"/>
         <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true"/>
-        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="false"/>
+        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="true"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
         <setting id="provider.yify" type="bool" label="YIFY" default="true"/>
