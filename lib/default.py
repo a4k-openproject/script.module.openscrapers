@@ -146,7 +146,7 @@ if action == "Defaults":
                   'scenerlscom', 'ultrahd',
                   'warezmovies', '1337x', 'btdb', 'btscene', 'digbt', 'doublr', 'eztv', 'glodls', 'kickass2',
                   'limetorrents',
-                  'magnetdl', 'mkvcage', 'piratebay', 'skytorrents', 'torrentapi', 'torrentdownloads', 'yify',
+                  'magnetdl', 'mkvcage', 'piratebay', 'torrentapi', 'torrentdownloads', 'yify',
                   'yifyddl',
                   'ytsam', 'zoogle']
     for i in sourceList:
