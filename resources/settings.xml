@@ -214,6 +214,7 @@
         <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="false"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
+        <setting id="provider.torrentgalaxy" type="bool" label="TORRENTGALAXY" default="true"/>
         <setting id="provider.torrentquest" type="bool" label="TORRENTQUEST" default="true"/>
         <setting id="provider.yify" type="bool" label="YIFY" default="true"/>
         <setting id="provider.yifyddl" type="bool" label="YIFYDDL" default="true"/>
