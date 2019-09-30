@@ -138,15 +138,15 @@ if action == "Defaults":
                   'freefmovies',
                   'gomoviesink', 'gowatchseries', 'hdmto', 'hdpopcorneu', 'iwaatch', 'iwannawatch',
                   'library', 'movie4kis', 'mycouchtuner', 'myhdpopcorn', 'onlineseries', 'primewire',
-                  'projectfreetv', 'putlockerfree', 'putlockeronl', 'seehd', 'series9', 'seriesonline', 'sezonlukdizi',
+                  'projectfreetv', 'putlockeronl', 'seehd', 'series9', 'seriesonline', 'sezonlukdizi',
                   'sharemovies', 'solarmoviefree', 'streamdreams', 'swatchseries', 'timewatch', 'toonget',
                   'tvbox', 'watchepisodes', 'watchserieshd', 'wnmnt', 'xwatchseries', 'yesmoviesgg',
                   '2ddl', '300mbdownload', '300mbfilms', 'ddlspot', 'directdl', 'ganool',
                   'maxrls', 'moviesleak', 'mvrls', 'myvideolink', 'rapidmoviez', 'rlsbb', 'sceneddl', 'scenerls',
                   'scenerlscom', 'ultrahd',
-                  'warezmovies', '1337x', 'btdb', 'btscene', 'digbt', 'doublr', 'eztv', 'glodls', 'kickass2',
+                  'warezmovies', '1337x', 'btdb', 'btscene', 'doublr', 'eztv', 'glodls', 'kickass2',
                   'limetorrents',
-                  'magnetdl', 'mkvcage', 'piratebay', 'torrentapi', 'torrentdownloads', 'yify',
+                  'magnetdl', 'mkvcage', 'piratebay', 'torrentapi', 'torrentdownloads','torrentgalaxy', 'torrentquest', 'yify',
                   'yifyddl',
                   'ytsam', 'zoogle']
     for i in sourceList:
