@@ -41,6 +41,7 @@ class source:
         self.search_base_link = 'http://search.rlsbb.ru'
         self.search_cookie = 'serach_mode=rlsbb'
         self.search_link = '/lib/search526049.php?phrase=%s&pindex=1&content=true'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -60,7 +61,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
 
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -86,11 +88,10 @@ class source:
             premDate = ''
 
             query = '%s S%02dE%02d' % (
-                data['tvshowtitle'], int(data['season']),
-                int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-                data['title'], data['year'])
-            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+                data['tvshowtitle'], int(data['season']), int(data['episode'])) \
+                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
 
+            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
             query = query.replace("&", "and")
             query = query.replace("  ", " ")
             query = query.replace(" ", "-")
@@ -101,9 +102,9 @@ class source:
             url = "http://rlsbb.ru/" + query
             if 'tvshowtitle' not in data: url = url + "-1080p"
 
-            r = scraper.get(url).content
+            r = self.scraper.get(url).content
 
-            if r == None and 'tvshowtitle' in data:
+            if r is None and 'tvshowtitle' in data:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)
                 query = title
@@ -113,19 +114,20 @@ class source:
                 query = query.replace("  ", " ")
                 query = query.replace(" ", "-")
                 url = "http://rlsbb.ru/" + query
-                r = scraper.get(url).content
+                r = self.scraper.get(url).content
 
-            for loopCount in range(0, 2):
-                if loopCount == 1 or (r == None and 'tvshowtitle' in data):
-                    premDate = re.sub('[ \.]', '-', data['premiered'])
+            for loopCount in range(0,2):
+                if loopCount == 1 or (r is None and 'tvshowtitle' in data):
+
+                    premDate = re.sub('[ \.]','-',data['premiered'])
                     query = re.sub('[\\\\:;*?"<>|/\-\']', '', data['tvshowtitle'])
                     query = query.replace("&", " and ").replace("  ", " ").replace(" ", "-")
                     query = query + "-" + premDate
 
                     url = "http://rlsbb.ru/" + query
-                    url = url.replace('The-Late-Show-with-Stephen-Colbert', 'Stephen-Colbert')
+                    url = url.replace('The-Late-Show-with-Stephen-Colbert','Stephen-Colbert')
 
-                    r = scraper.get(url).content
+                    r = self.scraper.get(url).content
 
                 posts = client.parseDOM(r, "div", attrs={"class": "content"})
                 hostDict = hostprDict + hostDict
@@ -136,17 +138,16 @@ class source:
                         for i in u:
                             try:
                                 name = str(i)
-                                if hdlr in name.upper():
-                                    items.append(name)
-                                elif len(premDate) > 0 and premDate in name.replace(".", "-"):
-                                    items.append(name)
+                                if hdlr in name.upper(): items.append(name)
+                                elif len(premDate) > 0 and premDate in name.replace(".","-"): items.append(name)
 
                             except:
                                 pass
                     except:
                         pass
 
-                if len(items) > 0: break
+                if len(items) > 0:
+                    break
 
             seen_urls = set()
 
@@ -165,28 +166,30 @@ class source:
                     host2 = host.strip('"')
                     host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(host2.strip().lower()).netloc)[0]
 
-                    if not host in hostDict: raise Exception()
+                    if not host in hostDict:
+                        raise Exception()
                     if any(x in host2 for x in ['.rar', '.zip', '.iso']): continue
 
-                    if '720p' in host2:
-                        quality = 'HD'
-                    elif '1080p' in host2:
-                        quality = '1080p'
+                    if '4K' in host2:
+                        quality = '4K'
                     elif '2160p' in host2:
                         quality = '4K'
-                    else:
-                        quality = 'SD'
+                    elif '1080p' in host2:
+                        quality = '1080p'
+                    elif '720p' in host2:
+                        quality = '720p'
+                    else: quality = 'SD'
 
                     info = ' | '.join(info)
                     host = client.replaceHTMLCodes(host)
                     host = host.encode('utf-8')
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info,
-                                    'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info, 'direct': False, 'debridonly': True})
 
                 except:
                     pass
             check = [i for i in sources if not i['quality'] == 'CAM']
-            if check: sources = check
+            if check:
+                sources = check
             return sources
         except:
             return sources

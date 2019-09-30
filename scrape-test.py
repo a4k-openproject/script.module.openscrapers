@@ -113,7 +113,7 @@ FAILED_PROVIDERS = []
 PASSED_PROVIDERS = []
 workers = []
 TOTAL_RUNTIME = 0
-TIMEOUT = 10
+TIMEOUT = 120
 
 hosts = [u'1fichier.com', u'24hd.club', u'2shared.com', u'4shared.com', u'adultswim.com', u'alfafile.net', u'aliez.me',
          u'amazon.com', u'ani-stream.com', u'anyfiles.pl', u'api.video.mail.ru', u'bestream.tv', u'big4shared.com',
