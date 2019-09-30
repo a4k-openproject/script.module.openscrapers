@@ -23,9 +23,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re, urllib, urlparse
-from openscrapers.modules import cleantitle, debrid, source_utils
+import re
+import urllib
+import urlparse
+
 from openscrapers.modules import client
+from openscrapers.modules import debrid
+from openscrapers.modules import source_utils
 
 
 class source:

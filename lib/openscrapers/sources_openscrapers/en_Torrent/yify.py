@@ -25,7 +25,6 @@
 
 
 import re
-import traceback
 import urllib
 import urlparse
 
@@ -33,7 +32,6 @@ from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import control
 from openscrapers.modules import debrid
-from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
 
 
