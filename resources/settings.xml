@@ -55,7 +55,7 @@
         <setting id="provider.ororo" type="bool" label="ORORO" default="false"/>
         <setting id="provider.primewire" type="bool" label="PRIMEWIRE" default="true"/>
         <setting id="provider.projectfreetv" type="bool" label="PROJECTFREETV" default="true"/>
-        <setting id="provider.putlockerfree" type="bool" label="PUTLOCKERFREE" default="true"/>
+        <setting id="provider.putlockerfree" type="bool" label="PUTLOCKERFREE" default="false"/>
         <setting id="provider.putlockeronl" type="bool" label="PUTLOCKERONL" default="true"/>
         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/>
         <setting id="provider.series9" type="bool" label="SERIES9" default="true"/>
@@ -180,6 +180,7 @@
         <setting id="provider.moviesleak" type="bool" label="MOVIESLEAK" default="true"/>
         <setting id="provider.mvrls" type="bool" label="MVRLS" default="true"/>
         <setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="true"/>
+        <setting id="provider.onlineseries" type="bool" label="ONLINESERIES" default="true"/>
         <setting id="provider.rapidmoviez" type="bool" label="RAPIDMOVIEZ" default="true"/>
         <setting id="provider.rlsbb" type="bool" label="RLSBB" default="true"/>
         <setting id="provider.sceneddl" type="bool" label="SCENEDDL" default="true"/>
@@ -201,7 +202,7 @@
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="true"/>
         <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
         <setting id="provider.btscene" type="bool" label="BTSCENE" default="true"/>
-        <setting id="provider.digbt" type="bool" label="DIGBT" default="true"/>
+        <setting id="provider.digbt" type="bool" label="DIGBT" default="false"/>
         <setting id="provider.doublr" type="bool" label="DOUBLR" default="true"/>
         <setting id="provider.eztv" type="bool" label="EZTV" default="true"/>
         <setting id="provider.glodls" type="bool" label="GLODLS" default="true"/>
@@ -213,9 +214,11 @@
         <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="false"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
+        <setting id="provider.torrentgalaxy" type="bool" label="TORRENTGALAXY" default="true"/>
+        <setting id="provider.torrentquest" type="bool" label="TORRENTQUEST" default="true"/>
         <setting id="provider.yify" type="bool" label="YIFY" default="true"/>
         <setting id="provider.yifyddl" type="bool" label="YIFYDDL" default="true"/>
-        <setting id="provider.ytsam" type="bool" label="YTSAM" default="true"/>
+        <setting id="provider.ytsam" type="bool" label="YTSAM" default="false"/>
         <setting id="provider.zoogle" type="bool" label="ZOOGLE" default="true"/>
     </category>
 

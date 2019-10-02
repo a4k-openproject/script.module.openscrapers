@@ -27,7 +27,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -37,10 +36,9 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['btdb.eu']
-        self.base_link = 'https://btdb.eu/'
-        self.search_link = '?search=%s'
-        self.scraper = cfscrape.create_scraper()
+        self.domains = ['torrentgalaxy.to']
+        self.base_link = 'https://torrentgalaxy.to'
+        self.search_link = '/torrents.php?search=%s'
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -93,10 +91,10 @@ class source:
             url = urlparse.urljoin(self.base_link, url)
 
             try:
-                r = self.scraper.get(url).content
-                posts = client.parseDOM(r, 'li')
+                r = client.request(url)
+                posts = client.parseDOM(r, 'div', attrs={'class': 'tgxtable'})
                 for post in posts:
-                    link = re.findall('a title="Download using magnet" href="(magnet:.+?)"', post, re.DOTALL)
+                    link = re.findall('a href="(magnet:.+?)"', post, re.DOTALL)
                     try:
                         size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
                         div = 1 if size.endswith('GB') else 1024

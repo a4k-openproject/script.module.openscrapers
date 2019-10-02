@@ -27,6 +27,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -36,9 +37,10 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['invictus.ws']
-        self.base_link = 'http://2ddl.vg'
+        self.domains = ['2ddl.vg', 'twoddl.net', 'invictus.ws']
+        self.base_link = 'https://2ddl.vg'
         self.search_link = '/?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -58,7 +60,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
 
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -72,9 +75,11 @@ class source:
         try:
             sources = []
 
-            if url == None: return sources
+            if url is None:
+                return sources
 
-            if debrid.status() == False: raise Exception()
+            if debrid.status() is False:
+                raise Exception()
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -86,19 +91,20 @@ class source:
                 if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
 
             url = self.search_link % urllib.quote_plus(query)
-            url = urlparse.urljoin(self.base_link, url).replace('-', '+')
+            url = urlparse.urljoin(self.base_link, url).replace('-', '+').replace('%3A+', '+')
 
-            r = client.request(url)
-            if r == None and 'tvshowtitle' in data:
+            r = self.scraper.get(url).content
+            if r is None and 'tvshowtitle' in data:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)
                 url = title
 
-                r = client.request(url)
+                r = self.scraper.get(url).content
 
             for loopCount in range(0, 2):
-                if loopCount == 1 or (r == None and 'tvshowtitle' in data):
-                    r = client.request(url)
+                if loopCount == 1 or (r is None and 'tvshowtitle' in data):
+
+                    r = self.scraper.get(url).content
 
                 posts = client.parseDOM(r, "div", attrs={"class": "postpage_movie_download"})
                 hostDict = hostprDict + hostDict
@@ -107,51 +113,31 @@ class source:
                     try:
                         u = client.parseDOM(post, 'a', ret='href')
                         for i in u:
-                            try:
-                                name = str(i)
-                                items.append(name)
-                                print
-                                items
-                            except:
-                                pass
+                            name = str(i)
+                            items.append(name)
                     except:
                         pass
 
-                if len(items) > 0: break
+                if len(items) > 0:
+                    break
 
             for item in items:
                 try:
-                    info = []
-
                     i = str(item)
-                    r = client.request(i)
+                    r = self.scraper.get(i).content
                     u = client.parseDOM(r, "div", attrs={"class": "multilink_lnks"})
                     for t in u:
                         r = client.parseDOM(t, 'a', ret='href')
                         for url in r:
-                            if '1080p' in url:
-                                quality = '1080p'
-                            elif '1080' in url:
-                                quality = '1080p'
-                            elif '720p' in url:
-                                quality = '720p'
-                            elif '720' in url:
-                                quality = '720p'
-                            elif 'HD' in url:
-                                quality = '720p'
-                            else:
-                                quality = 'SD'
-                            info = ' | '.join(info)
+                            if 'www.share-online.biz' in url:
+                                continue
+                            quality, info = source_utils.get_release_quality(url)
+                            if 'SD' in quality:
+                                continue
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            sources.append(
-                                {'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-                                 'direct': False, 'debridonly': True})
-
+                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
                 except:
                     pass
-            check = [i for i in sources if not i['quality'] == 'CAM']
-            if check: sources = check
-
             return sources
         except:
             return sources

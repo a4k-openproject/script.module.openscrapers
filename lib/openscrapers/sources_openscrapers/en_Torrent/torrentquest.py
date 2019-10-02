@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -Cleaned and Checked on 06-17-2019 by JewBMX in Scrubs.
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -27,7 +28,7 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape
+from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -36,11 +37,11 @@ from openscrapers.modules import source_utils
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en']
-        self.domains = ['btdb.eu']
-        self.base_link = 'https://btdb.eu/'
-        self.search_link = '?search=%s'
-        self.scraper = cfscrape.create_scraper()
+        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+        self.domains = ['torrentquest.com']
+        self.base_link = 'https://torrentquest.com'
+        self.search_link = '/{0}/{1}'
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -50,6 +51,7 @@ class source:
         except:
             return
 
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -58,9 +60,10 @@ class source:
         except:
             return
 
+
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None:
+            if url == None:
                 return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -69,6 +72,7 @@ class source:
             return url
         except:
             return
+
 
     def sources(self, url, hostDict, hostprDict):
         sources = []
@@ -84,43 +88,55 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s s%02de%02d' % (
-            data['tvshowtitle'], int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-            data['title'], data['year'])
+            query = '%s s%02de%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode']))\
+                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
-            url = self.search_link % urllib.quote_plus(query)
-            url = urlparse.urljoin(self.base_link, url)
+            url = urlparse.urljoin(self.base_link, self.search_link.format(query[0].lower(), cleantitle.geturl(query)))
 
-            try:
-                r = self.scraper.get(url).content
-                posts = client.parseDOM(r, 'li')
-                for post in posts:
-                    link = re.findall('a title="Download using magnet" href="(magnet:.+?)"', post, re.DOTALL)
-                    try:
-                        size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-                        div = 1 if size.endswith('GB') else 1024
-                        size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-                        size = '%.2f GB' % size
-                    except BaseException:
-                        size = '0'
-                    for url in link:
-                        if hdlr not in url:
-                            continue
-                        url = url.split('&tr')[0]
-                        quality, info = source_utils.get_release_quality(url)
-                        if any(x in url for x in ['FRENCH', 'Ita', 'italian', 'TRUEFRENCH', '-lat-', 'Dublado']):
-                            continue
-                        info.append(size)
-                        info = ' | '.join(info)
-                        sources.append(
-                            {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-                             'direct': False, 'debridonly': True})
-            except:
-                return
+            r = client.request(url)
+            r = client.parseDOM(r, 'tbody')[0]
+
+            posts = client.parseDOM(r, 'tr')
+            posts = [i for i in posts if 'magnet:' in i]
+
+            for post in posts:
+                post = post.replace('&nbsp;', ' ')
+                name = client.parseDOM(post, 'a', ret='title')[1]
+                t = name.split(hdlr)[0]
+                if not cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(title):
+                    continue
+                try:
+                    y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
+                except:
+                    y = re.findall('[\.|\(|\[|\s\_|\-](\d{4})[\.|\)|\]|\s\_|\-]', name, re.I)[-1].upper()
+                if not y == hdlr:
+                    continue
+                links = client.parseDOM(post, 'a', ret='href')
+                magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
+                url = magnet.split('&tr')[0]
+                if url in str(sources):
+                    continue
+                quality, info = source_utils.get_release_quality(name, name)
+                try:
+                    size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+                    div = 1 if size.endswith(('GB', 'GiB')) else 1024
+                    size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+                    size = '%.2f GB' % size
+                except BaseException:
+                    size = '0'
+
+                info.append(size)
+                info = ' | '.join(info)
+                sources.append(
+                    {'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+                     'direct': False, 'debridonly': True})
             return sources
         except:
             return sources
 
+
     def resolve(self, url):
         return url
+
+
