@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.1.97" provider-name="Addons4Kodi">
+<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.1.98" provider-name="Addons4Kodi">
     <requires>
         <import addon="xbmc.python" version="2.25.0" />
         <import addon="script.module.beautifulsoup4"/>
@@ -19,6 +19,6 @@
         <icon>icon.png</icon>
         <fanart></fanart>
     </assets>
-    <news>v0.0.1.93 - Scraper cleanup and EOL fixes</news>
+    <news>v0.0.1.98 - Scraper updates and language additions</news>
     </extension>
 </addon>
