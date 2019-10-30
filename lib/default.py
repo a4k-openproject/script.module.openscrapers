@@ -164,22 +164,17 @@ elif action == "toggleAllTorrent":
     control.openSettings(query, "script.module.openscrapers")
 
 if action == "Defaults":
-    sourceList = ['1putlocker', '123movieshubz', 'animetoon', 'azmovie', 'bnwmovies',
-                  'cartoonhd', 'cmovieshd', 'coolmoviezone', 'deepmovie', 'divxcrawler', 'extramovies', 'fmoviesio',
-                  'freefmovies',
-                  'gomoviesink', 'gowatchseries', 'hdmto', 'hdpopcorneu', 'iwaatch', 'iwannawatch',
-                  'library', 'movie4kis', 'mycouchtuner', 'myhdpopcorn', 'onlineseries', 'primewire',
-                  'projectfreetv', 'putlockeronl', 'seehd', 'series9', 'seriesonline', 'sezonlukdizi',
-                  'sharemovies', 'solarmoviefree', 'streamdreams', 'swatchseries', 'timewatch', 'toonget',
-                  'tvbox', 'watchepisodes', 'watchserieshd', 'wnmnt', 'xwatchseries', 'yesmoviesgg',
-                  '2ddl', '300mbdownload', '300mbfilms', 'ddlspot', 'directdl', 'ganool',
-                  'maxrls', 'moviesleak', 'mvrls', 'myvideolink', 'rapidmoviez', 'rlsbb', 'sceneddl', 'scenerls',
-                  'scenerlscom', 'ultrahd',
-                  'warezmovies', '1337x', 'btdb', 'btscene', 'doublr', 'eztv', 'glodls', 'kickass2',
-                  'limetorrents',
-                  'magnetdl', 'mkvcage', 'piratebay', 'torrentapi', 'torrentdownloads','torrentgalaxy', 'torrentquest', 'yify',
-                  'yifyddl',
-                  'ytsam', 'zoogle']
+    sourceList = ['1putlocker', '5movies', '123movieshubz', 'alucxyz', 'animetoon', 'azmovie', 'bnwmovies',
+                  'cartoonhd', 'cartoonhdto', 'cmovieshd', 'coolmoviezone', 'divxcrawler', 'extramovies', 'filmxy', 'fmovies',
+                  'freefmovies', 'ganoolcam', 'gomo', 'gomoviesink', 'gowatchseries', 'hdmto', 'hdpopcorneu', 'hubmovie', 'iwaatch', 'iwannawatch',
+                  'movie4kis', 'myhdpopcorn', 'primewire', 'projectfreetv', 'putlockerfree', 'putlockeronl', 'putlockeronline', 'seehd', 'series9',
+				  'seriesonline', 'sharemovies', 'solarmoviefree', 'streamdreams', 'timewatch', 'toonget',
+                  'tvbox', 'tvmovieflix', 'watchepisodes', 'watchserieshd', 'xwatchseries', 'yesmoviesgg',
+                  '0day', '2ddl', '300mbdownload', '300mbfilms', 'ddlspot', 'directdl', 'ganool',
+                  'maxrls', 'mkvcage', 'mvrls', 'myvideolink', 'onlineseries', 'rapidmoviez', 'rlsbb', 'sceneddl', 'scenerls',
+                  'ultrahdindir', '1337x', 'btdb', 'btscene', 'doublr', 'eztv', 'glodls', 'kickass2',
+                  'limetorrents', 'magnetdl', 'piratebay', 'torrentapi', 'torrentdownloads','torrentgalaxy', 'torrentquest', 'yify',
+                  'yifyddl', 'ytsam', 'zoogle']
     for i in sourceList:
         source_setting = 'provider.' + i
         control.setSetting(source_setting, params['setting'])

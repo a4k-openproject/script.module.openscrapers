@@ -30,7 +30,6 @@ import re
 import urlparse
 
 import requests
-
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 
