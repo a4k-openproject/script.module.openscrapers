@@ -27,8 +27,12 @@
 '''
 
 
-import re,urllib,urlparse,base64,json,unicodedata
-from openscrapers.modules import cleantitle,client,proxy
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 
 
 class source:

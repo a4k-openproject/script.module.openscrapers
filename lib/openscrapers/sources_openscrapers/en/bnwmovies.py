@@ -27,11 +27,9 @@
 
 
 import re
-import traceback
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import log_utils
 
 
 class source:

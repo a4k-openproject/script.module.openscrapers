@@ -25,12 +25,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
-
-import ast
-
-import re
-from openscrapers.modules import client, cleantitle
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 
 try:
     import HTMLParser

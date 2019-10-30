@@ -32,8 +32,9 @@ import json
 import re
 import urlparse
 
+from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client, cache
+from openscrapers.modules import client
 
 
 def byteify(input):

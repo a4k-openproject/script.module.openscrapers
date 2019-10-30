@@ -27,7 +27,10 @@
 '''
 
 
-import re,urllib,urlparse
+import re
+import urllib
+import urlparse
+
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils

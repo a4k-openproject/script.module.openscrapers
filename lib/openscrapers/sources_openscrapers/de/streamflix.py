@@ -27,8 +27,13 @@
 '''
 
 
-import json,urllib,urlparse
-from openscrapers.modules import cleantitle,client,source_utils
+import json
+import urllib
+import urlparse
+
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:

@@ -26,8 +26,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,urlparse
-from openscrapers.modules import cleantitle,client,dom_parser,source_utils
+import re
+import urlparse
+
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:

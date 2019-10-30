@@ -27,8 +27,13 @@
 '''
 
 
-import urllib,urlparse,re
-from openscrapers.modules import cleantitle,client,source_utils,trakt,tvmaze
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:

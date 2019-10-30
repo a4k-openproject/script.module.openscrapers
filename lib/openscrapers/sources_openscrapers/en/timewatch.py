@@ -26,7 +26,9 @@
 '''
 
 
-import re,urlparse
+import re
+import urlparse
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils

@@ -28,7 +28,9 @@
 
 
 import requests
-from openscrapers.modules import source_utils, client
+
+from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 try:
     import urlparse

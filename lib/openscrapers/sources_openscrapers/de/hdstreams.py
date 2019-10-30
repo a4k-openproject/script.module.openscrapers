@@ -26,8 +26,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import re,base64,json,urllib,urlparse
-from openscrapers.modules import cache,cleantitle,client,source_utils,dom_parser
+import base64
+import json
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cache
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:

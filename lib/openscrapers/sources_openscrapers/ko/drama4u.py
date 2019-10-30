@@ -27,8 +27,15 @@
 '''
 
 
-import re,urllib,urlparse
-from openscrapers.modules import cleantitle,client,directstream,source_utils,dom_parser
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import directstream
+from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 class source:

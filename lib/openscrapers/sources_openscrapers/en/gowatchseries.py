@@ -26,9 +26,12 @@
 '''
 
 
-import re,urllib,urlparse,json
-from openscrapers.modules import client
+import json
+import urllib
+import urlparse
+
 from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 from openscrapers.modules import more_sources
 from openscrapers.modules import source_utils
 

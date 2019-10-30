@@ -27,8 +27,16 @@
 '''
 
 
-import re,json,urllib,urlparse
-from openscrapers.modules import anilist,cleantitle,client,source_utils,dom_parser,tvmaze
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import anilist
+from openscrapers.modules import cleantitle
+from openscrapers.modules import client
+from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
+from openscrapers.modules import tvmaze
 
 
 class source:

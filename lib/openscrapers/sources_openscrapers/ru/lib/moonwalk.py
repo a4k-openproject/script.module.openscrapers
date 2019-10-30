@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import re,urllib,urlparse,json
-from openscrapers.modules import client,dom_parser,source_utils
+import json
+import re
+import urllib
+import urlparse
+
+from openscrapers.modules import client
+from openscrapers.modules import dom_parser
+from openscrapers.modules import source_utils
 
 
 def moonwalk(link, ref, season, episode):

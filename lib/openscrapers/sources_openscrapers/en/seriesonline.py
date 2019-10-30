@@ -26,9 +26,14 @@
 '''
 
 
-import re,requests,urllib,urlparse
-from openscrapers.modules import client
+import re
+import urllib
+import urlparse
+
+import requests
+
 from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import getSum
 from openscrapers.modules import source_utils

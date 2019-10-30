@@ -27,7 +27,10 @@
 
 
 
-import re, urllib, urlparse, time
+import re
+import time
+import urllib
+import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
