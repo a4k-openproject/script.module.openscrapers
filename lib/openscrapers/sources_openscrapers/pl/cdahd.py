@@ -1,4 +1,5 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
+#covenant
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -8,23 +9,31 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-#######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
-#######################################################################
+'''
+    OpenScrapers Project
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-# Addon Name: Placenta
-# Addon id: plugin.video.placenta
-# Addon Provider: Mr.blamo
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
 
 
 import re
 import urllib
-import urlparse
+
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -36,7 +45,7 @@ class source:
         self.language = ['pl']
         self.domains = ['cda-hd.cc']
 
-        self.base_link = 'http://cda-hd.cc/'
+        self.base_link = 'http://cda-hd.cc'
         self.search_link = '/?s=%s'
 
     def do_search(self, title, local_title, year, video_type):
@@ -84,7 +93,6 @@ class source:
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if url == None: return
-
             result = client.request(url)
             # cant user dom parser here because HTML is bugged div is not closed
             result = re.findall('<ul class="episodios">(.*?)</ul>', result, re.MULTILINE | re.DOTALL)
@@ -165,13 +173,21 @@ class source:
         return sources
 
     def get_lang_by_type(self, lang_type):
-        if lang_type == 'Lektor PL':
-            return 'pl', 'Lektor'
-        if lang_type == 'Dubbing PL':
+        if "dubbing" in lang_type.lower():
+            if "kino" in lang_type.lower():
+                return 'pl', 'Dubbing Kino'
             return 'pl', 'Dubbing'
-        if lang_type == 'Napisy PL':
+        elif 'lektor pl' in lang_type.lower():
+            return 'pl', 'Lektor'
+        elif 'lektor' in lang_type.lower():
+            return 'pl', 'Lektor'
+        elif 'napisy pl' in lang_type.lower():
             return 'pl', 'Napisy'
-        if lang_type == 'PL':
+        elif 'napisy' in lang_type.lower():
+            return 'pl', 'Napisy'
+        elif 'POLSKI' in lang_type.lower():
+            return 'pl', None
+        elif 'pl' in lang_type.lower():
             return 'pl', None
         return 'en', None
 

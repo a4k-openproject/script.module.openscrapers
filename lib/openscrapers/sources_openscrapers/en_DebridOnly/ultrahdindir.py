@@ -2,8 +2,32 @@
 # -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
 # Fixed by Tempest
 
-import re,urllib,urlparse
+#  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
+#  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
+#  .##.....#.##.....#.##......####..#.##......##......##.....#..##...##.##.....#.##......##.....#.##......
+#  .##.....#.########.######..##.##.#..######.##......########.##.....#.########.######..########..######.
+#  .##.....#.##.......##......##..###.......#.##......##...##..########.##.......##......##...##........##
+#  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
+#  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
+'''
+    OpenScrapers Project
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
+
+import re,urllib,urlparse
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import dom_parser
@@ -44,8 +68,8 @@ class source:
             post = 'do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=%s' % urllib.quote_plus(query)
             r = client.request(url, post=post)
             r = client.parseDOM(r, 'div', attrs={'class': 'box-out margin'})
-            r = [(dom_parser2.parse_dom(i, 'div', attrs={'class':'news-title'})) for i in r if data['imdb'] in i]
-            r = [(dom_parser2.parse_dom(i[0], 'a', req='href')) for i in r if i]
+            r = [(dom_parser.parse_dom(i, 'div', attrs={'class':'news-title'})) for i in r if data['imdb'] in i]
+            r = [(dom_parser.parse_dom(i[0], 'a', req='href')) for i in r if i]
             r = [(i[0].attrs['href'], i[0].content) for i in r if i]
             hostDict = hostprDict + hostDict
             for item in r:
@@ -54,7 +78,7 @@ class source:
                     s = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)
                     s = s[0] if s else '0'
                     data = client.request(item[0])
-                    data = dom_parser2.parse_dom(data, 'div', attrs={'id': 'r-content'})
+                    data = dom_parser.parse_dom(data, 'div', attrs={'id': 'r-content'})
                     data = re.findall('\s*<b><a href="(.+?)".+?</a></b>', data[0].content, re.DOTALL)
                     for url in data:
                         try:
