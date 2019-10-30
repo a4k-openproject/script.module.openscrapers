@@ -145,15 +145,21 @@ class source:
                 data = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
                 link = urllib.unquote(data).decode('utf8').replace('https://mylink.me.uk/?url=', '').replace('https://mylink.cx/?url=', '')
                 name = urllib.unquote_plus(re.search('dn=([^&]+)', link).groups()[0])
+
                 t = name.split(self.hdlr)[0]
                 if not cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(self.title):
                     continue
-                try:
-                    y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
-                except:
-                    y = re.findall('[\.|\(|\[|\s\_|\-](\d{4})[\.|\)|\]|\s\_|\-]', name, re.I)[-1].upper()
-                if not y == self.hdlr:
-                    continue
+
+                # try:
+                    # y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
+                # except:
+                    # y = re.findall('[\.|\(|\[|\s\_|\-](\d{4})[\.|\)|\]|\s\_|\-]', name, re.I)[-1].upper()
+                # if not y == self.hdlr:
+                    # continue
+
+                if self.hdlr not in name:
+                    raise Exception()
+
                 try:
                     size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
                     div = 1 if size.endswith('GB') else 1024
