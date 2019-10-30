@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +28,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -41,7 +41,6 @@ class source:
 		self.domains = ['myvideolinks.net', 'iwantmyshow.tk', 'new.myvideolinks.net']
 		self.base_link = 'http://myvideolinks.net'
 		self.search_link = 'rls/?s=%s'
-		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -82,6 +81,9 @@ class source:
 			if url is None:
 				return sources
 
+			if debrid.status() is False:
+				raise Exception()
+
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -107,18 +109,6 @@ class source:
 			# z = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
 			z = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a'))
 
-			r = [
-				(i[0],
-				i[1],
-				re.sub('(\.|\(|\[|\s)(\d{4}|3D)(\.|\)|\]|\s|)(.+|)', '', i[1]),
-				re.findall('[\.|\(|\[|\s](\d{4}|)([\.|\)|\]|\s|].+)', i[1])) for i in z]
-			r = [(i[0], i[1], i[2], i[3][0][0], i[3][0][1]) for i in r if i[3]]
-			r = [(i[0], i[1], i[2], i[3], re.split('\.|\(|\)|\[|\]|\s|\-', i[4])) for i in r]
-			r = [i for i in r if cleantitle.get(title) == cleantitle.get(i[2]) and data['year'] == i[3]]
-			r = [i for i in r if not any(x in i[4]
-										for x in ['HDCAM', 'CAM', 'DVDR', 'DVDRip', 'DVDSCR', 'HDTS', 'TS', '3D'])]
-			r = [i for i in r if '1080p' in i[4]][:1] + [i for i in r if '720p' in i[4]][:1]
-
 			if 'tvshowtitle' in data:
 				posts = [(i[1], i[0]) for i in z]
 			else:
@@ -141,11 +131,14 @@ class source:
 					u = [i for i in u if '/embed/' not in i]
 					u = [i for i in u if 'youtube' not in i]
 
-					# s = re.search('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', post)
-					# s = s.groups()[0] if s else '0'
+					try:
+						s = re.search('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', post)
+						s = s.groups()[0] if s else '0'
+					except:
+						s = '0'
+						pass
 
-					items += [(t, i) for i in u]
-					# items += [(t, i, s) for i in u]
+					items += [(t, i, s) for i in u]
 
 				except:
 					pass
@@ -196,7 +189,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-									'direct': False, 'debridonly': True})
+												'direct': False, 'debridonly': True})
 				except:
 					pass
 
