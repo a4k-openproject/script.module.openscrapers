@@ -29,7 +29,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['movie4k.is']
-        self.base_link = 'https://www1.movie4k.is'
+        self.base_link = 'https://www2.movie4k.is'
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
 

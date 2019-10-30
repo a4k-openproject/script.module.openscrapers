@@ -24,65 +24,54 @@
 '''
 
 import re
-import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import debrid
+from openscrapers.modules import client
+from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
+from openscrapers.modules import cfscrape
 
 
 class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['123movie.nu', 'ganool.ws', 'ganol.si', 'ganool123.com']
-        self.base_link = 'https://123movie.nu'
-        self.search_link = '/search/?q=%s'
+        self.domains = ['filmxy.nl', 'filmxy.me', 'filmxy.one', 'filmxy.ws']
+        self.base_link = 'https://www.filmxy.nl'
+        self.search_link = '/%s-%s'
         self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            url = {'imdb': imdb, 'title': title, 'year': year}
-            url = urllib.urlencode(url)
+            title = cleantitle.geturl(title)
+            url = urlparse.urljoin(self.base_link, (self.search_link % (title, year)))
             return url
-        except BaseException:
+        except Exception:
             return
 
     def sources(self, url, hostDict, hostprDict):
-        sources = []
         try:
+            sources = []
+
             if url is None:
                 return sources
-            if debrid.status() is False:
-                raise Exception()
-            data = urlparse.parse_qs(url)
-            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-            q = '%s' % cleantitle.get_gan_url(data['title'])
-            url = self.base_link + self.search_link % q
-            r = self.scraper.get(url).content
-            v = re.compile(
-                '<a href="(.+?)" class="ml-mask jt" title="(.+?)">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=".+?">(.+?)</span>').findall(
-                r)
-            for url, check, quality in v:
-                t = '%s (%s)' % (data['title'], data['year'])
-                if t not in check:
-                    raise Exception()
-                key = url.split('-hd')[1]
-                r = self.scraper.get('https://ganool.ws/moviedownload.php?q=' + key).content
-                r = re.compile('<a rel=".+?" href="(.+?)" target=".+?">').findall(r)
-                for url in r:
-                    if any(x in url for x in ['.rar']):
-                        continue
-                    quality = source_utils.check_url(quality)
-                    valid, host = source_utils.is_host_valid(url, hostDict)
-                    if not valid:
-                        continue
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-                                    'debridonly': True})
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0'}
+            result = self.scraper.get(url, headers=headers).content
+            streams = re.compile('data-player="&lt;[A-Za-z]{6}\s[A-Za-z]{3}=&quot;(.+?)&quot;', re.DOTALL).findall(result)
+
+            for link in streams:
+                quality = source_utils.check_sd_url(link)
+                host = link.split('//')[1].replace('www.', '')
+                host = host.split('/')[0].lower()
+
+                if quality == 'SD':
+                    sources.append({'source': host, 'quality': '720p', 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                else:
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+
             return sources
-        except:
+        except Exception:
             return sources
 
     def resolve(self, url):

@@ -30,7 +30,6 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import control
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -42,7 +41,7 @@ class source:
         self.domains = ['eztv.io']
         self.base_link = 'https://eztv.io'
         self.search_link = '/search/%s'
-        self.min_seeders = int(control.setting('torrent.min.seeders'))
+        self.min_seeders = 1
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:

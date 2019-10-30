@@ -37,8 +37,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['gowatchseries.tv', 'gowatchseries.co', 'gowatchseries.io']
-        self.base_link = 'https://gowatchseries.tv'
+        self.domains = ['gowatchseries.video', 'gowatchseries.tv', 'gowatchseries.co', 'gowatchseries.io']
+        self.base_link = 'https://www6.gowatchseries.video'
         self.search_link = '/ajax-search.html?keyword=%s&id=-1'
         self.search_link2 = '/search.html?keyword=%s'
 

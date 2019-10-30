@@ -51,8 +51,8 @@ class source:
     def __init__(self):
         self.priority = 0
         self.language = ['en']
-        self.domains = ['extramovies.trade', 'extramovies.guru', 'extramovies.wiki']  # http://extramovies.ind.in/
-        self.base_link = 'http://extramovies.wiki'  # Dead  extramovies.host
+        self.domains = ['extramovies.net.in', 'extramovies.trade', 'extramovies.guru', 'extramovies.wiki']  # http://extramovies.ind.in/
+        self.base_link = 'http://extramovies.net.in'  # Dead  extramovies.host
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
 

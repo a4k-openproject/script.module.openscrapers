@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
+# -Cleaned and Checked on 09-27-2019 by JewBMX in Scrubs.
 
-import re,urllib,urlparse
+import re, urllib, urlparse
 
 from openscrapers.modules import client
+from openscrapers.modules import cfscrape
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -12,9 +13,10 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['sceneddl.me']
-        self.base_link = 'http://www.sceneddl.me'
-        self.search_link = '/?s=%s'
+        self.domains = ['0daywarez.us', '0dayddl.xyz', '0dayddl.com']
+        self.base_link = 'https://0daywarez.us/'
+        self.search_link = '?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -37,7 +39,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None:
+            if url == None:
                 return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -51,56 +53,67 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url is None:
+            if url == None:
                 return sources
-            if debrid.status() is False:
+            if debrid.status() == False:
                 raise Exception()
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
             query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
-                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+                    if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url).replace('-', '+')
-            r = client.request(url)
-            if r is None and 'tvshowtitle' in data:
+            r = self.scraper.get(url).content
+            if r == None and 'tvshowtitle' in data:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)
                 url = title
-                r = client.request(url)
-            for loopCount in range(0, 2):
-                if loopCount == 1 or (r is None and 'tvshowtitle' in data):
-                    r = client.request(url)
-                posts = client.parseDOM(r, "h2", attrs={"class": "entry-title"})
+                r = self.scraper.get(url).content
+            for loopCount in range(0,2):
+                if loopCount == 1 or (r == None and 'tvshowtitle' in data):
+                    r = self.scraper.get(url).content
+                posts = client.parseDOM(r, "h2")
                 hostDict = hostprDict + hostDict
                 items = []
                 for post in posts:
                     try:
                         u = client.parseDOM(post, 'a', ret='href')
                         for i in u:
-                            name = str(i)
-                            items.append(name)
+                            try:
+                                name = str(i)
+                                items.append(name)
+                            except:
+                                pass
                     except:
                         pass
-                if len(items) > 0: break
+                if len(items) > 0:
+                    break
             for item in items:
                 try:
+                    info = []
                     i = str(item)
-                    r = client.request(i)
+                    r = self.scraper.get(i).content
                     u = client.parseDOM(r, "div", attrs={"class": "entry-content"})
                     for t in u:
-                        r = client.parseDOM(t, 'a', ret='href')
+                        r = re.compile('a href="(.+?)">.+?<').findall(t)
+                        query = query.replace(' ', '.')
                         for url in r:
-                            if '.rar' in url:
+                            if not query in url:
                                 continue
+                            if any(x in url for x in ['.rar', '.zip', '.iso']):
+                                raise Exception()
                             quality, info = source_utils.get_release_quality(url)
                             valid, host = source_utils.is_host_valid(url, hostDict)
                             sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
                 except:
                     pass
+            check = [i for i in sources if not i['quality'] == 'CAM']
+            if check:
+                sources = check
             return sources
-        except:
+        except Exception:
             return sources
 
 

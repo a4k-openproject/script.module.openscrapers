@@ -25,9 +25,9 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['watchserieshd.io', 'watchserieshd.co']
-        self.base_link = 'https://watchserieshd.io'
-        self.search_link = 'search.html?keyword=%s'
+        self.domains = ['watchserieshd.cc', 'watchserieshd.io', 'watchserieshd.co']
+        self.base_link = 'https://www1.watchserieshd.cc'
+        self.search_link = '/search.html?keyword=%s'
         self.scraper = cfscrape.create_scraper()
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):

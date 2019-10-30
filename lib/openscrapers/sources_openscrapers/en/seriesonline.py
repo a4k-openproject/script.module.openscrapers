@@ -38,8 +38,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['seriesonline.io']
-        self.base_link = 'https://www2.seriesonline8.co'
+        self.domains = ['123movieshub.gg']
+        self.base_link = 'https://www5.123movieshub.gg'
         self.search_link = '/movie/search/%s'
         self.scraper = cfscrape.create_scraper()
 

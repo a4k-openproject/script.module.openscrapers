@@ -32,7 +32,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['putlocker.onl']
-        self.base_link = 'https://putlocker.onl'
+        self.base_link = 'http://ww0.putlocker.onl'
         self.tv_link = '/show/%s/season/%s/episode/%s'
         self.movie_link = '/movie/%s'
         self.scraper = cfscrape.create_scraper()

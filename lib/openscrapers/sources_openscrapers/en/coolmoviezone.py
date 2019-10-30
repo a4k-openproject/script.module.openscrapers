@@ -26,8 +26,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['coolmoviezone.io']
-        self.base_link = 'https://coolmoviezone.io'
+        self.domains = ['coolmoviezone.xyz']
+        self.base_link = 'https://coolmoviezone.xyz'
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

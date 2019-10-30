@@ -25,7 +25,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['solarmoviefree.net']
-        self.base_link = 'http://solarmoviefree.net'
+        self.base_link = 'http://www6.solarmoviefree.net'
         self.search_link = '/search/%s+%s.html'
         self.scraper = cfscrape.create_scraper()
 

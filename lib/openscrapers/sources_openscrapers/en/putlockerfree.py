@@ -33,8 +33,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['putlockerfree.sc']
-        self.base_link = 'https://www.putlockerfree.sc'
+        self.domains = ['putlockerfree.info']
+        self.base_link = 'https://putlockerfree.info'
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:

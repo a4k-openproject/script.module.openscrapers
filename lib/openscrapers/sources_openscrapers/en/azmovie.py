@@ -34,8 +34,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['azmovie.to']
-        self.base_link = 'https://azmovie.to'
+        self.domains = ['azm.to', 'azmovie.to']
+        self.base_link = 'https://azm.to'
         self.search_link = '/watch.php?title=%s'
         self.scraper = cfscrape.create_scraper()
 

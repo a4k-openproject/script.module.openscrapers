@@ -23,7 +23,7 @@ class source:
         self.priority = 1
         self.language = ['en']
         self.domains = ['1putlocker.io']
-        self.base_link = 'https://www11.1putlocker.io'
+        self.base_link = 'https://www15.1putlocker.io'
         self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):

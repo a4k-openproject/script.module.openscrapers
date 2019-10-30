@@ -26,8 +26,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['yesmovies.gg']
-        self.base_link = 'https://yesmovies.gg'
+        self.domains = ['www6.yesmovies.fm']
+        self.base_link = 'https://www6.yesmovies.fm'
         self.search_link = '/film/%s/watching.html?ep=0'
 
     def movie(self, imdb, title, localtitle, aliases, year):
