@@ -171,7 +171,7 @@ if action == "Defaults":
 				  'seriesonline', 'sharemovies', 'solarmoviefree', 'streamdreams', 'timewatch', 'toonget',
                   'tvbox', 'tvmovieflix', 'watchepisodes', 'watchserieshd', 'xwatchseries', 'yesmoviesgg',
                   '0day', '2ddl', '300mbdownload', '300mbfilms', 'ddlspot', 'directdl', 'ganool',
-                  'maxrls', 'mkvcage', 'mvrls', 'myvideolink', 'onlineseries', 'rapidmoviez', 'rlsbb', 'sceneddl', 'scenerls',
+                  'maxrls', 'mkvcage', 'mkvhub', 'mvrls', 'myvideolink', 'onlineseries', 'rapidmoviez', 'rlsbb', 'sceneddl', 'scenerls',
                   'ultrahdindir', '1337x', 'btdb', 'btscene', 'doublr', 'eztv', 'glodls', 'kickass2',
                   'limetorrents', 'magnetdl', 'piratebay', 'torrentapi', 'torrentdownloads','torrentgalaxy', 'torrentquest', 'yify',
                   'yifyddl', 'ytsam', 'zoogle']

@@ -219,6 +219,7 @@
         <setting id="provider.ganool" type="bool" label="GANOOL" default="true"/>
         <setting id="provider.maxrls" type="bool" label="MAXRLS" default="true"/>
         <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
+        <setting id="provider.mkvhub" type="bool" label="MKVHUB" default="true"/>
         <setting id="provider.mvrls" type="bool" label="MVRLS" default="true"/>
         <setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="true"/>
         <setting id="provider.onlineseries" type="bool" label="ONLINESERIES" default="true"/>
