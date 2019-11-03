@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
+# -Cleaned and Checked on 11-23-2018 by JewBMX in Scrubs.
+# Only browser checks for active domains.
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -9,8 +11,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-    Covenant Add-on
-
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,6 +25,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+
 
 import re
 import urllib
@@ -39,58 +41,51 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['es']
-        self.domains = ['pepecine.online']
-        self.base_link = 'https://pepecine.online/'
-        self.search_link = '/resultados-online?q=%s'
+        self.domains = ['pepecine.to', 'pepecine.online','pepecine.me']
+        self.base_link = 'https://pepecine.to'
+        self.search_link = '/search?query=%s'
+        
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year, 'movies')
-            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(
-                aliases), year, 'movies')
+            if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),year, 'movies')
             return url
         except:
             return
 
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year, 'series')
-            if not url and tvshowtitle != localtvshowtitle: url = self.__search(
-                [tvshowtitle] + source_utils.aliases_to_array(aliases), year, 'series')
+            if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year, 'series')
             return url
         except:
             return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
             if not url:
                 return
-
             url = url[:-1] if url.endswith('/') else url
             url += '/seasons/%d/episodes/%d' % (int(season), int(episode))
             return url
         except:
             return
 
-    def __search(self, titles, year, content):
+
+    def __search(self, titles, year,content):
         try:
             query = self.search_link % (urllib.quote_plus(cleantitle.getsearch(titles[0])))
-
             query = urlparse.urljoin(self.base_link, query)
-
             t = [cleantitle.get(i) for i in set(titles) if i][0]
-
             r = client.request(query)
-
             r = client.parseDOM(r, 'div', attrs={'class': 'tab-content clearfix'})
-
-            if content == 'movies':
-                r = client.parseDOM(r, 'div', attrs={'id': 'movies'})
-            else:
-                r = client.parseDOM(r, 'div', attrs={'id': 'series'})
-
+            if content == 'movies': r = client.parseDOM(r, 'div', attrs={'id': 'movies'})
+            else: r = client.parseDOM(r, 'div', attrs={'id': 'series'})
             data = dom_parser.parse_dom(r, 'figcaption')
-
             for i in data:
                 title = i[0]['title']
                 title = cleantitle.get(title)
@@ -100,52 +95,44 @@ class source:
                 else:
                     url = dom_parser.parse_dom(i, 'a', req='href')
                     data = client.request(url[0][0]['href'])
-                    data = re.findall('<h3>Pelicula.+?">(.+?)\((\d{4})\).+?</a>', data, re.DOTALL)[0]
+                    data = re.findall('<h3>Pelicula.+?">(.+?)\((\d{4})\).+?</a>',data, re.DOTALL)[0]
                     if titles[0] in data[0] and year == data[1]: return source_utils.strip_domain(url[0][0]['href'])
-
             return
         except:
             return
 
+
     def sources(self, url, hostDict, hostprDict):
         sources = []
-
         try:
             if not url:
                 return sources
-
             query = urlparse.urljoin(self.base_link, url)
             r = client.request(query)
             links = client.parseDOM(r, 'li', attrs={'id': '\d+'})
-
             for i in links:
                 data = re.findall("<img.+?\('([^']+)'.+?<b>(\w+)\s*<img.+?<td.+?>(.+?)</td>\s*<td", i, re.DOTALL)
                 for url, info, quality in data:
-
                     lang, info = self.get_lang_by_type(info)
                     quality = self.quality_fixer(quality)
                     if 'streamcloud' in url: quality = 'SD'
-
                     valid, host = source_utils.is_host_valid(url, hostDict)
                     if 'goo' in url:
                         data = client.request(url)
                         url_id = re.findall('var\s*videokeyorig\s*=\s*"(.+?)"', data, re.DOTALL)[0]
                         url, host = 'http://hqq.tv/player/embed_player.php?vid=%s' % url_id, 'netu.tv'
-
                     sources.append({'source': host, 'quality': quality, 'language': lang, 'url': url, 'info': info,
-                                    'direct': False, 'debridonly': False})
-
+                                    'direct':False,'debridonly': False})
             return sources
         except:
             return sources
 
-    def quality_fixer(self, quality):
-        if '1080' in quality:
-            return '1080p'
-        elif '720' in quality:
-            return 'HD'
-        else:
-            return 'SD'
+
+    def quality_fixer(self,quality):
+        if '1080' in quality: return '1080p'
+        elif '720' in quality: return 'HD'
+        else: return 'SD'
+
 
     def get_lang_by_type(self, lang_type):
         if 'Latino' in lang_type:
@@ -166,5 +153,8 @@ class source:
             return 'en', 'Ingles'
         return 'es', None
 
+
     def resolve(self, url):
         return url
+        
+        

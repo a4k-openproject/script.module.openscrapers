@@ -8,7 +8,7 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-"""
+'''
     OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
+'''
 
 import re
 import urllib
@@ -30,7 +30,6 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import control
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -42,7 +41,7 @@ class source:
         self.domains = ['eztv.io']
         self.base_link = 'https://eztv.io'
         self.search_link = '/search/%s'
-        self.min_seeders = int(control.setting('torrent.min.seeders'))
+        self.min_seeders = 1
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:

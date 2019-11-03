@@ -1,4 +1,5 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
+#FanFilm Addon
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -8,21 +9,28 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-#######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
-#######################################################################
+'''
+    OpenScrapers Project
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-# Addon Name: Placenta
-# Addon id: plugin.video.placenta
-# Addon Provider: Mr.blamo
-import urlparse
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-from openscrapers.modules import cfscrape
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
+
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
@@ -33,10 +41,9 @@ class source:
         self.language = ['pl']
         self.domains = ['ekino-tv.pl']
 
-        self.base_link = 'http://ekino-tv.pl'
-        self.search_link = '/search/'
+        self.base_link = 'https://ekino-tv.pl'
+        self.search_link = '/s/search?q='
         self.resolve_link = '/watch/f/%s/%s'
-        self.scraper = cfscrape.create_scraper()
 
     def search(self, title, localtitle, year, search_type):
         try:
@@ -48,10 +55,10 @@ class source:
             return
 
     def do_search(self, search_string, title, localtitle, year, search_type):
-        url = urlparse.urljoin(self.base_link, self.search_link)
-        r = self.scraper.post(url, data={'search_field': search_string})
-        r = client.parseDOM(r, 'div', attrs={'class': 'movies-list-item'})
 
+        r = client.request("http://ekino-tv.pl/se/search?q=%s" % str.lower(search_string + " HD").replace(" ", "+"))
+        r = client.parseDOM(r, 'div', attrs={'class': 'movies-list-item'})
+        r = [x.encode('utf-8') for x in r]
         local_simple = cleantitle.get(localtitle)
         title_simple = cleantitle.get(title)
         for row in r:
@@ -61,7 +68,14 @@ class source:
             if not search_type in link:
                 continue
 
-            local_found = client.parseDOM(title_found, 'a')[0]
+            local_found = client.parseDOM(str(title_found).replace("Å ", "ń"), 'a')[0]
+            local_found = local_found.replace('&nbsp;', '')
+            local_found = local_found.replace('ENG', '')
+            local_found = local_found.replace('CAM', '')
+            local_found = local_found.replace('HD', '')
+            local_found = local_found.replace('-', '')
+            local_found = local_found.replace(' ', '')
+
             title_found = client.parseDOM(title_found, 'a', attrs={'class': 'blue'})
             if not title_found or not title_found[0]:
                 title_found = local_found
@@ -87,7 +101,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         url = urlparse.urljoin(self.base_link, url)
-        r = self.scraper.get(url).content
+        r = client.request(url)
         r = client.parseDOM(r, 'div', attrs={'id': 'list-series'})[0]
         p = client.parseDOM(r, 'p')
         index = p.index('Sezon ' + season)
@@ -113,11 +127,10 @@ class source:
         return 'en', None
 
     def sources(self, url, hostDict, hostprDict):
-
         sources = []
         try:
             if url == None: return sources
-            r = self.scraper.get(urlparse.urljoin(self.base_link, url))
+            r = client.request(urlparse.urljoin(self.base_link, url), redirect=False)
             rows = client.parseDOM(r, 'ul', attrs={'class': 'players'})[0]
             rows = client.parseDOM(rows, 'li')
             rows.pop()
@@ -138,7 +151,6 @@ class source:
                 sources.append(
                     {'source': host, 'quality': q, 'language': lang, 'url': link, 'info': info, 'direct': False,
                      'debridonly': False})
-
             return sources
         except:
             return sources
@@ -149,10 +161,15 @@ class source:
             host = splitted[1]
             video_id = splitted[3]
             transl_url = urlparse.urljoin(self.base_link, self.resolve_link) % (host, video_id)
-            result = self.scraper.get(transl_url, allow_redirects=False, headers={'cookie': "prch=true"})
+            result = client.request(transl_url, redirect=False, cookie="prch=true")
             scripts = client.parseDOM(result, 'script')
             for script in scripts:
                 if 'var url' in script:
-                    return script.split("'")[1]
+                    link = script.split("'")[1]
+                    if not 'watch' in link:
+                        return link
+                    result = client.request(link)
+                    video_link = client.parseDOM(result, 'iframe ', ret='src')[0]
+                    return video_link
         except:
             return None

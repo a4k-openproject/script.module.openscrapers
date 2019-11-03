@@ -1,4 +1,10 @@
 OpenScrapers Module Changelog:
+0.0.1.98
+- Updated scrapers
+- Updated domains
+- Removed dead websites
+- Added additional languages
+
 0.0.1.5
 - Added new scrapers (ty Nazegnl)
 - fixed bs4 issue in pubfilmonline

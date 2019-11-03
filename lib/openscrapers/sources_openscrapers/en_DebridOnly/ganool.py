@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -37,8 +38,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['ganool.ws', 'ganol.si', 'ganool123.com']
-        self.base_link = 'https://www4.ganool.ws'
+        self.domains = ['123movie.nu', 'ganool.ws', 'ganol.si', 'ganool123.com']
+        self.base_link = 'https://123movie.nu'
         self.search_link = '/search/?q=%s'
         self.scraper = cfscrape.create_scraper()
 

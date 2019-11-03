@@ -1,6 +1,17 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
+# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
+# Created by Tempest
+
+#  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
+#  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
+#  .##.....#.##.....#.##......####..#.##......##......##.....#..##...##.##.....#.##......##.....#.##......
+#  .##.....#.########.######..##.##.#..######.##......########.##.....#.########.######..########..######.
+#  .##.....#.##.......##......##..###.......#.##......##...##..########.##.......##......##...##........##
+#  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
+#  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +26,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -27,17 +39,19 @@ class source:
         self.language = ['en']
         self.domains = ['streamdreams.org']
         self.base_link = 'https://streamdreams.org'
-        self.search_movie = '/movies/!!-%s/'
-        self.search_tv = '/shows/!!-%s/'
+        self.search_movie = '/movies/bbb-%s/'
+        self.search_tv = '/shows/bbb-%s/'
         self.scraper = cfscrape.create_scraper()
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            title = cleantitle.geturl(title)
-            url = self.base_link + self.search_movie % title
+            mvtitle = cleantitle.geturl(title)
+            url = self.base_link + self.search_movie % mvtitle
             return url
         except:
             return
+
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -46,6 +60,7 @@ class source:
             return url
         except:
             return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
@@ -56,11 +71,12 @@ class source:
         except:
             return
 
+
     def sources(self, url, hostDict, hostprDict):
-        sources = []
         try:
-            if url is None:
+            if url == None:
                 return sources
+            sources = []
             hostDict = hostprDict + hostDict
             headers = {'Referer': url}
             r = self.scraper.get(url, headers=headers).content
@@ -70,14 +86,18 @@ class source:
                 for url in match:
                     if url in str(sources):
                         continue
-                    quality, info = source_utils.get_release_quality(url, url)
                     valid, host = source_utils.is_host_valid(url, hostDict)
                     if valid:
-                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url,
-                                        'direct': False, 'debridonly': False})
+                        quality, info = source_utils.get_release_quality(url, url)
+                        if source_utils.limit_hosts() is True and host in str(sources):
+                            continue
+                        sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
             return sources
         except:
             return sources
 
+
     def resolve(self, url):
         return url
+
+

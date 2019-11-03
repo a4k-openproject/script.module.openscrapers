@@ -52,7 +52,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-python scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=movie timeout_mode=true number_of_tests=15 > test-results\en-en_DebridOnly\os-en-and-debrid-movie-scrape-test.txt
+python scrape-test.py folders=en,en_DebridOnly,en_Torrent test_type=1 test_mode=movie timeout_mode=true number_of_tests=15 > test-results\os\os-en-movie-scrape-test.txt
 GOTO Retest
 
 :OS-En-Deb-Episode
@@ -67,7 +67,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-python scrape-test.py folders=en,en_DebridOnly test_type=1 test_mode=episode timeout_mode=true number_of_tests=15 > test-results\en-en_DebridOnly\os-en-and-debrid-episode-scrape-test.txt
+python scrape-test.py folders=en,en_DebridOnly,en_Torrent test_type=1 test_mode=episode timeout_mode=true number_of_tests=15 > test-results\os\os-en-episode-scrape-test.txt
 GOTO Retest
 
 :OS-Foreign
@@ -94,7 +94,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-python scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=movie timeout_mode=true number_of_tests=15 > test-results\de,es,gr,pl\os-foreign-movie-scrape-test.txt
+python scrape-test.py folders=de,es,fr,gr,ko,pl,ru test_type=1 test_mode=movie timeout_mode=true number_of_tests=15 > test-results\os\os-foreign-movie-scrape-test.txt
 GOTO Retest
 
 :OS-Foreign-Episode
@@ -109,7 +109,7 @@ ECHO so you can move to to_be_fixed folder and then test again
 ECHO.
 ECHO Close Window or Press CTRL+C to terminate test if it hangs
 ECHO.
-python scrape-test.py folders=de,es,gr,pl test_type=1 test_mode=episode timeout_mode=true number_of_tests=15 > test-results\de,es,gr,pl\os-foreign-episode-scrape-test.txt
+python scrape-test.py folders=de,es,fr,gr,ko,pl,ru test_type=1 test_mode=episode timeout_mode=true number_of_tests=15 > test-results\os\os-foreign-episode-scrape-test.txt
 GOTO Retest
 
 :OS-Torrents

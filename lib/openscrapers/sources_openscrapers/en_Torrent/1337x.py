@@ -10,6 +10,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -113,8 +114,10 @@ class source:
         try:
             headers = {'User-Agent': client.agent()}
             r = client.request(url, headers=headers)
+
             posts = client.parseDOM(r, 'tbody')[0]
             posts = client.parseDOM(posts, 'tr')
+
             for post in posts:
                 data = dom.parse_dom(post, 'a', req='href')[1]
                 link = urlparse.urljoin(self.base_link, data.attrs['href'])
@@ -122,12 +125,17 @@ class source:
                 t = name.split(self.hdlr)[0]
                 if not cleantitle.get(re.sub('(|)', '', t)) == cleantitle.get(self.title):
                     continue
-                try:
-                    y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
-                except BaseException:
-                    y = re.findall('[\.|\(|\[|\s\_|\-](\d{4})[\.|\)|\]|\s\_|\-]', name, re.I)[-1].upper()
-                if not y == self.hdlr:
-                    continue
+
+                # try:
+                    # y = re.findall('[\.|\(|\[|\s|\_|\-](S\d+E\d+|S\d+)[\.|\)|\]|\s|\_|\-]', name, re.I)[-1].upper()
+                # except BaseException:
+                    # y = re.findall('[\.|\(|\[|\s\_|\-](\d{4})[\.|\)|\]|\s\_|\-]', name, re.I)[-1].upper()
+                # if not y == self.hdlr:
+                    # continue
+
+                if self.hdlr not in name:
+                    raise Exception()
+
                 try:
                     size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
                     div = 1 if size.endswith('GB') else 1024

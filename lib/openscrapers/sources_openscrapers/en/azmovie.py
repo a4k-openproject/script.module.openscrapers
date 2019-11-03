@@ -8,7 +8,7 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-"""
+'''
     OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
+'''
+
+
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
@@ -34,8 +36,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['azmovie.to']
-        self.base_link = 'https://azmovie.to'
+        self.domains = ['azm.to', 'azmovie.to']
+        self.base_link = 'https://azm.to'
         self.search_link = '/watch.php?title=%s'
         self.scraper = cfscrape.create_scraper()
 

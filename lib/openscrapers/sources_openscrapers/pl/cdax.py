@@ -1,4 +1,5 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
+#Covenant
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -8,24 +9,31 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-#######################################################################
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# @Daddy_Blamo wrote this file.  As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
-# this stuff is worth it, you can buy me a beer in return. - Muad'Dib
-# ----------------------------------------------------------------------------
-#######################################################################
+'''
+    OpenScrapers Project
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-# Addon Name: Placenta
-# Addon id: plugin.video.placenta
-# Addon Provider: Mr.blamo
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
 
 
 import urllib
-import urlparse
 
-from openscrapers.modules import cfscrape
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -37,9 +45,8 @@ class source:
         self.language = ['pl']
         self.domains = ['cdax.online']
 
-        self.base_link = 'http://cdax.online/'
+        self.base_link = 'https://cda-tv.pl/'
         self.search_link = '/?s=%s'
-        self.scraper = cfscrape.create_scraper()
 
     def movie(self, imdb, title, localtitle, aliases, year):
         return self.search(localtitle, year, 'movies')
@@ -50,7 +57,7 @@ class source:
 
             query = self.search_link % urllib.quote_plus(cleantitle.query(localtitle))
             query = urlparse.urljoin(self.base_link, query)
-            result = self.scraper.get(query).content
+            result = client.request(query)
 
             result = client.parseDOM(result, 'div', attrs={'class': 'result-item'})
             for x in result:
@@ -70,7 +77,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            result = self.scraper.get(url).content
+            result = client.request(url)
             seasons = client.parseDOM(result, 'div', attrs={'class': 'se-c'})
             for season_data in seasons:
                 season_no = client.parseDOM(season_data, 'div', attrs={'class': 'se-q'})[0]
@@ -102,7 +109,7 @@ class source:
         try:
 
             if url == None: return sources
-            result = self.scraper.get(url).content
+            result = client.request(url)
 
             result = client.parseDOM(result, 'div', attrs={'id': 'downloads'})[0]
             rows = client.parseDOM(result, 'tr')
@@ -110,17 +117,16 @@ class source:
             for row in rows:
                 try:
                     cols = client.parseDOM(row, 'td')
-                    host = client.parseDOM(cols[0], 'img', ret='src')[0]
+                    host = client.parseDOM(cols, 'img', ret='src')[0]
                     host = host.rpartition('=')[-1]
-                    link = client.parseDOM(cols[0], 'a', ret='href')[0]
+                    link = client.parseDOM(cols, 'a', ret='href')[0]
                     valid, host = source_utils.is_host_valid(host, hostDict)
-                    if not valid:
-                        continue
+                    if not valid: continue
 
                     q = 'SD'
-                    if 'Wysoka' in cols[1]: q = 'HD'
+                    if 'Wysoka' in cols[2]: q = 'HD'
 
-                    lang, info = self.get_lang_by_type(cols[2])
+                    lang, info = self.get_lang_by_type(cols[3])
 
                     sources.append(
                         {'source': host, 'quality': q, 'language': lang, 'url': link, 'info': info, 'direct': False,
@@ -133,4 +139,7 @@ class source:
             return sources
 
     def resolve(self, url):
-        return url
+        result = client.request(url)
+        result = client.parseDOM(result, 'div', attrs={'class': 'boton reloading'})
+        link = client.parseDOM(result, 'a', ret='href')[0]
+        return link

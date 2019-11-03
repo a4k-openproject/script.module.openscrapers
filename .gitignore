@@ -146,3 +146,7 @@ test-results/scrapetest-scrubs/scrubs-movie-scrapetest.txt
 test-results/scrapetest-scrubs/temp
 .idea/inspectionProfiles/Project_Default.xml
 *.xlsx
+test-results/os/os-en-episode-scrape-test.txt
+test-results/os/os-en-movie-scrape-test.txt
+test-results/de-es-gr-pl/temp
+test-results/de-es-gr-pl/temp

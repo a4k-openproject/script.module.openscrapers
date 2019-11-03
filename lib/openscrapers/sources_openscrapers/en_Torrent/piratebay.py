@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -31,7 +32,6 @@ import urlparse
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import control
 from openscrapers.modules import debrid
 from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
@@ -46,7 +46,7 @@ class source:
                         'thepiratebay.zone']
         self._base_link = None
         self.search_link = '/s/?q=%s&page=0&&video=on&orderby=99'
-        self.min_seeders = int(control.setting('torrent.min.seeders'))
+        self.min_seeders = 1
 
     @property
     def base_link(self):

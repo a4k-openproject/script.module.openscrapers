@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +24,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
+
 import re
 
 from openscrapers.modules import cleantitle
@@ -33,8 +36,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['putlockerfree.sc']
-        self.base_link = 'https://www.putlockerfree.sc'
+        self.domains = ['putlockerfree.info']
+        self.base_link = 'https://putlockerfree.info'
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:

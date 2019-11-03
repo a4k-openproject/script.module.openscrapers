@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
+#  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
+#  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
+#  .##.....#.##.....#.##......####..#.##......##......##.....#..##...##.##.....#.##......##.....#.##......
+#  .##.....#.########.######..##.##.#..######.##......########.##.....#.########.######..########..######.
+#  .##.....#.##.......##......##..###.......#.##......##...##..########.##.......##......##...##........##
+#  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
+#  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
+
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -15,10 +24,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
 import re
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -28,6 +39,7 @@ class source:
         self.domains = ['cmovieshd.net']
         self.base_link = 'https://cmovieshd.net'
         self.search_link = '/search/?q=%s'
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -45,6 +57,7 @@ class source:
         except:
             return
 
+
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
@@ -52,10 +65,7 @@ class source:
             r = client.request(url)
             qual = re.compile('class="quality">(.+?)<').findall(r)
             for i in qual:
-                if 'HD' in i:
-                    quality = '720p'
-                else:
-                    quality = 'SD'
+                quality, info = source_utils.get_release_quality(i, i)
             r = client.parseDOM(r, "div", attrs={"id": "list-eps"})
             for i in r:
                 t = re.compile('<a href="(.+?)"').findall(i)
@@ -67,13 +77,14 @@ class source:
                         i = client.request(i).replace("\\", "")
                         u = re.findall('"(https.+?)"', i)
                         for url in u:
-                            sources.append(
-                                {'source': 'CDN', 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-                                 'debridonly': False})
+                            valid, host = source_utils.is_host_valid(url, hostDict)
+                            sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
+            return sources
+        except:
+            return sources
 
-                return sources
-        except Exception:
-            return
 
     def resolve(self, url):
         return url
+
+

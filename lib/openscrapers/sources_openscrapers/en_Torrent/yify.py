@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +31,6 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import control
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
@@ -42,7 +42,7 @@ class source:
         self.domains = ['yts.am']
         self.base_link = 'https://yts.lt/'
         self.search_link = '/browse-movies/%s/all/all/0/latest'
-        self.min_seeders = int(control.setting('torrent.min.seeders'))
+        self.min_seeders = 1
 
     def movie(self, imdb, title, localtitle, aliases, year):
         if debrid.status(True) is False:

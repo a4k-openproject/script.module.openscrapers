@@ -9,6 +9,23 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
+'''
+    OpenScrapers Project
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
+
 import re
 
 from openscrapers.modules import cfscrape
@@ -27,10 +44,13 @@ class source:
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
-            url = '%s %s' % (title, year)
+            title = cleantitle.geturl(title)
+            url = '%s-%s' % (title, year)
+            url = self.base_link + '/' + url
             return url
         except:
             return
+
 
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
@@ -39,17 +59,19 @@ class source:
         except:
             return
 
+
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None:
+            if not url:
                 return
-            if str(season) == '1':
-                url = '%s/%s-episode-%s' % (self.base_link, url, episode)
+            if season == '1': 
+                url = self.base_link + '/' + url + '-episode-' + episode
             else:
-                url = '%s/%s-season-%s-episode-%s' % (self.base_link, url, season, episode)
+                url = self.base_link + '/' + url + '-season-' + season + '-episode-' + episode
             return url
         except:
             return
+
 
     def sources(self, url, hostDict, hostprDict):
         sources = []

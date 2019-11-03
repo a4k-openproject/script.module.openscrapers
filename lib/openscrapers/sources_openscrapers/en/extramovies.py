@@ -9,6 +9,7 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +24,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
+
 import base64
 import re
 import traceback
@@ -31,30 +34,18 @@ import urlparse
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
-
-
-def clean_search(title):
-    if title is None:
-        return
-    title = title.lower()
-    title = re.sub('&#(\d+);', '', title)
-    title = re.sub('(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-    title = title.replace('&quot;', '\"').replace('&amp;', '&')
-    title = re.sub('\\\|/|\(|\)|\[|\]|\{|\}|-|:|;|\*|\?|"|\'|<|>|\_|\.|\?', ' ', title).lower()
-    title = ' '.join(title.split())
-    return title
 
 
 class source:
     def __init__(self):
-        self.priority = 0
+        self.priority = 1
         self.language = ['en']
-        self.domains = ['extramovies.trade', 'extramovies.guru', 'extramovies.wiki']  # http://extramovies.ind.in/
-        self.base_link = 'http://extramovies.wiki'  # Dead  extramovies.host
+        self.domains = ['extramovies.net.in', 'extramovies.trade', 'extramovies.guru', 'extramovies.wiki']  # http://extramovies.ind.in/
+        self.base_link = 'http://extramovies.net.in'  # Dead  extramovies.host
         self.search_link = '/?s=%s'
         self.scraper = cfscrape.create_scraper()
+
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
@@ -96,6 +87,8 @@ class source:
         try:
             sources = []
             self.hostDict = hostDict + hostprDict
+            if url == None:
+                return sources
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
