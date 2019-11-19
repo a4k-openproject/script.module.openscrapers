@@ -29,6 +29,7 @@ import json
 import sys
 
 import requests
+
 from openscrapers.modules import control
 from openscrapers.modules import source_utils
 

@@ -31,6 +31,7 @@ import urllib
 import urlparse
 
 import requests
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import directstream

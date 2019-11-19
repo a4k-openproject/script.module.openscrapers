@@ -2,9 +2,10 @@
 # --[getSum v1.4]--|--[From JewBMX]--
 # Lazy Module to make life a little easier.
 
-import re, time, traceback
-from openscrapers.modules import log_utils
 import HTMLParser
+import re
+
+from openscrapers.modules import log_utils
 
 headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3555.0 Safari/537.36"}
 
@@ -207,7 +208,6 @@ def unpacked(url):
 
 
 def TEST_RUN():
-    import re
     from openscrapers.modules import jsunpack
     from openscrapers.modules import log_utils
     log_utils.log('#####################################')

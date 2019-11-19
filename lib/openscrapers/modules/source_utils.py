@@ -27,9 +27,8 @@ import urlparse
 
 from openscrapers.modules import client
 from openscrapers.modules import directstream
-from openscrapers.modules import trakt
 from openscrapers.modules import pyaes
-
+from openscrapers.modules import trakt
 
 RES_4K = ['4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra-hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
 					'1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',

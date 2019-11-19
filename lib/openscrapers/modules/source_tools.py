@@ -1,11 +1,12 @@
 # Original file: schism_meta and code bits from others.
 # Contents: all sorts of random code for source work lol.
 
-import re,sys,urllib,urllib2,urlparse,time
-import requests,random,base64,unicodedata
 import HTMLParser
-import traceback
+import re
+import urllib
+import urlparse
 
+import requests
 
 RES_8K = ['8k', 'hd8k', 'hd8k ', '8khd', '8khd ', '4320p', '4320i', 'hd4320', '4320hd', '4320p ', '4320i ', 'hd4320 ', '4320hd ', '5120p', '5120i', 'hd5120', '5120hd', '5120p ', '5120i ', 'hd5120 ', '5120hd ', '8192p', '8192i', 'hd8192', '8192hd', '8192p ', '8192i ', 'hd8192 ', '8192hd ']
 RES_6K = ['6k', 'hd6k', 'hd6k ', '6khd', '6khd ', '3160p', '3160i', 'hd3160', '3160hd', '3160p ', '3160i ', 'hd3160 ', '3160hd ', '4096p', '4096i', 'hd4096', '4096hd', '4096p ', '4096i ', 'hd4096 ', '4096hd ']

@@ -1,13 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import re, sys, cookielib, urllib, urllib2, urlparse, gzip
-import StringIO, HTMLParser, time, random, base64
-
+import HTMLParser
+import StringIO
+import base64
+import cookielib
+import gzip
+import random
+import re
+import sys
+import time
+import urllib
+import urllib2
+import urlparse
 
 from openscrapers.modules import cache
 from openscrapers.modules import dom_parser
-from openscrapers.modules import workers
 from openscrapers.modules import log_utils
+from openscrapers.modules import workers
 
 
 def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False, limit=None, referer=None, cookie=None, compression=True, output='', timeout='30', ignoreSsl=False, flare=True, ignoreErrors=None):

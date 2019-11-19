@@ -1,6 +1,6 @@
 import ast
-import re
 import operator as op
+import re
 
 operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
              ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,

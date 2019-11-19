@@ -21,7 +21,12 @@
 
 
 import os
-import xbmc, xbmcaddon, xbmcplugin, xbmcvfs, xbmcgui
+
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+import xbmcvfs
 
 integer = 1000
 
