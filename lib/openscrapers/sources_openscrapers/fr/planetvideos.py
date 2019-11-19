@@ -54,7 +54,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -84,7 +85,8 @@ class source:
         sources = []
 
         try:
-            if url == None: return sources
+            if url is None:
+                return sources
 
             hostDict = [(i.rsplit('.', 1)[0], i) for i in hostDict]
             locDict = [i[0] for i in hostDict]

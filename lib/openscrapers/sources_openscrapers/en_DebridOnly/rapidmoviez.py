@@ -25,17 +25,17 @@
 '''
 
 import re
-import time
 import urllib
 import urlparse
+import time
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
 from openscrapers.modules import workers
+from openscrapers.modules import cfscrape
+from openscrapers.modules import dom_parser                # switch to client.parseDOM() to rid import
 
 
 class source:
@@ -47,25 +47,29 @@ class source:
         self.search_link = 'search/%s'
         self.scraper = cfscrape.create_scraper()
 
+
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
             url = urllib.urlencode(url)
             return url
-        except BaseException:
+        except:
             return
-            
+
+
     def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
             url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
             url = urllib.urlencode(url)
             return url
-        except Exception:
+        except:
             return
+
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url is None: return
+            if url is None:
+                return
 
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -75,11 +79,14 @@ class source:
         except:
             return
 
+
     def search(self, title, year):
         try:
             url = urlparse.urljoin(self.base_link, self.search_link % (urllib.quote_plus(title)))
             headers = {'User-Agent': client.agent()}
             r = self.scraper.get(url, headers=headers).content
+
+                # switch to client.parseDOM() to rid import
             r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
             r = dom_parser.parse_dom(r.content, 'li')
             r = [(dom_parser.parse_dom(i, 'a', {'class': 'title'})) for i in r]
@@ -88,22 +95,25 @@ class source:
             if r: return r[0]
             else: return
         except:
+            source_utils.scraper_error('RAPIDMOVIEZ')
             return
-    
-    def sources(self, url, hostDict, hostprDict):
-            
-        self.sources = []
 
+
+    def sources(self, url, hostDict, hostprDict):
         try:
+            self.sources = []
+
             if url is None:
                 return self.sources
 
             if debrid.status() is False:
                 raise Exception()
 
+            self.hostDict = hostDict + hostprDict
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-                         
+
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 
             hdlr = data['year']
@@ -113,30 +123,35 @@ class source:
             url = self.search(title, hdlr)
             headers = {'User-Agent': client.agent()}
             r = self.scraper.get(url, headers=headers).content
+
             if hdlr2 == '':
                 r = dom_parser.parse_dom(r, 'ul', {'id': 'releases'})[0]
             else:
                 r = dom_parser.parse_dom(r, 'ul', {'id': 'episodes'})[0]
+
             r = dom_parser.parse_dom(r.content, 'a', req=['href'])
             r = [(i.content, urlparse.urljoin(self.base_link, i.attrs['href'])) for i in r if i and i.content != 'Watch']
+
             if hdlr2 != '':
                 r = [(i[0], i[1]) for i in r if hdlr2.lower() in i[0].lower()]
-            
-            self.hostDict = hostDict + hostprDict
-            threads = []
 
+            threads = []
             for i in r:
+                # log_utils.log('i = %s' % str(i), log_utils.LOGDEBUG)
                 threads.append(workers.Thread(self._get_sources, i[0], i[1]))
             [i.start() for i in threads]
-            
+            [i.join() for i in threads]
+
             alive = [x for x in threads if x.is_alive() is True]
             while alive:
                 alive = [x for x in threads if x.is_alive() is True]
                 time.sleep(0.1)
             return self.sources
         except:
+            source_utils.scraper_error('RAPIDMOVIEZ')
             return self.sources
-          
+
+
     def _get_sources(self, name, url):
         try:
             headers = {'User-Agent': client.agent()}
@@ -144,10 +159,13 @@ class source:
             name = client.replaceHTMLCodes(name)
             l = dom_parser.parse_dom(r, 'div', {'class': 'ppu2h'})
             s = ''
+
             for i in l:
                 s += i.content
+
             urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''', i.content, flags=re.MULTILINE|re.DOTALL)
             urls = [i for i in urls if '.rar' not in i or '.zip' not in i or '.iso' not in i or '.idx' not in i or '.sub' not in i]
+
             for url in urls:
                 if url in str(self.sources):
                     continue
@@ -157,18 +175,23 @@ class source:
                     continue
                 host = client.replaceHTMLCodes(host)
                 host = host.encode('utf-8')
+
                 quality, info = source_utils.get_release_quality(name, url)
+
                 try:
                     size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', name)[0]
                     div = 1 if size.endswith(('GB', 'GiB')) else 1024
                     size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
                     size = '%.2f GB' % size
                     info.append(size)
-                except BaseException:
+                except:
                     pass
+
                 info = ' | '.join(info)
+
                 self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
         except:
+            source_utils.scraper_error('RAPIDMOVIEZ')
             pass
 
     def resolve(self, url):

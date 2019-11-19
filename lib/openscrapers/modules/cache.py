@@ -73,7 +73,8 @@ def remove(function, *args):
         cursor = _get_connection_cursor()
         cursor.execute("DELETE FROM %s WHERE key = ?" % cache_table, [key])
         cursor.connection.commit()
-    except Exception:
+        cursor.close()
+    except:
         pass
 
 
@@ -82,7 +83,7 @@ def timeout(function, *args):
         key = _hash_function(function, args)
         result = cache_get(key)
         return int(result['date'])
-    except Exception:
+    except:
         return None
 
 
@@ -116,16 +117,16 @@ def bennu_download_get(function, timeout, *args, **table):
         t1 = int(match[3])
         t2 = int(time.time())
         update = (abs(t2 - t1) / 3600) >= int(timeout)
-        if update == False:
+        if update is False:
             return response
     except:
         pass
 
     try:
         r = function(*args)
-        if (r == None or r == []) and not response == None:
+        if (r is None or r == []) and response is not None:
             return response
-        elif (r == None or r == []):
+        elif (r is None or r == []):
             return r
     except:
         return
@@ -152,30 +153,34 @@ def cache_get(key):
     try:
         cursor = _get_connection_cursor()
         cursor.execute("SELECT * FROM %s WHERE key = ?" % cache_table, [key])
-        return cursor.fetchone()
+        results = cursor.fetchone()
+        cursor.close()
+        return results
     except OperationalError:
         return None
 
 
 def cache_insert(key, value):
-    # type: (str, str) -> None
-    cursor = _get_connection_cursor()
-    now = int(time.time())
-    cursor.execute(
-        "CREATE TABLE IF NOT EXISTS %s (key TEXT, value TEXT, date INTEGER, UNIQUE(key))"
-        % cache_table
-    )
-    update_result = cursor.execute(
-        "UPDATE %s SET value=?,date=? WHERE key=?"
-        % cache_table, (value, now, key))
+    try:
+        # type: (str, str) -> None
+        cursor = _get_connection_cursor()
+        now = int(time.time())
 
-    if update_result.rowcount is 0:
-        cursor.execute(
-            "INSERT INTO %s Values (?, ?, ?)"
-            % cache_table, (key, value, now)
-        )
+        cursor.execute("CREATE TABLE IF NOT EXISTS %s (key TEXT, value TEXT, date INTEGER, UNIQUE(key))" % cache_table)
 
-    cursor.connection.commit()
+        update_result = cursor.execute("UPDATE %s SET value=?,date=? WHERE key=?" % cache_table, (value, now, key))
+
+        if update_result.rowcount is 0:
+            cursor.execute("INSERT INTO %s Values (?, ?, ?)" % cache_table, (key, value, now))
+
+        cursor.connection.commit()
+        cursor.close()
+    except:
+        try:cursor.close()
+        except: pass
+        import traceback
+        traceback.print_exc()
+        pass
 
 
 def cache_clear():
@@ -186,56 +191,66 @@ def cache_clear():
             try:
                 cursor.execute("DROP TABLE IF EXISTS %s" % t)
                 cursor.execute("VACUUM")
-                cursor.commit()
+                cursor.connection.commit()
+                cursor.close()
             except:
+                cursor.close()
+                import traceback
+                traceback.print_exc()
                 pass
     except:
+        cursor.close()
+        import traceback
+        traceback.print_exc()
         pass
 
 
 def cache_clear_meta():
-    try:
-        cursor = _get_connection_cursor_meta()
+    cursor = _get_connection_cursor_meta()
 
-        for t in ['meta']:
-            try:
-                cursor.execute("DROP TABLE IF EXISTS %s" % t)
-                cursor.execute("VACUUM")
-                cursor.commit()
-            except:
-                pass
-    except:
-        pass
+    for t in ['meta']:
+        try:
+            cursor.execute("DROP TABLE IF EXISTS %s" % t)
+            cursor.execute("VACUUM")
+            cursor.connection.commit()
+        except:
+            cursor.close()
+            import traceback
+            traceback.print_exc()
+            pass
+    cursor.close()
 
 
 def cache_clear_providers():
-    try:
-        cursor = _get_connection_cursor_providers()
+    cursor = _get_connection_cursor_providers()
 
-        for t in ['rel_src', 'rel_url']:
-            try:
-                cursor.execute("DROP TABLE IF EXISTS %s" % t)
-                cursor.execute("VACUUM")
-                cursor.commit()
-            except:
-                pass
-    except:
-        pass
+    for t in ['rel_src', 'rel_url']:
+        try:
+            cursor.execute("DROP TABLE IF EXISTS %s" % t)
+            cursor.execute("VACUUM")
+            cursor.connection.commit()
+        except:
+            cursor.close()
+            import traceback
+            traceback.print_exc()
+            pass
+    cursor.close()
 
 
 def cache_clear_search():
-    try:
-        cursor = _get_connection_cursor_search()
+    cursor = _get_connection_cursor_search()
 
-        for t in ['tvshow', 'movies']:
-            try:
-                cursor.execute("DROP TABLE IF EXISTS %s" % t)
-                cursor.execute("VACUUM")
-                cursor.commit()
-            except:
-                pass
-    except:
-        pass
+    for t in ['tvshow', 'movies']:
+        try:
+            cursor.execute("DROP TABLE IF EXISTS %s" % t)
+            cursor.execute("VACUUM")
+            cursor.commit()
+        except:
+            cursor.close()
+            import traceback
+            traceback.print_exc()
+            pass
+    cursor.close()
 
 
 def cache_clear_all():
@@ -309,7 +324,10 @@ def _get_function_name(function_instance):
 
 def _generate_md5(*args):
     md5_hash = hashlib.md5()
-    [md5_hash.update(str(arg)) for arg in args]
+    try:
+        [md5_hash.update(str(arg)) for arg in args]
+    except:
+        [md5_hash.update(str(arg).encode('utf-8')) for arg in args]
     return str(md5_hash.hexdigest())
 
 
@@ -330,6 +348,7 @@ def cache_version_check():
 def _find_cache_version():
     import os
     versionFile = os.path.join(control.dataPath, 'cache.v')
+
     try:
         if not os.path.exists(versionFile):
             f = open(versionFile, 'w')
@@ -339,11 +358,13 @@ def _find_cache_version():
         print 'OpenScrapers Addon Data Path Does not Exist. Creating Folder....'
         ad_folder = xbmc.translatePath('special://home/userdata/addon_data/script.module.openscrapers')
         os.makedirs(ad_folder)
+
     try:
         with open(versionFile, 'rb') as fh:
             oldVersion = fh.read()
     except:
         oldVersion = '0'
+
     try:
         curVersion = control.addon('script.module.openscrapers').getAddonInfo('version')
         if oldVersion != curVersion:

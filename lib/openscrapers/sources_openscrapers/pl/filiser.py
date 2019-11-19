@@ -99,12 +99,15 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
 
             url = urlparse.urljoin(self.base_link, url)
+
             result = client.request(url)
             result = client.parseDOM(result, 'ul', attrs={'data-season-num': season})[0]
             result = client.parseDOM(result, 'li')
+
             for i in result:
                 s = client.parseDOM(i, 'a', attrs={'class': 'episodeNum'})[0]
                 e = int(s[7:-1])
@@ -118,7 +121,8 @@ class source:
         try:
             sources = []
 
-            if url == None: return sources
+            if url is None:
+                return sources
 
             url = urlparse.urljoin(self.base_link, url)
 

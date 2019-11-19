@@ -92,10 +92,13 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
+
             result = client.request(url)
             # cant user dom parser here because HTML is bugged div is not closed
             result = re.findall('<ul class="episodios">(.*?)</ul>', result, re.MULTILINE | re.DOTALL)
+
             for item in result:
                 season_episodes = re.findall('<li>(.*?)</li>', item, re.MULTILINE | re.DOTALL)
                 for row in season_episodes:
@@ -114,7 +117,8 @@ class source:
         try:
             sources = []
 
-            if url == None: return sources
+            if url is None:
+                return sources
 
             result = client.request(url)
             box_result = client.parseDOM(result, 'li', attrs={'class': 'elemento'})

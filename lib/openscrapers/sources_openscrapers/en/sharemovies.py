@@ -64,7 +64,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return sources
+            if url is None:
+                return sources
             q = url + '-season-' + season
             q2 = url.replace('-', '+')
             url = self.base_link + self.search_link % q2
@@ -81,7 +82,8 @@ class source:
 
     def sources(self, url, hostDict, hostprDict):
         try:
-            if url == None: return sources
+            if url is None:
+                return sources
             sources = []
             r = self.scraper.get(url).content
             try:

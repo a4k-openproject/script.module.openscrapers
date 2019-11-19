@@ -129,8 +129,11 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url == None: return sources
+            if url is None:
+                return sources
+
             r = client.request(urlparse.urljoin(self.base_link, url), redirect=False)
+
             rows = client.parseDOM(r, 'ul', attrs={'class': 'players'})[0]
             rows = client.parseDOM(rows, 'li')
             rows.pop()

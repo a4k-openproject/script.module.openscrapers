@@ -26,34 +26,27 @@ def get(title):
         title = title.encode('utf-8')
     except:
         pass
-    title = str(title)
-    title = re.sub('&#(\d);', '', title)
+    title = re.sub('&#(\d+);', '', title)
     title = re.sub('(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
     title = title.replace('&quot;', '\"').replace('&amp;', '&')
-    title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|"|,|\'|\_|\.|\?)|\s', '', title)
-    return title.lower()
-
-
-def get_title(title):
-    if title is None:
-        return
-    try:
-        title = title.encode('utf-8')
-    except:
-        pass
-    title = str(title)
-    title = re.sub('&#(\d);', '', title)
-    title = re.sub('(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-    title = title.replace('&quot;', '\"').replace('&amp;', '&')
-    title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|"|,|\'|\_|\.|\?)|\s', '', title)
-    return title.lower()
+    title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|"|,|\'|\_|\.|\?)|\s', '', title).lower()
+    return title
 
 
 def geturl(title):
     if title is None:
         return
     title = title.lower()
-    title = title.translate(None, ':*?"\'\.<>|&!,')
+
+    #title = title.translate(None, ':*?"\'\.<>|&!,')
+    try:
+        # This gives a weird error saying that translate only takes 1 argument, not 2. However, the Python 2 documentation states 2, but 1 for Python 3.
+        # This has most likley to do with titles being unicode (foreign titles)
+        title = title.translate(None, ':*?"\'\.<>|&!,')
+    except:
+        for c in ':*?"\'\.<>|&!,':
+            title = title.replace(c, '')
+
     title = title.replace('/', '-')
     title = title.replace(' ', '-')
     title = title.replace('--', '-')

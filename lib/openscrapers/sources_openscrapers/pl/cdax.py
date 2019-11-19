@@ -108,9 +108,10 @@ class source:
         sources = []
         try:
 
-            if url == None: return sources
-            result = client.request(url)
+            if url is None:
+                return sources
 
+            result = client.request(url)
             result = client.parseDOM(result, 'div', attrs={'id': 'downloads'})[0]
             rows = client.parseDOM(result, 'tr')
 
@@ -120,8 +121,10 @@ class source:
                     host = client.parseDOM(cols, 'img', ret='src')[0]
                     host = host.rpartition('=')[-1]
                     link = client.parseDOM(cols, 'a', ret='href')[0]
+
                     valid, host = source_utils.is_host_valid(host, hostDict)
-                    if not valid: continue
+                    if not valid:
+                        continue
 
                     q = 'SD'
                     if 'Wysoka' in cols[2]: q = 'HD'

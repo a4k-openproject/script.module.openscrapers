@@ -66,7 +66,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             html = self.scraper.get(url).content
             links = re.compile('id="linkplayer.+?href="(.+?)"',re.DOTALL).findall(html)

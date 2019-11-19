@@ -89,7 +89,7 @@ def getTraktAsJson(url, post=None):
 
 # def authTrakt():
 #     try:
-#         if getTraktCredentialsInfo() == True:
+#         if getTraktCredentialsInfo() is True:
 #             if control.yesnoDialog(control.lang(32511).encode('utf-8'), control.lang(32512).encode('utf-8'), '', 'Trakt'):
 #                 control.setSetting(id='trakt.user', value='')
 #                 control.setSetting(id='trakt.token', value='')
@@ -136,7 +136,7 @@ def getTraktCredentialsInfo():
 
 
 def getTraktIndicatorsInfo():
-    indicators = control.setting('indicators') if getTraktCredentialsInfo() == False else control.setting(
+    indicators = control.setting('indicators') if getTraktCredentialsInfo() is False else control.setting(
         'indicators.alt')
     indicators = True if indicators == '1' else False
     return indicators
@@ -205,7 +205,8 @@ def manager(name, imdb, tvdb, content):
             k = control.keyboard('', t);
             k.doModal()
             new = k.getText() if k.isConfirmed() else None
-            if (new == None or new == ''): return
+            if (new is None or new == ''):
+                return
             result = __getTrakt('/users/me/lists', post={"name": new, "privacy": "private"})[0]
             try:
                 slug = utils.json_loads_as_str(result)['ids']['slug']
@@ -304,7 +305,7 @@ def timeoutsyncMovies():
 
 def syncMovies(user):
     try:
-        if getTraktCredentialsInfo() == False: return
+        if getTraktCredentialsInfo() is False: return
         indicators = getTraktAsJson('/users/me/watched/movies')
         indicators = [i['movie']['ids'] for i in indicators]
         indicators = [str(i['imdb']) for i in indicators if 'imdb' in i]
@@ -325,7 +326,7 @@ def timeoutsyncTVShows():
 
 def syncTVShows(user):
     try:
-        if getTraktCredentialsInfo() == False: return
+        if getTraktCredentialsInfo() is False: return
         indicators = getTraktAsJson('/users/me/watched/shows?extended=full')
         indicators = [(i['show']['ids']['tvdb'], i['show']['aired_episodes'],
                        sum([[(s['number'], e['number']) for e in s['episodes']] for s in i['seasons']], [])) for i in
@@ -338,7 +339,7 @@ def syncTVShows(user):
 
 def syncSeason(imdb):
     try:
-        if getTraktCredentialsInfo() == False: return
+        if getTraktCredentialsInfo() is False: return
         indicators = getTraktAsJson('/shows/%s/progress/watched?specials=false&hidden=false' % imdb)
         indicators = indicators['seasons']
         indicators = [(i['number'], [x['completed'] for x in i['episodes']]) for i in indicators]

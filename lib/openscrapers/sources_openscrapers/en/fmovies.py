@@ -68,7 +68,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None:
+            if url is None:
                 return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -88,7 +88,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             r = self.scraper.get(url).content
             qual = re.findall(">(\w+)<\/p",r)
@@ -120,7 +120,7 @@ class source:
             p3 = self.scraper.get('http://fmovies.sc/ip.file/swf/ipplayer/api.php?hash=%s' % (p2['hash'])).content
             p3 = json.loads(p3)
             n = p3['status']
-            if n == False:
+            if n is False:
                 p2 = self.scraper.get('http://fmovies.sc/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=1' % (p1['s'], urldata['data-server'])).content
                 p2 = json.loads(p2)
             url = p2["data"].replace("\/","/")

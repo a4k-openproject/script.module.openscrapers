@@ -160,13 +160,18 @@ class source:
         try:
             for url in linki:
                 try:
-                    if url == None: return sources
+                    if url is None:
+                        return sources
+
                     url = urlparse.urljoin(self.base_link, url)
                     result = client.request(url)
                     title = client.parseDOM(result, 'span', attrs={'style': 'margin-right: 3px;'})[0]
                     lang, info = self.get_lang_by_type(title)
+
                     valid, host = source_utils.is_host_valid(url, hostDict)
-                    if not valid: continue
+                    if not valid:
+                        continue
+
                     if "?wersja=1080p" in result:
                         sources.append(
                             {'source': host, 'quality': '1080p', 'language': lang, 'url': url + "?wersja=1080p",

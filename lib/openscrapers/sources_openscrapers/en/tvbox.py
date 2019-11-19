@@ -51,7 +51,7 @@ class source:
             query = self.search_link % urllib.quote_plus(cleantitle.query(title))           
             for i in range(3):
                 result = self.scraper.get(query).content
-                if not result == None:
+                if not result is None:
                     break
             t = [title] + [localtitle] + source_utils.aliases_to_array(aliases)
             t = [cleantitle.get(i) for i in set(t) if i]
@@ -61,7 +61,7 @@ class source:
                 result = re.findall(r'href="([^"]+)">(.*)<', i.content)
                 if re.sub('<[^<]+?>', '', cleantitle.get(cleantitle.normalize(result[0][1]))) in t and year in result[0][1]:
                     url = result[0][0]
-                if not url == None:
+                if not url is None:
                     break
             url = url.encode('utf-8')
             return url
@@ -74,7 +74,7 @@ class source:
             query = self.search_link % urllib.quote_plus(cleantitle.query(tvshowtitle))
             for i in range(3):
                 result = self.scraper.get(query).content
-                if not result == None:
+                if not result is None:
                     break
             t = [tvshowtitle] + source_utils.aliases_to_array(aliases)
             t = [cleantitle.get(i) for i in set(t) if i]
@@ -84,7 +84,7 @@ class source:
                 result = re.findall(r'href="([^"]+)">(.*)<', i.content)
                 if re.sub('<[^<]+?>', '', cleantitle.get(cleantitle.normalize(result[0][1]))) in t and year in result[0][1]:
                     url = result[0][0]
-                if not url == None:
+                if not url is None:
                     break
             url = url.encode('utf-8')
             return url
@@ -94,12 +94,12 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None:
+            if url is None:
                 return
             url = urlparse.urljoin(self.base_link, url)
             for i in range(3):
                 result = self.scraper.get(url).content
-                if not result == None:
+                if not result is None:
                     break
             title = cleantitle.get(title)
             premiered = re.compile('(\d{4})-(\d{2})-(\d{2})').findall(premiered)[0]
@@ -116,12 +116,12 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             url = urlparse.urljoin(self.base_link, url)
             for i in range(3):
                 result = self.scraper.get(url).content
-                if not result == None:
+                if not result is None:
                     break
             links = re.compile('onclick="report\(\'([^\']+)').findall(result)         
             for link in links:

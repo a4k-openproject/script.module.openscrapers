@@ -12,6 +12,7 @@ except:
     pass
 
 
+
 def sources(specified_folders=None, debug=False):
     try:
         sourceDict = []

@@ -72,33 +72,48 @@ class source:
 
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
             title = data['tvshowtitle']
+
             hdlr = 's%02de%02d' % (int(data['season']), int(data['episode']))
 
             query = urllib.quote_plus(cleantitle.getsearch(title))
+
             surl = urlparse.urljoin(self.base_link, self.search_link % query)
+
             r = client.request(surl, XHR=True)
             r = json.loads(r)
             r = r['series']
+
             for i in r:
                 tit = i['value']
-                if not cleantitle.get(title) == cleantitle.get(tit): raise Exception()
+
+                if cleantitle.get(title) != cleantitle.get(tit):
+                    raise Exception()
                 slink = i['seo']
                 slink = urlparse.urljoin(self.base_link, slink)
 
                 r = client.request(slink)
-                if not data['imdb'] in r: raise Exception()
+
+                if not data['imdb'] in r:
+                    raise Exception()
+
                 data = client.parseDOM(r, 'div', {'class': 'el-item\s*'})
+
                 epis = [client.parseDOM(i, 'a', ret='href')[0] for i in data if i]
                 epis = [i for i in epis if hdlr in i.lower()][0]
+
                 r = client.request(epis)
                 links = client.parseDOM(r, 'a', ret='data-actuallink')
+
                 for url in links:
                     try:
                         valid, host = source_utils.is_host_valid(url, hostDict)
-                        if not valid: raise Exception()
-                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
-                                        'debridonly': False})
+                        if not valid:
+                            raise Exception()
+
+                        sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url,
+                                                    'direct': False, 'debridonly': False})
                     except BaseException:
                         return sources
 

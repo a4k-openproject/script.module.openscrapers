@@ -76,7 +76,7 @@ def logSum(matches):
 def get(url, Type=None):
     if not url:
         return
-    if Type == 'client' or Type == None:
+    if Type == 'client' or Type is None:
         from openscrapers.modules import client
         content = client.request(url, headers=headers)
     if Type == 'cfscrape':

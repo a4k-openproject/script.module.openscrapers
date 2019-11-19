@@ -74,7 +74,7 @@ class source:
 
     def sources(self, url, hostDict, hostprDict):
         try:
-            if url == None:
+            if url is None:
                 return sources
             sources = []
             hostDict = hostprDict + hostDict

@@ -61,7 +61,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None:
+            if url is None:
                 return
             return urllib.urlencode({'mID': re.sub('[^0-9]', '', imdb), 'season': season, 'episode': episode})
         except:
@@ -71,7 +71,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url == None:
+            if url is None:
                 return sources
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])

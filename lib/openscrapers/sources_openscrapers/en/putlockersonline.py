@@ -59,7 +59,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             hostDict = hostDict + hostprDict
             moviePage = getSum.get(url)

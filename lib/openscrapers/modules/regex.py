@@ -132,7 +132,7 @@ def resolve(regex):
         except:
             pass
 
-        if r[1] == True:
+        if r[1] is True:
             return r[0]
     except:
         return
@@ -168,7 +168,7 @@ def getRegexParsed(regexs, url, cookieJar=None, forCookieJarOnly=False, recursiv
                     cookieJarParam = True
             # print 'm[cookiejar]',m['cookiejar'],cookieJar
             if cookieJarParam:
-                if cookieJar == None:
+                if cookieJar is None:
                     # print 'create cookie jar'
                     cookie_jar_file = None
                     if 'open[' in m['cookiejar']:
@@ -217,7 +217,7 @@ def getRegexParsed(regexs, url, cookieJar=None, forCookieJarOnly=False, recursiv
                 m['rawpost'] = m['rawpost'].replace('$epoctime2$', getEpocTime2())
 
             link = ''
-            if m['page'] and m['page'] in cachedPages and not 'ignorecache' in m and forCookieJarOnly == False:
+            if m['page'] and m['page'] in cachedPages and not 'ignorecache' in m and forCookieJarOnly is False:
                 # print 'using cache page',m['page']
                 link = cachedPages[m['page']]
             else:
@@ -297,7 +297,7 @@ def getRegexParsed(regexs, url, cookieJar=None, forCookieJarOnly=False, recursiv
                             n, v = h.split('=')
                             req.add_header(n, v)
 
-                    if not cookieJar == None:
+                    if cookieJar is not None:
                         #                            print 'cookieJarVal',cookieJar
                         cookie_handler = urllib2.HTTPCookieProcessor(cookieJar)
                         opener = urllib2.build_opener(cookie_handler, urllib2.HTTPBasicAuthHandler(),
@@ -436,7 +436,7 @@ def getRegexParsed(regexs, url, cookieJar=None, forCookieJarOnly=False, recursiv
                             val = reg.group(1).strip()
                         except:
                             traceback.print_exc()
-                    elif m['page'] == '' or m['page'] == None:
+                    elif m['page'] == '' or m['page'] is None:
                         val = m['expres']
 
                     if rawPost:
@@ -805,7 +805,7 @@ def get_decode(str, reg=None):
 def javascriptUnEscape(str):
     js = re.findall('unescape\(\'(.*?)\'', str)
     #    print 'js',js
-    if (not js == None) and len(js) > 0:
+    if (not js is None) and len(js) > 0:
         for j in js:
             # print urllib.unquote(j)
             str = str.replace(j, urllib.unquote(j))

@@ -78,7 +78,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None:
+            if url is None:
                 return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -120,7 +120,7 @@ class source:
             except:
                 url = None
                 pass
-            if (url == None):
+            if (url is None):
                 url = [i[0] for i in results if self.matchAlias(i[1], aliases)][0]
             url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
             return url
@@ -131,7 +131,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -140,13 +140,13 @@ class source:
                 ep = data['episode']
                 url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
                 r = client.request(url, timeout='10', output='geturl')
-                if url == None:
+                if url is None:
                     url = self.searchShow(data['tvshowtitle'], data['season'], aliases)
             else:
                 url = self.searchMovie(data['title'], data['year'], aliases)
-                if url == None:
+                if url is None:
                     url = '%s/film/%s/watching.html?ep=0' % (self.base_link, cleantitle.geturl(data['title']))
-            if url == None:
+            if url is None:
                 raise Exception()
             r = client.request(url, timeout='10')
             r = client.parseDOM(r, 'div', attrs={'class': 'les-content'})

@@ -48,7 +48,8 @@ class source:
     def movie(self, imdb, title, localtitle, aliases, year):
         try:
             url = self.__get_direct_url(imdb)
-            if not url: return
+            if not url:
+                return
             return urllib.urlencode({'url': url})
         except:
             return
@@ -63,7 +64,8 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
             j = self.__get_json(url)
             if not j: return
             j = [v['info'] for k, v in j.items()]
@@ -77,14 +79,20 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url == None:
+            if url is None:
                 return sources
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
             j = self.__get_json(data['url'])
-            if not j: return
+
+            if not j:
+                return
+
             sid = data['sid'] if 'sid' in data else j.keys()[0]
             pcnt = int(j[sid]['1']) if '1' in j[sid] else 1
+
             for jHoster in j[sid]['links']:
                 jLinks = [i[3] for i in j[sid]['links'][jHoster] if i[5] == 'stream']
                 if len(jLinks) < pcnt: continue
@@ -92,8 +100,11 @@ class source:
                 valid, hoster = source_utils.is_host_valid(h_url, hostDict)
                 if not valid: continue
                 h_url = h_url if pcnt == 1 else 'stack://' + ' , '.join(jLinks)
-                try: sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'info' : '' if pcnt == 1 else 'multi-part', 'url': h_url, 'direct': False, 'debridonly': False})
-                except: pass
+
+                try:
+                    sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'info' : '' if pcnt == 1 else 'multi-part', 'url': h_url, 'direct': False, 'debridonly': False})
+                except:
+                    pass
             return sources
         except:
             return sources

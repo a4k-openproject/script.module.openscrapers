@@ -67,7 +67,7 @@ class source:
         try:
             hostDict = hostprDict + hostDict
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             headers = {'User-Agent':self.User_Agent}
             html = requests.get(url, headers=headers, timeout=10).content

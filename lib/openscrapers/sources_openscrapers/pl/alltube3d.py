@@ -121,7 +121,9 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None: return
+            if url is None:
+                return
+
             cookies = cache.cache_get('alltube_cookie')['value']
             txts = 's%02de%02d' % (int(season), int(episode))
             result = client.request(url, headers={'Cookie': cookies})
@@ -157,7 +159,8 @@ class source:
         try:
             sources = []
 
-            if url == None: return sources
+            if url is None:
+                return sources
 
             url = urlparse.urljoin(self.base_link, url)
             cookies = cache.cache_get('alltube_cookie')['value']

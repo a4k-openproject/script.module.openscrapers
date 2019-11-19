@@ -42,9 +42,11 @@ def log(msg, level=LOGNOTICE):
         print(DEBUGPREFIX + ' Debug Log?: ' + str(debug_log))
     if not control.setting('addon_debug') == 'true':
         return
+
     try:
         if isinstance(msg, unicode):
             msg = '%s (ENCODED)' % (msg.encode('utf-8'))
+
         if not control.setting('debug.location') == '0':
             log_file = os.path.join(LOGPATH, 'openscrapers.log')
             if not os.path.exists(log_file):

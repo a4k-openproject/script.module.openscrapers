@@ -67,7 +67,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             for source in more_sources.more_gomo(url, hostDict):
                 sources.append(source)

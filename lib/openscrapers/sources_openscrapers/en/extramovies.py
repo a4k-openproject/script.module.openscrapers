@@ -87,12 +87,17 @@ class source:
         try:
             sources = []
             self.hostDict = hostDict + hostprDict
-            if url == None:
+
+            if url is None:
                 return sources
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+
             url = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.query(title)))
+
             if 'tvshowtitle' in data:
                 html = self.scraper.get(url).content
                 match = re.compile('class="post-item.+?href="(.+?)" title="(.+?)"', re.DOTALL).findall(html)

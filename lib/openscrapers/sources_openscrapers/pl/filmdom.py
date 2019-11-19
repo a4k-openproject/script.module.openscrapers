@@ -119,7 +119,8 @@ class source:
 
         sources = []
         try:
-            if url == None: return sources
+            if url is None:
+                return sources
 
             result = client.request(url)
 

@@ -77,7 +77,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None:
+            if url is None:
                 return
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -90,14 +90,20 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         sources = []
         try:
-            if url == None:
+            if url is None:
                 return sources
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
             url = urlparse.urljoin(self.base_link, data.get('url'))
+
             season = data.get('season')
+
             episode = data.get('episode')
+
             r = client.request(url)
+
             if season and episode:
                 r = dom_parser.parse_dom(r, 'select', attrs={'id': 'SeasonSelection'}, req='rel')[0]
                 r = client.replaceHTMLCodes(r.attrs['rel'])[1:]
@@ -110,11 +116,13 @@ class source:
             r = [(client.replaceHTMLCodes(i.attrs['rel']), i.content) for i in r if i[0] and i[1]]
             r = [(i[0], re.findall('class="Named"[^>]*>([^<]+).*?(\d+)/(\d+)', i[1])) for i in r]
             r = [(i[0], i[1][0][0].lower().rsplit('.', 1)[0], i[1][0][2]) for i in r if len(i[1]) > 0]
+
             for link, hoster, mirrors in r:
                 valid, hoster = source_utils.is_host_valid(hoster, hostDict)
                 if not valid: continue
                 u = urlparse.parse_qs('&id=%s' % link)
                 u = dict([(x, u[x][0]) if u[x] else (x, '') for x in u])
+
                 for x in range(0, int(mirrors)):
                     url = self.mirror_link % (u['id'], u['Hoster'], x + 1)
                     if season and episode: url += "&Season=%s&Episode=%s" % (season, episode)

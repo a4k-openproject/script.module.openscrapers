@@ -11,7 +11,7 @@ from openscrapers.modules import source_utils
 
 def getMore(link, hostDict):
     sources = []
-    if link == None:
+    if link is None:
         return sources
     if "vidnode.net" in link:
         for source in more_vidnode(link, hostDict):

@@ -178,8 +178,11 @@ class source:
 
         sources = []
         try:
-            if url == None: return sources
+            if url is None:
+                return sources
+
             typ = url[4]
+
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0",
                 "http.content_type": "application/x-www-form-urlencoded; charset=UTF-8"

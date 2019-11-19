@@ -76,7 +76,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None:
+            if url is None:
                 return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -102,36 +102,51 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+
+            if url is None:
                 return sources
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
             aliases = eval(data['aliases'])
+
             headers = {}
+
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+
             year = data['year']
-            if 'tvshowtitle' in data:    
+
+            if 'tvshowtitle' in data:
                 episode = data['episode']
                 season = data['season']
-                url = self._search(data['tvshowtitle'], data['year'], aliases, headers)
+                url = self._search(title, data['year'], aliases, headers)
                 url = url.replace('online-free', 'season-%s-episode-%s-online-free' % (season, episode))
             else:
                 episode = None
                 year = data['year']
                 url = self._search(data['title'], data['year'], aliases, headers)
+
             url = url if 'http' in url else urlparse.urljoin(self.base_link, url)
+
             result = client.request(url);
             result = client.parseDOM(result, 'li', attrs={'class':'link-button'})
+
             links = client.parseDOM(result, 'a', ret='href')
+
             i = 0
+
             for l in links:
                 if i == 10:
                     break
                 try:
                     l = l.split('=')[1]
                     l = urlparse.urljoin(self.base_link, self.video_link % l)
+
                     result = client.request(l, post={}, headers={'Referer':url})
+
                     u = result if 'http' in result else 'http:' + result 
+
                     if 'google' in u:
                         valid, hoster = source_utils.is_host_valid(u, hostDict)
                         urls, host, direct = source_utils.check_directstreams(u, hoster)
@@ -147,6 +162,7 @@ class source:
                             i+=1
                         except:
                             pass
+
                 except:
                     pass
             return sources

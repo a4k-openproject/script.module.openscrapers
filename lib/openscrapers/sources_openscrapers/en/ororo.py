@@ -82,7 +82,8 @@ class source:
         try:
             if (self.user == '' or self.password == ''): raise Exception()
 
-            if url == None: return
+            if url is None:
+                return
 
             url = urlparse.urljoin(self.base_link, url)
 

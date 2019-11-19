@@ -62,7 +62,7 @@ class source:
         try:
             sources = []
             hostDict = hostDict + hostprDict
-            if url == None:
+            if url is None:
                 return sources
             html = client.request(url)
             links = re.compile('<div class="link_go">.+?<a href="(.+?)" target="_blank">',re.DOTALL).findall(html)

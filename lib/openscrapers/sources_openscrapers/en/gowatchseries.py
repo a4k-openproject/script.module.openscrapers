@@ -66,7 +66,7 @@ class source:
 
     def episode(self, url, imdb, tvdb, title, premiered, season, episode):
         try:
-            if url == None:
+            if url is None:
                 return
             url = urlparse.parse_qs(url)
             url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -80,7 +80,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             if not str(url).startswith('http'):
                 data = urlparse.parse_qs(url)
@@ -114,7 +114,7 @@ class source:
                 headers['Referer'] = vurl
                 slinks = client.parseDOM(r, 'div', attrs = {'class': 'anime_muti_link'})
                 slinks = client.parseDOM(slinks, 'li', ret='data-video')
-                if len(slinks) == 0 and not vurl2 == None:
+                if len(slinks) == 0 and vurl2 is not None:
                     r = client.request(vurl2, headers=headers)
                     headers['Referer'] = vurl2
                     slinks = client.parseDOM(r, 'div', attrs = {'class': 'anime_muti_link'})                

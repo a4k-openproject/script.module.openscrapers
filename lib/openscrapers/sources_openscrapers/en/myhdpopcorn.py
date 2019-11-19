@@ -72,7 +72,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             r = client.request(url)
             match = re.compile('<iframe src=".+?//(.+?)/(.+?)"').findall(r)

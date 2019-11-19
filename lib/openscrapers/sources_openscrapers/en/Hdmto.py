@@ -61,10 +61,14 @@ class source:
         try:
             hostDict = hostDict + hostprDict
             sources = []
-            if url == None:
+
+            if url is None:
                 return sources
+
             t = client.request(url)
+
             r = re.compile('<iframe.+?src="(.+?)"').findall(t)
+
             for url in r:
                 valid, host = source_utils.is_host_valid(url, hostDict)
                 if valid:

@@ -73,7 +73,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             hostDict = hostprDict + hostDict
             r = getSum.get(url)

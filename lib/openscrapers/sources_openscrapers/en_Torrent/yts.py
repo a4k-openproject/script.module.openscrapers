@@ -37,29 +37,16 @@ from openscrapers.modules import source_utils
 class source:
 	def __init__(self):
 		self.priority = 1
-		self.language = ['en']
-		self.domains = ['eztv.io']
-		self.base_link = 'https://eztv.io'
-		self.search_link = '/search/%s'
+		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+		self.domains = ['yts.am', 'yts.lt']  # Old yts.ag
+		self.base_link = 'https://yts.lt'
+		self.search_link = '/browse-movies/%s/all/all/0/latest'
 		self.min_seeders = 1
 
 
-	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
-			return url
-		except:
-			return
-
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if url is None:
-				return
-			url = urlparse.parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
+			url = {'imdb': imdb, 'title': title, 'year': year}
 			url = urllib.urlencode(url)
 			return url
 		except:
@@ -79,87 +66,89 @@ class source:
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			title = data['tvshowtitle']
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
+			title = data['title']
+			hdlr = data['year']
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			url = self.search_link % (urllib.quote_plus(query).replace('+', '-'))
+			url = self.search_link % urllib.quote(query)
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			html = client.request(url)
 
 			try:
-				results = client.parseDOM(html, 'table', attrs={'class': 'forum_header_border'})
-				for result in results:
-					if 'magnet:' in result:
-						results = result
-						break
+				results = client.parseDOM(html, 'div', attrs={'class': 'row'})[2]
 			except:
+				source_utils.scraper_error('YTS')
 				return sources
 
-			rows = re.findall('<tr name="hover" class="forum_header_border">(.+?)</tr>', results, re.DOTALL)
+			items = re.findall('class="browse-movie-bottom">(.+?)</div>\s</div>', results, re.DOTALL)
 
-			if rows is None:
+			if items is None:
 				return sources
 
-			for entry in rows:
+			for entry in items:
 				try:
 					try:
-						columns = re.findall('<td\s.+?>(.+?)</td>', entry, re.DOTALL)
-						derka = re.findall('href="magnet:(.+?)" class="magnet" title="(.+?)"', columns[2], re.DOTALL)[0]
+						link, name = re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
+						name = client.replaceHTMLCodes(name)
 					except:
 						continue
 
-					url = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
-
 					# altered to allow multi-lingual audio tracks
-					if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+					if any(x in link.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
 						continue
 
-					name = derka[1]
-
-					# some shows like "Power" have year and hdlr in name
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+					t = name.split(hdlr)[0]
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
-					if hdlr not in name:
+					y = entry[-4:]
+					if y != hdlr:
 						continue
+
+					response = client.request(link)
 
 					try:
-						seeders = int(re.findall('<font color=".+?">(.+?)</font>', columns[5], re.DOTALL)[0])
+						entries = client.parseDOM(response, 'div', attrs={'class': 'modal-torrent'})
+
+						for torrent in entries:
+							link, name = re.findall(
+								'href="magnet:(.+?)" class="magnet-download download-torrent magnet" title="(.+?)"',
+								torrent, re.DOTALL)[0]
+							link = 'magnet:%s' % link
+							link = str(client.replaceHTMLCodes(link).split('&tr')[0])
+							if link in str(sources):
+								continue
+
+							quality, info = source_utils.get_release_quality(name, link)
+
+							try:
+								size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', torrent)[-1]
+								div = 1 if size.endswith(('GB', 'GiB')) else 1024
+								size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+								size = '%.2f GB' % size
+								info.append(size)
+							except:
+								pass
+
+							info = ' | '.join(info)
+
+							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link,
+														'info': info, 'direct': False, 'debridonly': True})
 					except:
+						source_utils.scraper_error('YTS')
 						continue
-
-					if self.min_seeders > seeders:
-						continue
-
-					quality, info = source_utils.get_release_quality(name, url)
-
-					try:
-						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', name)[-1]
-						div = 1 if size.endswith(('GB', 'GiB')) else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-						size = '%.2f GB' % size
-						info.append(size)
-					except:
-						pass
-
-					info = ' | '.join(info)
-
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
 				except:
-					source_utils.scraper_error('EZTV')
+					source_utils.scraper_error('YTS')
 					continue
 
 			return sources
 
 		except:
-			source_utils.scraper_error('EZTV')
+			source_utils.scraper_error('YTS')
 			return sources
 
 

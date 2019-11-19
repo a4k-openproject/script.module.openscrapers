@@ -38,9 +38,9 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['www.skytorrents.lol']
-		self.base_link = 'https://www.skytorrents.lol/'
-		self.search_link = '?query=%s'
+		self.domains = ['mkvcage.site', 'www.mkvcage.ws', 'mkvcage.fun']
+		self.base_link = 'https://www.mkvcage.site'
+		self.search_link = '/?s=%s'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -63,8 +63,7 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if url is None:
-				return
+			if url is None: return
 			url = urlparse.parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -75,82 +74,101 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
-
 			if url is None:
 				return sources
 
 			if debrid.status() is False:
-				return sources
+				raise Exception()
 
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-			query = '%s %s' % (title, hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = '%s S%02dE%02d' % (title, int(data['season']), int(data['episode'])) \
+				if 'tvshowtitle' in data else '%s %s' % (title, data['year'])
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
+			r = client.request(url)
+
 			try:
-				r = client.request(url)
-				posts = client.parseDOM(r, 'tbody')[0]
-				posts = client.parseDOM(posts, 'tr')
+				posts = client.parseDOM(r, 'h2', attrs={'class': 'entry-title'})
 
 				for post in posts:
-					link = re.findall('a href="(magnet:.+?)" title="(.+?)"', post, re.DOTALL)
+					data = client.parseDOM(post, 'a', ret='href')
 
-					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-						div = 1 if size.endswith('GB') else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-						size = '%.2f GB' % size
-					except:
-						size = '0'
+					tit = client.parseDOM(post, 'a')[0].replace('Download ', '')
+					t = tit.split(hdlr)[0].replace('(', '')
 
-					for url, ref in link:
-						url = url.split('&tr')[0]
 
-						# altered to allow multi-lingual audio tracks
-						if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
-							continue
+					if cleantitle.get(t) != cleantitle.get(title):
+						continue
 
-						name = url.split('&dn=')[1]
-						if name.startswith('www.'):
+					if hdlr not in tit:
+						continue
+
+					for u in data:
+						r = client.request(u)
+						r = client.parseDOM(r, 'div', attrs={'class': 'clearfix entry-content'})
+
+						for i in r:
+							if 'buttn magnet' not in i:
+								continue
+
+							# link = client.parseDOM(i, 'a', ret='href', attrs={'class': 'buttn magnet'})[0] #random drops with this
+							link = re.findall('a class="buttn magnet" href="(.+?)"', i, re.DOTALL)[0]
+							# log_utils.log('magnet link = %s' % link, log_utils.LOGDEBUG)
+
+
+							# # for another day to fetch torrent link from form data, seems like junk though
+							# btorrent = client.parseDOM(i, 'a', ret='href', attrs={'class': 'buttn torrent'})[0]
+							# btorrent = btorrent.replace(' ', '+')
+							# # <input type="password" name="Pass1" size="20"></p>
+							# # <input type="submit" value="Submit" name="Submit0"></p>
+							# post = {'Pass1': "mkvcage", 'Submit0': 'Submit'}
+							# import requests
+							# p_data = requests.post(btorrent, data=post)
+							# response = p_data.content
+							# torrent = re.findall('a href="(.+?)"', response, re.DOTALL)[4]
+							# # log_utils.log('torrent link = %s' % torrent, log_utils.LOGDEBUG)
+
+			# <a class="buttn watch" href="https://ylink.bid/watchonline" target="_blank" rel="noopener noreferrer">Watch Online</a>
+			# <a class="buttn blue" href="https://l.ylink.bid/index.php?ID=759s341illy" target="_blank" rel="noopener noreferrer">Download Links</a>
+			# <a class="buttn magnet" href="magnet:?xt=urn:btih:9BC72CEF74E3BD56D46509B35B621113FE10EB86" target="_blank" rel="noopener noreferrer">Magnet</a>
+			# <a class="buttn torrent" href="https://l.ylink.bid/index.php?ID=604lessy74" target="_blank" rel="noopener noreferrer">Torrent</a>
+			# linksPassword = 'mkvcage'
+
+							quality, info = source_utils.get_release_quality(u)
 							try:
-								name = name.split(' - ')[1].lstrip()
+								size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:gb|gib|mb|mib))', str(data))[-1]
+								div = 1 if size.endswith(('gb')) else 1024
+								size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+								size = '%.2f gb' % size
+								info.append(size)
 							except:
-								name = re.sub(r'\www..+? ', '', name)
+								pass
+							info = ' | '.join(info)
 
-						if 'extramovies.wiki' in name.lower():
-							name = name.split(' - ')[1].lstrip()
+							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+														'direct': False, 'debridonly': True})
 
-						# some shows like "Power" have year and hdlr in name
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
-						if cleantitle.get(t) != cleantitle.get(title):
-							continue
 
-						if hdlr not in name:
-							continue
-
-						quality, info = source_utils.get_release_quality(name, url)
-
-						info.append(size)
-						info = ' | '.join(info)
-
-						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True})
 			except:
-				source_utils.scraper_error('SKYTORRENTS')
-				return sources
+				source_utils.scraper_error('MKVCAGE')
+				pass
+
+			return sources
 
 		except:
-			source_utils.scraper_error('SKYTORRENTS')
+			source_utils.scraper_error('MKVCAGE')
 			return sources
 
 

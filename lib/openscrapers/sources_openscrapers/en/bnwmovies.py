@@ -66,7 +66,7 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+            if url is None:
                 return sources
             html = client.request(url)
             Links = re.compile('<source.+?src="(.+?)"',re.DOTALL).findall(html)

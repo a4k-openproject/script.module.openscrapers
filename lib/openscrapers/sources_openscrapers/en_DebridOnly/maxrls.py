@@ -79,19 +79,28 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
+
             if url is None:
                 return sources
+
             if debrid.status() is False:
                 raise Exception()
+
             data = urlparse.parse_qs(url)
             data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
             title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
-                if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
+
+            query = '%s S%02dE%02d' % (title, int(data['season']), int(data['episode'])) \
+                if 'tvshowtitle' in data else '%s %s' % (title, data['year'])
+
             url = self.search_link % urllib.quote_plus(query)
             url = urlparse.urljoin(self.base_link, url).replace('%3A+', '+')
+
             r = client.request(url)
+
             if r is None and 'tvshowtitle' in data:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)

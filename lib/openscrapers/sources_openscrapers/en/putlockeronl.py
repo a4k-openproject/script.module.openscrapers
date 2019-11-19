@@ -73,17 +73,23 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-            if url == None:
+
+            if url is None:
                 return sources
+
             r = self.scraper.get(url).content
+
             try:
                 match = re.compile('<IFRAME.+?SRC=.+?//(.+?)/(.+?)"').findall(r)
                 for host,url in match: 
                     url = 'http://%s/%s' % (host,url)
+
                     host = host.replace('www.','')
                     valid, host = source_utils.is_host_valid(host, hostDict)
+
                     if source_utils.limit_hosts() is True and host in str(sources):
                         continue
+
                     if valid:
                         sources.append({ 'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False })
             except:
