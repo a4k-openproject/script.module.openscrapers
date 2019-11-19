@@ -31,25 +31,27 @@ from openscrapers.modules import pyaes
 from openscrapers.modules import trakt
 
 RES_4K = ['4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra-hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
-					'1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
-					'3112i', 'hd3112', '3112hd', '2880p', '2880i', 'hd2880', '2880hd']
+          '1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
+          '3112i', 'hd3112', '3112hd', '2880p', '2880i', 'hd2880', '2880hd']
 RES_2K = ['2k', 'hd2k', 'hd2k ', '2khd', '2khd ', '2048p', '2048i', 'hd2048', '2048hd', '1332p', '1332i',
-					'hd1332', '1332hd', '1556p', '1556i', 'hd1556', '1556hd']
+          'hd1332', '1332hd', '1556p', '1556i', 'hd1556', '1556hd']
 RES_1080 = ['1080', '1080p', '1080i', 'hd1080', '1080hd', '1200p', '1200i', 'hd1200', '1200hd']
 RES_HD = ['720', '720p', '720i', 'hd720', '720hd', '.hd.']
 RES_SD = ['576', '576p', '576i', 'sd576', '576sd', '480', '480p', '480i', 'sd480', '480sd', '360', '360p',
-					'360i', 'sd360', '360sd', '240', '240p', '240i', 'sd240', '240sd']
+          '360i', 'sd360', '360sd', '240', '240p', '240i', 'sd240', '240sd']
 
 SCR = ['dvdscr', 'screener', 'r5', 'r6']
 
-CAM = ['camrip', 'cam rip', 'tsrip', 'ts rip', 'dvdcam', 'dvd cam', 'dvdts', 'dvd ts', 'cam', 'telesync', 'tele sync', 'ts']
+CAM = ['camrip', 'cam rip', 'tsrip', 'ts rip', 'dvdcam', 'dvd cam', 'dvdts', 'dvd ts', 'cam', 'telesync', 'tele sync',
+       'ts']
 HDCAM = ['hdcam', 'hd cam', 'hd-cam', 'hd.cam', 'hdts', 'hd ts', 'hcam']
 
 CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
 CODEC_H264 = ['avc', 'h264', 'h.264', 'x264', 'x.264']
 CODEC_XVID = ['xvid', 'x.vid', 'x-vid']
 CODEC_DIVX = ['divx', 'divx ', 'div2', 'div2 ', 'div3']
-CODEC_MPEG = ['mp4', 'mpeg', 'm4v', 'mpg', 'mpg1', 'mpg2', 'mpg3', 'mpg4', 'mp4 ', 'mpeg ', 'msmpeg', 'msmpeg4', 'mpegurl']
+CODEC_MPEG = ['mp4', 'mpeg', 'm4v', 'mpg', 'mpg1', 'mpg2', 'mpg3', 'mpg4', 'mp4 ', 'mpeg ', 'msmpeg', 'msmpeg4',
+              'mpegurl']
 CODEC_AVI = ['avi']
 CODEC_MKV = ['mkv', '.mkv', 'matroska']
 
@@ -59,15 +61,20 @@ AUDIO_6CH = ['ch6', '6ch', 'ch5-1', '5-1ch', '5-1']
 AUDIO_2CH = ['ch2', '2ch', 'ch2.0', 'stereo']
 AUDIO_1CH = ['ch1', '1ch', 'mono', 'monoaudio']
 
-VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side by side', 'stereoscopic', 'tab', 'htab', 'topandbottom', 'top and bottom']
+VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side by side', 'stereoscopic', 'tab', 'htab', 'topandbottom',
+            'top and bottom']
 
 MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng', 'dut.eng', 'ell.eng', 'esl.eng',
-					'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng', 'gtm.eng',
-					'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng', 'lat.eng',
-					'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
-					'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual audio', 'dual-audio', 'dual.audio']
+              'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng',
+              'gtm.eng',
+              'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng',
+              'lat.eng',
+              'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
+              'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual audio', 'dual-audio',
+              'dual.audio']
 
-LANG = ['french', 'italian', 'spanish', 'truefrech', 'german', 'arabic', 'dutch', 'portuguese', 'greek', 'arabic', 'finnish', 'hebrew']
+LANG = ['french', 'italian', 'spanish', 'truefrech', 'german', 'arabic', 'dutch', 'portuguese', 'greek', 'arabic',
+        'finnish', 'hebrew']
 
 ADDS = ['1xbet']
 
@@ -267,8 +274,7 @@ def getFileType(url):
 	if any(value in url for value in ADDS):
 		type += ' IXBET /'
 
-
-	if 'subs' in url: 
+	if 'subs' in url:
 		if type != '':
 			type += ' WITH SUBS'
 		else:
@@ -305,7 +311,8 @@ def check_sd_url(release_link):
 			quality = '720p'
 		elif any(i in ['dvdscr', 'screener', 'r5', 'r6'] for i in release_link):
 			quality = 'SCR'
-		elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in release_link):
+		elif any(i in ['camrip', 'tsrip', 'hdcam', 'hdts', 'dvdcam', 'dvdts', 'cam', 'telesync', 'ts'] for i in
+		         release_link):
 			quality = 'CAM'
 		else:
 			quality = 'SD'
@@ -429,7 +436,8 @@ def strip_domain(url):
 
 def is_host_valid(url, domains):
 	try:
-		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
+		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(
+				url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
 			raise Exception()
 
 		host = __top_domain(url)

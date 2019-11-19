@@ -19,7 +19,9 @@ from openscrapers.modules import log_utils
 from openscrapers.modules import workers
 
 
-def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False, limit=None, referer=None, cookie=None, compression=True, output='', timeout='30', ignoreSsl=False, flare=True, ignoreErrors=None):
+def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False,
+            limit=None, referer=None, cookie=None, compression=True, output='', timeout='30', ignoreSsl=False,
+            flare=True, ignoreErrors=None):
 	try:
 		if url is None:
 			return None
@@ -27,7 +29,7 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 		handlers = []
 
 		if proxy is not None:
-			handlers += [urllib2.ProxyHandler({'http':'%s' % (proxy)}), urllib2.HTTPHandler]
+			handlers += [urllib2.ProxyHandler({'http': '%s' % (proxy)}), urllib2.HTTPHandler]
 			opener = urllib2.build_opener(*handlers)
 			opener = urllib2.install_opener(opener)
 
@@ -60,7 +62,7 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 		if 'User-Agent' in headers:
 			pass
 		elif mobile is not True:
-			#headers['User-Agent'] = agent()
+			# headers['User-Agent'] = agent()
 			headers['User-Agent'] = cache.get(randomagent, 1)
 		else:
 			headers['User-Agent'] = 'Apple-iPhone/701.341'
@@ -146,9 +148,10 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 									data = None
 
 							scraper = cfscrape.CloudflareScraper()
-							response = scraper.request(method = 'GET' if post is None else 'POST', url = url, headers = headers, data = data, timeout = int(timeout))
+							response = scraper.request(method='GET' if post is None else 'POST', url=url,
+							                           headers=headers, data=data, timeout=int(timeout))
 							result = response.content
-							flare = 'cloudflare' # Used below
+							flare = 'cloudflare'  # Used below
 							try:
 								cookies = response.request._cookies
 							except:
@@ -228,7 +231,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 		if encoding == 'gzip':
 			result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
 
-
 		if 'sucuri_cloudproxy_js' in result:
 			su = sucuri().get(result)
 
@@ -268,7 +270,7 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 			try:
 				response_code = str(response.code)
 			except:
-				response_code = str(response.status_code) # object from CFScrape Requests object.
+				response_code = str(response.status_code)  # object from CFScrape Requests object.
 
 			try:
 				cookie = '; '.join(['%s=%s' % (i.name, i.value) for i in cookies])
@@ -376,33 +378,39 @@ def _replaceHTMLCodes(txt):
 def randomagent():
 	BR_VERS = [
 		['%s.0' % i for i in xrange(18, 50)],
-		['37.0.2062.103', '37.0.2062.120', '37.0.2062.124', '38.0.2125.101', '38.0.2125.104', '38.0.2125.111', '39.0.2171.71', '39.0.2171.95', '39.0.2171.99',
-		'40.0.2214.93', '40.0.2214.111',
-		'40.0.2214.115', '42.0.2311.90', '42.0.2311.135', '42.0.2311.152', '43.0.2357.81', '43.0.2357.124', '44.0.2403.155', '44.0.2403.157', '45.0.2454.101',
-		'45.0.2454.85', '46.0.2490.71',
-		'46.0.2490.80', '46.0.2490.86', '47.0.2526.73', '47.0.2526.80', '48.0.2564.116', '49.0.2623.112', '50.0.2661.86', '51.0.2704.103', '52.0.2743.116',
-		'53.0.2785.143', '54.0.2840.71', '61.0.3163.100'],
+		['37.0.2062.103', '37.0.2062.120', '37.0.2062.124', '38.0.2125.101', '38.0.2125.104', '38.0.2125.111',
+		 '39.0.2171.71', '39.0.2171.95', '39.0.2171.99',
+		 '40.0.2214.93', '40.0.2214.111',
+		 '40.0.2214.115', '42.0.2311.90', '42.0.2311.135', '42.0.2311.152', '43.0.2357.81', '43.0.2357.124',
+		 '44.0.2403.155', '44.0.2403.157', '45.0.2454.101',
+		 '45.0.2454.85', '46.0.2490.71',
+		 '46.0.2490.80', '46.0.2490.86', '47.0.2526.73', '47.0.2526.80', '48.0.2564.116', '49.0.2623.112',
+		 '50.0.2661.86', '51.0.2704.103', '52.0.2743.116',
+		 '53.0.2785.143', '54.0.2840.71', '61.0.3163.100'],
 		['11.0'],
 		['8.0', '9.0', '10.0', '10.6']]
-	WIN_VERS = ['Windows NT 10.0', 'Windows NT 7.0', 'Windows NT 6.3', 'Windows NT 6.2', 'Windows NT 6.1', 'Windows NT 6.0', 'Windows NT 5.1', 'Windows NT 5.0']
+	WIN_VERS = ['Windows NT 10.0', 'Windows NT 7.0', 'Windows NT 6.3', 'Windows NT 6.2', 'Windows NT 6.1',
+	            'Windows NT 6.0', 'Windows NT 5.1', 'Windows NT 5.0']
 	FEATURES = ['; WOW64', '; Win64; IA64', '; Win64; x64', '']
 	RAND_UAS = ['Mozilla/5.0 ({win_ver}{feature}; rv:{br_ver}) Gecko/20100101 Firefox/{br_ver}',
-				'Mozilla/5.0 ({win_ver}{feature}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{br_ver} Safari/537.36',
-				'Mozilla/5.0 ({win_ver}{feature}; Trident/7.0; rv:{br_ver}) like Gecko',
-				'Mozilla/5.0 (compatible; MSIE {br_ver}; {win_ver}{feature}; Trident/6.0)']
+	            'Mozilla/5.0 ({win_ver}{feature}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{br_ver} Safari/537.36',
+	            'Mozilla/5.0 ({win_ver}{feature}; Trident/7.0; rv:{br_ver}) like Gecko',
+	            'Mozilla/5.0 (compatible; MSIE {br_ver}; {win_ver}{feature}; Trident/6.0)']
 	index = random.randrange(len(RAND_UAS))
-	return RAND_UAS[index].format(win_ver=random.choice(WIN_VERS), feature=random.choice(FEATURES), br_ver=random.choice(BR_VERS[index]))
+	return RAND_UAS[index].format(win_ver=random.choice(WIN_VERS), feature=random.choice(FEATURES),
+	                              br_ver=random.choice(BR_VERS[index]))
 
 
 def agent():
 	return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'
-	# return 'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
+
+
+# return 'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
 
 
 class cfcookie:
 	def __init__(self):
 		self.cookie = None
-
 
 	def get(self, netloc, ua, timeout):
 		threads = []
@@ -415,7 +423,6 @@ class cfcookie:
 			if self.cookie is not None:
 				return self.cookie
 			time.sleep(1)
-
 
 	def get_cookie(self, netloc, ua, timeout):
 		try:
@@ -442,9 +449,9 @@ class cfcookie:
 
 			for line in lines:
 				if len(line) > 0 and '=' in line:
-					sections=line.split('=')
+					sections = line.split('=')
 					line_val = self.parseJSString(sections[1])
-					decryptVal = int(eval(str(decryptVal)+sections[0][-1]+str(line_val)))
+					decryptVal = int(eval(str(decryptVal) + sections[0][-1] + str(line_val)))
 
 			answer = decryptVal + len(urlparse.urlparse(netloc).netloc)
 
@@ -452,7 +459,8 @@ class cfcookie:
 
 			if 'type="hidden" name="pass"' in result:
 				passval = re.findall('name="pass" value="(.*?)"', result)[0]
-				query = '%s/cdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (netloc, urllib.quote_plus(passval), jschl, answer)
+				query = '%s/cdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (
+				netloc, urllib.quote_plus(passval), jschl, answer)
 				time.sleep(6)
 
 			cookies = cookielib.LWPCookieJar()
@@ -474,11 +482,11 @@ class cfcookie:
 		except:
 			pass
 
-
 	def parseJSString(self, s):
 		try:
 			offset = 1 if s[0] == '+' else 0
-			val = int(eval(s.replace('!+[]','1').replace('!![]','1').replace('[]','0').replace('(','str(')[offset:]))
+			val = int(
+				eval(s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]))
 			return val
 		except:
 			pass
@@ -487,7 +495,6 @@ class cfcookie:
 class bfcookie:
 	def __init__(self):
 		self.COOKIE_NAME = 'BLAZINGFAST-WEB-PROTECT'
-
 
 	def get(self, netloc, ua, timeout):
 		try:
@@ -512,14 +519,12 @@ class bfcookie:
 		except:
 			return
 
-
 	# not very robust but lazieness...
 	def getCookieString(self, content, rcksid):
 		vars = re.findall('toNumbers\("([^"]+)"', content)
 		value = self._decrypt(vars[2], vars[0], vars[1])
 		cookie = "%s=%s;%s" % (self.COOKIE_NAME, value, rcksid)
 		return cookie
-
 
 	def _decrypt(self, msg, key, iv):
 		from binascii import unhexlify, hexlify
@@ -543,7 +548,6 @@ class sucuri:
 	def __init__(self):
 		self.cookie = None
 
-
 	def get(self, result):
 		try:
 			s = re.compile("S\s*=\s*'([^']+)").findall(result)[0]
@@ -557,7 +561,8 @@ class sucuri:
 			s = re.sub(r'\n', '', s)
 			s = re.sub(r'document\.cookie', 'cookie', s)
 
-			cookie = '' ; exec(s)
+			cookie = '';
+			exec (s)
 			self.cookie = re.compile('([^=]+)=(.*)').findall(cookie)[0]
 			self.cookie = '%s=%s' % (self.cookie[0], self.cookie[1])
 

@@ -42,7 +42,6 @@ class source:
 		self.base_link = 'https://www.skytorrents.lol/'
 		self.search_link = '?query=%s'
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,7 +50,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,7 +57,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -72,7 +69,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -144,7 +140,7 @@ class source:
 						info = ' | '.join(info)
 
 						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True})
+						                'info': info, 'direct': False, 'debridonly': True})
 			except:
 				source_utils.scraper_error('SKYTORRENTS')
 				return sources
@@ -152,7 +148,6 @@ class source:
 		except:
 			source_utils.scraper_error('SKYTORRENTS')
 			return sources
-
 
 	def resolve(self, url):
 		return url

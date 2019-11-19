@@ -42,7 +42,6 @@ class source:
 		self.base_link = 'https://www.mkvcage.site'
 		self.search_link = '/?s=%s'
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,7 +50,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,7 +57,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -71,7 +68,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
@@ -108,7 +104,6 @@ class source:
 					tit = client.parseDOM(post, 'a')[0].replace('Download ', '')
 					t = tit.split(hdlr)[0].replace('(', '')
 
-
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -127,7 +122,6 @@ class source:
 							link = re.findall('a class="buttn magnet" href="(.+?)"', i, re.DOTALL)[0]
 							# log_utils.log('magnet link = %s' % link, log_utils.LOGDEBUG)
 
-
 							# # for another day to fetch torrent link from form data, seems like junk though
 							# btorrent = client.parseDOM(i, 'a', ret='href', attrs={'class': 'buttn torrent'})[0]
 							# btorrent = btorrent.replace(' ', '+')
@@ -140,11 +134,11 @@ class source:
 							# torrent = re.findall('a href="(.+?)"', response, re.DOTALL)[4]
 							# # log_utils.log('torrent link = %s' % torrent, log_utils.LOGDEBUG)
 
-			# <a class="buttn watch" href="https://ylink.bid/watchonline" target="_blank" rel="noopener noreferrer">Watch Online</a>
-			# <a class="buttn blue" href="https://l.ylink.bid/index.php?ID=759s341illy" target="_blank" rel="noopener noreferrer">Download Links</a>
-			# <a class="buttn magnet" href="magnet:?xt=urn:btih:9BC72CEF74E3BD56D46509B35B621113FE10EB86" target="_blank" rel="noopener noreferrer">Magnet</a>
-			# <a class="buttn torrent" href="https://l.ylink.bid/index.php?ID=604lessy74" target="_blank" rel="noopener noreferrer">Torrent</a>
-			# linksPassword = 'mkvcage'
+							# <a class="buttn watch" href="https://ylink.bid/watchonline" target="_blank" rel="noopener noreferrer">Watch Online</a>
+							# <a class="buttn blue" href="https://l.ylink.bid/index.php?ID=759s341illy" target="_blank" rel="noopener noreferrer">Download Links</a>
+							# <a class="buttn magnet" href="magnet:?xt=urn:btih:9BC72CEF74E3BD56D46509B35B621113FE10EB86" target="_blank" rel="noopener noreferrer">Magnet</a>
+							# <a class="buttn torrent" href="https://l.ylink.bid/index.php?ID=604lessy74" target="_blank" rel="noopener noreferrer">Torrent</a>
+							# linksPassword = 'mkvcage'
 
 							quality, info = source_utils.get_release_quality(u)
 							try:
@@ -157,8 +151,9 @@ class source:
 								pass
 							info = ' | '.join(info)
 
-							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
-														'direct': False, 'debridonly': True})
+							sources.append(
+								{'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+								 'direct': False, 'debridonly': True})
 
 
 			except:
@@ -170,7 +165,6 @@ class source:
 		except:
 			source_utils.scraper_error('MKVCAGE')
 			return sources
-
 
 	def resolve(self, url):
 		return url

@@ -43,7 +43,6 @@ class source:
 		# self.search_link = 'rls/?s=%s'
 		self.search_link = '/ups/?s=%s'
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -52,7 +51,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,7 +58,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -73,7 +70,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -105,7 +101,6 @@ class source:
 
 			# z = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
 			z = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a'))
-
 
 			if 'tvshowtitle' in data:
 				posts = [(i[1], i[0]) for i in z]
@@ -184,7 +179,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+					                'info': info, 'direct': False, 'debridonly': True})
 				except:
 					pass
 
@@ -192,7 +187,6 @@ class source:
 		except:
 			source_utils.scraper_error('MYVIDEOLINK')
 			return sources
-
 
 	def resolve(self, url):
 		return url

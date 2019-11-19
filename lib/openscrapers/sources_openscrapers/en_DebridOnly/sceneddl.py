@@ -42,7 +42,6 @@ class source:
 		self.base_link = 'http://www.sceneddl.me'
 		self.search_link = '/?s=%s'
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,7 +50,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,7 +57,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -72,7 +69,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -153,7 +149,9 @@ class source:
 
 							valid, host = source_utils.is_host_valid(url, hostDict)
 							if valid:
-								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+								sources.append(
+									{'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+									 'direct': False, 'debridonly': True})
 				except:
 					source_utils.scraper_error('SCENEDDL')
 					pass
@@ -164,8 +162,5 @@ class source:
 			source_utils.scraper_error('SCENEDDL')
 			return sources
 
-
 	def resolve(self, url):
 		return url
-
-

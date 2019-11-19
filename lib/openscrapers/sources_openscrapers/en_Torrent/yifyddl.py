@@ -42,7 +42,6 @@ class source:
 		self.base_link = 'https://yify.yt/'
 		self.search_link = '/movie/%s'
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -50,7 +49,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -90,7 +88,8 @@ class source:
 
 			p = 0
 			for torrent in results:
-				link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent, re.DOTALL)
+				link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent,
+				                  re.DOTALL)
 
 				for url, ref in link:
 					url = str(client.replaceHTMLCodes(url).split('&tr')[0])
@@ -123,13 +122,12 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+					                'info': info, 'direct': False, 'debridonly': True})
 			return sources
 
 		except:
 			source_utils.scraper_error('YIFYDLL')
 			return sources
-
 
 	def resolve(self, url):
 		return url

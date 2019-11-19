@@ -75,17 +75,15 @@ skinPath = xbmc.translatePath('special://skin/')
 
 # addonPath = xbmc.translatePath(addonInfo('path'))
 try:
-    addonPath = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
+	addonPath = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
 except:
-    addonPath = xbmcaddon.Addon().getAddonInfo('path')
-
+	addonPath = xbmcaddon.Addon().getAddonInfo('path')
 
 # dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
 try:
-    dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+	dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
 except:
-    dataPath = xbmc.translatePath(addonInfo('profile'))
-
+	dataPath = xbmc.translatePath(addonInfo('profile'))
 
 settingsFile = os.path.join(dataPath, 'settings.xml')
 viewsFile = os.path.join(dataPath, 'views.db')
@@ -101,75 +99,75 @@ addonIcon = os.path.join(addonPath, 'icon.png')
 
 
 def sleep(time):  # Modified `sleep` command that honors a user exit request
-    while time > 0 and not xbmc.abortRequested:
-        xbmc.sleep(min(100, time))
-        time = time - 100
+	while time > 0 and not xbmc.abortRequested:
+		xbmc.sleep(min(100, time))
+		time = time - 100
 
 
 def getKodiVersion():
-    return xbmc.getInfoLabel("System.BuildVersion").split(".")[0]
+	return xbmc.getInfoLabel("System.BuildVersion").split(".")[0]
 
 
 def addonId():
-    return addonInfo('id')
+	return addonInfo('id')
 
 
 def addonName():
-    return addonInfo('name')
+	return addonInfo('name')
 
 
 def version():
-    num = ''
-    try:
-        version = addon('xbmc.addon').getAddonInfo('version')
-    except:
-        version = '999'
-    for i in version:
-        if i.isdigit():
-            num += i
-        else:
-            break
-    return int(num)
+	num = ''
+	try:
+		version = addon('xbmc.addon').getAddonInfo('version')
+	except:
+		version = '999'
+	for i in version:
+		if i.isdigit():
+			num += i
+		else:
+			break
+	return int(num)
 
 
 try:
-    def openSettings(query=None, id=addonInfo('id')):
-        try:
-            idle()
-            execute('Addon.OpenSettings(%s)' % id)
-            if query is None:
-                raise Exception()
-            c, f = query.split('.')
-            if int(getKodiVersion()) >= 18:
-                execute('SetFocus(%i)' % (int(c) - 100))
-                execute('SetFocus(%i)' % (int(f) - 80))
-            else:
-                execute('SetFocus(%i)' % (int(c) + 100))
-                execute('SetFocus(%i)' % (int(f) + 200))
-        except:
-            return
+	def openSettings(query=None, id=addonInfo('id')):
+		try:
+			idle()
+			execute('Addon.OpenSettings(%s)' % id)
+			if query is None:
+				raise Exception()
+			c, f = query.split('.')
+			if int(getKodiVersion()) >= 18:
+				execute('SetFocus(%i)' % (int(c) - 100))
+				execute('SetFocus(%i)' % (int(f) - 80))
+			else:
+				execute('SetFocus(%i)' % (int(c) + 100))
+				execute('SetFocus(%i)' % (int(f) + 200))
+		except:
+			return
 except:
-    pass
+	pass
 
 
 def getCurrentViewId():
-    win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-    return str(win.getFocusId())
+	win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+	return str(win.getFocusId())
 
 
 def refresh():
-    return execute('Container.Refresh')
+	return execute('Container.Refresh')
 
 
 def busy():
-    if int(getKodiVersion()) >= 18:
-        return execute('ActivateWindow(busydialognocancel)')
-    else:
-        return execute('ActivateWindow(busydialog)')
+	if int(getKodiVersion()) >= 18:
+		return execute('ActivateWindow(busydialognocancel)')
+	else:
+		return execute('ActivateWindow(busydialog)')
 
 
 def idle():
-    if int(getKodiVersion()) >= 18:
-        return execute('Dialog.Close(busydialognocancel)')
-    else:
-        return execute('Dialog.Close(busydialog)')
+	if int(getKodiVersion()) >= 18:
+		return execute('Dialog.Close(busydialognocancel)')
+	else:
+		return execute('Dialog.Close(busydialog)')

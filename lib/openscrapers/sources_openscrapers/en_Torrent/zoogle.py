@@ -43,7 +43,6 @@ class source:
 		self.search_link = '/search?q=%s'
 		self.min_seeders = 1
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -52,7 +51,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,7 +58,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -73,7 +70,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -104,7 +100,8 @@ class source:
 			html = html.replace('&nbsp;', ' ')
 
 			try:
-				results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
+				results = \
+				client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
 			except:
 				return sources
 
@@ -146,7 +143,8 @@ class source:
 						continue
 
 					try:
-						seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0])
+						seeders = int(
+							re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0])
 					except:
 						continue
 
@@ -167,7 +165,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+					                'info': info, 'direct': False, 'debridonly': True})
 				except:
 					continue
 
@@ -176,7 +174,6 @@ class source:
 		except:
 			source_utils.scraper_error('ZOOGLE')
 			return sources
-
 
 	def resolve(self, url):
 		return url

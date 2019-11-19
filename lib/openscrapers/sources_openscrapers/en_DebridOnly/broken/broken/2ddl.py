@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
+# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
+# Created by Tempest
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -28,6 +30,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -38,10 +41,10 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['glodls.to']
-		self.base_link = 'https://glodls.to/'
-		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
-		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
+		self.domains = ['invictus.ws', 'twoddl.net', '2ddl.vg']
+		self.base_link = 'https://2ddl.vg'
+		self.search_link = '/?s=%s'
+		self.scraper = cfscrape.create_scraper()
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -79,95 +82,85 @@ class source:
 				return sources
 
 			if debrid.status() is False:
-				return sources
+				raise Exception()
+
+			hostDict = hostprDict + hostDict
 
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-				'year']
-			self.year = data['year']
+			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 
-			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-			if 'tvshowtitle' in data:
-				url = self.tvsearch.format(urllib.quote_plus(query))
-			else:
-				url = self.moviesearch.format(urllib.quote_plus(query))
-			url = urlparse.urljoin(self.base_link, url)
+			query = '%s S%02dE%02d' % (title, int(data['season']), int(data['episode'])) \
+				if 'tvshowtitle' in data else '%s %s' % (title, data['year'])
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+
+			url = self.search_link % urllib.quote_plus(query)
+			url = urlparse.urljoin(self.base_link, url).replace('-', '+')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			items = self._get_items(url)
+			r = self.scraper.get(url).content
+			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
+
+			if r is None and 'tvshowtitle' in data:
+				season = re.search('S(.*?)E', hdlr)
+				season = season.group(1)
+				url = title
+				r = self.scraper.get(url).content
+
+			for loopCount in range(0, 2):
+				if loopCount == 1 or (r is None and 'tvshowtitle' in data):
+					r = self.scraper.get(url).content
+				posts = client.parseDOM(r, "div", attrs={"class": "postpage_movie_download"})
+
+				items = []
+				for post in posts:
+					try:
+						tit = client.parseDOM(post, "a")[0]
+						t = tit.split(hdlr)[0].replace('(', '')
+
+						if cleantitle.get(t) != cleantitle.get(title):
+							continue
+
+						if hdlr not in tit:
+							continue
+
+						u = client.parseDOM(post, 'a', ret='href')
+
+						for i in u:
+							name = str(i)
+							items.append(name)
+					except:
+						pass
+				if len(items) > 0:
+					break
 
 			for item in items:
 				try:
-					name = item[0]
+					i = str(item)
+					r = self.scraper.get(i).content
+					u = client.parseDOM(r, "div", attrs={"class": "multilink_lnks"})
+					for t in u:
+						r = client.parseDOM(t, 'a', ret='href')
+						for url in r:
+							if 'www.share-online.biz' in url:
+								continue
+							if url in str(sources):
+								continue
+							quality, info = source_utils.get_release_quality(url, url)
 
-					url = item[1]
-					url = url.split('&tr')[0]
-
-					quality, info = source_utils.get_release_quality(name, url)
-
-					info.append(item[2])  # if item[2] != '0'
-					info = ' | '.join(info)
-
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-					                'info': info, 'direct': False, 'debridonly': True})
+							valid, host = source_utils.is_host_valid(url, hostDict)
+							if valid:
+								sources.append(
+									{'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+									 'direct': False, 'debridonly': True})
 				except:
-					source_utils.scraper_error('GLODLS')
 					pass
-
 			return sources
-
 		except:
-			source_utils.scraper_error('GLODLS')
 			return sources
-
-	def _get_items(self, url):
-		items = []
-		try:
-			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers)
-			posts = client.parseDOM(r, 'tr', attrs={'class': 't-row'})
-			posts = [i for i in posts if not 'racker:' in i]
-
-			for post in posts:
-				ref = client.parseDOM(post, 'a', ret='href')
-				url = [i for i in ref if 'magnet:' in i][0]
-
-				# altered to allow multi-lingual audio tracks
-				if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
-					continue
-
-				name = client.parseDOM(post, 'a', ret='title')[0]
-
-				# some shows like "Power" have year and hdlr in name
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '')
-				if cleantitle.get(t) != cleantitle.get(self.title).replace('&',
-				                                                           'and'):  # glodls does not seem to use ampersand symbol in titles
-					continue
-
-				if self.hdlr not in name:
-					continue
-
-				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-					div = 1 if size.endswith('GB') else 1024
-					size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-					size = '%.2f GB' % size
-				except:
-					size = '0'
-					pass
-
-				items.append((name, url, size))
-
-			return items
-
-		except:
-			source_utils.scraper_error('GLODLS')
-			return items
 
 	def resolve(self, url):
 		return url

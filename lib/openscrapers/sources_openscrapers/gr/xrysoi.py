@@ -26,7 +26,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
 import urllib
 import urlparse
@@ -37,79 +36,75 @@ from openscrapers.modules import source_utils
 
 
 class source:
-    def __init__(self):
-        self.priority = 1
-        self.language = ['gr']
-        self.domains = ['xrysoi.net','xrysoi.se','xrysoi.online']
-        self.base_link = 'https://xrysoi.net/'
-        self.search_link = 'search/%s/feed/rss2/'
+	def __init__(self):
+		self.priority = 1
+		self.language = ['gr']
+		self.domains = ['xrysoi.net', 'xrysoi.se', 'xrysoi.online']
+		self.base_link = 'https://xrysoi.net/'
+		self.search_link = 'search/%s/feed/rss2/'
 
+	def movie(self, imdb, title, localtitle, aliases, year):
+		try:
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
+			url = urllib.urlencode(url)
+			return url
+		except:
+			return
 
-    def movie(self, imdb, title, localtitle, aliases, year):
-        try:
-            url = {'imdb': imdb, 'title': title, 'aliases': aliases,'year': year}
-            url = urllib.urlencode(url)
-            return url
-        except:
-            return
+	def sources(self, url, hostDict, hostprDict):
+		sources = []
+		try:
+			sources = []
 
+			if url is None:
+				return sources
 
-    def sources(self, url, hostDict, hostprDict):
-        sources = []
-        try:
-            sources = []
+			data = urlparse.parse_qs(url)
+			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-            if url is None:
-                return sources
+			title = data['title']
 
-            data = urlparse.parse_qs(url)
-            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+			year = data['year']
 
-            title = data['title']
+			query = '%s %s' % (data['title'], data['year'])
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
-            year = data['year']
+			url = self.search_link % urllib.quote_plus(query)
+			url = urlparse.urljoin(self.base_link, url)
 
-            query = '%s %s' % (data['title'], data['year'])
-            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+			r = client.request(url)
+			posts = client.parseDOM(r, 'item')
 
-            url = self.search_link % urllib.quote_plus(query)
-            url = urlparse.urljoin(self.base_link, url)
+			for post in posts:
+				try:
+					name = client.parseDOM(post, 'title')
+					links = client.parseDOM(post, 'a', ret='href')
 
-            r = client.request(url)
-            posts = client.parseDOM(r, 'item')
+					t = re.sub('(\.|\(|\[|\s|)(\d{4})(\.|\)|\]|\s|)(.+|)', '', name[0])
 
-            for post in posts:
-                try:
-                    name = client.parseDOM(post, 'title')
-                    links = client.parseDOM(post, 'a', ret='href')
+					if cleantitle.get(t) != cleantitle.get(title):
+						raise Exception()
 
-                    t = re.sub('(\.|\(|\[|\s|)(\d{4})(\.|\)|\]|\s|)(.+|)', '',name[0])
+					y = re.findall('\(\s*(\d{4})\s*\)', name[0])[0]
+					if y != year:
+						raise Exception()
 
-                    if cleantitle.get(t) != cleantitle.get(title):
-                        raise Exception()
+					for url in links:
+						if any(x in url for x in ['.online', 'xrysoi.se', 'filmer', '.bp', '.blogger']): continue
+						url = client.replaceHTMLCodes(url)
+						url = url.encode('utf-8')
+						valid, host = source_utils.is_host_valid(url, hostDict)
+						if 'hdvid' in host: valid = True
+						if not valid: continue
+						quality = 'SD'
+						info = 'SUB'
+						sources.append({'source': host, 'quality': quality, 'language': 'gr', 'url': url, 'info': info,
+						                'direct': False, 'debridonly': False})
+				except:
+					pass
+			return sources
+		except:
+			return sources
 
-                    y = re.findall('\(\s*(\d{4})\s*\)', name[0])[0]
-                    if y != year:
-                        raise Exception()
-
-                    for url in links:
-                        if any(x in url for x in ['.online', 'xrysoi.se', 'filmer', '.bp', '.blogger']): continue
-                        url = client.replaceHTMLCodes(url)
-                        url = url.encode('utf-8')
-                        valid, host = source_utils.is_host_valid(url,hostDict)
-                        if 'hdvid' in host: valid = True
-                        if not valid: continue
-                        quality = 'SD'
-                        info = 'SUB'
-                        sources.append({'source': host, 'quality': quality, 'language': 'gr', 'url': url, 'info': info, 'direct': False, 'debridonly': False})
-                except:
-                    pass
-            return sources
-        except:
-            return sources
-
-
-    def resolve(self, url):
-        return url
-        
-        
+	def resolve(self, url):
+		return url

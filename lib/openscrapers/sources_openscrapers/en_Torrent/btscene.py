@@ -43,7 +43,6 @@ class source:
 		self.base_link = 'http://btscene.today/'
 		self.search_link = 'search?q=%s'
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -52,7 +51,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,7 +58,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -73,7 +70,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -89,7 +85,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
+				'year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -111,7 +108,6 @@ class source:
 		except:
 			source_utils.scraper_error('BTSCENE')
 			return self.sources
-
 
 	def _get_sources(self, url):
 		try:
@@ -157,12 +153,11 @@ class source:
 					info = ' | '.join(info)
 
 					self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-														'info': info, 'direct': False, 'debridonly': True})
+					                     'info': info, 'direct': False, 'debridonly': True})
 
 		except:
 			source_utils.scraper_error('BTSCENE')
 			pass
-
 
 	def resolve(self, url):
 		return url

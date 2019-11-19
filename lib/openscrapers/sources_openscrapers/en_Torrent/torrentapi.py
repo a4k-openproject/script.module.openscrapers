@@ -40,11 +40,10 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.base_link = 'https://torrentapi.org' #-just to satisfy scraper_test
+		self.base_link = 'https://torrentapi.org'  # -just to satisfy scraper_test
 		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&{2}'
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&{2}'
 		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
-
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -54,7 +53,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -62,7 +60,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -75,7 +72,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -125,7 +121,8 @@ class source:
 
 				# some shows like "Power" have year and hdlr in name
 				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
-				if cleantitle.get(t) != cleantitle.get(title).replace('&', 'and'):  #torrentapi does not seem to use ampersand symbol in titles
+				if cleantitle.get(t) != cleantitle.get(title).replace('&',
+				                                                      'and'):  # torrentapi does not seem to use ampersand symbol in titles
 					continue
 
 				if hdlr not in name:
@@ -138,13 +135,12 @@ class source:
 				info = ' | '.join(info)
 
 				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-											'info': info, 'direct': False, 'debridonly': True})
+				                'info': info, 'direct': False, 'debridonly': True})
 			return sources
 
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
-
 
 	def resolve(self, url):
 		return url

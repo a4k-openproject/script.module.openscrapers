@@ -44,7 +44,6 @@ class source:
 		self.search = 'https://www.torrentdownloads.me/rss.xml?new=1&type=search&cid={0}&search={1}'
 		self.min_seeders = 1
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -53,7 +52,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -61,7 +59,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -74,7 +71,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -90,7 +86,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
+				'year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -116,7 +113,6 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOADS')
 			return self._sources
-
 
 	def _get_items(self, r):
 		try:
@@ -153,11 +149,10 @@ class source:
 
 			if seeders > self.min_seeders:
 				self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-														'info': info, 'direct': False, 'debridonly': True})
+				                      'info': info, 'direct': False, 'debridonly': True})
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOADS')
 			pass
-
 
 	def resolve(self, url):
 		return url

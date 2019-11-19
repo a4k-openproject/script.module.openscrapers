@@ -25,7 +25,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
 import urllib
 import urlparse
@@ -43,8 +42,8 @@ class source:
 		self.domains = ['mvrls.com']
 		self.base_link = 'http://mvrls.com'
 		self.search_link = '/search/%s/feed/rss2/'
-		# self.search_link = '/?s=%s' # should really switch to site search since rss feed often returns incorect query results vs. site
 
+	# self.search_link = '/?s=%s' # should really switch to site search since rss feed often returns incorect query results vs. site
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -54,7 +53,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -62,7 +60,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -75,7 +72,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -110,7 +106,7 @@ class source:
 				try:
 					t = client.parseDOM(post, 'title')[0]
 					u = client.parseDOM(post, 'enclosure', ret='url')
-					#---rss feed does not contain size info-another reason why switching to site search be better
+					# ---rss feed does not contain size info-another reason why switching to site search be better
 					s = re.search('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', post)
 					s = s.groups()[0] if s else '0'
 					items += [(t, i, s) for i in u]
@@ -159,7 +155,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+					                'info': info, 'direct': False, 'debridonly': True})
 
 				except:
 					source_utils.scraper_error('MVRLS')
@@ -169,7 +165,6 @@ class source:
 		except:
 			source_utils.scraper_error('MVRLS')
 			return sources
-
 
 	def resolve(self, url):
 		return url

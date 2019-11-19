@@ -43,7 +43,6 @@ class source:
 		self.search_link = '/browse-movies/%s/all/all/0/latest'
 		self.min_seeders = 1
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,7 +50,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -92,7 +90,8 @@ class source:
 			for entry in items:
 				try:
 					try:
-						link, name = re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
+						link, name = \
+						re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name)
 					except:
 						continue
@@ -137,7 +136,7 @@ class source:
 							info = ' | '.join(info)
 
 							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link,
-														'info': info, 'direct': False, 'debridonly': True})
+							                'info': info, 'direct': False, 'debridonly': True})
 					except:
 						source_utils.scraper_error('YTS')
 						continue
@@ -150,7 +149,6 @@ class source:
 		except:
 			source_utils.scraper_error('YTS')
 			return sources
-
 
 	def resolve(self, url):
 		return url

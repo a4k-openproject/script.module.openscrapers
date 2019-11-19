@@ -44,7 +44,6 @@ class source:
 		self.tvsearch = 'https://www.limetorrents.info/search/tv/{0}/1/'
 		self.moviesearch = 'https://www.limetorrents.info/search/movies/{0}/1/'
 
-
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -53,7 +52,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -61,7 +59,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -74,7 +71,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -91,7 +87,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
+				'year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -124,7 +121,6 @@ class source:
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return self._sources
-
 
 	def _get_items(self, url):
 		try:
@@ -177,14 +173,13 @@ class source:
 			source_utils.scraper_error('LIMETORRENTS')
 			return self.items
 
-
 	def _get_sources(self, item):
 		try:
 			name = item[0]
 
 			quality, info = source_utils.get_release_quality(name, name)
 
-			info.append(item[2]) # if item[2] != '0'
+			info.append(item[2])  # if item[2] != '0'
 			info = ' | '.join(info)
 
 			data = client.request(item[1])
@@ -201,12 +196,11 @@ class source:
 				return
 
 			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+			                      'info': info, 'direct': False, 'debridonly': True})
 
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			pass
-
 
 	def resolve(self, url):
 		return url

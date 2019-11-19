@@ -40,20 +40,19 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domains = ['pirateproxy.live', 'thepiratebay.org', 'thepiratebay.fun', 'thepiratebay.asia', 'tpb.party',
-								'thehiddenbay.com', 'piratebay.live', 'thepiratebay.zone'] #-- 'thepiratebayz.org' and 'thepiratebay3.org' seem dead
+		                'thehiddenbay.com', 'piratebay.live',
+		                'thepiratebay.zone']  # -- 'thepiratebayz.org' and 'thepiratebay3.org' seem dead
 
 		self._base_link = None
 		# self.search_link = '/s/?q=%s&page=1&&video=on&orderby=99' #-page flip does not work
-		self.search_link = '/search/%s/1/99/200' #-direct link can flip pages
+		self.search_link = '/search/%s/1/99/200'  # -direct link can flip pages
 		self.min_seeders = 1
-
 
 	@property
 	def base_link(self):
 		if not self._base_link:
 			self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
 		return self._base_link
-
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -63,7 +62,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -71,7 +69,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -84,7 +81,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -108,7 +104,6 @@ class source:
 			url = self.search_link % urllib.quote(query)
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 
 			html = client.request(url)
 			html = html.replace('&nbsp;', ' ')
@@ -182,7 +177,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+					                'info': info, 'direct': False, 'debridonly': True})
 				except:
 					source_utils.scraper_error('PIRATEBAY')
 					continue
@@ -192,7 +187,6 @@ class source:
 		except:
 			source_utils.scraper_error('PIRATEBAY')
 			return sources
-
 
 	def __get_base_url(self, fallback):
 		try:
@@ -209,7 +203,6 @@ class source:
 			pass
 
 		return fallback
-
 
 	def resolve(self, url):
 		return url
