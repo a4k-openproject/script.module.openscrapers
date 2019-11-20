@@ -173,13 +173,13 @@ if action == "Defaults":
 	              'putlockeronline', 'seehd', 'series9',
 	              'seriesonline', 'sharemovies', 'solarmoviefree', 'streamdreams', 'timewatch', 'toonget',
 	              'tvbox', 'tvmovieflix', 'watchepisodes', 'watchserieshd', 'xwatchseries', 'yesmoviesgg',
-	              '0day', '2ddl', '300mbdownload', '300mbfilms', 'ddlspot', 'directdl', 'ganool',
-	              'maxrls', 'mkvcage', 'mkvhub', 'mvrls', 'myvideolink', 'onlineseries', 'rapidmoviez', 'rlsbb',
+	              '300mbdownload', '300mbfilms', 'ddlspot', 'ganool', 'ganool2',
+	              'maxrls', 'mkvhub', 'mvrls', 'myvideolink', 'onlineseries', 'rapidmoviez', 'rlsbb',
 	              'sceneddl', 'scenerls',
 	              'ultrahdindir', '1337x', 'btdb', 'btscene', 'doublr', 'eztv', 'glodls', 'kickass2',
-	              'limetorrents', 'magnetdl', 'piratebay', 'torrentapi', 'torrentdownloads', 'torrentgalaxy',
-	              'torrentquest', 'yify',
-	              'yifyddl', 'ytsam', 'zoogle']
+	              'limetorrents', 'magnetdl', 'mkvccage', 'piratebay', 'torrentapi', 'torrentdownloads',
+	              'torrentgalaxy',
+	              'torrentquest', 'yifyddl', 'yts', 'zoogle']
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
