@@ -16,13 +16,14 @@ from openscrapers.modules import control
 
 try:
 	import xbmc
-	from xbmc import LOGDEBUG, LOGNOTICE, LOGWARNING  # @UnusedImport
+	from xbmc import LOGDEBUG, LOGERROR, LOGNOTICE, LOGWARNING  # @UnusedImport
 
 	LOGPATH = xbmc.translatePath('special://logpath/')
 	name = control.addonInfo('name')
 except:
 	xbmc = False
 	LOGDEBUG = "LOGDEBUG"
+	LOGERROR = "LOGERROR"
 	LOGNOTICE = "LOGNOTICE"
 	LOGWARNING = "LOGWARNING"
 	name = "OPENSCRAPERS"
@@ -31,19 +32,23 @@ except:
 DEBUGPREFIX = '[COLOR red][ OPENSCRAPERS DEBUG ][/COLOR]'
 
 
-def log(msg, level=LOGNOTICE):
-	try:
-		debug_enabled = control.setting('addon_debug')
-		debug_log = control.setting('debug.location')
-	except:
-		return
-	if xbmc:
-		print(DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled))
-		print(DEBUGPREFIX + ' Debug Log?: ' + str(debug_log))
-	if not control.setting('addon_debug') == 'true':
+def log(msg, caller=None, level=LOGNOTICE):
+	debug_enabled = control.setting('addon_debug')
+	debug_log = control.setting('debug.location')
+
+	print DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled)
+	print DEBUGPREFIX + ' Debug Log?: ' + str(debug_log)
+
+	if control.setting('addon_debug') != 'true':
 		return
 
 	try:
+		if caller is not None and level == LOGDEBUG:
+			func = inspect.currentframe().f_back.f_code
+			line_number = inspect.currentframe().f_back.f_lineno
+			caller = "%s.%s()" % (caller, func.co_name)
+			msg = 'From func name: %s Line # :%s\n                       msg : %s' % (caller, line_number, msg)
+
 		if isinstance(msg, unicode):
 			msg = '%s (ENCODED)' % (msg.encode('utf-8'))
 
@@ -60,8 +65,33 @@ def log(msg, level=LOGNOTICE):
 	except Exception as e:
 		try:
 			xbmc.log('Logging Failure: %s' % (e), level)
-		except Exception:
+		except:
 			pass
+
+
+def error(message=None, exception=True):
+	try:
+		import sys
+		if exception:
+			type, value, traceback = sys.exc_info()
+			errortype = type.__name__
+			errormessage = value.message
+
+			if errormessage == '':
+				raise Exception()
+
+			if message:
+				message += ' -> '
+			else:
+				message = ''
+			message += str(errortype) + ' -> ' + str(errormessage)
+
+		else:
+			caller = None
+
+		log(msg=message, caller=__name__, level=LOGERROR)
+	except:
+		pass
 
 
 class Profiler(object):

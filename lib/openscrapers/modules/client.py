@@ -155,11 +155,10 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 							try:
 								cookies = response.request._cookies
 							except:
-								import traceback
-								traceback.print_exc()
+								log_utils.error()
+
 						except:
-							import traceback
-							traceback.print_exc()
+							log_utils.error()
 
 					elif 'cf-browser-verification' in cf_result:
 						netloc = '%s://%s' % (urlparse.urlparse(url).scheme, urlparse.urlparse(url).netloc)
@@ -291,8 +290,7 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 			return result
 
 	except Exception as e:
-		import traceback
-		traceback.print_exc()
+		log_utils.error()
 		log_utils.log('Request-Error: (%s) => %s' % (str(e), url), log_utils.LOGDEBUG)
 		return
 
@@ -460,7 +458,7 @@ class cfcookie:
 			if 'type="hidden" name="pass"' in result:
 				passval = re.findall('name="pass" value="(.*?)"', result)[0]
 				query = '%s/cdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (
-				netloc, urllib.quote_plus(passval), jschl, answer)
+					netloc, urllib.quote_plus(passval), jschl, answer)
 				time.sleep(6)
 
 			cookies = cookielib.LWPCookieJar()

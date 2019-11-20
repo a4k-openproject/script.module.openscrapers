@@ -38,9 +38,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['www.skytorrents.lol']
-		self.base_link = 'https://www.skytorrents.lol/'
-		self.search_link = '?query=%s'
+		self.domains = ['300mbdownload.mobi']
+		self.base_link = 'https://www.300mbdownload.mobi'
+		self.search_link = '/search/%s/feed/rss2/'
+
+	# self.search_link = '/?s=%s' #rss2 seems down in which a re-write to parse will be needed
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -62,6 +64,7 @@ class source:
 		try:
 			if url is None:
 				return
+
 			url = urlparse.parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -78,7 +81,9 @@ class source:
 				return sources
 
 			if debrid.status() is False:
-				return sources
+				raise Exception()
+
+			hostDict = hostprDict + hostDict
 
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -93,67 +98,76 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			try:
-				r = client.request(url)
+			html = client.request(url)
 
-				posts = client.parseDOM(r, 'tbody')[0]
-				posts = client.parseDOM(posts, 'tr')
+			posts = client.parseDOM(html, 'item')
 
-				for post in posts:
-					link = re.findall('a href="(magnet:.+?)" title="(.+?)"', post, re.DOTALL)
+			items = []
+			for post in posts:
+				try:
+					t = client.parseDOM(post, 'title')[0]
+					u = client.parseDOM(post, 'a', ret='href')
+					s = re.search('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', post)
+					s = s.groups()[0] if s else '0'
+					items += [(t, i, s) for i in u]
+				except:
+					source_utils.scraper_error('300MBDOWNLOAD')
+					pass
+
+			for item in items:
+				try:
+					name = item[0]
+					name = client.replaceHTMLCodes(name)
+
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+					if cleantitle.get(t) != cleantitle.get(title):
+						continue
+
+					if hdlr not in name:
+						continue
+
+					url = item[1]
+					if any(x in url for x in ['.rar', '.zip', '.iso']):
+						continue
+
+					url = client.replaceHTMLCodes(url)
+					url = url.encode('utf-8')
+
+					if url in str(sources):
+						continue
+
+					valid, host = source_utils.is_host_valid(url, hostDict)
+					if not valid:
+						continue
+
+					host = client.replaceHTMLCodes(host)
+					host = host.encode('utf-8')
+
+					quality, info = source_utils.get_release_quality(name, url)
 
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-						div = 1 if size.endswith('GB') else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', item[2])[-1]
+						div = 1 if size.endswith(('GB', 'GiB')) else 1024
+						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
 						size = '%.2f GB' % size
-					except:
-						size = '0'
-
-					for url, ref in link:
-						url = url.split('&tr')[0]
-
-						# altered to allow multi-lingual audio tracks
-						if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
-							continue
-
-						name = url.split('&dn=')[1]
-
-						if name.startswith('www.'):
-							try:
-								name = name.split(' - ')[1].lstrip()
-							except:
-								name = re.sub(r'\www..+? ', '', name)
-
-						if 'extramovies.wiki' in name.lower():
-							name = name.split(' - ')[1].lstrip()
-
-						# some shows like "Power" have year and hdlr in name
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
-
-						if cleantitle.get(t) != cleantitle.get(title):
-							continue
-
-						if hdlr not in name:
-							continue
-
-						quality, info = source_utils.get_release_quality(name, url)
-
 						info.append(size)
-						info = ' | '.join(info)
+					except:
+						pass
 
-						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-						                'info': info, 'direct': False, 'debridonly': True})
+					fileType = source_utils.getFileType(name)
+					info.append(fileType)
+					info = ' | '.join(info) if fileType else info[0]
 
-				return sources
+					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
+					                'info': info, 'direct': False, 'debridonly': True})
+				except:
+					source_utils.scraper_error('300MBDOWNLOAD')
+					pass
 
-			except:
-				source_utils.scraper_error('SKYTORRENTS')
-				return sources
-
-		except:
-			source_utils.scraper_error('SKYTORRENTS')
 			return sources
+		except:
+			source_utils.scraper_error('300MBDOWNLOAD')
+			return
 
 	def resolve(self, url):
 		return url
