@@ -32,7 +32,7 @@ torrent_providers = en_Torrent.__all__
 paid_providers = {'en_DebridOnly': debrid_providers, 'en_Torrent': torrent_providers}
 all_paid_providers = []
 for key, value in paid_providers.iteritems():
-    all_paid_providers += value
+	all_paid_providers += value
 
 ##--Foreign Providers--##
 german_providers = de.__all__
@@ -44,16 +44,18 @@ polish_providers = pl.__all__
 russian_providers = ru.__all__
 
 ##--All Foreign Providers--##
-foreign_providers = {'de': german_providers, 'es': spanish_providers, 'fr': french_providers, 'gr': greek_providers, 'ko': korean_providers,
-						'pl': polish_providers, 'ru': russian_providers}
+foreign_providers = {'de': german_providers, 'es': spanish_providers, 'fr': french_providers, 'gr': greek_providers,
+                     'ko': korean_providers,
+                     'pl': polish_providers, 'ru': russian_providers}
 all_foreign_providers = []
 for key, value in foreign_providers.iteritems():
-    all_foreign_providers += value
+	all_foreign_providers += value
 
 ##--All Providers--##
 total_providers = {'en': hoster_providers, 'en_Debrid': debrid_providers, 'en_Torrent': torrent_providers,
-                   'de': german_providers, 'es': spanish_providers, 'fr': french_providers, 'gr': greek_providers, 'ko': korean_providers,
-						'pl': polish_providers, 'ru': russian_providers}
+                   'de': german_providers, 'es': spanish_providers, 'fr': french_providers, 'gr': greek_providers,
+                   'ko': korean_providers,
+                   'pl': polish_providers, 'ru': russian_providers}
 all_providers = []
 for key, value in total_providers.iteritems():
-    all_providers += value
+	all_providers += value

@@ -22,133 +22,152 @@
 
 import os
 
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+import xbmcvfs
+
+integer = 1000
+
+addon = xbmcaddon.Addon
+AddonID = xbmcaddon.Addon().getAddonInfo('id')
+addonInfo = xbmcaddon.Addon().getAddonInfo
+addonName = addonInfo('name')
+addonVersion = addonInfo('version')
+
+lang = xbmcaddon.Addon().getLocalizedString
+lang2 = xbmc.getLocalizedString
+
+setting = xbmcaddon.Addon().getSetting
+setSetting = xbmcaddon.Addon().setSetting
+
+addItem = xbmcplugin.addDirectoryItem
+item = xbmcgui.ListItem
+directory = xbmcplugin.endOfDirectory
+content = xbmcplugin.setContent
+property = xbmcplugin.setProperty
+
+infoLabel = xbmc.getInfoLabel
+condVisibility = xbmc.getCondVisibility
+jsonrpc = xbmc.executeJSONRPC
+window = xbmcgui.Window(10000)
+dialog = xbmcgui.Dialog()
+progressDialog = xbmcgui.DialogProgress()
+progressDialogBG = xbmcgui.DialogProgressBG()
+windowDialog = xbmcgui.WindowDialog()
+button = xbmcgui.ControlButton
+image = xbmcgui.ControlImage
+getCurrentDialogId = xbmcgui.getCurrentWindowDialogId()
+keyboard = xbmc.Keyboard
+execute = xbmc.executebuiltin
+skin = xbmc.getSkinDir()
+player = xbmc.Player()
+playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+resolve = xbmcplugin.setResolvedUrl
+openFile = xbmcvfs.File
+makeFile = xbmcvfs.mkdir
+deleteFile = xbmcvfs.delete
+deleteDir = xbmcvfs.rmdir
+listDir = xbmcvfs.listdir
+transPath = xbmc.translatePath
+skinPath = xbmc.translatePath('special://skin/')
+
+# addonPath = xbmc.translatePath(addonInfo('path'))
 try:
-    import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
-
-    integer = 1000
-    lang = xbmcaddon.Addon().getLocalizedString
-    lang2 = xbmc.getLocalizedString
-    setting = xbmcaddon.Addon().getSetting
-    setSetting = xbmcaddon.Addon().setSetting
-    addon = xbmcaddon.Addon
-    addItem = xbmcplugin.addDirectoryItem
-    item = xbmcgui.ListItem
-    directory = xbmcplugin.endOfDirectory
-    content = xbmcplugin.setContent
-    property = xbmcplugin.setProperty
-    addonInfo = xbmcaddon.Addon().getAddonInfo
-    infoLabel = xbmc.getInfoLabel
-    condVisibility = xbmc.getCondVisibility
-    jsonrpc = xbmc.executeJSONRPC
-    window = xbmcgui.Window(10000)
-    dialog = xbmcgui.Dialog()
-    progressDialog = xbmcgui.DialogProgress()
-    progressDialogBG = xbmcgui.DialogProgressBG()
-    windowDialog = xbmcgui.WindowDialog()
-    button = xbmcgui.ControlButton
-    image = xbmcgui.ControlImage
-    getCurrentDialogId = xbmcgui.getCurrentWindowDialogId()
-    keyboard = xbmc.Keyboard
-    execute = xbmc.executebuiltin
-    skin = xbmc.getSkinDir()
-    player = xbmc.Player()
-    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-    resolve = xbmcplugin.setResolvedUrl
-    openFile = xbmcvfs.File
-    makeFile = xbmcvfs.mkdir
-    deleteFile = xbmcvfs.delete
-    deleteDir = xbmcvfs.rmdir
-    listDir = xbmcvfs.listdir
-    transPath = xbmc.translatePath
-    skinPath = xbmc.translatePath('special://skin/')
-    addonPath = xbmc.translatePath(addonInfo('path'))
-    dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
-
-    settingsFile = os.path.join(dataPath, 'settings.xml')
-    viewsFile = os.path.join(dataPath, 'views.db')
-    bookmarksFile = os.path.join(dataPath, 'bookmarks.db')
-    providercacheFile = os.path.join(dataPath, 'providers.13.db')
-    metacacheFile = os.path.join(dataPath, 'meta.5.db')
-    searchFile = os.path.join(dataPath, 'search.1.db')
-    libcacheFile = os.path.join(dataPath, 'library.db')
-    cacheFile = os.path.join(dataPath, 'cache.db')
-    key = "RgUkXp2s5v8x/A?D(G+KbPeShVmYq3t6"
-    iv = "p2s5v8y/B?E(H+Mb"
-    addonIcon = os.path.join(addonPath, 'icon.png')
+	addonPath = xbmcaddon.Addon().getAddonInfo('path').decode('utf-8')
 except:
-    addonInfo = {}
-    pass
+	addonPath = xbmcaddon.Addon().getAddonInfo('path')
+
+# dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+try:
+	dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+except:
+	dataPath = xbmc.translatePath(addonInfo('profile'))
+
+settingsFile = os.path.join(dataPath, 'settings.xml')
+viewsFile = os.path.join(dataPath, 'views.db')
+bookmarksFile = os.path.join(dataPath, 'bookmarks.db')
+providercacheFile = os.path.join(dataPath, 'providers.13.db')
+metacacheFile = os.path.join(dataPath, 'meta.5.db')
+searchFile = os.path.join(dataPath, 'search.1.db')
+libcacheFile = os.path.join(dataPath, 'library.db')
+cacheFile = os.path.join(dataPath, 'cache.db')
+key = "RgUkXp2s5v8x/A?D(G+KbPeShVmYq3t6"
+iv = "p2s5v8y/B?E(H+Mb"
+addonIcon = os.path.join(addonPath, 'icon.png')
 
 
 def sleep(time):  # Modified `sleep` command that honors a user exit request
-    while time > 0 and not xbmc.abortRequested:
-        xbmc.sleep(min(100, time))
-        time = time - 100
+	while time > 0 and not xbmc.abortRequested:
+		xbmc.sleep(min(100, time))
+		time = time - 100
 
 
 def getKodiVersion():
-    return xbmc.getInfoLabel("System.BuildVersion").split(".")[0]
+	return xbmc.getInfoLabel("System.BuildVersion").split(".")[0]
 
 
 def addonId():
-    return addonInfo('id')
+	return addonInfo('id')
 
 
 def addonName():
-    return addonInfo('name')
+	return addonInfo('name')
 
 
 def version():
-    num = ''
-    try:
-        version = addon('xbmc.addon').getAddonInfo('version')
-    except:
-        version = '999'
-    for i in version:
-        if i.isdigit():
-            num += i
-        else:
-            break
-    return int(num)
+	num = ''
+	try:
+		version = addon('xbmc.addon').getAddonInfo('version')
+	except:
+		version = '999'
+	for i in version:
+		if i.isdigit():
+			num += i
+		else:
+			break
+	return int(num)
 
 
 try:
-    def openSettings(query=None, id=addonInfo('id')):
-        try:
-            idle()
-            execute('Addon.OpenSettings(%s)' % id)
-            if query == None: raise Exception()
-            c, f = query.split('.')
-            if int(getKodiVersion()) >= 18:
-                execute('SetFocus(%i)' % (int(c) - 100))
-                execute('SetFocus(%i)' % (int(f) - 80))
-            else:
-                execute('SetFocus(%i)' % (int(c) + 100))
-                execute('SetFocus(%i)' % (int(f) + 200))
-        except:
-            return
+	def openSettings(query=None, id=addonInfo('id')):
+		try:
+			idle()
+			execute('Addon.OpenSettings(%s)' % id)
+			if query is None:
+				raise Exception()
+			c, f = query.split('.')
+			if int(getKodiVersion()) >= 18:
+				execute('SetFocus(%i)' % (int(c) - 100))
+				execute('SetFocus(%i)' % (int(f) - 80))
+			else:
+				execute('SetFocus(%i)' % (int(c) + 100))
+				execute('SetFocus(%i)' % (int(f) + 200))
+		except:
+			return
 except:
-    pass
+	pass
 
 
 def getCurrentViewId():
-    win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-    return str(win.getFocusId())
+	win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+	return str(win.getFocusId())
 
 
 def refresh():
-    return execute('Container.Refresh')
+	return execute('Container.Refresh')
 
 
 def busy():
-    if int(getKodiVersion()) >= 18:
-        return execute('ActivateWindow(busydialognocancel)')
-    else:
-        return execute('ActivateWindow(busydialog)')
+	if int(getKodiVersion()) >= 18:
+		return execute('ActivateWindow(busydialognocancel)')
+	else:
+		return execute('ActivateWindow(busydialog)')
 
 
 def idle():
-    if int(getKodiVersion()) >= 18:
-        return execute('Dialog.Close(busydialognocancel)')
-    else:
-        return execute('Dialog.Close(busydialog)')
+	if int(getKodiVersion()) >= 18:
+		return execute('Dialog.Close(busydialognocancel)')
+	else:
+		return execute('Dialog.Close(busydialog)')

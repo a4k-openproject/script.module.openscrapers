@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#covenant
+# covenant
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,116 +29,117 @@ from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
 try:
-    import HTMLParser
-    from HTMLParser import HTMLParser
+	import HTMLParser
+	from HTMLParser import HTMLParser
 except:
-    from html.parser import HTMLParser
+	from html.parser import HTMLParser
 try:
-    import urlparse
+	import urlparse
 except:
-    import urllib.parse as urlparse
+	import urllib.parse as urlparse
 try:
-    import urllib2
+	import urllib2
 except:
-    import urllib.request as urllib2
+	import urllib.request as urllib2
 
 
 class source:
-    def __init__(self):
+	def __init__(self):
 
-        self.priority = 1
-        self.language = ['pl']
-        self.domains = ['filmdom.fun']
-        self.base_link = 'https://filmdom.fun'
-        self.search_link = 'https://filmdom.fun/videos/search?q=%s'
+		self.priority = 1
+		self.language = ['pl']
+		self.domains = ['filmdom.fun']
+		self.base_link = 'https://filmdom.fun'
+		self.search_link = 'https://filmdom.fun/videos/search?q=%s'
 
-    def movie(self, imdb, title, localtitle, aliases, year):
-        return self.search(title, localtitle, year)
+	def movie(self, imdb, title, localtitle, aliases, year):
+		return self.search(title, localtitle, year)
 
-    def contains_word(self, str_to_check, word):
-        if str(word).lower() in str(str_to_check).lower():
-            return True
-        return False
+	def contains_word(self, str_to_check, word):
+		if str(word).lower() in str(str_to_check).lower():
+			return True
+		return False
 
-    def contains_all_words(self, str_to_check, words):
-        for word in words:
-            if not self.contains_word(str_to_check, word):
-                return False
-        return True
+	def contains_all_words(self, str_to_check, words):
+		for word in words:
+			if not self.contains_word(str_to_check, word):
+				return False
+		return True
 
-    def search(self, title, localtitle, year):
-        try:
-            titles = []
-            title2 = title.split('.')[0]
-            localtitle2 = localtitle.split('.')[0]
-            titles.append(cleantitle.normalize(cleantitle.getsearch(title2)))
-            titles.append(cleantitle.normalize(cleantitle.getsearch(localtitle2)))
-            titles.append(title2)
-            titles.append(localtitle2)
+	def search(self, title, localtitle, year):
+		try:
+			titles = []
+			title2 = title.split('.')[0]
+			localtitle2 = localtitle.split('.')[0]
+			titles.append(cleantitle.normalize(cleantitle.getsearch(title2)))
+			titles.append(cleantitle.normalize(cleantitle.getsearch(localtitle2)))
+			titles.append(title2)
+			titles.append(localtitle2)
 
-            for title in titles:
-                title = title.replace(" ", "+")
-                result = client.request(self.search_link % title)
+			for title in titles:
+				title = title.replace(" ", "+")
+				result = client.request(self.search_link % title)
 
-                result = client.parseDOM(result, 'div', attrs={'class': 'col-xs-4'})
-                for item in result:
-                    try:
-                        rok = client.parseDOM(item, 'div', attrs={'class': 'col-sm-8'})
-                        rok_nazwa = client.parseDOM(rok, 'p')[0].lower()
-                        link = client.parseDOM(item, 'a', ret='href')[0]
-                        link = self.base_link + link
-                        words = title.lower().split(" ")
-                        if self.contains_all_words(rok_nazwa, words) and year in rok_nazwa:
-                            return link
-                    except:
-                        continue
-            return
-        except:
-            return
+				result = client.parseDOM(result, 'div', attrs={'class': 'col-xs-4'})
+				for item in result:
+					try:
+						rok = client.parseDOM(item, 'div', attrs={'class': 'col-sm-8'})
+						rok_nazwa = client.parseDOM(rok, 'p')[0].lower()
+						link = client.parseDOM(item, 'a', ret='href')[0]
+						link = self.base_link + link
+						words = title.lower().split(" ")
+						if self.contains_all_words(rok_nazwa, words) and year in rok_nazwa:
+							return link
+					except:
+						continue
+			return
+		except:
+			return
 
-    def get_lang_by_type(self, lang_type):
-        if "dubbing" in lang_type.lower():
-            if "kino" in lang_type.lower():
-                return 'pl', 'Dubbing Kino'
-            return 'pl', 'Dubbing'
-        elif 'napisy pl' in lang_type.lower():
-            return 'pl', 'Napisy'
-        elif 'napisy' in lang_type.lower():
-            return 'pl', 'Napisy'
-        elif 'lektor pl' in lang_type.lower():
-            return 'pl', 'Lektor'
-        elif 'lektor' in lang_type.lower():
-            return 'pl', 'Lektor'
-        elif 'POLSKI' in lang_type.lower():
-            return 'pl', None
-        elif 'pl' in lang_type.lower():
-            return 'pl', None
-        return 'en', None
+	def get_lang_by_type(self, lang_type):
+		if "dubbing" in lang_type.lower():
+			if "kino" in lang_type.lower():
+				return 'pl', 'Dubbing Kino'
+			return 'pl', 'Dubbing'
+		elif 'napisy pl' in lang_type.lower():
+			return 'pl', 'Napisy'
+		elif 'napisy' in lang_type.lower():
+			return 'pl', 'Napisy'
+		elif 'lektor pl' in lang_type.lower():
+			return 'pl', 'Lektor'
+		elif 'lektor' in lang_type.lower():
+			return 'pl', 'Lektor'
+		elif 'POLSKI' in lang_type.lower():
+			return 'pl', None
+		elif 'pl' in lang_type.lower():
+			return 'pl', None
+		return 'en', None
 
-    def sources(self, url, hostDict, hostprDict):
+	def sources(self, url, hostDict, hostprDict):
 
-        sources = []
-        try:
-            if url == None: return sources
+		sources = []
+		try:
+			if url is None:
+				return sources
 
-            result = client.request(url)
+			result = client.request(url)
 
-            result = client.parseDOM(result, 'table', attrs={'class': 'table table-striped'})
-            result = client.parseDOM(result, 'tbody')
-            result = client.parseDOM(result, 'tr')
-            for item in result:
-                try:
-                    content = client.parseDOM(item, 'td')
-                    link = client.parseDOM(item, 'a', ret='href')[0]
-                    host = client.parseDOM(item, 'a')[0]
-                    lang, info = self.get_lang_by_type(content[1])
-                    sources.append({'source': host, 'quality': 'SD', 'language': lang, 'url': link, 'info': info,
-                                    'direct': False, 'debridonly': False})
-                except:
-                    continue
-            return sources
-        except:
-            return sources
+			result = client.parseDOM(result, 'table', attrs={'class': 'table table-striped'})
+			result = client.parseDOM(result, 'tbody')
+			result = client.parseDOM(result, 'tr')
+			for item in result:
+				try:
+					content = client.parseDOM(item, 'td')
+					link = client.parseDOM(item, 'a', ret='href')[0]
+					host = client.parseDOM(item, 'a')[0]
+					lang, info = self.get_lang_by_type(content[1])
+					sources.append({'source': host, 'quality': 'SD', 'language': lang, 'url': link, 'info': info,
+					                'direct': False, 'debridonly': False})
+				except:
+					continue
+			return sources
+		except:
+			return sources
 
-    def resolve(self, url):
-        return url
+	def resolve(self, url):
+		return url

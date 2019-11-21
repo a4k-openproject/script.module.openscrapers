@@ -38,28 +38,26 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['myvideolinks.net', 'iwantmyshow.tk', 'new.myvideolinks.net']
+		self.domains = ['myvideolinks.net', 'new.myvideolinks.net']
 		self.base_link = 'http://myvideolinks.net'
-		self.search_link = 'rls/?s=%s'
-
+		# self.search_link = 'rls/?s=%s'
+		self.search_link = '/ups/?s=%s'
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
 			url = urllib.urlencode(url)
 			return url
-		except Exception:
+		except:
 			return
-
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
 			url = urllib.urlencode(url)
 			return url
-		except Exception:
+		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -70,9 +68,8 @@ class source:
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
 			url = urllib.urlencode(url)
 			return url
-		except Exception:
+		except:
 			return
-
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -91,19 +88,15 @@ class source:
 
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-			query = '%s S%02dE%02d' % (
-				data['tvshowtitle'],
-				int(data['season']),
-				int(data['episode'])) if 'tvshowtitle' in data else '%s %s' % (
-				data['title'],
-				data['year'])
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+			query = '%s %s' % (title, hdlr)
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
 			url = urlparse.urljoin(self.base_link, self.search_link)
-			url = url % urllib.quote_plus(query)
+			# url = url % urllib.quote_plus(query)
+			url = url % urllib.quote(query)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
-
 			r = client.parseDOM(r, 'h2')
 
 			# z = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
@@ -141,25 +134,23 @@ class source:
 					items += [(t, i, s) for i in u]
 
 				except:
+					source_utils.scraper_error('MYVIDEOLINK')
 					pass
 
 			for item in items:
 				try:
 					url = item[1]
 
-					# if any(x in url for x in ['.rar', '.zip', '.iso', '.part']):
-						# if any(x in url for x in ['.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', 'gif']):
-
 					url = client.replaceHTMLCodes(url)
 					url = url.encode('utf-8')
 
 					void = ('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')
 					if url.endswith(void):
-						raise Exception()
+						continue
 
 					valid, host = source_utils.is_host_valid(url, hostDict)
 					if not valid:
-						raise Exception()
+						continue
 
 					host = client.replaceHTMLCodes(host)
 					host = host.encode('utf-8')
@@ -167,13 +158,12 @@ class source:
 					name = item[0]
 					name = client.replaceHTMLCodes(name)
 
-					t = re.sub('(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*|3D)(\.|\)|\]|\s|)(.+|)', '', name, flags=re.I)
-					if not cleantitle.get(t) == cleantitle.get(title):
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+					if cleantitle.get(t) != cleantitle.get(title):
 						raise Exception()
 
-					y = re.findall('[\.|\(|\[|\s](\d{4}|S\d*E\d*|S\d*)[\.|\)|\]|\s]', name)[-1].upper()
-					if not y == hdlr:
-						raise Exception()
+					if hdlr not in name:
+						continue
 
 					quality, info = source_utils.get_release_quality(name, url)
 
@@ -188,19 +178,15 @@ class source:
 
 					info = ' | '.join(info)
 
-					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-												'direct': False, 'debridonly': True})
+					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
+					                'info': info, 'direct': False, 'debridonly': True})
 				except:
 					pass
 
-			check = [i for i in sources if not i['quality'] == 'CAM']
-			if check:
-				sources = check
-
 			return sources
 		except:
+			source_utils.scraper_error('MYVIDEOLINK')
 			return sources
-
 
 	def resolve(self, url):
 		return url

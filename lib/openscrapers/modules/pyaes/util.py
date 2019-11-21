@@ -27,39 +27,39 @@
 # ensures the object behaves as we need it to.
 
 def to_bufferable(binary):
-    return binary
+	return binary
 
 
 def _get_byte(c):
-    return ord(c)
+	return ord(c)
 
 
 try:
-    xrange
+	xrange
 except:
 
-    def to_bufferable(binary):
-        if isinstance(binary, bytes):
-            return binary
-        return bytes(ord(b) for b in binary)
+	def to_bufferable(binary):
+		if isinstance(binary, bytes):
+			return binary
+		return bytes(ord(b) for b in binary)
 
 
-    def _get_byte(c):
-        return c
+	def _get_byte(c):
+		return c
 
 
 def append_PKCS7_padding(data):
-    pad = 16 - (len(data) % 16)
-    return data + to_bufferable(chr(pad) * pad)
+	pad = 16 - (len(data) % 16)
+	return data + to_bufferable(chr(pad) * pad)
 
 
 def strip_PKCS7_padding(data):
-    if len(data) % 16 != 0:
-        raise ValueError("invalid length")
+	if len(data) % 16 != 0:
+		raise ValueError("invalid length")
 
-    pad = _get_byte(data[-1])
+	pad = _get_byte(data[-1])
 
-    if not pad or pad > 16:
-        return data
+	if not pad or pad > 16:
+		return data
 
-    return data[:-pad]
+	return data[:-pad]

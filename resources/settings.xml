@@ -193,7 +193,6 @@
         <setting id="provider.serialeco" type="bool" label="SERIALECO" default="false"/>
         <setting id="provider.szukajkatv" type="bool" label="SZUKAJKATV" default="false"/>
 
-
         <setting label="Russian" type="lsep"/>
         <setting label="Disable All Russian Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllRussian&setting=false&query=3.20)"/>
@@ -213,15 +212,12 @@
         <setting label="Enable All Debrid Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&setting=true&query=4.1)"/>
         <setting type="sep"/>
-        <setting id="provider.0day" type="bool" label="$NUMBER[0]DAY" default="true"/>
-        <setting id="provider.2ddl" type="bool" label="$NUMBER[2]DDL" default="true"/>
         <setting id="provider.300mbdownload" type="bool" label="$NUMBER[300]MBDOWNLOAD" default="true"/>
         <setting id="provider.300mbfilms" type="bool" label="$NUMBER[300]MBFILMS" default="true"/>
         <setting id="provider.ddlspot" type="bool" label="DDLSPOT" default="true"/>
-        <setting id="provider.directdl" type="bool" label="DIRECTDL" default="true"/>
         <setting id="provider.ganool" type="bool" label="GANOOL" default="true"/>
+        <setting id="provider.ganool2" type="bool" label="GANOOL2" default="false"/>
         <setting id="provider.maxrls" type="bool" label="MAXRLS" default="true"/>
-        <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
         <setting id="provider.mkvhub" type="bool" label="MKVHUB" default="true"/>
         <setting id="provider.mvrls" type="bool" label="MVRLS" default="true"/>
         <setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="true"/>
@@ -233,6 +229,7 @@
         <setting id="provider.ultrahdindir" type="bool" label="ULTRAHDINDIR" default="true"/>
     </category>
 
+
     <!-- Torrents-5 -->
     <category label="Torrent (cached)">
         <setting label="Disable All Torrent Providers" type="action" option="close"
@@ -240,27 +237,25 @@
         <setting label="Enable All Torrent Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=true&query=5.1)"/>
 		<setting id="torrent.enabled" type="bool" label="Enable Torrent Scrapers" default="true" visible = "false" />
-		<!-- <setting id="torrent.min.seeders" type="slider" label="Minimum Seeders" default="1" range="1,100" option="int"/> -->
         <setting type="sep"/>
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="true"/>
         <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
         <setting id="provider.btscene" type="bool" label="BTSCENE" default="true"/>
-        <setting id="provider.digbt" type="bool" label="DIGBT" default="false"/>
         <setting id="provider.doublr" type="bool" label="DOUBLR" default="true"/>
         <setting id="provider.eztv" type="bool" label="EZTV" default="true"/>
         <setting id="provider.glodls" type="bool" label="GLODLS" default="true"/>
         <setting id="provider.kickass2" type="bool" label="KICKASS2" default="true"/>
         <setting id="provider.limetorrents" type="bool" label="LIMETORRENTS" default="true"/>
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true"/>
+        <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true"/>
-        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="false"/>
+        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="true"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
         <setting id="provider.torrentgalaxy" type="bool" label="TORRENTGALAXY" default="true"/>
         <setting id="provider.torrentquest" type="bool" label="TORRENTQUEST" default="true"/>
-        <setting id="provider.yify" type="bool" label="YIFY" default="true"/>
         <setting id="provider.yifyddl" type="bool" label="YIFYDDL" default="true"/>
-        <setting id="provider.ytsam" type="bool" label="YTSAM" default="false"/>
+        <setting id="provider.yts" type="bool" label="YTS" default="true"/>
         <setting id="provider.zoogle" type="bool" label="ZOOGLE" default="true"/>
     </category>
 
