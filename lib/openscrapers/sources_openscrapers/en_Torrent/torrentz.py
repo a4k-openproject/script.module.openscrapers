@@ -32,18 +32,15 @@ from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
 
 
 class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['btdb.eu']
-		self.base_link = 'https://btdb.eu/'
-		# self.search_link = '?search=%s'
-		self.search_link = '/?s=%s'
-		self.scraper = cfscrape.create_scraper()
+		self.domains = ['torrentz2.eu']
+		self.base_link = 'https://torrentz2.eu'
+		self.search_link = '/search?f=%s'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -78,9 +75,8 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
-
 			if url is None:
 				return sources
 
@@ -103,26 +99,24 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			try:
-				r = self.scraper.get(url).content
-				posts = client.parseDOM(r, 'li')
+				r = client.request(url)
+
+				posts = client.parseDOM(r, 'div', attrs={'class': 'results'})[0]
+				posts = client.parseDOM(posts, 'dl')
 
 				for post in posts:
-					link = re.findall('a title="Download using magnet" href="(magnet:.+?)"', post, re.DOTALL)
+					links = re.findall('<dt><a href=/(.+)</a>', post, re.DOTALL)
 
-					for url in link:
-						url = url.split('&tr')[0]
+					for link in links:
+						magnet = link.split('</a>')[0]
+						hash = 'magnet:?xt=urn:btih:' + magnet.split('>')[0]
+						dn = '&dn=' + magnet.split('>')[1]
+						url = hash + dn
 
 						if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 							continue
 
 						name = url.split('&dn=')[1]
-
-						if name.startswith('www.'):
-							try:
-								name = name.split(' - ')[1].lstrip()
-							except:
-								name = re.sub(r'\www..+? ', '', name)
-
 						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 						if cleantitle.get(t) != cleantitle.get(title):
 							continue
@@ -130,7 +124,7 @@ class source:
 						if hdlr not in name:
 							continue
 
-						quality, info = source_utils.get_release_quality(url)
+						quality, info = source_utils.get_release_quality(name, url)
 
 						try:
 							size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
@@ -144,15 +138,16 @@ class source:
 						info = ' | '.join(info)
 
 						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True})
+
+				return sources
+
 			except:
-				source_utils.scraper_error('BTDB')
+				source_utils.scraper_error('TORRENTZ')
 				return
 
-			return sources
-
 		except:
-			source_utils.scraper_error('BTDB')
+			source_utils.scraper_error('TORRENTZ')
 			return sources
 
 

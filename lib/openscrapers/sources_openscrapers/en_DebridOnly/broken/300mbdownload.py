@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
-# Created by Tempest
+# -*- coding: utf-8 -*-
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -30,7 +28,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -41,10 +38,10 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['invictus.ws', 'twoddl.net', '2ddl.vg']
-		self.base_link = 'https://2ddl.vg'
-		self.search_link = '/?s=%s'
-		self.scraper = cfscrape.create_scraper()
+		self.domains = ['300mbdownload.mobi']
+		self.base_link = 'https://www.300mbdownload.mobi'
+		self.search_link = '/search/%s/feed/rss2/'
+	# self.search_link = '/?s=%s' #rss2 seems down in which a re-write to parse will be needed
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -66,6 +63,7 @@ class source:
 		try:
 			if url is None:
 				return
+
 			url = urlparse.parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -90,77 +88,85 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-			query = '%s S%02dE%02d' % (title, int(data['season']), int(data['episode'])) \
-				if 'tvshowtitle' in data else '%s %s' % (title, data['year'])
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+			query = '%s %s' % (title, hdlr)
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
 			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url).replace('-', '+')
+			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = self.scraper.get(url).content
-			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
+			html = client.request(url)
 
-			if r is None and 'tvshowtitle' in data:
-				season = re.search('S(.*?)E', hdlr)
-				season = season.group(1)
-				url = title
-				r = self.scraper.get(url).content
+			posts = client.parseDOM(html, 'item')
 
-			for loopCount in range(0, 2):
-				if loopCount == 1 or (r is None and 'tvshowtitle' in data):
-					r = self.scraper.get(url).content
-				posts = client.parseDOM(r, "div", attrs={"class": "postpage_movie_download"})
-
-				items = []
-				for post in posts:
-					try:
-						tit = client.parseDOM(post, "a")[0]
-						t = tit.split(hdlr)[0].replace('(', '')
-
-						if cleantitle.get(t) != cleantitle.get(title):
-							continue
-
-						if hdlr not in tit:
-							continue
-
-						u = client.parseDOM(post, 'a', ret='href')
-
-						for i in u:
-							name = str(i)
-							items.append(name)
-					except:
-						pass
-				if len(items) > 0:
-					break
+			items = []
+			for post in posts:
+				try:
+					t = client.parseDOM(post, 'title')[0]
+					u = client.parseDOM(post, 'a', ret='href')
+					s = re.search('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', post)
+					s = s.groups()[0] if s else '0'
+					items += [(t, i, s) for i in u]
+				except:
+					source_utils.scraper_error('300MBDOWNLOAD')
+					pass
 
 			for item in items:
 				try:
-					i = str(item)
-					r = self.scraper.get(i).content
-					u = client.parseDOM(r, "div", attrs={"class": "multilink_lnks"})
-					for t in u:
-						r = client.parseDOM(t, 'a', ret='href')
-						for url in r:
-							if 'www.share-online.biz' in url:
-								continue
-							if url in str(sources):
-								continue
-							quality, info = source_utils.get_release_quality(url, url)
+					name = item[0]
+					name = client.replaceHTMLCodes(name)
 
-							valid, host = source_utils.is_host_valid(url, hostDict)
-							if valid:
-								sources.append(
-									{'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-									 'direct': False, 'debridonly': True})
+					t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '')
+					if cleantitle.get(t) != cleantitle.get(title):
+						continue
+
+					if self.hdlr not in name:
+						continue
+
+					url = item[1]
+					if any(x in url for x in ['.rar', '.zip', '.iso']):
+						continue
+
+					url = client.replaceHTMLCodes(url)
+					url = url.encode('utf-8')
+
+					if url in str(sources):
+						continue
+
+					valid, host = source_utils.is_host_valid(url, hostDict)
+					if not valid:
+						continue
+
+					host = client.replaceHTMLCodes(host)
+					host = host.encode('utf-8')
+
+					quality, info = source_utils.get_release_quality(name, url)
+
+					try:
+						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', item[2])[-1]
+						div = 1 if size.endswith(('GB', 'GiB')) else 1024
+						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+						size = '%.2f GB' % size
+						info.append(size)
+					except:
+						pass
+
+					fileType = source_utils.getFileType(name)
+					info.append(fileType)
+					info = ' | '.join(info) if fileType else info[0]
+
+					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
+					                'info': info, 'direct': False, 'debridonly': True})
 				except:
+					source_utils.scraper_error('300MBDOWNLOAD')
 					pass
+
 			return sources
 		except:
-			return sources
+			source_utils.scraper_error('300MBDOWNLOAD')
+			return
 
 	def resolve(self, url):
 		return url

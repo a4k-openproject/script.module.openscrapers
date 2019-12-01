@@ -41,8 +41,8 @@ class source:
 		self.domains = ['300mbfilms.io', '300mbfilms.co']
 		self.base_link = 'https://www.300mbfilms.io'
 		self.search_link = '/?s=%s'
+		# self.search_link = '/search/%s/feed/rss2/'
 
-	# self.search_link = '/search/%s/feed/rss2/'
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -52,6 +52,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,6 +60,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -71,6 +73,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -88,6 +91,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -108,8 +113,7 @@ class source:
 
 				try:
 					tit = client.parseDOM(item, "a")[0]
-					t = tit.split(hdlr)[0].replace('(', '')
-
+					t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -119,8 +123,7 @@ class source:
 					quality, info = source_utils.get_release_quality(tit, item[0])
 
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item)[
-							0]
+						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item)[0]
 						div = 1 if size.endswith(('GB', 'GiB', 'Gb')) else 1024
 						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
 						size = '%.2f GB' % size
@@ -166,14 +169,13 @@ class source:
 				host = client.replaceHTMLCodes(host)
 				host = host.encode('utf-8')
 
-				sources.append(
-					{'source': host, 'quality': item[1], 'language': 'en', 'url': url, 'info': item[2], 'direct': False,
-					 'debridonly': True})
+				sources.append({'source': host, 'quality': item[1], 'language': 'en', 'url': url, 'info': item[2], 'direct': False, 'debridonly': True})
 			return sources
 
 		except:
 			source_utils.scraper_error('300MBFILMS')
 			return sources
+
 
 	def links(self, url):
 		urls = []
@@ -192,7 +194,7 @@ class source:
 				r = client.parseDOM(r, 'div', attrs={'id': 'post-\d+'})[0]
 
 				if 'enter the password' in r:
-					plink = client.parseDOM(r, 'form', ret='action')[0]
+					plink= client.parseDOM(r, 'form', ret='action')[0]
 					post = {'post_password': '300mbfilms', 'Submit': 'Submit'}
 					send_post = client.request(plink, post=post, output='cookie')
 					link = client.request(r1, cookie=send_post)
@@ -214,6 +216,7 @@ class source:
 		except:
 			source_utils.scraper_error('300MBFILMS')
 			pass
+
 
 	def resolve(self, url):
 		return url

@@ -42,6 +42,7 @@ class source:
 		self.base_link = 'https://www.mkvcage.site'
 		self.search_link = '/?s=%s'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -49,6 +50,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
@@ -58,9 +60,11 @@ class source:
 		except:
 			return
 
+
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if url is None: return
+			if url is None:
+				return
 			url = urlparse.parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -68,6 +72,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
@@ -82,12 +87,13 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.year = data['year']
 
-			query = '%s S%02dE%02d' % (title, int(data['season']), int(data['episode'])) \
-				if 'tvshowtitle' in data else '%s %s' % (title, data['year'])
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
+			query = '%s %s' % (title, hdlr)
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
@@ -102,8 +108,7 @@ class source:
 					data = client.parseDOM(post, 'a', ret='href')
 
 					tit = client.parseDOM(post, 'a')[0].replace('Download ', '')
-					t = tit.split(hdlr)[0].replace('(', '')
-
+					t = tit.split(hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -117,10 +122,8 @@ class source:
 						for i in r:
 							if 'buttn magnet' not in i:
 								continue
-
 							# link = client.parseDOM(i, 'a', ret='href', attrs={'class': 'buttn magnet'})[0] #random drops with this
 							link = re.findall('a class="buttn magnet" href="(.+?)"', i, re.DOTALL)[0]
-							# log_utils.log('magnet link = %s' % link, log_utils.LOGDEBUG)
 
 							# # for another day to fetch torrent link from form data, seems like junk though
 							# btorrent = client.parseDOM(i, 'a', ret='href', attrs={'class': 'buttn torrent'})[0]
@@ -132,39 +135,40 @@ class source:
 							# p_data = requests.post(btorrent, data=post)
 							# response = p_data.content
 							# torrent = re.findall('a href="(.+?)"', response, re.DOTALL)[4]
-							# # log_utils.log('torrent link = %s' % torrent, log_utils.LOGDEBUG)
+							# log_utils.log('torrent link = %s' % torrent, log_utils.LOGDEBUG)
 
-							# <a class="buttn watch" href="https://ylink.bid/watchonline" target="_blank" rel="noopener noreferrer">Watch Online</a>
-							# <a class="buttn blue" href="https://l.ylink.bid/index.php?ID=759s341illy" target="_blank" rel="noopener noreferrer">Download Links</a>
-							# <a class="buttn magnet" href="magnet:?xt=urn:btih:9BC72CEF74E3BD56D46509B35B621113FE10EB86" target="_blank" rel="noopener noreferrer">Magnet</a>
-							# <a class="buttn torrent" href="https://l.ylink.bid/index.php?ID=604lessy74" target="_blank" rel="noopener noreferrer">Torrent</a>
-							# linksPassword = 'mkvcage'
+			# <a class="buttn watch" href="https://ylink.bid/watchonline" target="_blank" rel="noopener noreferrer">Watch Online</a>
+			# <a class="buttn blue" href="https://l.ylink.bid/index.php?ID=759s341illy" target="_blank" rel="noopener noreferrer">Download Links</a>
+			# <a class="buttn magnet" href="magnet:?xt=urn:btih:9BC72CEF74E3BD56D46509B35B621113FE10EB86" target="_blank" rel="noopener noreferrer">Magnet</a>
+			# <a class="buttn torrent" href="https://l.ylink.bid/index.php?ID=604lessy74" target="_blank" rel="noopener noreferrer">Torrent</a>
+			# linksPassword = 'mkvcage'
 
 							quality, info = source_utils.get_release_quality(u)
+
 							try:
-								size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:gb|gib|mb|mib))', str(data))[-1]
-								div = 1 if size.endswith(('gb')) else 1024
-								size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-								size = '%.2f gb' % size
+								size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', tit)[-1]
+								div = 1 if size.endswith('GB') else 1024
+								size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+								size = '%.2f GB' % size
 								info.append(size)
 							except:
 								pass
+
 							info = ' | '.join(info)
 
-							sources.append(
-								{'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
-								 'direct': False, 'debridonly': True})
+							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+														'direct': False, 'debridonly': True})
 
+				return sources
 
 			except:
 				source_utils.scraper_error('MKVCAGE')
 				pass
 
-			return sources
-
 		except:
 			source_utils.scraper_error('MKVCAGE')
 			return sources
+
 
 	def resolve(self, url):
 		return url

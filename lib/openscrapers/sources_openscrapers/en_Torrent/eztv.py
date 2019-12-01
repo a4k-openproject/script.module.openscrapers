@@ -43,6 +43,7 @@ class source:
 		self.search_link = '/search/%s'
 		self.min_seeders = 1
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -50,6 +51,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -62,6 +64,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -76,7 +79,8 @@ class source:
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			title = data['tvshowtitle']
+			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
 
 			query = '%s %s' % (title, hdlr)
@@ -111,15 +115,14 @@ class source:
 						continue
 
 					url = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
+					url = urllib.unquote(url).decode('utf8')
 
-					# altered to allow multi-lingual audio tracks
-					if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 						continue
 
 					name = derka[1]
 
-					# some shows like "Power" have year and hdlr in name
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -148,7 +151,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-					                'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True})
 				except:
 					source_utils.scraper_error('EZTV')
 					continue
@@ -158,6 +161,7 @@ class source:
 		except:
 			source_utils.scraper_error('EZTV')
 			return sources
+
 
 	def resolve(self, url):
 		return url

@@ -39,10 +39,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentdownloads.me']
-		self.base_link = 'https://www.torrentdownloads.me'
+		self.domains = ['torrentdownloads.me', 'torrentsdl1.unblocked.lol']
+		self.base_link = 'https://torrentsdl1.unblocked.to/'
 		self.search = 'https://www.torrentdownloads.me/rss.xml?new=1&type=search&cid={0}&search={1}'
 		self.min_seeders = 1
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -52,6 +53,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,6 +61,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -71,6 +74,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -86,8 +90,9 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-				'year']
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -114,21 +119,22 @@ class source:
 			source_utils.scraper_error('TORRENTDOWNLOADS')
 			return self._sources
 
+
 	def _get_items(self, r):
 		try:
 			size = re.search(r'<size>([\d]+)</size>', r).groups()[0]
 			seeders = re.search(r'<seeders>([\d]+)</seeders>', r).groups()[0]
+
 			_hash = re.search(r'<info_hash>([a-zA-Z0-9]+)</info_hash>', r).groups()[0]
 			name = re.search(r'<title>(.+?)</title>', r).groups()[0]
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (_hash.upper(), urllib.quote_plus(name))
 
-			# altered to allow multi-lingual audio tracks
-			if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
-				return
+			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+					continue
 
-			# some shows like "Power" have year and hdlr in name
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '')
+			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
+			t = name.split(self.hdlr)[0]
 			if cleantitle.get(t) != cleantitle.get(self.title):
 				return
 
@@ -149,10 +155,11 @@ class source:
 
 			if seeders > self.min_seeders:
 				self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-				                      'info': info, 'direct': False, 'debridonly': True})
+													'info': info, 'direct': False, 'debridonly': True})
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOADS')
 			pass
+
 
 	def resolve(self, url):
 		return url

@@ -38,10 +38,12 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
-		self.domains = ['yts.am', 'yts.lt']  # Old yts.ag
+		self.domains = ['yts.lt', 'yts.am']  # Old yts.ag
 		self.base_link = 'https://yts.lt'
 		self.search_link = '/browse-movies/%s/all/all/0/latest'
+		# self.search_link = '/movie/%s'
 		self.min_seeders = 1
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -50,6 +52,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -64,7 +67,7 @@ class source:
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			title = data['title']
+			title = data['title'].replace('&', 'and')
 			hdlr = data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -90,17 +93,15 @@ class source:
 			for entry in items:
 				try:
 					try:
-						link, name = \
-						re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
+						link, name = re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name)
 					except:
 						continue
 
-					# altered to allow multi-lingual audio tracks
-					if any(x in link.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+					if any(x in link.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 						continue
 
-					t = name.split(hdlr)[0]
+					t = name.split(hdlr)[0].replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -136,7 +137,7 @@ class source:
 							info = ' | '.join(info)
 
 							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link,
-							                'info': info, 'direct': False, 'debridonly': True})
+														'info': info, 'direct': False, 'debridonly': True})
 					except:
 						source_utils.scraper_error('YTS')
 						continue
@@ -149,6 +150,7 @@ class source:
 		except:
 			source_utils.scraper_error('YTS')
 			return sources
+
 
 	def resolve(self, url):
 		return url

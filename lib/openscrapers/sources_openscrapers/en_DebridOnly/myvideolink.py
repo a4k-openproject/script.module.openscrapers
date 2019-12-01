@@ -39,9 +39,12 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domains = ['myvideolinks.net', 'new.myvideolinks.net']
-		self.base_link = 'http://myvideolinks.net'
+		# self.base_link = 'http://myvideolinks.net'
+		self.base_link = 'http://search.myvideolinks.net/'
 		# self.search_link = 'rls/?s=%s'
-		self.search_link = '/ups/?s=%s'
+		# self.search_link = '/ups/?s=%s'
+		self.search_link = '?s=%s'
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -51,6 +54,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -58,6 +62,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -71,6 +76,7 @@ class source:
 		except:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
@@ -79,12 +85,13 @@ class source:
 				return sources
 
 			if debrid.status() is False:
-				raise Exception()
+				return sources
 
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
@@ -158,9 +165,9 @@ class source:
 					name = item[0]
 					name = client.replaceHTMLCodes(name)
 
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
-						raise Exception()
+						continue
 
 					if hdlr not in name:
 						continue
@@ -179,14 +186,16 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
-					                'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True})
 				except:
+					source_utils.scraper_error('MYVIDEOLINK')
 					pass
 
 			return sources
 		except:
 			source_utils.scraper_error('MYVIDEOLINK')
 			return sources
+
 
 	def resolve(self, url):
 		return url
