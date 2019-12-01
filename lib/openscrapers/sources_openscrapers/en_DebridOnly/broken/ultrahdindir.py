@@ -28,11 +28,10 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
+from openscrapers.modules import dom_parser  # switch to client.parseDOM() to rid import
 from openscrapers.modules import source_utils
-from openscrapers.modules import dom_parser                # switch to client.parseDOM() to rid import
 
 
 class source:

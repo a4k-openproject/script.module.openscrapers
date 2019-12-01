@@ -24,11 +24,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 import re
+import time
 import urllib
 import urlparse
-import time
-import json
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client

@@ -12,8 +12,8 @@
 import re
 import urllib
 import urlparse
-import requests
 
+import requests
 
 # from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils

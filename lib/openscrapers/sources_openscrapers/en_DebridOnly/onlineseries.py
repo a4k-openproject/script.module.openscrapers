@@ -25,16 +25,16 @@
 '''
 
 import re
+import time
 import urllib
 import urlparse
-import time
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
+from openscrapers.modules import dom_parser  # switch to client.parseDOM() to rid import
 from openscrapers.modules import source_utils
 from openscrapers.modules import workers
-from openscrapers.modules import dom_parser                # switch to client.parseDOM() to rid import
 
 
 class source:
