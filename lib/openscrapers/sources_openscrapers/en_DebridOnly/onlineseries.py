@@ -45,6 +45,7 @@ class source:
 		self.base_link = 'https://onlineseries.ucoz.com'
 		self.search_link = 'search/?q=%s'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		self.aliases = [cleantitle.get(i['title']) for i in aliases]
 		try:
@@ -54,6 +55,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		self.aliases = [cleantitle.get(i['title']) for i in aliases]
 		try:
@@ -62,6 +64,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -74,6 +77,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -91,8 +95,9 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-				'year']
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -105,10 +110,11 @@ class source:
 			r = client.request(url)
 
 			# switch to client.parseDOM() to rid import
-			posts = dom_parser.parse_dom(r, 'div', {'class': 'eTitle'})
+			posts = dom_parser.parse_dom(r, 'div', {'class':'eTitle'})
 			posts = [dom_parser.parse_dom(i.content, 'a', req='href') for i in posts if i]
 			posts = [(i[0].attrs['href'], re.sub('<.+?>', '', i[0].content)) for i in posts if i]
 			posts = [[i[0], i[1]] for i in posts]
+
 
 			threads = []
 			for i in posts:
@@ -125,6 +131,7 @@ class source:
 			source_utils.scraper_error('ONLINESERIES')
 			return self._sources
 
+
 	def _get_sources(self, url):
 		try:
 			item = client.request(url[0])
@@ -136,7 +143,7 @@ class source:
 			self.title = self.title.replace('!', '')
 
 			# some shows like "Power" have year and hdlr in name
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '')
+			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
 			tc = cleantitle.get(t)
 			if tc != cleantitle.get(self.title):
 				try:
@@ -153,6 +160,7 @@ class source:
 			links = dom_parser.parse_dom(item, 'a', req='href')
 			links = [i.attrs['href'] for i in links]
 
+
 			info = []
 			try:
 				size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', item)[0]
@@ -166,8 +174,7 @@ class source:
 			info = ' | '.join(info)
 
 			for url in links:
-				if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(
-						url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
+				if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
 					continue
 
 				if any(x in url.lower() for x in ['youtube', 'sample', 'trailer']):
@@ -186,11 +193,12 @@ class source:
 					continue
 
 				self._sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
-				                      'info': info, 'direct': False, 'debridonly': True})
+														'info': info, 'direct': False, 'debridonly': True})
 
 		except:
 			source_utils.scraper_error('ONLINESERIES')
 			pass
+
 
 	def resolve(self, url):
 		return url

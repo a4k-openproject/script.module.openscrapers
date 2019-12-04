@@ -35,70 +35,72 @@ from openscrapers.modules import source_utils
 
 
 class source:
-	def __init__(self):
-		self.priority = 1
-		self.language = ['en']
-		self.domains = ['123movie.nu', 'ganool.ws', 'ganol.si', 'ganool123.com']
-		self.base_link = 'https://123movie.nu'
-		self.search_link = '/search/?q=%s'
-		self.scraper = cfscrape.create_scraper()
+    def __init__(self):
+        self.priority = 1
+        self.language = ['en']
+        self.domains = ['123movie.nu', 'ganool.ws', 'ganol.si', 'ganool123.com']
+        self.base_link = 'https://123movie.nu'
+        self.search_link = '/search/?q=%s'
+        self.scraper = cfscrape.create_scraper()
 
-	def movie(self, imdb, title, localtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
-			return url
-		except:
-			return
 
-	def sources(self, url, hostDict, hostprDict):
-		sources = []
-		try:
-			if url is None:
-				return sources
+    def movie(self, imdb, title, localtitle, aliases, year):
+        try:
+            url = {'imdb': imdb, 'title': title, 'year': year}
+            url = urllib.urlencode(url)
+            return url
+        except:
+            return
 
-			if debrid.status() is False:
-				raise Exception()
 
-			data = urlparse.parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+    def sources(self, url, hostDict, hostprDict):
+        sources = []
+        try:
+            if url is None:
+                return sources
 
-			q = '%s' % cleantitle.get_gan_url(data['title'])
+            if debrid.status() is False:
+                return sources
 
-			url = self.base_link + self.search_link % q
+            data = urlparse.parse_qs(url)
+            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			r = self.scraper.get(url).content
+            q = '%s' % cleantitle.get_gan_url(data['title'])
 
-			v = re.compile(
-				'<a href="(.+?)" class="ml-mask jt" title="(.+?)">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=".+?">(.+?)</span>').findall(
-				r)
+            url = self.base_link + self.search_link % q
 
-			for url, check, quality in v:
-				t = '%s (%s)' % (data['title'], data['year'])
+            r = self.scraper.get(url).content
 
-				if t not in check:
-					raise Exception()
+            v = re.compile(
+                '<a href="(.+?)" class="ml-mask jt" title="(.+?)">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=".+?">(.+?)</span>').findall(
+                r)
 
-				key = url.split('-hd')[1]
+            for url, check, quality in v:
+                t = '%s (%s)' % (data['title'], data['year'])
 
-				r = self.scraper.get('https://ganool.ws/moviedownload.php?q=' + key).content
-				r = re.compile('<a rel=".+?" href="(.+?)" target=".+?">').findall(r)
+                if t not in check:
+                    raise Exception()
 
-				for url in r:
-					if any(x in url for x in ['.rar']):
-						continue
+                key = url.split('-hd')[1]
 
-					quality = source_utils.check_url(quality)
+                r = self.scraper.get('https://ganool.ws/moviedownload.php?q=' + key).content
+                r = re.compile('<a rel=".+?" href="(.+?)" target=".+?">').findall(r)
 
-					valid, host = source_utils.is_host_valid(url, hostDict)
-					if not valid:
-						continue
+                for url in r:
+                    if any(x in url for x in ['.rar']):
+                        continue
 
-					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-					                'debridonly': True})
-			return sources
-		except:
-			return sources
+                    quality = source_utils.check_url(quality)
 
-	def resolve(self, url):
-		return url
+                    valid, host = source_utils.is_host_valid(url, hostDict)
+                    if not valid:
+                        continue
+
+                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+                                    'debridonly': True})
+            return sources
+        except:
+            return sources
+
+    def resolve(self, url):
+        return url

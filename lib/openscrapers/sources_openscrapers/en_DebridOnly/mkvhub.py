@@ -43,6 +43,7 @@ class source:
 		# self.search_link = '/search/%s/feed/rss2/'
 		self.search_link = '/?s=%s'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,6 +52,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -58,6 +60,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -71,6 +74,7 @@ class source:
 		except:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			self._sources = []
@@ -78,15 +82,12 @@ class source:
 			if url is None:
 				return self._sources
 
-			# if debrid.status() is False:
-			# return self._sources
-
-			# hostDict = hostprDict + hostDict
-
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02d' % (int(data['season'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -105,7 +106,7 @@ class source:
 				try:
 					tit = client.parseDOM(post, 'img', ret='title')[0]
 					tit = client.replaceHTMLCodes(tit)
-					t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+					t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -131,14 +132,15 @@ class source:
 			source_utils.scraper_error('MKVHUB')
 			return self._sources
 
+
 	def _get_sources(self, url, name, hostDict, hostprDict):
 		try:
 			urls = []
 			result = client.request(url)
 
 			urls = [(client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn watch'})[0],
-			         client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn blue'})[0],
-			         client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn magnet'})[0])]
+						client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn blue'})[0],
+						client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn magnet'})[0])]
 
 			# '''<a class="dbuttn watch" href="https://www.linkomark.xyz/view/EnWNqSNeLw" target="_blank" rel="nofollow noopener">Watch Online Links</a>
 			# <a class="dbuttn blue" href="https://www.linkomark.xyz/view/3-Gjyz5Q2R" target="_blank" rel="nofollow noopener">Get Download Links</a> 
@@ -159,9 +161,9 @@ class source:
 			info.append(fileType)
 			info = ' | '.join(info) if fileType else info[0]
 
-		# Debrid_info = info.append(fileType)
-		# Debrid_info = ' | '.join(info) if fileType else info[0]
-		# Torrent_info = ' | '.join(info)
+			# Debrid_info = info.append(fileType)
+			# Debrid_info = ' | '.join(info) if fileType else info[0]
+			# Torrent_info = ' | '.join(info)
 
 		except:
 			source_utils.scraper_error('MKVHUB')
@@ -177,7 +179,7 @@ class source:
 					# info = Debrid_info
 					p_link = client.parseDOM(r, 'link', attrs={'rel': 'canonical'}, ret='href')[0]
 
-					# <input type="hidden" name="_csrf_token_" value=""/>
+					#<input type="hidden" name="_csrf_token_" value=""/>
 					input_name = client.parseDOM(r, 'input', ret='name')[0]
 					input_value = client.parseDOM(r, 'input', ret='value')[0]
 
@@ -203,10 +205,10 @@ class source:
 
 						if rd:
 							self._sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': i,
-							                      'info': info, 'direct': False, 'debridonly': True})
+																	'info': info, 'direct': False, 'debridonly': True})
 						else:
 							self._sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': i,
-							                      'info': info, 'direct': False, 'debridonly': False})
+																	'info': info, 'direct': False, 'debridonly': False})
 
 				elif 'torrent' in url:
 					# info = Torrent_info
@@ -216,11 +218,12 @@ class source:
 					url = url.split('&tr')[0]
 
 					self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-					                      'info': info, 'direct': False, 'debridonly': True})
+															'info': info, 'direct': False, 'debridonly': True})
 
 			except:
 				source_utils.scraper_error('MKVHUB')
 				pass
+
 
 	def resolve(self, url):
 		return url

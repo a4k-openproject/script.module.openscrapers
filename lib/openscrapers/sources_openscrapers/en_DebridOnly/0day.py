@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
-# Created by Tempest
+# -*- coding: utf-8 -*-
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -26,12 +24,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -41,9 +38,11 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['max-rls.com']
-        self.base_link = 'http://max-rls.com'
-        self.search_link = '/?s=%s&submit=Find'
+        self.domains = ['0daywarez.us', '0dayddl.xyz', '0dayddl.com']
+        # self.base_link = 'https://0daywarez.us'
+        self.base_link = 'https://0dayreleases.com'
+        self.search_link = '/?s=%s'
+        self.scraper = cfscrape.create_scraper()
 
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -80,7 +79,6 @@ class source:
     def sources(self, url, hostDict, hostprDict):
         try:
             sources = []
-
             if url is None:
                 return sources
 
@@ -95,25 +93,26 @@ class source:
 
             hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-            query = '%s %s' % (title, hdlr)
-            query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+            query = '%s S%02dE%02d' % (data['tvshowtitle'], int(data['season']), int(data['episode'])) \
+                    if 'tvshowtitle' in data else '%s %s' % (data['title'], data['year'])
 
             url = self.search_link % urllib.quote_plus(query)
-            url = urlparse.urljoin(self.base_link, url).replace('%3A+', '+')
-            # log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+            url = urlparse.urljoin(self.base_link, url).replace('-', '+')
 
-            r = client.request(url)
+            r = self.scraper.get(url).content
 
             if r is None and 'tvshowtitle' in data:
                 season = re.search('S(.*?)E', hdlr)
                 season = season.group(1)
                 url = title
-                r = client.request(url)
+                r = self.scraper.get(url).content
 
-            for loopCount in range(0, 2):
+            for loopCount in range(0,2):
                 if loopCount == 1 or (r is None and 'tvshowtitle' in data):
-                    r = client.request(url)
-                posts = client.parseDOM(r, "h2", attrs={"class": "postTitle"})
+                    r = self.scraper.get(url).content
+
+                posts = client.parseDOM(r, "h2")
+
                 hostDict = hostprDict + hostDict
 
                 items = []
@@ -121,49 +120,53 @@ class source:
                     try:
                         u = client.parseDOM(post, 'a', ret='href')
                         for i in u:
-                            name = str(i)
-                            items.append(name)
-
-                            tit = name.rsplit('/', 1)[0]
-                            tit = tit.rsplit('/', 1)[1].upper()
-                            t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-                            if cleantitle.get(t) != cleantitle.get(title):
-                                continue
+                            try:
+                                name = str(i)
+                                items.append(name)
+                            except:
+                                source_utils.scraper_error('0DAY')
+                                pass
                     except:
-                        source_utils.scraper_error('MAXRLS')
+                        source_utils.scraper_error('0DAY')
                         pass
+
                 if len(items) > 0:
                     break
 
             for item in items:
                 try:
+                    info = []
                     i = str(item)
-                    r = client.request(i)
-                    u = client.parseDOM(r, "div", attrs={"class": "postContent"})
+                    r = self.scraper.get(i).content
+                    u = client.parseDOM(r, "div", attrs={"class": "entry-content"})
 
                     for t in u:
-                        r = client.parseDOM(t, 'a', ret='href')
+                        r = re.compile('a href="(.+?)">.+?<').findall(t)
+                        query = query.replace(' ', '.')
 
                         for url in r:
+
+                            if not query in url:
+                                continue
+
+                            if any(x in url for x in ['.rar', '.zip', '.iso']):
+                                continue
+
                             quality, info = source_utils.get_release_quality(url)
 
                             valid, host = source_utils.is_host_valid(url, hostDict)
-                            if not valid:
-                                continue
 
                             sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+
                 except:
-                    source_utils.scraper_error('MAXRLS')
+                    source_utils.scraper_error('0DAY')
                     pass
 
             return sources
-
         except:
-            source_utils.scraper_error('MAXRLS')
+            source_utils.scraper_error('0DAY')
             return sources
 
 
     def resolve(self, url):
         return url
-
-

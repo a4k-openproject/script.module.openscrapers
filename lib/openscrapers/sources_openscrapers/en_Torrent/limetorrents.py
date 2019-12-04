@@ -44,6 +44,7 @@ class source:
 		self.tvsearch = 'https://www.limetorrents.info/search/tv/{0}/1/'
 		self.moviesearch = 'https://www.limetorrents.info/search/movies/{0}/1/'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -52,6 +53,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -59,6 +61,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -71,6 +74,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -87,8 +91,9 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-				'year']
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -122,6 +127,7 @@ class source:
 			source_utils.scraper_error('LIMETORRENTS')
 			return self._sources
 
+
 	def _get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
@@ -148,8 +154,7 @@ class source:
 
 				name = client.parseDOM(post, 'a')[1]
 
-				# some shows like "Power" have year and hdlr in name
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '')
+				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
 				if cleantitle.get(t) != cleantitle.get(self.title):
 					continue
 
@@ -173,13 +178,14 @@ class source:
 			source_utils.scraper_error('LIMETORRENTS')
 			return self.items
 
+
 	def _get_sources(self, item):
 		try:
 			name = item[0]
 
 			quality, info = source_utils.get_release_quality(name, name)
 
-			info.append(item[2])  # if item[2] != '0'
+			info.append(item[2]) # if item[2] != '0'
 			info = ' | '.join(info)
 
 			data = client.request(item[1])
@@ -191,16 +197,16 @@ class source:
 			except:
 				return
 
-			# altered to allow multi-lingual audio tracks
-			if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 				return
 
 			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-			                      'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True})
 
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			pass
+
 
 	def resolve(self, url):
 		return url

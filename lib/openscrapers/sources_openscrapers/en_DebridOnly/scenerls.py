@@ -45,6 +45,7 @@ class source:
 		self.search_link = '/?s=%s'
 		self.scraper = cfscrape.create_scraper()
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -53,6 +54,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,6 +62,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -72,6 +75,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -89,6 +93,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -97,6 +103,7 @@ class source:
 			try:
 				url = self.search_link % urllib.quote_plus(query)
 				url = urlparse.urljoin(self.base_link, url)
+				# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 				r = self.scraper.get(url).content
 
@@ -125,8 +132,7 @@ class source:
 					name = item[0]
 					name = client.replaceHTMLCodes(name)
 
-					# t = name.split(hdlr)[0].replace('.', ' ') # test this - might be better than below
-					t = re.sub('(\.|\(|\[|\s)(\d{4}|S\d*E\d*|S\d*|3D)(\.|\)|\]|\s|)(.+|)', '', name)
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -155,7 +161,7 @@ class source:
 					host = host.encode('utf-8')
 
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-					                'direct': False, 'debridonly': True})
+									'direct': False, 'debridonly': True})
 				except:
 					source_utils.scraper_error('SCENERLS')
 					pass
@@ -165,6 +171,7 @@ class source:
 		except:
 			source_utils.scraper_error('SCENERLS')
 			return sources
+
 
 	def resolve(self, url):
 		return url

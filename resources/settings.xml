@@ -212,11 +212,12 @@
         <setting label="Enable All Debrid Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&setting=true&query=4.1)"/>
         <setting type="sep"/>
-        <setting id="provider.300mbdownload" type="bool" label="$NUMBER[300]MBDOWNLOAD" default="true"/>
+        <setting id="provider.0day" type="bool" label="$NUMBER[0]DAY" default="true"/>
+        <setting id="provider.2ddl" type="bool" label="$NUMBER[2]DDL" default="true"/>
         <setting id="provider.300mbfilms" type="bool" label="$NUMBER[300]MBFILMS" default="true"/>
         <setting id="provider.ddlspot" type="bool" label="DDLSPOT" default="true"/>
-        <setting id="provider.ganool" type="bool" label="GANOOL" default="true"/>
-        <setting id="provider.ganool2" type="bool" label="GANOOL2" default="false"/>
+        <setting id="provider.ganool" type="bool" label="GANOOL" default="false"/>
+        <setting id="provider.ganool2" type="bool" label="GANOOL2" default="true"/>
         <setting id="provider.maxrls" type="bool" label="MAXRLS" default="true"/>
         <setting id="provider.mkvhub" type="bool" label="MKVHUB" default="true"/>
         <setting id="provider.mvrls" type="bool" label="MVRLS" default="true"/>
@@ -226,7 +227,6 @@
         <setting id="provider.rlsbb" type="bool" label="RLSBB" default="true"/>
         <setting id="provider.sceneddl" type="bool" label="SCENEDDL" default="true"/>
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true"/>
-        <setting id="provider.ultrahdindir" type="bool" label="ULTRAHDINDIR" default="true"/>
     </category>
 
 
@@ -239,6 +239,7 @@
 		<setting id="torrent.enabled" type="bool" label="Enable Torrent Scrapers" default="true" visible = "false" />
         <setting type="sep"/>
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="true"/>
+        <setting id="provider.bitlord" type="bool" label="BITLORD" default="true"/>
         <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
         <setting id="provider.btscene" type="bool" label="BTSCENE" default="true"/>
         <setting id="provider.doublr" type="bool" label="DOUBLR" default="true"/>
@@ -249,13 +250,16 @@
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true"/>
         <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true"/>
+        <setting id="provider.pirateiro" type="bool" label="PIRATEIRO" default="true"/>
         <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="true"/>
+        <setting id="provider.topnow" type="bool" label="TOPNOW" default="true"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
         <setting id="provider.torrentgalaxy" type="bool" label="TORRENTGALAXY" default="true"/>
         <setting id="provider.torrentquest" type="bool" label="TORRENTQUEST" default="true"/>
-        <setting id="provider.yifyddl" type="bool" label="YIFYDDL" default="true"/>
-        <setting id="provider.yts" type="bool" label="YTS" default="true"/>
+        <setting id="provider.torrentz" type="bool" label="TORRENTZ" default="true"/>
+        <setting id="provider.ytsws" type="bool" label="YTSWS" default="true"/>
+        <setting id="provider.ytslt" type="bool" label="YTSLT" default="true"/>
         <setting id="provider.zoogle" type="bool" label="ZOOGLE" default="true"/>
     </category>
 

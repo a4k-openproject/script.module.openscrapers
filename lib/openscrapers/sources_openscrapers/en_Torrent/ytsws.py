@@ -28,9 +28,9 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import dom_parser  # switch to client.parseDOM() to rid import
 from openscrapers.modules import source_utils
 
 
@@ -38,9 +38,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['ultrahdindir.com']
-		self.base_link = 'http://ultrahdindir.com'
-		self.post_link = '/index.php?do=search'
+		self.domains = ['yts.ws']
+		self.base_link = 'https://yts.ws'
+		self.search_link = '/movie/%s'
+		# self.search_link = '/search?search=%s'
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -49,6 +51,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -60,82 +63,73 @@ class source:
 			if debrid.status() is False:
 				return sources
 
-			hostDict = hostprDict + hostDict
-
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			title = data['title']
+			title = data['title'].replace('&', 'and')
+			hdlr = data['year']
 
-			year = data['year']
-
-			query = '%s %s' % (title, year)
+			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			url = urlparse.urljoin(self.base_link, self.post_link)
+			url = self.search_link % urllib.quote(query)
+			url = urlparse.urljoin(self.base_link, url).replace('%20', '-')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			post = 'do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=%s' % urllib.quote_plus(
-				query)
-			# log_utils.log('post = %s' % post, log_utils.LOGDEBUG)
+			html = client.request(url)
+			if html is None:
+				return sources
 
-			r = client.request(url, post=post)
-			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
+			quality_size = client.parseDOM(html, 'p', attrs={'class': 'quality-size'})
 
-			r = client.parseDOM(r, 'div', attrs={'class': 'box-out margin'})
-			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
+			tit = client.parseDOM(html, 'title')[0]
 
-			# switch to client.parseDOM() to rid import
-			r = [(dom_parser.parse_dom(i, 'div', attrs={'class': 'news-title'})) for i in r if data['imdb'] in i]
-			r = [(dom_parser.parse_dom(i[0], 'a', req='href')) for i in r if i]
-			r = [(i[0].attrs['href'], i[0].content) for i in r if i]
+			try:
+				results = client.parseDOM(html, 'div', attrs={'class': 'ava1'})
+			except:
+				return sources
 
-			for item in r:
-				try:
-					name = item[0]
-					s = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)
-					s = s[0] if s else '0'
+			p = 0
+			for torrent in results:
+				link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent, re.DOTALL)
 
-					data = client.request(item[0])
-					data = dom_parser.parse_dom(data, 'div', attrs={'id': 'r-content'})
-					data = re.findall('\s*<b><a href="(.+?)".+?</a></b>', data[0].content, re.DOTALL)
+				for url, ref in link:
+					url = str(client.replaceHTMLCodes(url).split('&tr')[0])
 
-					for url in data:
-						try:
-							try:
-								qual = client.request(url)
-								quals = re.findall('span class="file-title" id="file-title">(.+?)</span', qual)
+					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+						continue
 
-								for quals in quals:
-									quality, info = source_utils.get_release_quality(quals, url)
+					name = url.split('&dn=')[1]
 
-							except:
-								quality = ''
+					t = name.split(hdlr)[0].replace('&', 'and')
+					if cleantitle.get(t) != cleantitle.get(title):
+						continue
 
-							url = client.replaceHTMLCodes(url)
-							url = url.encode('utf-8')
+					if hdlr not in tit:
+						continue
 
-							if any(x in url for x in ['.rar', '.zip', '.iso']):
-								raise Exception()
+					quality, info = source_utils.get_release_quality(ref, url)
 
-							if not 'turbobit' in url:
-								continue
+					try:
+						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', quality_size[p])[-1]
+						div = 1 if size.endswith(('GB', 'GiB')) else 1024
+						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+						size = '%.2f GB' % size
+						info.append(size)
+					except:
+						pass
 
-							if url in str(sources):
-								continue
+					p += 1
+					info = ' | '.join(info)
 
-							sources.append({'source': 'turbobit', 'quality': quality, 'language': 'en', 'url': url,
-							                'info': info, 'direct': True, 'debridonly': True})
-						except:
-							source_utils.scraper_error('ULTRAHDINDIR')
-							pass
-				except:
-					source_utils.scraper_error('ULTRAHDINDIR')
-					pass
+					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+												'info': info, 'direct': False, 'debridonly': True})
 			return sources
+
 		except:
-			source_utils.scraper_error('ULTRAHDINDIR')
+			source_utils.scraper_error('YIFYDLL')
 			return sources
+
 
 	def resolve(self, url):
 		return url

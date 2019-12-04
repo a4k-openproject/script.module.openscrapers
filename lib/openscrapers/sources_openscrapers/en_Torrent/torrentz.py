@@ -38,10 +38,18 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['eztv.io']
-		self.base_link = 'https://eztv.io'
-		self.search_link = '/search/%s'
-		self.min_seeders = 1
+		self.domains = ['torrentz2.eu']
+		self.base_link = 'https://torrentz2.eu'
+		self.search_link = '/search?f=%s'
+
+
+	def movie(self, imdb, title, localtitle, aliases, year):
+		try:
+			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = urllib.urlencode(url)
+			return url
+		except:
+			return
 
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
@@ -67,9 +75,8 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
-
 			if url is None:
 				return sources
 
@@ -79,87 +86,68 @@ class source:
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			url = self.search_link % (urllib.quote_plus(query).replace('+', '-'))
+			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			html = client.request(url)
-
 			try:
-				results = client.parseDOM(html, 'table', attrs={'class': 'forum_header_border'})
-				for result in results:
-					if 'magnet:' in result:
-						results = result
-						break
-			except:
-				return sources
+				r = client.request(url)
 
-			rows = re.findall('<tr name="hover" class="forum_header_border">(.+?)</tr>', results, re.DOTALL)
+				posts = client.parseDOM(r, 'div', attrs={'class': 'results'})[0]
+				posts = client.parseDOM(posts, 'dl')
 
-			if rows is None:
-				return sources
+				for post in posts:
+					links = re.findall('<dt><a href=/(.+)</a>', post, re.DOTALL)
 
-			for entry in rows:
-				try:
-					try:
-						columns = re.findall('<td\s.+?>(.+?)</td>', entry, re.DOTALL)
-						derka = re.findall('href="magnet:(.+?)" class="magnet" title="(.+?)"', columns[2], re.DOTALL)[0]
-					except:
-						continue
+					for link in links:
+						magnet = link.split('</a>')[0]
+						hash = 'magnet:?xt=urn:btih:' + magnet.split('>')[0]
+						dn = '&dn=' + magnet.split('>')[1]
+						url = hash + dn
 
-					url = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
-					url = urllib.unquote(url).decode('utf8')
+						if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+							continue
 
-					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-						continue
+						name = url.split('&dn=')[1]
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+						if cleantitle.get(t) != cleantitle.get(title):
+							continue
 
-					name = derka[1]
+						if hdlr not in name:
+							continue
 
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-					if cleantitle.get(t) != cleantitle.get(title):
-						continue
+						quality, info = source_utils.get_release_quality(name, url)
 
-					if hdlr not in name:
-						continue
+						try:
+							size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+							div = 1 if size.endswith('GB') else 1024
+							size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+							size = '%.2f GB' % size
+							info.append(size)
+						except:
+							pass
 
-					try:
-						seeders = int(re.findall('<font color=".+?">(.+?)</font>', columns[5], re.DOTALL)[0])
-					except:
-						continue
+						info = ' | '.join(info)
 
-					if self.min_seeders > seeders:
-						continue
-
-					quality, info = source_utils.get_release_quality(name, url)
-
-					try:
-						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', name)[-1]
-						div = 1 if size.endswith(('GB', 'GiB')) else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-						size = '%.2f GB' % size
-						info.append(size)
-					except:
-						pass
-
-					info = ' | '.join(info)
-
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
 												'info': info, 'direct': False, 'debridonly': True})
-				except:
-					source_utils.scraper_error('EZTV')
-					continue
 
-			return sources
+				return sources
+
+			except:
+				source_utils.scraper_error('TORRENTZ')
+				return
 
 		except:
-			source_utils.scraper_error('EZTV')
+			source_utils.scraper_error('TORRENTZ')
 			return sources
 
 

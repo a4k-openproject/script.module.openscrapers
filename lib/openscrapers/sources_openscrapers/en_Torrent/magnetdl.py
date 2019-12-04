@@ -42,6 +42,7 @@ class source:
 		self.base_link = 'https://www.magnetdl.com'
 		self.search_link = '/{0}/{1}'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -50,6 +51,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -57,6 +59,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -69,6 +72,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -84,6 +88,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -93,6 +99,9 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
+			if '<tbody' not in r:
+				return sources
+
 			r = client.parseDOM(r, 'tbody')[0]
 
 			results = client.parseDOM(r, 'tr')
@@ -106,7 +115,7 @@ class source:
 
 				page = client.parseDOM(next_page, 'a', ret='href', attrs={'title': 'Downloads | Page 2'})[0]
 
-				r2 = client.request(self.base_link + page)
+				r2 = client.request(self.base_link+page)
 				results2 = client.parseDOM(r2, 'tr')
 				posts += [i for i in results2 if 'magnet:' in i]
 			except:
@@ -119,14 +128,11 @@ class source:
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = magnet.split('&tr')[0]
 
-				# altered to allow multi-lingual audio tracks
-				if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+				if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 					continue
 
 				name = client.parseDOM(post, 'a', ret='title')[1]
-
-				# some shows like "Power" have year and hdlr in name
-				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 				if cleantitle.get(t) != cleantitle.get(title):
 					continue
 
@@ -147,12 +153,13 @@ class source:
 				info = ' | '.join(info)
 
 				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-				                'info': info, 'direct': False, 'debridonly': True})
+											'info': info, 'direct': False, 'debridonly': True})
 
 			return sources
 		except:
 			source_utils.scraper_error('MAGNETDL')
 			return sources
+
 
 	def resolve(self, url):
 		return url

@@ -14,6 +14,7 @@ import urllib
 import urlparse
 
 import requests
+
 # from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 
@@ -27,6 +28,7 @@ class source:
 		self.search_link = '/search/?q=%s'
 		self.download_links = '/loadmoviedownloadsection.php'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -34,6 +36,7 @@ class source:
 			return url
 		except Exception:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
@@ -47,7 +50,7 @@ class source:
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			title = data['title']
+			title = data['title'].replace('&', 'and')
 			year = data['year']
 
 			search = title.lower()
@@ -79,8 +82,7 @@ class source:
 						post = shell.post(post_link, headers=headers, data=payload)
 						response = post.content
 
-						grab = re.compile('<a rel="\w+" href="(.+?)">\w{5}\s\w+\s\w+\s\w+\s\w{5}<\/a>',
-						                  re.DOTALL).findall(response)
+						grab = re.compile('<a rel="\w+" href="(.+?)">\w{5}\s\w+\s\w+\s\w+\s\w{5}<\/a>', re.DOTALL).findall(response)
 
 						for links in grab:
 							r = shell.get(links, headers=headers).content
@@ -93,11 +95,12 @@ class source:
 								continue
 
 							sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link,
-							                'direct': False, 'debridonly': False})
+															'direct': False, 'debridonly': False})
 
 			return sources
 		except Exception:
 			return sources
+
 
 	def resolve(self, url):
 		return url

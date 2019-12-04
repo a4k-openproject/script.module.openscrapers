@@ -45,6 +45,7 @@ class source:
 		self.search_link = '/?s=%s'
 		self.scraper = cfscrape.create_scraper()
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -53,6 +54,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,6 +62,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -72,6 +75,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -87,6 +91,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -98,7 +104,6 @@ class source:
 
 			try:
 				r = self.scraper.get(url).content
-
 				posts = client.parseDOM(r, 'li')
 
 				for post in posts:
@@ -107,8 +112,7 @@ class source:
 					for url in link:
 						url = url.split('&tr')[0]
 
-						# altered to allow multi-lingual audio tracks
-						if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+						if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 							continue
 
 						name = url.split('&dn=')[1]
@@ -119,8 +123,7 @@ class source:
 							except:
 								name = re.sub(r'\www..+? ', '', name)
 
-						# some shows like "Power" have year and hdlr in name
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 						if cleantitle.get(t) != cleantitle.get(title):
 							continue
 
@@ -141,13 +144,17 @@ class source:
 						info = ' | '.join(info)
 
 						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-						                'info': info, 'direct': False, 'debridonly': True})
+													'info': info, 'direct': False, 'debridonly': True})
 			except:
+				source_utils.scraper_error('BTDB')
 				return
+
 			return sources
+
 		except:
 			source_utils.scraper_error('BTDB')
 			return sources
+
 
 	def resolve(self, url):
 		return url

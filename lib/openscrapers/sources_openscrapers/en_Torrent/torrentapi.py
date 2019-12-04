@@ -40,10 +40,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.base_link = 'https://torrentapi.org'  # -just to satisfy scraper_test
+		self.base_link = 'https://torrentapi.org' #-just to satisfy scraper_test
 		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&{2}'
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&{2}'
 		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -53,6 +54,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -60,6 +62,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -72,6 +75,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -87,6 +91,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -113,16 +119,13 @@ class source:
 				url = file["download"]
 				url = url.split('&tr')[0]
 
-				# altered to allow multi-lingual audio tracks
-				if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+				if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 					continue
 
 				name = file["title"]
 
-				# some shows like "Power" have year and hdlr in name
-				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
-				if cleantitle.get(t) != cleantitle.get(title).replace('&',
-				                                                      'and'):  # torrentapi does not seem to use ampersand symbol in titles
+				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+				if cleantitle.get(t) != cleantitle.get(title):
 					continue
 
 				if hdlr not in name:
@@ -135,12 +138,13 @@ class source:
 				info = ' | '.join(info)
 
 				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-				                'info': info, 'direct': False, 'debridonly': True})
+											'info': info, 'direct': False, 'debridonly': True})
 			return sources
 
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
+
 
 	def resolve(self, url):
 		return url

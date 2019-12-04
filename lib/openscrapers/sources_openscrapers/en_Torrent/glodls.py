@@ -43,6 +43,7 @@ class source:
 		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -51,6 +52,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -58,6 +60,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -70,6 +73,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -85,8 +89,9 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-				'year']
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -110,11 +115,11 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name, url)
 
-					info.append(item[2])  # if item[2] != '0'
+					info.append(item[2]) # if item[2] != '0'
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-					                'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True})
 				except:
 					source_utils.scraper_error('GLODLS')
 					pass
@@ -124,6 +129,7 @@ class source:
 		except:
 			source_utils.scraper_error('GLODLS')
 			return sources
+
 
 	def _get_items(self, url):
 		items = []
@@ -137,16 +143,13 @@ class source:
 				ref = client.parseDOM(post, 'a', ret='href')
 				url = [i for i in ref if 'magnet:' in i][0]
 
-				# altered to allow multi-lingual audio tracks
-				if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+				if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 					continue
 
 				name = client.parseDOM(post, 'a', ret='title')[0]
 
-				# some shows like "Power" have year and hdlr in name
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '')
-				if cleantitle.get(t) != cleantitle.get(self.title).replace('&',
-				                                                           'and'):  # glodls does not seem to use ampersand symbol in titles
+				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
+				if cleantitle.get(t) != cleantitle.get(self.title):
 					continue
 
 				if self.hdlr not in name:
@@ -168,6 +171,7 @@ class source:
 		except:
 			source_utils.scraper_error('GLODLS')
 			return items
+
 
 	def resolve(self, url):
 		return url

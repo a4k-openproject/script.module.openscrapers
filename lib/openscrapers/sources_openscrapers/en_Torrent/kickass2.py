@@ -41,19 +41,21 @@ class source:
 		self.priority = 1
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = ['kickasshydra.net', 'kickasstrusty.com', 'kickassindia.com',
-		                'kickassmovies.net', 'torrentskickass.org', 'kickasstorrents.li', 'kkat.net',
-		                'kickassdb.com', 'kickassaustralia.com', 'kickasspk.com', 'kkickass.com',
-		                'kathydra.com', 'kickasst.org', 'kickasstorrents.id', 'kickasst.net', 'thekat.cc',
-		                'thekat.ch', 'kickasstorrents.bz', 'kickass-kat.com', 'kickass-usa.com']
+			'kickassmovies.net', 'torrentskickass.org', 'kickasstorrents.li', 'kkat.net',
+			'kickassdb.com', 'kickassaustralia.com', 'kickasspk.com', 'kkickass.com',
+			'kathydra.com', 'kickasst.org', 'kickasstorrents.id', 'kickasst.net', 'thekat.cc',
+			'thekat.ch', 'kickasstorrents.bz', 'kickass-kat.com', 'kickass-usa.com']
 		self._base_link = None
 		self.search = '/usearch/{0}%20category:movies'
 		self.search2 = '/usearch/{0}%20category:tv'
+
 
 	@property
 	def base_link(self):
 		if not self._base_link:
 			self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
 		return self._base_link
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -63,6 +65,7 @@ class source:
 		except Exception:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -70,6 +73,7 @@ class source:
 			return url
 		except Exception:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -82,6 +86,7 @@ class source:
 			return url
 		except Exception:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -98,8 +103,9 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data[
-				'year']
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -123,7 +129,7 @@ class source:
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 
-			threads2 = []
+ 			threads2 = []
 			for i in self.items:
 				threads2.append(workers.Thread(self._get_sources, i))
 			[i.start() for i in threads2]
@@ -134,6 +140,7 @@ class source:
 			source_utils.scraper_error('KICKASS2')
 			return self._sources
 
+
 	def _get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
@@ -142,13 +149,11 @@ class source:
 
 			for post in posts:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
-				link = urllib.unquote(ref).decode('utf8').replace('https://mylink.me.uk/?url=', '').replace(
-					'https://mylink.cx/?url=', '')
+				link = urllib.unquote(ref).decode('utf8').replace('https://mylink.me.uk/?url=', '').replace('https://mylink.cx/?url=', '')
 
 				name = urllib.unquote_plus(re.search('dn=([^&]+)', link).groups()[0])
 
-				# some shows like "Power" have year and hdlr in name
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '')
+				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
 				if cleantitle.get(t) != cleantitle.get(self.title):
 					continue
 
@@ -172,30 +177,31 @@ class source:
 			source_utils.scraper_error('KICKASS2')
 			return self.items
 
+
 	def _get_sources(self, item):
 		try:
 			name = item[0]
 			url = item[1]
 
-			# altered to allow multi-lingual audio tracks
-			if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 				return
 
 			quality, info = source_utils.get_release_quality(name, url)
 
 			info.append(item[2])  # if item[2] != '0'
-
 			info = ' | '.join(info)
 
 			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-			                      'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True})
 
 		except:
 			source_utils.scraper_error('KICKASS2')
 			pass
 
+
 	def resolve(self, url):
 		return url
+
 
 	def __get_base_url(self, fallback):
 		try:
@@ -211,3 +217,5 @@ class source:
 		except:
 			pass
 		return fallback
+
+

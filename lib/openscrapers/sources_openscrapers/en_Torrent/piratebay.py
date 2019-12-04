@@ -40,19 +40,20 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domains = ['pirateproxy.live', 'thepiratebay.org', 'thepiratebay.fun', 'thepiratebay.asia', 'tpb.party',
-		                'thehiddenbay.com', 'piratebay.live',
-		                'thepiratebay.zone']  # -- 'thepiratebayz.org' and 'thepiratebay3.org' seem dead
+								'thehiddenbay.com', 'piratebay.live', 'thepiratebay.zone'] #-- 'thepiratebayz.org' and 'thepiratebay3.org' seem dead
 
 		self._base_link = None
 		# self.search_link = '/s/?q=%s&page=1&&video=on&orderby=99' #-page flip does not work
-		self.search_link = '/search/%s/1/99/200'  # -direct link can flip pages
+		self.search_link = '/search/%s/1/99/200' #-direct link can flip pages
 		self.min_seeders = 1
+
 
 	@property
 	def base_link(self):
 		if not self._base_link:
 			self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
 		return self._base_link
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -62,6 +63,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
@@ -69,6 +71,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -81,6 +84,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -96,6 +100,8 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
@@ -137,16 +143,14 @@ class source:
 					except:
 						continue
 
-					# altered to allow multi-lingual audio tracks
-					if any(x in url.lower() for x in ['french', 'italian', 'truefrench', 'dublado', 'dubbed']):
+					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 						continue
 
 					try:
 						name = re.findall('class="detLink" title=".+?">(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name)
 
-						# some shows like "Power" have year and hdlr in name
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '')
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 						if cleantitle.get(t) != cleantitle.get(title):
 							continue
 					except:
@@ -177,7 +181,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-					                'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True})
 				except:
 					source_utils.scraper_error('PIRATEBAY')
 					continue
@@ -187,6 +191,7 @@ class source:
 		except:
 			source_utils.scraper_error('PIRATEBAY')
 			return sources
+
 
 	def __get_base_url(self, fallback):
 		try:
@@ -203,6 +208,7 @@ class source:
 			pass
 
 		return fallback
+
 
 	def resolve(self, url):
 		return url
