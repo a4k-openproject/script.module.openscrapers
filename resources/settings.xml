@@ -39,6 +39,7 @@
         <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="true"/>
         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/>
         <setting id="provider.divxcrawler" type="bool" label="DIVXCRAWLER" default="true"/>
+        <setting id="provider.easynews" type="bool" label="EASYNEWS" default="true"/>
         <setting id="provider.extramovies" type="bool" label="EXTRAMOVIES" default="true"/>
         <setting id="provider.filmxy" type="bool" label="FILMXY" default="true"/>
         <setting id="provider.fmovies" type="bool" label="FMOVIES" default="true"/>
@@ -269,8 +270,10 @@
         <setting id="furk.user_name" type="text" label="Furk Username" default=""/>
         <setting id="furk.user_pass" type="text" label="Furk Password" option="hidden" default=""/>
         <setting id="furk.api" type="text" label="Furk API Key" default=""/>
-        <!--    <setting id="furk.mod.level" type="labelenum" label="Set Furk Moderation Level" default="Yes" values="No|Yes|Full" />   -->
-        <setting id="furk.limit" label="Limit results" type="slider" default="25" range="5,5,200" option="int"/>
+
+        <setting type="lsep" label="Easynews"/>
+        <setting id="easynews.user" type="text" label="Easynews Username" default=""/>
+        <setting id="easynews.password" type="text" label="Easynews Password" default=""/>
 
         <setting type="lsep" label="Ororo.tv"/>
         <setting id="ororo.user" type="text" label="Email" default=""/>
