@@ -32,6 +32,7 @@ from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
+from openscrapers.modules import cfscrape
 
 
 class source:
@@ -41,6 +42,7 @@ class source:
 		self.domains = ['www.doublr.org']
 		self.base_link = 'https://www.doublr.org'
 		self.search_link = '/search?q=%s'
+		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -100,7 +102,8 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			try:
-				r = client.request(url)
+				# r = client.request(url)
+				r = self.scraper.get(url).content
 				posts = client.parseDOM(r, 'tr')
 
 				for post in posts:
@@ -116,13 +119,17 @@ class source:
 
 					for link, ref in links:
 						link = urlparse.urljoin(self.base_link, link)
-						link = client.request(link)
+						# link = client.request(link)
+						link = self.scraper.get(link).content
 						link = re.findall('a class=".+?" rel=".+?" href="(magnet:.+?)"', link, re.DOTALL)
 
 						for url in link:
 							url = url.split('&tr')[0]
 
 							if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+								continue
+
+							if url in str(sources):
 								continue
 
 							name = url.split('&dn=')[1]
@@ -148,6 +155,7 @@ class source:
 
 							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
 														'info': info, 'direct': False, 'debridonly': True})
+
 				return sources
 
 			except:
