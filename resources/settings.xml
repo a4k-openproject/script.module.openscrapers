@@ -6,25 +6,25 @@
                  visible="hidden" action="RunPlugin(plugin://script.module.openscrapers/?action=ScraperChoice)"
                  default="OpenScrapers"/>
         <setting label="OpenScrapers Default Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=Defaults&setting=true&query=0.1)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=Defaults&amp;setting=true&amp;query=0.1)"/>
         <setting label="Disable All Providers" type="action"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&setting=false&query=0.2)"
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&amp;setting=false&amp;query=0.2)"
                  option="close"/>
         <setting label="Enable All Providers" type="action"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&setting=true&query=0.3)"
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAll&amp;setting=true&amp;query=0.3)"
                  option="close"/>
         <setting label="Enable Paid Debrid-w/Torrents" type="action"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPaid&setting=true&query=0.4)"
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPaid&amp;setting=true&amp;query=0.4)"
                  option="close"/>
     </category>
 
     <!-- Providers/Hosters-1 -->
     <category label="Hosters">
         <setting label="Disable All Hosters" type="action"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllHosters&setting=false&query=1.0)"
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllHosters&amp;setting=false&amp;query=1.0)"
                  option="close"/>
         <setting label="Enable All Hosters" type="action"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllHosters&setting=true&query=1.1)"
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllHosters&amp;setting=true&amp;query=1.1)"
                  option="close"/>
         <setting type="sep"/>
         <setting id="provider.1putlocker" type="bool" label="$NUMBER[1]PUTLOCKER" default="true"/>
@@ -64,7 +64,7 @@
         <setting id="provider.putlockeronline" type="bool" label="PUTLOCKERONLINE" default="true"/>
         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/>
         <setting id="provider.series9" type="bool" label="SERIES9" default="true"/>
-		<setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/>
+        <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/>
         <setting id="provider.sharemovies" type="bool" label="SHAREMOVIES" default="true"/>
         <setting id="provider.solarmoviefree" type="bool" label="SOLARMOVIEFREE" default="true"/>
         <setting id="provider.streamdreams" type="bool" label="STREAMDREAMS" default="true"/>
@@ -81,16 +81,16 @@
     <!-- Providers/Foreign-2 -->
     <category label="Foreign">
         <setting label="Disable All Foreign Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllForeign&setting=false&query=2.0)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllForeign&amp;setting=false&amp;query=2.0)"/>
         <setting label="Enable All Foreign Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllForeign&setting=true&query=2.1)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllForeign&amp;setting=true&amp;query=2.1)"/>
 
 
         <setting label="German" type="lsep"/>
         <setting label="Disable All German Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&setting=false&query=2.4)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&amp;setting=false&amp;query=2.4)"/>
         <setting label="Enable All German Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&setting=true&query=2.5)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&amp;setting=true&amp;query=2.5)"/>
         <setting type="sep"/>
         <setting id="provider.animebase" type="bool" label="ANIMELOADS" default="false"/>
         <setting id="provider.animeloads" type="bool" label="ANIMELOADS" default="false"/>
@@ -119,9 +119,9 @@
 
         <setting label="Spanish" type="lsep"/>
         <setting label="Disable All Spanish Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllSpanish&setting=false&query=2.32)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllSpanish&amp;setting=false&amp;query=2.32)"/>
         <setting label="Enable All Spanish Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllSpanish&setting=true&query=2.33)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllSpanish&amp;setting=true&amp;query=2.33)"/>
         <setting type="sep"/>
         <setting id="provider.pelisplustv" type="bool" label="PELISPLUSTV" default="false"/>
         <setting id="provider.pepecine" type="bool" label="PEPCINE" default="false"/>
@@ -130,9 +130,9 @@
 
         <setting label="French" type="lsep"/>
         <setting label="Disable All French Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllFrench&setting=false&query=2.40)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllFrench&amp;setting=false&amp;query=2.40)"/>
         <setting label="Enable All French Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllFrench&setting=true&query=2.41)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllFrench&amp;setting=true&amp;query=2.41)"/>
         <setting type="sep"/>
         <setting id="provider.cinemay" type="bool" label="CINEMAY" default="false"/>
         <setting id="provider.dadyflix" type="bool" label="DADYFLIX" default="false"/>
@@ -147,9 +147,9 @@
 
         <setting label="Greek" type="lsep"/>
         <setting label="Disable All Greek Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGreek&setting=false&query=2.54)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGreek&amp;setting=false&amp;query=2.54)"/>
         <setting label="Enable All Greek Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGreek&setting=true&query=2.55)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGreek&amp;setting=true&amp;query=2.55)"/>
         <setting type="sep"/>
         <setting id="provider.gamatotv" type="bool" label="GAMATOTV" default="false"/>
         <setting id="provider.liomenoi" type="bool" label="LIOMENOI" default="false"/>
@@ -159,9 +159,9 @@
 
         <setting label="Korean" type="lsep"/>
         <setting label="Disable All Korean Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllKorean&setting=false&query=2.63)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllKorean&amp;setting=false&amp;query=2.63)"/>
         <setting label="Enable All Korean Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllKorean&setting=true&query=2.64)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllKorean&amp;setting=true&amp;query=2.64)"/>
         <setting type="sep"/>
         <setting id="provider.drama4u" type="bool" label="DRAMA4U" default="false"/>
         <setting id="provider.dramacool" type="bool" label="DRAMACOOL" default="false"/>
@@ -174,9 +174,9 @@
     <category label="Foreign2">
         <setting label="Polish" type="lsep"/>
         <setting label="Disable All Polish Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPolish&setting=false&query=3.1)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPolish&amp;setting=false&amp;query=3.1)"/>
         <setting label="Enable All Polish Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPolish&setting=true&query=3.2)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllPolish&amp;setting=true&amp;query=3.2)"/>
         <setting type="sep"/>
         <setting id="provider.alltube" type="bool" label="ALLTUBE" default="false"/>
         <setting id="provider.alltube3d" type="bool" label="ALLTUBE3D" default="false"/>
@@ -195,9 +195,9 @@
 
         <setting label="Russian" type="lsep"/>
         <setting label="Disable All Russian Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllRussian&setting=false&query=3.20)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllRussian&amp;setting=false&amp;query=3.20)"/>
         <setting label="Enable All Russian Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllRussian&setting=true&query=3.21)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllRussian&amp;setting=true&amp;query=3.21)"/>
         <setting type="sep"/>
         <setting id="provider.exfs" type="bool" label="EXFS" default="false"/>
         <setting id="provider.filmix" type="bool" label="FILMIX" default="false"/>
@@ -208,9 +208,9 @@
     <!-- Debrid Sources-4 -->
     <category label="Debrid Only">
         <setting label="Disable All Debrid Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&setting=false&query=4.0)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&amp;setting=false&amp;query=4.0)"/>
         <setting label="Enable All Debrid Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&setting=true&query=4.1)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&amp;setting=true&amp;query=4.1)"/>
         <setting type="sep"/>
         <setting id="provider.0day" type="bool" label="$NUMBER[0]DAY" default="true"/>
         <setting id="provider.2ddl" type="bool" label="$NUMBER[2]DDL" default="true"/>
@@ -233,10 +233,10 @@
     <!-- Torrents-5 -->
     <category label="Torrent (cached)">
         <setting label="Disable All Torrent Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=false&query=5.0)"/>
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&amp;setting=false&amp;query=5.0)"/>
         <setting label="Enable All Torrent Providers" type="action" option="close"
-                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&setting=true&query=5.1)"/>
-		<setting id="torrent.enabled" type="bool" label="Enable Torrent Scrapers" default="true" visible = "false" />
+                 action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllTorrent&amp;setting=true&amp;query=5.1)"/>
+        <setting id="torrent.enabled" type="bool" label="Enable Torrent Scrapers" default="true" visible = "false" />
         <setting type="sep"/>
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="true"/>
         <setting id="provider.bitlord" type="bool" label="BITLORD" default="true"/>
