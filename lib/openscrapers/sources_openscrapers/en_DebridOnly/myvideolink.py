@@ -38,11 +38,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['myvideolinks.net', 'new.myvideolinks.net']
-		# self.base_link = 'http://myvideolinks.net'
-		self.base_link = 'http://search.myvideolinks.net/'
-		# self.search_link = 'rls/?s=%s'
-		# self.search_link = '/ups/?s=%s'
+		# self.domains = ['myvideolinks.net', 'new.myvideolinks.net']
+		self.domains = ['myvideolinks.69.mu', 'nothingcan.undo.it', 'dl.myvideolinks.net']
+		# self.base_link = 'http://myvideolinks.net/'
+		# self.base_link = 'http://search.myvideolinks.net/'
+		self.base_link = 'http://myvideolinks.69.mu/'
 		self.search_link = '?s=%s'
 
 
