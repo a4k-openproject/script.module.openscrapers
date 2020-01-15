@@ -65,7 +65,7 @@
         <setting id="provider.putlockeronline" type="bool" label="PUTLOCKERONLINE" default="true"/>
         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/>
         <setting id="provider.series9" type="bool" label="SERIES9" default="true"/>
-		<setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/>
+        <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/>
         <setting id="provider.sharemovies" type="bool" label="SHAREMOVIES" default="true"/>
         <setting id="provider.solarmoviefree" type="bool" label="SOLARMOVIEFREE" default="true"/>
         <setting id="provider.streamdreams" type="bool" label="STREAMDREAMS" default="true"/>
@@ -244,16 +244,19 @@
         <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
         <setting id="provider.btscene" type="bool" label="BTSCENE" default="true"/>
         <setting id="provider.doublr" type="bool" label="DOUBLR" default="true"/>
+        <setting id="provider.ettv" type="bool" label="ETTV" default="true"/>
         <setting id="provider.eztv" type="bool" label="EZTV" default="true"/>
         <setting id="provider.glodls" type="bool" label="GLODLS" default="true"/>
         <setting id="provider.kickass2" type="bool" label="KICKASS2" default="true"/>
         <setting id="provider.limetorrents" type="bool" label="LIMETORRENTS" default="true"/>
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true"/>
-        <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/>
+        <setting id="provider.moviemagnet" type="bool" label="MOVIEMAGNET" default="true"/>
+<!--         <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/> CAPTCHA -->
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true"/>
         <setting id="provider.pirateiro" type="bool" label="PIRATEIRO" default="true"/>
         <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="true"/>
         <setting id="provider.topnow" type="bool" label="TOPNOW" default="true"/>
+        <setting id="provider.torlock" type="bool" label="TORLOCK" default="true"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
         <setting id="provider.torrentdownloads" type="bool" label="TORRENTDOWNLOADS" default="true"/>
         <setting id="provider.torrentgalaxy" type="bool" label="TORRENTGALAXY" default="true"/>
