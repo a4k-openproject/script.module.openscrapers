@@ -199,6 +199,9 @@ def getFileType(url):
 	if any(value in url for value in ['hd-rip', 'hd.rip', 'hdrip']):
 		type += ' HDRIP /'
 
+	if 'hdr.' in url:
+		type += ' HDR /'
+
 	if any(value in url for value in ['dd5.1', 'dd-5.1', 'dolby-digital', 'dolby.digital']):
 		type += ' DOLBYDIGITAL /'
 
