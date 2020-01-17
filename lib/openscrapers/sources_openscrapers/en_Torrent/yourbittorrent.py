@@ -39,9 +39,9 @@ class source:
 	def __init__(self):
 		self.priority = 0
 		self.language = ['en']
-		self.domain = ['torlock.unblockit.biz']
-		self.base_link = 'https://torlock.unblockit.biz'
-		self.search_link = '/all/torrents/%s.html?'
+		self.domain = ['yourbittorrent2.com']
+		self.base_link = 'https://yourbittorrent2.com'
+		self.search_link = '/?v=&c=&q=%s'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -102,7 +102,7 @@ class source:
 
 			try:
 				r = client.request(url)
-				links = re.findall('<a href=(/torrent/.+?)>', r, re.DOTALL)
+				links = re.findall('<a href="(/torrent/.+?)"', r, re.DOTALL)
 
 				threads = []
 				for link in links:
@@ -111,11 +111,11 @@ class source:
 				[i.join() for i in threads]
 				return self.sources
 			except:
-				source_utils.scraper_error('TORLOCK')
+				source_utils.scraper_error('YOURBITTORRENT')
 				return self.sources
 
 		except:
-			source_utils.scraper_error('TORLOCK')
+			source_utils.scraper_error('YOURBITTORRENT')
 			return self.sources
 
 
@@ -123,23 +123,20 @@ class source:
 		try:
 			url = '%s%s' % (self.base_link, link)
 			result = client.request(url)
-			if 'magnet' not in result:
-				return
 
-			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
-			url = urllib.unquote(url).decode('utf8').replace('&amp;', '&')
-			url = url.split('&tr=')[0]
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			info_hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
+			url = '%s%s' % ('magnet:?xt=urn:btih:', info_hash)
+			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0]
+			url = '%s%s%s' % (url, '&dn=', str(name))
+
+			size = re.findall('<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
 
 			if url in str(self.sources):
 				return
 
-			size_list = re.findall('<dt>SIZE</dt><dd>(.+?)<', result, re.DOTALL)
-
 			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
 				return
 
-			name = url.split('&dn=')[1]
 			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('+', ' ')
 
 			if cleantitle.get(t) != cleantitle.get(self.title):
@@ -150,18 +147,15 @@ class source:
 
 			quality, info = source_utils.get_release_quality(name, url)
 
-			for match in size_list:
-				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', match)[0]
-					div = 1 if size.endswith('GB') else 1024
-					size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-					size = '%.2f GB' % size
-					info.insert(0, size)
-					if size:
-						break
-				except:
-					size = '0'
-					pass
+			try:
+				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', size)[0]
+				div = 1 if size.endswith('GB') else 1024
+				size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+				size = '%.2f GB' % size
+				info.insert(0, size)
+			except:
+				size = '0'
+				pass
 
 			info = ' | '.join(info)
 
@@ -169,7 +163,7 @@ class source:
 												'info': info, 'direct': False, 'debridonly': True})
 
 		except:
-			source_utils.scraper_error('TORLOCK')
+			source_utils.scraper_error('YOURBITTORRENT')
 			pass
 
 	def resolve(self, url):

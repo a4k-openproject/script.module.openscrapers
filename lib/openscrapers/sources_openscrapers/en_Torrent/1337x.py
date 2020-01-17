@@ -148,7 +148,7 @@ class source:
 					continue
 
 				if self.hdlr not in name:
-					raise Exception()
+					continue
 
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
