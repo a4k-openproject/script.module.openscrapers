@@ -32,6 +32,7 @@ import urlparse
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
+from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
 
 
@@ -41,7 +42,8 @@ class source:
 		self.language = ['en']
 		self.domains = ['extramovies.net.in', 'extramovies.trade', 'extramovies.guru',
 		                'extramovies.wiki']  # http://extramovies.ind.in/
-		self.base_link = 'http://extramovies.net.in'  # Dead  extramovies.host
+		# self.base_link = 'http://extramovies.net.in'  # Dead  extramovies.host
+		self.base_link = 'http://extramovies.pink'
 		self.search_link = '/?s=%s'
 		self.scraper = cfscrape.create_scraper()
 

@@ -33,13 +33,13 @@ DEBUGPREFIX = '[COLOR red][ OPENSCRAPERS DEBUG ][/COLOR]'
 
 
 def log(msg, caller=None, level=LOGNOTICE):
-	debug_enabled = control.setting('addon_debug')
+	debug_enabled = control.setting('debug.enabled')
 	debug_log = control.setting('debug.location')
 
 	print DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled)
 	print DEBUGPREFIX + ' Debug Log?: ' + str(debug_log)
 
-	if control.setting('addon_debug') != 'true':
+	if control.setting('debug.enabled') != 'true':
 		return
 
 	try:
@@ -48,6 +48,9 @@ def log(msg, caller=None, level=LOGNOTICE):
 			line_number = inspect.currentframe().f_back.f_lineno
 			caller = "%s.%s()" % (caller, func.co_name)
 			msg = 'From func name: %s Line # :%s\n                       msg : %s' % (caller, line_number, msg)
+
+		if caller is not None and level == LOGERROR:
+			msg = 'From func name: %s.%s() Line # :%s\n                       msg : %s'%(caller[0], caller[1], caller[2], msg)
 
 		if isinstance(msg, unicode):
 			msg = '%s (ENCODED)' % (msg.encode('utf-8'))
@@ -69,29 +72,65 @@ def log(msg, caller=None, level=LOGNOTICE):
 			pass
 
 
+# def error(message=None, exception=True):
+	# try:
+		# import sys
+		# if exception:
+			# type, value, traceback = sys.exc_info()
+			# errortype = type.__name__
+			# errormessage = value.message
+
+			# if errormessage == '':
+				# raise Exception()
+
+			# if message:
+				# message += ' -> '
+			# else:
+				# message = ''
+			# message += str(errortype) + ' -> ' + str(errormessage)
+
+		# else:
+			# caller = None
+
+		# log(msg=message, caller=__name__, level=LOGERROR)
+	# except:
+		# pass
+
+
 def error(message=None, exception=True):
 	try:
 		import sys
 		if exception:
 			type, value, traceback = sys.exc_info()
+
+			sysaddon = sys.argv[0].split('//')[1].replace('/', '.')
+
+			filename = (traceback.tb_frame.f_code.co_filename).replace('\\', '.').replace('.py', '')
+			filename = filename.split(sysaddon)[1].replace('\\', '.')
+
+			name = traceback.tb_frame.f_code.co_name
+
+			linenumber = traceback.tb_lineno
+
 			errortype = type.__name__
 			errormessage = value.message
 
 			if errormessage == '':
 				raise Exception()
-
 			if message:
 				message += ' -> '
 			else:
 				message = ''
 			message += str(errortype) + ' -> ' + str(errormessage)
+			caller = [filename, name, linenumber]
 
 		else:
 			caller = None
-
-		log(msg=message, caller=__name__, level=LOGERROR)
+		log(msg=message, caller=caller, level = LOGERROR)
 	except:
 		pass
+
+
 
 
 class Profiler(object):

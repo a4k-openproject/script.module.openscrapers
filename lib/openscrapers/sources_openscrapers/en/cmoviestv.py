@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -9,7 +9,6 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -26,8 +25,8 @@
 
 import re
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
 from openscrapers.modules import source_utils
 
 
@@ -35,32 +34,61 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['coolmoviezone.xyz', 'coolmoviezone.watch']
-		self.base_link = 'https://coolmoviezone.watch'
+		self.domains = ['cmovies.tv', 'cmovies.video', 'cmovieshd.bz']
+		self.base_link = 'https://cmovies.tv'
+		self.search_link = '/film/%s/watching.html?ep=0'
+		self.scraper = cfscrape.create_scraper()
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			mtitle = cleantitle.geturl(title)
-			url = self.base_link + '/%s-%s' % (mtitle, year)
+			title = cleantitle.geturl(title).replace('--', '-')
+			url = self.base_link + self.search_link % title
 			return url
 		except:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
-			hostDict = hostprDict + hostDict
-			r = client.request(url)
-			match = re.compile('<td align="center"><strong><a href="(.+?)"').findall(r)
-			for url in match:
+			hostDict = hostDict + hostprDict
+
+			r = self.scraper.get(url).content
+
+			qual = re.compile('class="quality">(.+?)</span>').findall(r)
+			for i in qual:
+				info = i
+				if '1080' in i:
+					quality = '1080p'
+				elif '720' in i:
+					quality = '720p'
+				else:
+					quality = 'SD'
+			u = re.compile('data-video="(.+?)"').findall(r)
+
+			for url in u:
+				if not url.startswith('http'):
+					url =  "https:" + url
+				if 'vidcloud' in url:
+					r = self.scraper.get(url).content
+					t = re.compile('data-video="(.+?)"').findall(r)
+					for url in t:
+						if not url.startswith('http'):
+							url =  "https:" + url
+						valid, host = source_utils.is_host_valid(url, hostDict)
+						if valid and 'vidcloud' not in url:
+							sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
+
 				valid, host = source_utils.is_host_valid(url, hostDict)
-				if valid:
-					quality, info = source_utils.get_release_quality(url, url)
-					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-					                'direct': False, 'debridonly': False})
+
+				if valid and 'vidcloud' not in url:
+					sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
 			return sources
-		except Exception:
+		except:
+			source_utils.scraper_error('CMOVIESTV')
 			return sources
+
 
 	def resolve(self, url):
 		return url

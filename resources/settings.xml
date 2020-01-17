@@ -37,6 +37,7 @@
         <setting id="provider.cartoonhd" type="bool" label="CARTOONHD" default="true"/>
         <setting id="provider.cartoonhdto" type="bool" label="CARTOONHDTO" default="true"/>
         <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="true"/>
+        <setting id="provider.cmoviestv" type="bool" label="CMOVIESTV" default="true"/>
         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/>
         <setting id="provider.divxcrawler" type="bool" label="DIVXCRAWLER" default="true"/>
         <setting id="provider.easynews" type="bool" label="EASYNEWS" default="true"/>
@@ -86,7 +87,6 @@
         <setting label="Enable All Foreign Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllForeign&amp;setting=true&amp;query=2.1)"/>
 
-
         <setting label="German" type="lsep"/>
         <setting label="Disable All German Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGerman&amp;setting=false&amp;query=2.4)"/>
@@ -116,8 +116,6 @@
         <setting id="provider.video4k" type="bool" label="VIDEO$NUMBER[4]K" default="false"/>
         <setting id="provider.view4u" type="bool" label="VIEW4U" default="false"/>
         <setting id="provider.view4u2" type="bool" label="VIEW4U2" default="false"/>
-
-
         <setting label="Spanish" type="lsep"/>
         <setting label="Disable All Spanish Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllSpanish&amp;setting=false&amp;query=2.32)"/>
@@ -127,8 +125,6 @@
         <setting id="provider.pelisplustv" type="bool" label="PELISPLUSTV" default="false"/>
         <setting id="provider.pepecine" type="bool" label="PEPCINE" default="false"/>
         <setting id="provider.seriespapaya" type="bool" label="SERIESPAPAYA" default="false"/>
-
-
         <setting label="French" type="lsep"/>
         <setting label="Disable All French Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllFrench&amp;setting=false&amp;query=2.40)"/>
@@ -144,8 +140,6 @@
         <setting id="provider.planetvideos" type="bool" label="PLANETVIDEOS" default="false"/>
         <setting id="provider.streamay" type="bool" label="STREAMAY" default="false"/>
         <setting id="provider.zonestreaming" type="bool" label="ZONESTREAMING" default="false"/>
-
-
         <setting label="Greek" type="lsep"/>
         <setting label="Disable All Greek Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllGreek&amp;setting=false&amp;query=2.54)"/>
@@ -156,8 +150,6 @@
         <setting id="provider.liomenoi" type="bool" label="LIOMENOI" default="false"/>
         <setting id="provider.tainiomania" type="bool" label="TAINIOMANIA" default="false"/>
         <setting id="provider.xrysoi" type="bool" label="XRYSOI" default="false"/>
-
-
         <setting label="Korean" type="lsep"/>
         <setting label="Disable All Korean Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllKorean&amp;setting=false&amp;query=2.63)"/>
@@ -193,7 +185,6 @@
         <setting id="provider.kinonet" type="bool" label="KINONET" default="false"/>
         <setting id="provider.serialeco" type="bool" label="SERIALECO" default="false"/>
         <setting id="provider.szukajkatv" type="bool" label="SZUKAJKATV" default="false"/>
-
         <setting label="Russian" type="lsep"/>
         <setting label="Disable All Russian Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllRussian&amp;setting=false&amp;query=3.20)"/>
@@ -204,7 +195,6 @@
         <setting id="provider.filmix" type="bool" label="FILMIX" default="false"/>
         <setting id="provider.newkino" type="bool" label="NEWKINO" default="false"/>
     </category>
-
 
     <!-- Debrid Sources-4 -->
     <category label="Debrid Only">
@@ -229,7 +219,6 @@
         <setting id="provider.sceneddl" type="bool" label="SCENEDDL" default="true"/>
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true"/>
     </category>
-
 
     <!-- Torrents-5 -->
     <category label="Torrent (cached)">
@@ -262,6 +251,7 @@
         <setting id="provider.torrentgalaxy" type="bool" label="TORRENTGALAXY" default="true"/>
         <setting id="provider.torrentquest" type="bool" label="TORRENTQUEST" default="true"/>
         <setting id="provider.torrentz" type="bool" label="TORRENTZ" default="true"/>
+        <setting id="provider.yourbittorrent" type="bool" label="YOURBITTORRENT" default="true"/>
         <setting id="provider.ytsws" type="bool" label="YTSWS" default="true"/>
         <setting id="provider.ytslt" type="bool" label="YTSLT" default="true"/>
         <setting id="provider.zoogle" type="bool" label="ZOOGLE" default="true"/>
@@ -285,12 +275,11 @@
         <setting type="lsep" label="SerienStream.to"/>
         <setting id="serienstream.user" type="text" label="Email" default=""/>
         <setting id="serienstream.pass" type="text" option="hidden" label="Password" default=""/>
-
-        <!--	<setting type="lsep" label="Streamlord.com" /> -->
-        <!--	<setting id="streamlord.user" type="text" label="User" default="" /> -->
-        <!--	<setting id="streamlord.pass" type="text" option="hidden" label="Password" default="" /> -->
     </category>
-    <!--    <category label="Debug">\-->
-    <!--        <setting id="addon_debug" type="bool" label="Enable Debug" default="false" />-->
-    <!--    </category>-->
+
+    <!-- Debugging - 7 -->
+    <category label="Debug">
+        <setting id="debug.enabled" type="bool" label="Enable Debug" default="false" />
+        <setting id="debug.location" type="enum" label="Logging Location" values="Kodi Log|Addon Log" default="1" enable="eq(-1,true)" />
+    </category>
 </settings>
