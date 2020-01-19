@@ -114,15 +114,15 @@ class source:
 			for link in links:
 				url = str(client.replaceHTMLCodes(link).split('&tr')[0])
 				url = urllib.unquote_plus(url)
-
-				if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-					continue
-
 				if url in str(sources):
 					continue
 
 				name = url.split('&dn=')[1]
-				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+				name = urllib.unquote_plus(name).replace(' ', '.')
+				if source_utils.remove_lang(name):
+					continue
+
+				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 				if cleantitle.get(t) != cleantitle.get(title):
 					continue
 
@@ -136,13 +136,14 @@ class source:
 					div = 1 if size.endswith(('GB', 'GiB')) else 1024
 					size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
 					size = '%.2f GB' % size
-					info.append(size)
+					info.insert(0, size)
 				except:
 					pass
 
 				info = ' | '.join(info)
 
-				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+												'info': info, 'direct': False, 'debridonly': True})
 			return sources
 
 		except:

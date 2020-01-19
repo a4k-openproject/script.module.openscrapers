@@ -41,7 +41,6 @@ class source:
 		self.language = ['en']
 		self.domains = ['btdb.eu']
 		self.base_link = 'https://btdb.eu/'
-		# self.search_link = '?search=%s'
 		self.search_link = '/?s=%s'
 		self.scraper = cfscrape.create_scraper()
 
@@ -112,10 +111,10 @@ class source:
 					for url in link:
 						url = url.split('&tr')[0]
 
-						if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-							continue
-
 						name = url.split('&dn=')[1]
+						name = urllib.unquote_plus(name).replace(' ', '.')
+						if source_utils.remove_lang(name):
+							continue
 
 						if name.startswith('www.'):
 							try:
@@ -123,7 +122,7 @@ class source:
 							except:
 								name = re.sub(r'\www..+? ', '', name)
 
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 						if cleantitle.get(t) != cleantitle.get(title):
 							continue
 
@@ -137,7 +136,7 @@ class source:
 							div = 1 if size.endswith('GB') else 1024
 							size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
 							size = '%.2f GB' % size
-							info.append(size)
+							info.insert(0, size)
 						except:
 							pass
 

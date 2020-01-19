@@ -39,8 +39,8 @@ class source:
 	def __init__(self):
 		self.priority = 0
 		self.language = ['en']
-		self.domain = ['ettv.unblockit.ca']
-		self.base_link = 'https://ettv.unblockit.ca'
+		self.domain = ['ettv.unblockit.biz']
+		self.base_link = 'https://ettv.unblockit.biz'
 		self.search_link = '/torrents-search.php?search=%s'
 
 
@@ -125,28 +125,28 @@ class source:
 			url = '%s%s' % (self.base_link, url)
 			result = client.request(url)
 			if 'magnet' not in result:
-				raise Exception()
+				return
 
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
 			url = urllib.unquote(url).decode('utf8').replace('&amp;', '&')
 			url = url.split('&xl=')[0]
 
 			if url in str(self.sources):
-				raise Exception()
+				return
 
 			size_list = client.parseDOM(result, "td", attrs={"class": "table_col2"})
 
-			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-				raise Exception()
-
 			name = url.split('&dn=')[1]
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('+', ' ')
+			name = urllib.unquote_plus(urllib.unquote_plus(name)).replace(' ', '.')
+			if source_utils.remove_lang(name):
+				return
 
+			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 			if cleantitle.get(t) != cleantitle.get(self.title):
-				raise Exception()
+				return
 
 			if self.hdlr not in name:
-				raise Exception()
+				return
 
 			quality, info = source_utils.get_release_quality(name, url)
 
@@ -169,6 +169,7 @@ class source:
 												'info': info, 'direct': False, 'debridonly': True})
 
 		except:
+			source_utils.scraper_error('ETTV')
 			pass
 
 	def resolve(self, url):

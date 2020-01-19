@@ -38,8 +38,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentgalaxy.to']
-		self.base_link = 'https://torrentgalaxy.to'
+		self.domain = ['torrentgalaxy.unblockit.biz']
+		self.base_link = 'https://torrentgalaxy.unblockit.biz'
 		self.search_link = '/torrents.php?search=%s'
 
 
@@ -99,45 +99,45 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			try:
-				r = client.request(url)
-				posts = client.parseDOM(r, 'div', attrs={'class': 'tgxtable'})
+			r = client.request(url)
+			posts = client.parseDOM(r, 'div', attrs={'class': 'tgxtable'})
 
-				for post in posts:
-					link = re.findall('a href="(magnet:.+?)"', post, re.DOTALL)
+			for post in posts:
+				link = re.findall('a href="(magnet:.+?)"', post, re.DOTALL)
 
-					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-						div = 1 if size.endswith('GB') else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-						size = '%.2f GB' % size
-					except:
-						size = '0'
+				try:
+					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					div = 1 if size.endswith('GB') else 1024
+					size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+					size = '%.2f GB' % size
+				except:
+					size = '0'
 
-					for url in link:
-						url = url.split('&tr')[0]
+				for url in link:
+					url = url.split('&tr')[0]
 
-						if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-							continue
+					name = url.split('&dn=')[1]
+					name = urllib.unquote_plus(name).replace(' ', '.')
+					if source_utils.remove_lang(name):
+						continue
 
-						name = url.split('&dn=')[1]
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-						if cleantitle.get(t) != cleantitle.get(title):
-							continue
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+					if cleantitle.get(t) != cleantitle.get(title):
+						continue
 
-						if hdlr not in name:
-							continue
+					if hdlr not in name:
+						continue
 
-						quality, info = source_utils.get_release_quality(name, url)
+					quality, info = source_utils.get_release_quality(name, url)
 
-						info.append(size)
-						info = ' | '.join(info)
+					info.insert(0, size)
+					info = ' | '.join(info)
 
-						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True})
-			except:
-				return
+					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+												'info': info, 'direct': False, 'debridonly': True})
+
 			return sources
+
 		except:
 			source_utils.scraper_error('TORRENTGALAXY')
 			return sources

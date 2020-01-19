@@ -152,8 +152,11 @@ class source:
 				link = urllib.unquote(ref).decode('utf8').replace('https://mylink.me.uk/?url=', '').replace('https://mylink.cx/?url=', '')
 
 				name = urllib.unquote_plus(re.search('dn=([^&]+)', link).groups()[0])
+				name = name.replace(' ', '.')
+				if source_utils.remove_lang(name):
+					continue
 
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
+				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 				if cleantitle.get(t) != cleantitle.get(self.title):
 					continue
 
@@ -183,17 +186,13 @@ class source:
 			name = item[0]
 			url = item[1]
 
-			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-				return
-
 			quality, info = source_utils.get_release_quality(name, url)
 
-			info.append(item[2])  # if item[2] != '0'
+			info.insert(0, item[2]) # if item[2] != '0'
 			info = ' | '.join(info)
 
 			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
 												'info': info, 'direct': False, 'debridonly': True})
-
 		except:
 			source_utils.scraper_error('KICKASS2')
 			pass

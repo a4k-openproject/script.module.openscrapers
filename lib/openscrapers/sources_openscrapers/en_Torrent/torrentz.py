@@ -113,11 +113,12 @@ class source:
 						dn = '&dn=' + magnet.split('>')[1]
 						url = hash + dn
 
-						if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+						name = url.split('&dn=')[1]
+						name = urllib.unquote_plus(name).replace(' ', '.')
+						if source_utils.remove_lang(name):
 							continue
 
-						name = url.split('&dn=')[1]
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 						if cleantitle.get(t) != cleantitle.get(title):
 							continue
 
@@ -131,7 +132,7 @@ class source:
 							div = 1 if size.endswith('GB') else 1024
 							size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
 							size = '%.2f GB' % size
-							info.append(size)
+							info.insert(0, size)
 						except:
 							pass
 

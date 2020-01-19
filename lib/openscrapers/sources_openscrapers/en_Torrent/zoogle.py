@@ -125,20 +125,21 @@ class source:
 					except:
 						continue
 
-					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-						continue
-
 					try:
 						name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
+						name = urllib.unquote_plus(name).replace(' ', '.')
 					except:
+						continue
+
+					if source_utils.remove_lang(name):
 						continue
 
 					# allot of movies have foreign title translation in front so remove it
 					if ' / ' in name:
 						name = name.split(' / ')[1]
 
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -160,7 +161,7 @@ class source:
 						div = 1 if size.endswith(('GB', 'GiB')) else 1024
 						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
 						size = '%.2f GB' % size
-						info.append(size)
+						info.insert(0, size)
 					except:
 						pass
 

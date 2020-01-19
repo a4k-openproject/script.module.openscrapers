@@ -142,8 +142,11 @@ class source:
 				link = urlparse.urljoin(self.base_link, data)
 
 				name = client.parseDOM(post, 'a')[1]
+				name = urllib.unquote_plus(name).replace(' ', '.')
+				if source_utils.remove_lang(name):
+					return
 
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
+				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 				if cleantitle.get(t) != cleantitle.get(self.title):
 					continue
 
@@ -174,7 +177,7 @@ class source:
 
 			quality, info = source_utils.get_release_quality(item[1], name)
 
-			info.append(item[2]) # if item[2] != '0'
+			info.insert(0, item[2]) # if item[2] != '0'
 			info = ' | '.join(info)
 
 			data = client.request(item[1])
@@ -183,12 +186,8 @@ class source:
 			url = [i for i in data if 'magnet:' in i][0]
 			url = url.split('&tr')[0]
 
-			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-				return
-
 			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
 												'info': info, 'direct': False, 'debridonly': True})
-
 		except:
 			source_utils.scraper_error('1337X')
 			pass

@@ -127,20 +127,17 @@ class source:
 
 			_hash = re.search(r'<info_hash>([a-zA-Z0-9]+)</info_hash>', r).groups()[0]
 			name = re.search(r'<title>(.+?)</title>', r).groups()[0]
+			name = urllib.unquote_plus(name).replace(' ', '.')
+			if source_utils.remove_lang(name):
+				return
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (_hash.upper(), urllib.quote_plus(name))
 
-			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-				# raise Exception()
-				return
-
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
-			t = name.split(self.hdlr)[0]
+			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 			if cleantitle.get(t) != cleantitle.get(self.title):
 				return
 
 			if self.hdlr not in name:
-				# raise Exception()
 				return
 
 			quality, info = source_utils.get_release_quality(name, name)

@@ -82,7 +82,7 @@ class source:
 			try:
 				results = client.parseDOM(html, 'div', attrs={'class': 'row'})[2]
 			except:
-				source_utils.scraper_error('YTS')
+				source_utils.scraper_error('YTSLT')
 				return sources
 
 			items = re.findall('class="browse-movie-bottom">(.+?)</div>\s</div>', results, re.DOTALL)
@@ -95,13 +95,14 @@ class source:
 					try:
 						link, name = re.findall('<a href="(.+?)" class="browse-movie-title">(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name)
+						name = urllib.unquote_plus(name).replace(' ', '.')
 					except:
 						continue
 
-					if any(x in link.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+					if source_utils.remove_lang(name):
 						continue
 
-					t = name.split(hdlr)[0].replace('&', 'and')
+					t = name.split(hdlr)[0].replace('&', 'and').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -130,7 +131,7 @@ class source:
 								div = 1 if size.endswith(('GB', 'GiB')) else 1024
 								size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
 								size = '%.2f GB' % size
-								info.append(size)
+								info.insert(0, size)
 							except:
 								pass
 
@@ -139,16 +140,16 @@ class source:
 							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': link,
 														'info': info, 'direct': False, 'debridonly': True})
 					except:
-						source_utils.scraper_error('YTS')
+						source_utils.scraper_error('YTSLT')
 						continue
 				except:
-					source_utils.scraper_error('YTS')
+					source_utils.scraper_error('YTSLT')
 					continue
 
 			return sources
 
 		except:
-			source_utils.scraper_error('YTS')
+			source_utils.scraper_error('YTSLT')
 			return sources
 
 

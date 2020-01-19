@@ -127,24 +127,23 @@ class source:
 			info_hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
 			url = '%s%s' % ('magnet:?xt=urn:btih:', info_hash)
 			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0]
+			name = urllib.unquote_plus(name).replace(' ', '.')
 			url = '%s%s%s' % (url, '&dn=', str(name))
 
-			size = re.findall('<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
+			if source_utils.remove_lang(name):
+				return
 
 			if url in str(self.sources):
 				return
 
-			if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-				return
-
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('+', ' ')
-
+			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 			if cleantitle.get(t) != cleantitle.get(self.title):
 				return
 
 			if self.hdlr not in name:
 				return
 
+			size = re.findall('<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
 			quality, info = source_utils.get_release_quality(name, url)
 
 			try:

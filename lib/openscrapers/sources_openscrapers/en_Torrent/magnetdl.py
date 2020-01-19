@@ -132,7 +132,11 @@ class source:
 					continue
 
 				name = client.parseDOM(post, 'a', ret='title')[1]
-				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+				name = urllib.unquote_plus(name).replace(' ', '.')
+				if source_utils.remove_lang(name):
+					continue
+
+				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 				if cleantitle.get(t) != cleantitle.get(title):
 					continue
 
@@ -146,7 +150,7 @@ class source:
 					div = 1 if size.endswith(('GB', 'GiB')) else 1024
 					size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
 					size = '%.2f GB' % size
-					info.append(size)
+					info.insert(0, size)
 				except:
 					pass
 
