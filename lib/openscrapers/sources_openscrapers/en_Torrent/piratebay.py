@@ -143,14 +143,14 @@ class source:
 					except:
 						continue
 
-					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-						continue
-
 					try:
 						name = re.findall('class="detLink" title=".+?">(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name)
+						name = urllib.unquote_plus(name).replace(' ', '.')
+						if source_utils.remove_lang(name):
+							continue
 
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 						if cleantitle.get(t) != cleantitle.get(title):
 							continue
 					except:
@@ -174,7 +174,7 @@ class source:
 						div = 1 if size.endswith(('GB', 'GiB')) else 1024
 						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
 						size = '%.2f GB' % size
-						info.append(size)
+						info.insert(0, size)
 					except:
 						pass
 

@@ -38,8 +38,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['pirateiro.unblocked.earth']
-		self.base_link = 'https://pirateiro.unblocked.earth'
+		self.domains = ['pirateiro.unblockit.biz']
+		self.base_link = 'https://pirateiro.unblockit.biz'
 		self.search_link = '/torrents/?search=%s'
 		self.scraper = cfscrape.create_scraper()
 
@@ -101,7 +101,6 @@ class source:
 
 			try:
 				r = self.scraper.get(url).content
-
 				links = zip(re.findall('href="(magnet:.+?)"', r, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', r, re.DOTALL))
 
 				for link in links:
@@ -109,11 +108,12 @@ class source:
 
 					size = link[1]
 
-					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+					name = url.split('&dn=')[1]
+					name = urllib.unquote_plus(name).replace(' ', '.')
+					if source_utils.remove_lang(name):
 						continue
 
-					name = url.split('&dn=')[1]
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -126,7 +126,7 @@ class source:
 						div = 1 if size.endswith('GB') else 1024
 						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
 						size = '%.2f GB' % size
-						info.append(size)
+						info.insert(0, size)
 					except:
 						pass
 

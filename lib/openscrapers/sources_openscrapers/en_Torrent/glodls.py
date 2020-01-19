@@ -115,7 +115,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name, url)
 
-					info.append(item[2]) # if item[2] != '0'
+					info.insert(0, item[2]) # if item[2] != '0'
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
@@ -143,12 +143,12 @@ class source:
 				ref = client.parseDOM(post, 'a', ret='href')
 				url = [i for i in ref if 'magnet:' in i][0]
 
-				if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+				name = client.parseDOM(post, 'a', ret='title')[0]
+				name = urllib.unquote_plus(name).replace(' ', '.')
+				if source_utils.remove_lang(name):
 					continue
 
-				name = client.parseDOM(post, 'a', ret='title')[0]
-
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
+				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 				if cleantitle.get(t) != cleantitle.get(self.title):
 					continue
 
@@ -167,7 +167,6 @@ class source:
 				items.append((name, url, size))
 
 			return items
-
 		except:
 			source_utils.scraper_error('GLODLS')
 			return items

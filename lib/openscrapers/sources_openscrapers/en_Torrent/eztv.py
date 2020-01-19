@@ -117,12 +117,12 @@ class source:
 					url = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
 					url = urllib.unquote(url).decode('utf8')
 
-					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+					name = derka[1]
+					name = urllib.unquote_plus(name).replace(' ', '.')
+					if source_utils.remove_lang(name):
 						continue
 
-					name = derka[1]
-
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -144,7 +144,7 @@ class source:
 						div = 1 if size.endswith(('GB', 'GiB')) else 1024
 						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
 						size = '%.2f GB' % size
-						info.append(size)
+						info.insert(0, size)
 					except:
 						pass
 

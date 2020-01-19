@@ -106,16 +106,17 @@ class source:
 					url = link[0].replace('&amp;', '&')
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 					url = url.split('&tr=')[0]
+
 					if 'magnet' not in url:
 						continue
-
 					size = int(link[1])
 
-					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+					name = url.split('&dn=')[1]
+					name = urllib.unquote_plus(name).replace(' ', '.')
+					if source_utils.remove_lang(name):
 						continue
 
-					name = url.split('&dn=')[1]
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
@@ -128,7 +129,7 @@ class source:
 						if size < 5.12: raise Exception()
 						size = float(size) / 1024
 						size = '%.2f GB' % size
-						info.append(size)
+						info.insert(0, size)
 					except:
 						pass
 

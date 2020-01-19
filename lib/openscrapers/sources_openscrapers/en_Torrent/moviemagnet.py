@@ -98,17 +98,20 @@ class source:
 
 				for link in links:
 					name = link[0]
-					t = name.split(year)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('+', ' ')
+					name = urllib.unquote_plus(name).replace(' ', '.')
+					if source_utils.remove_lang(name):
+						continue
 
+					t = name.split(year)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 					if cleantitle.get(t) != cleantitle.get(title):
+						continue
+
+					if year not in name:
 						continue
 
 					url = link[1]
 					url = urllib.unquote(url).decode('utf8').replace('&amp;', '&')
 					url = url.split('&tr')[0]
-
-					if year not in name:
-						continue
 
 					quality, info = source_utils.get_release_quality(name, url)
 

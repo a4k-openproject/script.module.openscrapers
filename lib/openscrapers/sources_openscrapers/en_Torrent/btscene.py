@@ -128,16 +128,14 @@ class source:
 					continue
 
 				for url in link:
-
 					url = url.split('&tr')[0]
 
-					if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+					name = url.split('&dn=')[1]
+					name = urllib.unquote_plus(name).replace(' ', '.')
+					if source_utils.remove_lang(name):
 						continue
 
-					name = url.split('&dn=')[1]
-					name = urllib.unquote_plus(name)
-
-					t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
+					t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 					if cleantitle.get(t) != cleantitle.get(self.title):
 						continue
 
@@ -151,7 +149,7 @@ class source:
 						div = 1 if size.endswith(('GB', 'GiB')) else 1024
 						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
 						size = '%.2f GB' % size
-						info.append(size)
+						info.insert(0, size)
 					except:
 						pass
 

@@ -125,15 +125,13 @@ class source:
 
 						for url in link:
 							url = url.split('&tr')[0]
-
-							if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
-								continue
-
 							if url in str(sources):
 								continue
 
 							name = url.split('&dn=')[1]
-							name = urllib.unquote_plus(urllib.unquote_plus(name))
+							name = urllib.unquote_plus(urllib.unquote_plus(name)).replace(' ', '.')
+							if source_utils.remove_lang(name):
+								continue
 
 							if name.startswith('www.'):
 								try:
@@ -141,7 +139,7 @@ class source:
 								except:
 									name = re.sub(r'\www..+? ', '', name)
 
-							t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+							t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 							if cleantitle.get(t) != cleantitle.get(title):
 								continue
 
@@ -150,7 +148,7 @@ class source:
 
 							quality, info = source_utils.get_release_quality(name, url)
 
-							info.append(size)
+							info.insert(0, size)
 							info = ' | '.join(info)
 
 							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,

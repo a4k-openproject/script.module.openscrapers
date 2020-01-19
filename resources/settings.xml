@@ -30,7 +30,6 @@
         <setting id="provider.1putlocker" type="bool" label="$NUMBER[1]PUTLOCKER" default="true"/>
         <setting id="provider.5movies" type="bool" label="$NUMBER[5]MOVIES" default="true"/>
         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="true"/>
-        <setting id="provider.allucxyz" type="bool" label="ALLUCXYZ" default="true"/>
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="true"/>
         <setting id="provider.azmovie" type="bool" label="AZMOVIE" default="true"/>	
         <setting id="provider.bnwmovies" type="bool" label="BNWMOVIES" default="true"/>
@@ -252,8 +251,8 @@
         <setting id="provider.torrentquest" type="bool" label="TORRENTQUEST" default="true"/>
         <setting id="provider.torrentz" type="bool" label="TORRENTZ" default="true"/>
         <setting id="provider.yourbittorrent" type="bool" label="YOURBITTORRENT" default="true"/>
-        <setting id="provider.ytsws" type="bool" label="YTSWS" default="true"/>
         <setting id="provider.ytslt" type="bool" label="YTSLT" default="true"/>
+        <setting id="provider.ytsws" type="bool" label="YTSWS" default="true"/>
         <setting id="provider.zoogle" type="bool" label="ZOOGLE" default="true"/>
     </category>
 

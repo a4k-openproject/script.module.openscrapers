@@ -28,7 +28,7 @@ import urlparse
 from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import pyaes
-from openscrapers.modules import trakt
+from openscrapers.modules import trakt, log_utils
 
 RES_4K = ['4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra-hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
           '1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
@@ -66,15 +66,19 @@ VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side by side', 'stereoscopic', '
 
 MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng', 'dut.eng', 'ell.eng', 'esl.eng',
               'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng',
-              'gtm.eng',
-              'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng',
-              'lat.eng',
-              'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
+              'gtm.eng', 'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng',
+              'lat.eng', 'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
               'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual audio', 'dual-audio',
               'dual.audio']
 
-LANG = ['french', 'italian', 'spanish', 'truefrech', 'german', 'arabic', 'dutch', 'portuguese', 'greek', 'arabic',
-        'finnish', 'hebrew']
+LANG = ['arabic', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'polish', 'portuguese', 'spanish',
+              'truefrech', 'hebrew']
+
+UNDESIREABLES = ['coldfilm', 'lostfilm', 'newstudio', 'vostfr']
+
+DUBBED = ['dublado', 'dubbed']
+
+SUBS = ['subs', 'subtitula']
 
 ADDS = ['1xbet']
 
@@ -277,7 +281,7 @@ def getFileType(url):
 	if any(value in url for value in ADDS):
 		type += ' IXBET /'
 
-	if 'subs' in url:
+	if any(value in url for value in SUBS):
 		if type != '':
 			type += ' WITH SUBS'
 		else:
@@ -583,6 +587,25 @@ def evpKDF(passwd, salt, key_size=8, iv_size=4, iterations=1, hash_algorithm="md
 		number_of_derived_words += len(block) / 4
 
 	return {"key": derived_bytes[0: key_size * 4], "iv": derived_bytes[key_size * 4:]}
+
+
+def remove_lang(name):
+	try:
+		name = name.lower()
+		name = name.replace(' ', '.')
+	except:
+		name = str(name)
+
+	if any(value in name for value in LANG):
+		return True
+	elif any(value in name for value in UNDESIREABLES):
+		return True
+	elif any(value in name for value in DUBBED):
+		return True
+	elif 'rus' in name and 'eng' not in name.lower():
+		return True
+	else:
+		return False
 
 
 def scraper_error(provider):
