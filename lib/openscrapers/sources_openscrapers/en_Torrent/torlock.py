@@ -39,9 +39,9 @@ class source:
 	def __init__(self):
 		self.priority = 0
 		self.language = ['en']
-		self.domain = ['torlock.unblockit.biz']
-		self.base_link = 'https://torlock.unblockit.biz'
-		self.search_link = '/all/torrents/%s.html?'
+		self.domain = ['torlock.cc']
+		self.base_link = 'https://torlock.cc'
+		self.search_link = '/all/torrents/%s/'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -102,7 +102,10 @@ class source:
 
 			try:
 				r = client.request(url)
-				links = re.findall('<a href=(/torrent/.+?)>', r, re.DOTALL)
+				div = client.parseDOM(r, 'div', attrs={'class': 'panel panel-default'})[0]
+				table = client.parseDOM(div, 'table', attrs={'class': 'table table-striped table-bordered table-hover table-condensed'})[0]
+				links = re.findall('<a href="(.+?)">', table, re.DOTALL)
+				# log_utils.log('links = %s' % links, log_utils.LOGDEBUG)
 
 				threads = []
 				for link in links:
