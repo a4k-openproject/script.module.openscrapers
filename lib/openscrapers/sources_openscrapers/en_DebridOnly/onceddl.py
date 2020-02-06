@@ -38,8 +38,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['sceneddl.me']
-		self.base_link = 'http://www.sceneddl.me'
+		self.domains = ['onceddl.net']
+		self.base_link = 'https://onceddl.net'
 		self.search_link = '/?s=%s'
 
 
@@ -99,73 +99,59 @@ class source:
 
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url).replace('-', '+')
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
+			posts = client.parseDOM(r, "div", attrs={"class": "item-post"})
+			posts = client.parseDOM(posts, "h3")
 
-			if r is None and 'tvshowtitle' in data:
-				season = re.search('S(.*?)E', hdlr)
-				season = season.group(1)
-				url = title
-				r = client.request(url)
-
-			for loopCount in range(0, 2):
-				if loopCount == 1 or (r is None and 'tvshowtitle' in data):
-					r = client.request(url)
-				posts = client.parseDOM(r, "h2", attrs={"class": "entry-title"})
-
-				items = []
-				for post in posts:
-					try:
-						tit = client.parseDOM(post, "a")[0]
-						t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-						if cleantitle.get(t) != cleantitle.get(title):
-							continue
-
-						if hdlr not in tit:
-							continue
-
-						u = client.parseDOM(post, 'a', ret='href')
-
-						for i in u:
-							name = str(i)
-							items.append(name)
-					except:
-						source_utils.scraper_error('SCENEDDL')
-						pass
-
-				if len(items) > 0:
-					break
-
-			for item in items:
+			items = []
+			for post in posts:
 				try:
-					i = str(item)
-					r = client.request(i)
-					u = client.parseDOM(r, "div", attrs={"class": "entry-content"})
+					u = client.parseDOM(post, 'a', ret='href')[0]
+					r = client.request(u)
+					u = client.parseDOM(r, "div", attrs={"class": "single-link"})
 
 					for t in u:
 						r = client.parseDOM(t, 'a', ret='href')
 
 						for url in r:
-							if '.rar' in url or 'imdb.com' in url:
+							if any(x in url for x in ['.rar', '.zip', '.iso', '.sample.']):
 								continue
 
-							quality, info = source_utils.get_release_quality(url)
-
 							valid, host = source_utils.is_host_valid(url, hostDict)
+
 							if valid:
+								name = url.split('OnceDDL_')[1]
+
+								if source_utils.remove_lang(name):
+									continue
+
+								t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+								if cleantitle.get(t) != cleantitle.get(title):
+									continue
+
+								if hdlr not in name:
+									continue
+
+								if url in str(sources):
+									continue
+
+								quality, info = source_utils.get_release_quality(name, url)
+
+								# size info not available on onceddl
+
 								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
 				except:
-					source_utils.scraper_error('SCENEDDL')
+					source_utils.scraper_error('ONCEDDL')
 					pass
 
 			return sources
 
 		except:
-			source_utils.scraper_error('SCENEDDL')
+			source_utils.scraper_error('ONCEDDL')
 			return sources
 
 
 	def resolve(self, url):
 		return url
-
-

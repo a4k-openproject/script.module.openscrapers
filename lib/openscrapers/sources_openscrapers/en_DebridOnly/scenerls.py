@@ -32,7 +32,7 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import source_utils
+from openscrapers.modules import source_utils, log_utils
 
 
 class source:
@@ -109,15 +109,16 @@ class source:
 
 				posts = client.parseDOM(r, 'div', attrs={'class': 'post'})
 
-				items = [];
+				items = []
 				dupes = []
 
 				for post in posts:
 					try:
-						u = client.parseDOM(post, "div", attrs={"class": "postContent"})
-						u = client.parseDOM(u, "h2")
+						content = client.parseDOM(post, "div", attrs={"class": "postContent"})
+						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', content[0])[0]
+						u = client.parseDOM(content, "h2")
 						u = client.parseDOM(u, 'a', ret='href')
-						u = [(i.strip('/').split('/')[-1], i) for i in u]
+						u = [(i.strip('/').split('/')[-1], i, size) for i in u]
 						items += u
 					except:
 						source_utils.scraper_error('SCENERLS')
@@ -132,25 +133,38 @@ class source:
 					name = item[0]
 					name = client.replaceHTMLCodes(name)
 
+					if source_utils.remove_lang(name):
+						return
+
 					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 					if cleantitle.get(t) != cleantitle.get(title):
 						continue
 
-					tit = name.replace('.', ' ')
-
-					if hdlr not in tit:
+					if hdlr not in name:
 						continue
 
 					quality, info = source_utils.get_release_quality(name, item[1])
+
+					try:
+						size = item[2]
+						div = 1 if size.endswith('GB') else 1024
+						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
+						size = '%.2f GB' % size
+						info.insert(0, size)
+					except:
+						size = '0'
+						pass
+
 					info = ' | '.join(info)
 
 					url = item[1]
-
-					if any(x in url for x in ['.rar', '.zip', '.iso']):
+					if any(x in url for x in ['.rar', '.zip', '.iso', '.sample.']):
 						continue
 
 					url = client.replaceHTMLCodes(url)
 					url = url.encode('utf-8')
+					if url in str(sources):
+						continue
 
 					host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
 
