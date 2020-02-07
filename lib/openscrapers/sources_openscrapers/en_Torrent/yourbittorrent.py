@@ -100,20 +100,18 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			try:
-				r = client.request(url)
-				links = re.findall('<a href="(/torrent/.+?)"', r, re.DOTALL)
-
-				threads = []
-				for link in links:
-					threads.append(workers.Thread(self.get_sources, link))
-				[i.start() for i in threads]
-				[i.join() for i in threads]
-				return self.sources
-			except:
-				source_utils.scraper_error('YOURBITTORRENT')
+			r = client.request(url)
+			if r is None:
 				return self.sources
 
+			links = re.findall('<a href="(/torrent/.+?)"', r, re.DOTALL)
+
+			threads = []
+			for link in links:
+				threads.append(workers.Thread(self.get_sources, link))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
+			return self.sources
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 			return self.sources
@@ -123,7 +121,8 @@ class source:
 		try:
 			url = '%s%s' % (self.base_link, link)
 			result = client.request(url)
-
+			if result is None:
+				return
 			info_hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
 			url = '%s%s' % ('magnet:?xt=urn:btih:', info_hash)
 			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0]

@@ -147,7 +147,8 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 								except:
 									data = None
 
-							scraper = cfscrape.CloudflareScraper()
+							# scraper = cfscrape.CloudflareScraper()
+							scraper = cfscrape.CloudScraper()
 							response = scraper.request(method='GET' if post is None else 'POST', url=url,
 							                           headers=headers, data=data, timeout=int(timeout))
 							result = response.content

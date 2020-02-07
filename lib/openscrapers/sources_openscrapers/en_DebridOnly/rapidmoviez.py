@@ -39,163 +39,173 @@ from openscrapers.modules import workers
 
 
 class source:
-    def __init__(self):
-        self.priority = 1
-        self.language = ['en']
-        self.domains = ['rmz.cr']
-        self.base_link = 'http://rmz.cr/'
-        self.search_link = 'search/%s'
-        self.scraper = cfscrape.create_scraper()
+	def __init__(self):
+		self.priority = 1
+		self.language = ['en']
+		# self.domains = ['rmz.cr']
+		self.domains = ['rapidmoviez.cr']
+		# self.base_link = 'http://rmz.cr/' # reCaptcha
+		self.base_link = 'http://rapidmoviez.cr/'
+		self.search_link = 'search/%s'
+		self.scraper = cfscrape.create_scraper()
 
 
-    def movie(self, imdb, title, localtitle, aliases, year):
-        try:
-            url = {'imdb': imdb, 'title': title, 'year': year}
-            url = urllib.urlencode(url)
-            return url
-        except:
-            return
+	def movie(self, imdb, title, localtitle, aliases, year):
+		try:
+			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = urllib.urlencode(url)
+			return url
+		except:
+			return
 
 
-    def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-        try:
-            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-            url = urllib.urlencode(url)
-            return url
-        except:
-            return
+	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+		try:
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = urllib.urlencode(url)
+			return url
+		except:
+			return
 
 
-    def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-        try:
-            if url is None:
-                return
+	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
+		try:
+			if url is None:
+				return
 
-            url = urlparse.parse_qs(url)
-            url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-            url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-            url = urllib.urlencode(url)
-            return url
-        except:
-            return
-
-
-    def search(self, title, year):
-        try:
-            url = urlparse.urljoin(self.base_link, self.search_link % (urllib.quote_plus(title)))
-            headers = {'User-Agent': client.agent()}
-            r = self.scraper.get(url, headers=headers).content
-
-                # switch to client.parseDOM() to rid import
-            r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
-            r = dom_parser.parse_dom(r.content, 'li')
-            r = [(dom_parser.parse_dom(i, 'a', {'class': 'title'})) for i in r]
-            r = [(i[0].attrs['href'], i[0].content) for i in r]
-            r = [(urlparse.urljoin(self.base_link, i[0])) for i in r if cleantitle.get(title) in cleantitle.get(i[1]) and year in i[1]]
-
-            if r:
-                return r[0]
-            else:
-                return
-        except:
-            return
+			url = urlparse.parse_qs(url)
+			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
+			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
+			url = urllib.urlencode(url)
+			return url
+		except:
+			return
 
 
-    def sources(self, url, hostDict, hostprDict):
-        try:
-            self.sources = []
+	def search(self, title, year):
+		try:
+			url = urlparse.urljoin(self.base_link, self.search_link % (urllib.quote_plus(title)))
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			headers = {'User-Agent': client.agent()}
+			r = self.scraper.get(url, headers=headers).content
 
-            if url is None:
-                return self.sources
+				# switch to client.parseDOM() to rid import
+			r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
+			r = dom_parser.parse_dom(r.content, 'li')
+			r = [(dom_parser.parse_dom(i, 'a', {'class': 'title'})) for i in r]
+			r = [(i[0].attrs['href'], i[0].content) for i in r]
+			r = [(urlparse.urljoin(self.base_link, i[0])) for i in r if cleantitle.get(title) in cleantitle.get(i[1]) and year in i[1]]
 
-            if debrid.status() is False:
-                raise Exception()
-
-            self.hostDict = hostDict + hostprDict
-
-            data = urlparse.parse_qs(url)
-            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
-            title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-            # title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
-            hdlr = data['year']
-            hdlr2 = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ''
-            imdb = data['imdb']
-
-            url = self.search(title, hdlr)
-            headers = {'User-Agent': client.agent()}
-            r = self.scraper.get(url, headers=headers).content
-
-            if hdlr2 == '':
-                r = dom_parser.parse_dom(r, 'ul', {'id': 'releases'})[0]
-            else:
-                r = dom_parser.parse_dom(r, 'ul', {'id': 'episodes'})[0]
-
-            r = dom_parser.parse_dom(r.content, 'a', req=['href'])
-            r = [(i.content, urlparse.urljoin(self.base_link, i.attrs['href'])) for i in r if i and i.content != 'Watch']
-
-            if hdlr2 != '':
-                r = [(i[0], i[1]) for i in r if hdlr2.lower() in i[0].lower()]
-
-            threads = []
-            for i in r:
-                threads.append(workers.Thread(self._get_sources, i[0], i[1]))
-            [i.start() for i in threads]
-            # [i.join() for i in threads]
-
-            alive = [x for x in threads if x.is_alive() is True]
-            while alive:
-                alive = [x for x in threads if x.is_alive() is True]
-                time.sleep(0.1)
-            return self.sources
-        except:
-            source_utils.scraper_error('RAPIDMOVIEZ')
-            return self.sources
+			if r:
+				return r[0]
+			else:
+				return
+		except:
+			source_utils.scraper_error('RAPIDMOVIEZ')
+			return
 
 
-    def _get_sources(self, name, url):
-        try:
-            headers = {'User-Agent': client.agent()}
-            r = self.scraper.get(url, headers=headers).content
+	def sources(self, url, hostDict, hostprDict):
+		try:
+			self.sources = []
 
-            name = client.replaceHTMLCodes(name)
-            l = dom_parser.parse_dom(r, 'div', {'class': 'ppu2h'})
-            s = ''
+			if url is None:
+				return self.sources
 
-            for i in l:
-                s += i.content
+			if debrid.status() is False:
+				raise Exception()
 
-            urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''', i.content, flags=re.MULTILINE|re.DOTALL)
-            urls = [i for i in urls if '.rar' not in i or '.zip' not in i or '.iso' not in i or '.idx' not in i or '.sub' not in i]
+			self.hostDict = hostDict + hostprDict
 
-            for url in urls:
-                if url in str(self.sources):
-                    continue
+			data = urlparse.parse_qs(url)
+			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-                valid, host = source_utils.is_host_valid(url, self.hostDict)
-                if not valid:
-                    continue
-                host = client.replaceHTMLCodes(host)
-                host = host.encode('utf-8')
+			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			# title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
-                quality, info = source_utils.get_release_quality(name, url)
+			hdlr = data['year']
+			hdlr2 = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ''
+			imdb = data['imdb']
 
-                try:
-                    size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', name)[0]
-                    div = 1 if size.endswith(('GB', 'GiB')) else 1024
-                    size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-                    size = '%.2f GB' % size
-                    info.append(size)
-                except:
-                    pass
+			url = self.search(title, hdlr)
+			headers = {'User-Agent': client.agent()}
+			r = self.scraper.get(url, headers=headers).content
 
-                info = ' | '.join(info)
+			if hdlr2 == '':
+				r = dom_parser.parse_dom(r, 'ul', {'id': 'releases'})[0]
+			else:
+				r = dom_parser.parse_dom(r, 'ul', {'id': 'episodes'})[0]
 
-                self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
-        except:
-            source_utils.scraper_error('RAPIDMOVIEZ')
-            pass
+			r = dom_parser.parse_dom(r.content, 'a', req=['href'])
+			r = [(i.content, urlparse.urljoin(self.base_link, i.attrs['href'])) for i in r if i and i.content != 'Watch']
 
-    def resolve(self, url):
-        return url
+			if hdlr2 != '':
+				r = [(i[0], i[1]) for i in r if hdlr2.lower() in i[0].lower()]
+
+			threads = []
+			for i in r:
+				threads.append(workers.Thread(self._get_sources, i[0], i[1]))
+			[i.start() for i in threads]
+			# [i.join() for i in threads]
+
+			alive = [x for x in threads if x.is_alive() is True]
+			while alive:
+				alive = [x for x in threads if x.is_alive() is True]
+				time.sleep(0.1)
+			return self.sources
+		except:
+			source_utils.scraper_error('RAPIDMOVIEZ')
+			return self.sources
+
+
+	def _get_sources(self, name, url):
+		try:
+			headers = {'User-Agent': client.agent()}
+			r = self.scraper.get(url, headers=headers).content
+
+			name = client.replaceHTMLCodes(name)
+			if ']' in name:
+				name = name.split(']')[1]
+			name = name.strip().replace(' ', '.')
+
+			l = dom_parser.parse_dom(r, 'div', {'class': 'ppu2h'})
+			s = ''
+
+			for i in l:
+				s += i.content
+
+			urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''', i.content, flags=re.MULTILINE|re.DOTALL)
+			urls = [i for i in urls if '.rar' not in i or '.zip' not in i or '.iso' not in i or '.idx' not in i or '.sub' not in i]
+
+			for url in urls:
+				if url in str(self.sources):
+					continue
+
+				valid, host = source_utils.is_host_valid(url, self.hostDict)
+				if not valid:
+					continue
+				host = client.replaceHTMLCodes(host)
+				host = host.encode('utf-8')
+
+				quality, info = source_utils.get_release_quality(name, url)
+
+				try:
+					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', name)[0]
+					div = 1 if size.endswith(('GB', 'GiB')) else 1024
+					size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
+					size = '%.2f GB' % size
+					info.insert(0, size)
+				except:
+					pass
+
+				fileType = source_utils.getFileType(name)
+				info.append(fileType)
+				info = ' | '.join(info) if fileType else info[0]
+
+				self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+		except:
+			source_utils.scraper_error('RAPIDMOVIEZ')
+			pass
+
+	def resolve(self, url):
+		return url
