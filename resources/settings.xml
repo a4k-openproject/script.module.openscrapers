@@ -202,7 +202,6 @@
         <setting label="Enable All Debrid Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&amp;setting=true&amp;query=4.1)"/>
         <setting type="sep"/>
-<!--         <setting id="provider.0day" type="bool" label="$NUMBER[0]DAY" default="true"/> CAPTCHA -->
         <setting id="provider.300mbfilms" type="bool" label="$NUMBER[300]MBFILMS" default="true"/>
         <setting id="provider.ddlspot" type="bool" label="DDLSPOT" default="true"/>
         <setting id="provider.ganool" type="bool" label="GANOOL" default="false"/>
@@ -242,10 +241,9 @@
         <setting id="provider.limetorrents" type="bool" label="LIMETORRENTS" default="true"/>
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL" default="true"/>
         <setting id="provider.moviemagnet" type="bool" label="MOVIEMAGNET" default="true"/>
-<!--         <setting id="provider.mkvcage" type="bool" label="MKVCAGE" default="true"/> CAPTCHA -->
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY" default="true"/>
         <setting id="provider.pirateiro" type="bool" label="PIRATEIRO" default="true"/>
-        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="true"/>
+        <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS" default="false"/>
         <setting id="provider.topnow" type="bool" label="TOPNOW" default="true"/>
         <setting id="provider.torlock" type="bool" label="TORLOCK" default="true"/>
         <setting id="provider.torrentapi" type="bool" label="TORRENTAPI" default="true"/>
