@@ -28,25 +28,26 @@ def sources(specified_folders=None, debug=False):
 			for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(sourceFolderLocation, i)]):
 				if is_pkg:
 					continue
-				try:
-					module = loader.find_module(module_name).load_module(module_name)
-					sourceDict.append((module_name, module.source()))
-				except Exception as e:
-					if debug:
-						print('Error:Loading module: %s | %s ' % (module_name, e))
-					pass
-		return enabledHosters(sourceDict)
+				if enabledCheck(module_name):
+					try:
+						module = loader.find_module(module_name).load_module(module_name)
+						sourceDict.append((module_name, module.source()))
+					except Exception as e:
+						if debug:
+							print('Error:Loading module: %s | %s ' % (module_name, e))
+						pass
+		return sourceDict
 	except:
 		return []
 
 
-def enabledHosters(sourceDict, function=False):
+def enabledCheck(module_name):
 	if __addon__ is not None:
-		enabledHosts = [i[0] for i in sourceDict if __addon__.getSetting('provider.' + i[0].split('_')[0]) == 'true']
-		returnedHosts = [i for i in sourceDict if i[0] in enabledHosts]
-	else:
-		return sourceDict
-	return returnedHosts
+		if __addon__.getSetting('provider.' + module_name) == 'true':
+			return True
+		else:
+			return False
+	return True
 
 
 def providerSources():
