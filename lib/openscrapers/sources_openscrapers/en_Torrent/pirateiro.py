@@ -123,17 +123,15 @@ class source:
 					quality, info = source_utils.get_release_quality(name, url)
 
 					try:
-						div = 1 if size.endswith('GB') else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-						size = '%.2f GB' % size
-						info.insert(0, size)
+						dsize, isize = source_utils._size(size)
+						info.insert(0, isize)
 					except:
 						pass
 
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-											'info': info, 'direct': False, 'debridonly': True})
+											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 				return sources
 

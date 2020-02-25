@@ -133,12 +133,14 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name, name)
 
-				size = source_utils.convert_size(file["size"])
-				info.insert(0, size)
+				#size = source_utils.convert_size(file["size"])
+				dsize = float(file["size"]) / 1073741824
+				isize = '%.2f GB' % dsize
+				info.insert(0, isize)
 				info = ' | '.join(info)
 
 				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-											'info': info, 'direct': False, 'debridonly': True})
+											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			return sources
 
 		except:

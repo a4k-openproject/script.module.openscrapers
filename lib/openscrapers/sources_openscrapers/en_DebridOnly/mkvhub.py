@@ -150,10 +150,8 @@ class source:
 
 			try:
 				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', result)[0]
-				div = 1 if size.endswith(('GB', 'GiB', 'Gb')) else 1024
-				size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-				size = '%.2f GB' % size
-				info.append(size)
+				dsize, isize = source_utils._size(size)
+				info.append(isize)
 			except:
 				pass
 
@@ -218,7 +216,7 @@ class source:
 					url = url.split('&tr')[0]
 
 					self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-															'info': info, 'direct': False, 'debridonly': True})
+															'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 			except:
 				source_utils.scraper_error('MKVHUB')

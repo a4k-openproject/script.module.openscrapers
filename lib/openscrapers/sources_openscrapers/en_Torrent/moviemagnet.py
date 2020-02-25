@@ -117,18 +117,17 @@ class source:
 
 					try:
 						size = link[2]
-						div = 1 if size.endswith(('GB', 'GiB')) else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-						size = '%.2f GB' % size
-						info.insert(0, size)
+						dsize, isize = source_utils._size(size)
+						info.insert(0, isize)
 					except:
-						size = '0'
+						isize = '0'
+						dsize = 0
 						pass
 
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-														'info': info, 'direct': False, 'debridonly': True})
+														'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				return sources
 
 			except:

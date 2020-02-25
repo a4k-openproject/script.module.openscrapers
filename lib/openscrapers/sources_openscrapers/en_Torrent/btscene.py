@@ -146,17 +146,15 @@ class source:
 
 					try:
 						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-						div = 1 if size.endswith(('GB', 'GiB')) else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-						size = '%.2f GB' % size
-						info.insert(0, size)
+						dsize, isize = source_utils._size(size)
+						info.insert(0, isize)
 					except:
 						pass
 
 					info = ' | '.join(info)
 
 					self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-														'info': info, 'direct': False, 'debridonly': True})
+														'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 		except:
 			source_utils.scraper_error('BTSCENE')

@@ -127,16 +127,16 @@ class source:
 
 					try:
 						if size < 5.12: raise Exception()
-						size = float(size) / 1024
-						size = '%.2f GB' % size
-						info.insert(0, size)
+						dsize = float(size) / 1024
+						isize = '%.2f GB' % dsize
+						info.insert(0, isize)
 					except:
 						pass
 
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 				return sources
 

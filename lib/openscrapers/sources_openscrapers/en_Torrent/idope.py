@@ -151,18 +151,17 @@ class source:
 
 					try:
 						size = re.findall('<div class="resultdivbottonlength">(.+?)<', post)[0]
-						div = 1 if size.endswith(('GB', 'GiB', 'Gb')) else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-						size = '%.2f GB' % size
-						info.insert(0, size)
+						dsize, isize = source_utils._size(size)
+						info.insert(0, isize)
 					except:
-						size = '0'
+						isize = '0'
+						dsize = 0
 						pass
 
 					info = ' | '.join(info)
 
 					self.sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-													'direct': False, 'debridonly': True})
+													'direct': False, 'debridonly': True, 'size': dsize})
 
 		except:
 			source_utils.scraper_error('IDOPE')
