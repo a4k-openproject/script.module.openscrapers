@@ -119,7 +119,7 @@ class source:
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True})
+												'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
 				except:
 					source_utils.scraper_error('GLODLS')
 					pass
@@ -157,14 +157,13 @@ class source:
 
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-					div = 1 if size.endswith('GB') else 1024
-					size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-					size = '%.2f GB' % size
+					dsize, isize = source_utils._size(size)
 				except:
-					size = '0'
+					isize = '0'
+					dsize = 0
 					pass
 
-				items.append((name, url, size))
+				items.append((name, url, isize, dsize))
 
 			return items
 		except:

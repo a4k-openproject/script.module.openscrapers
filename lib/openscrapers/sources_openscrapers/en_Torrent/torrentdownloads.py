@@ -144,9 +144,9 @@ class source:
 
 			try:
 				div = 1000 ** 3
-				size = float(size) / div
-				size = '%.2f GB' % size
-				info.insert(0, size)
+				dsize = float(size) / div
+				isize = '%.2f GB' % dsize
+				info.insert(0, isize)
 			except:
 				pass
 
@@ -154,7 +154,7 @@ class source:
 
 			if seeders > self.min_seeders:
 				self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True})
+													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOADS')
 			pass
