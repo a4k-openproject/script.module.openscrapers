@@ -48,7 +48,7 @@
         <setting id="provider.gomoviesink" type="bool" label="GOMOVIESINK" default="true"/>
         <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true"/>
         <setting id="provider.hdmto" type="bool" label="HDMTO" default="true"/>
-        <setting id="provider.hdpopcornseu" type="bool" label="HDPOPCORNSEU" default="true"/>
+        <setting id="provider.hdpopcorneu" type="bool" label="HDPOPCORNEU" default="true"/>
         <setting id="provider.iwaatch" type="bool" label="IWAATCH" default="true"/>
         <setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
         <setting id="provider.megashare9" type="bool" label="MEGASHARE$NUMBER[9]" default="true"/>
