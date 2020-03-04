@@ -26,8 +26,8 @@
 
 import re
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
 
 
 class source:
@@ -36,6 +36,7 @@ class source:
 		self.language = ['en']
 		self.domains = ['putlockerfree.info']
 		self.base_link = 'https://putlockerfree.info'
+		self.scraper = cfscrape.create_scraper()
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
@@ -63,7 +64,7 @@ class source:
 			for url, episode in match:
 				url = url
 				episode = episode
-				r = client.request(url)
+				r = self.scraper.get(url).content
 				try:
 					match = re.compile('<a title="Episode ' + episode + '.+?" data-openload="(.+?)"').findall(r)
 					for url in match:

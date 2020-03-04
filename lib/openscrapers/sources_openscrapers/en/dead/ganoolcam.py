@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 # -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
-# Created by Tempest
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -26,9 +25,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import re
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import more_sources
 from openscrapers.modules import source_utils
 
 
@@ -36,58 +38,52 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['streamdreams.org']
-		self.base_link = 'https://streamdreams.org'
-		self.search_movie = '/movies/lll-%s/'
-		self.search_tv = '/shows/lll-%s/'
+		self.domains = ['ganool.cam', 'ganool.fun', 'ganool.rip']
+		self.base_link = 'https://ganool.cam'
+		self.search_link = '/?s=%s+%s'
 		self.scraper = cfscrape.create_scraper()
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			mvtitle = cleantitle.geturl(title)
-			url = self.base_link + self.search_movie % mvtitle
-			return url
-		except:
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-		try:
-			tvtitle = cleantitle.geturl(tvshowtitle)
-			url = self.base_link + self.search_tv % tvtitle
-			return url
-		except:
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url:
-				return
-			url = url + '?session=%s&episode=%s' % (season, episode)
+			title = cleantitle.geturl(title).replace('-', '+')
+			url = self.base_link + self.search_link % (title, year)
 			return url
 		except:
 			return
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
-			if url is None:
-				return sources
+			hostDict = hostDict + hostprDict
 			sources = []
-			hostDict = hostprDict + hostDict
-			headers = {'Referer': url}
-			r = self.scraper.get(url, headers=headers).content
-			u = client.parseDOM(r, "span", attrs={"class": "movie_version_link"})
-			for t in u:
-				match = client.parseDOM(t, 'a', ret='data-href')
-				for url in match:
-					if url in str(sources):
-						continue
-					valid, host = source_utils.is_host_valid(url, hostDict)
-					if valid:
+			r = self.scraper.get(url).content
+			u = client.parseDOM(r, "div", attrs={"class": "ml-item"})
+			for i in u:
+				t = re.compile('<a href="(.+?)"').findall(i)
+				for r in t:
+					t = self.scraper.get(r).content
+					results1 = re.compile('<a href="(.+?)" class="lnk').findall(t)
+					for url in results1:
+						if self.base_link in url:
+							continue
 						quality, info = source_utils.get_release_quality(url, url)
-						sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
+						valid, host = source_utils.is_host_valid(url, hostDict)
+						sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+						                'direct': False, 'debridonly': False})
+					results2 = re.compile('<iframe src="(.+?)"').findall(t)
+					for link in results2:
+						if "gomostream.com" in link:
+							for source in more_sources.more_gomo(link, hostDict):
+								sources.append(source)
+						else:
+							if "//ouo.io/" in link:
+								continue
+							quality, info = source_utils.get_release_quality(link, link)
+							valid, host = source_utils.is_host_valid(link, hostDict)
+							sources.append(
+								{'source': host, 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+								 'direct': False, 'debridonly': False})
 			return sources
 		except:
-			source_utils.scraper_error('STREAMDREAMS')
 			return sources
 
 	def resolve(self, url):

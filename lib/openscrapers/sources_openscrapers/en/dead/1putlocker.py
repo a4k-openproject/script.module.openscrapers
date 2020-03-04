@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
-# Created by Tempest
+# -Cleaned and Checked on 05-06-2019 by JewBMX in Scrubs.
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -26,9 +25,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import re
+import traceback
+
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
+from openscrapers.modules import log_utils
 from openscrapers.modules import source_utils
 
 
@@ -36,59 +38,63 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['streamdreams.org']
-		self.base_link = 'https://streamdreams.org'
-		self.search_movie = '/movies/lll-%s/'
-		self.search_tv = '/shows/lll-%s/'
+		self.domains = ['1putlocker.io']
+		self.base_link = 'https://www15.1putlocker.io'
 		self.scraper = cfscrape.create_scraper()
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			mvtitle = cleantitle.geturl(title)
-			url = self.base_link + self.search_movie % mvtitle
+			title = cleantitle.geturl(title)
+			url = self.base_link + '/%s/' % title
 			return url
-		except:
+		except Exception:
+			failure = traceback.format_exc()
+			log_utils.log('1putlocker - Exception: \n' + str(failure))
 			return
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			tvtitle = cleantitle.geturl(tvshowtitle)
-			url = self.base_link + self.search_tv % tvtitle
+			url = cleantitle.geturl(tvshowtitle)
 			return url
-		except:
+		except Exception:
+			failure = traceback.format_exc()
+			log_utils.log('1putlocker - Exception: \n' + str(failure))
 			return
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if not url:
+			if url is None:
 				return
-			url = url + '?session=%s&episode=%s' % (season, episode)
+			tvshowtitle = url
+			url = self.base_link + '/episode/%s-season-%s-episode-%s/' % (tvshowtitle, season, episode)
 			return url
-		except:
+		except Exception:
+			failure = traceback.format_exc()
+			log_utils.log('1putlocker - Exception: \n' + str(failure))
 			return
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
+			sources = []
 			if url is None:
 				return sources
-			sources = []
-			hostDict = hostprDict + hostDict
-			headers = {'Referer': url}
-			r = self.scraper.get(url, headers=headers).content
-			u = client.parseDOM(r, "span", attrs={"class": "movie_version_link"})
-			for t in u:
-				match = client.parseDOM(t, 'a', ret='data-href')
+			r = self.scraper.get(url).content
+			try:
+				match = re.compile('<iframe src="(.+?)"').findall(r)
 				for url in match:
-					if url in str(sources):
-						continue
+					quality = source_utils.check_url(url)
 					valid, host = source_utils.is_host_valid(url, hostDict)
 					if valid:
-						quality, info = source_utils.get_release_quality(url, url)
-						sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
-			return sources
-		except:
-			source_utils.scraper_error('STREAMDREAMS')
-			return sources
+						sources.append(
+							{'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+							 'debridonly': False})
+			except:
+				return
+		except Exception:
+			failure = traceback.format_exc()
+			log_utils.log('1putlocker - Exception: \n' + str(failure))
+			return
+		return sources
 
 	def resolve(self, url):
 		return url

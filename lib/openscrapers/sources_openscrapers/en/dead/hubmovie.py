@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
-# Created by Tempest
+# Need to add a year check in sometime to make sure there isnt false hits.
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -26,7 +26,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from openscrapers.modules import cfscrape
+import re
+
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -36,58 +37,40 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['streamdreams.org']
-		self.base_link = 'https://streamdreams.org'
-		self.search_movie = '/movies/lll-%s/'
-		self.search_tv = '/shows/lll-%s/'
-		self.scraper = cfscrape.create_scraper()
+		self.domains = ['hubmovie.cc', 'hubmoviehd.net']
+		self.base_link = 'http://hubmovie.cc'
+		self.search_link = '/pages/search2/%s'
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			mvtitle = cleantitle.geturl(title)
-			url = self.base_link + self.search_movie % mvtitle
-			return url
-		except:
+			search_id = cleantitle.getsearch(title)
+			search_url = self.base_link + self.search_link % (search_id.replace(':', ' ').replace(' ', '%20'))
+			search_results = client.request(search_url)
+			match = re.compile('<a href=".(.+?)">', re.DOTALL).findall(search_results)
+			for link in match:
+				if cleantitle.geturl(title).lower() in link:
+					url = self.base_link + link
+					return url
 			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-		try:
-			tvtitle = cleantitle.geturl(tvshowtitle)
-			url = self.base_link + self.search_tv % tvtitle
-			return url
-		except:
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url:
-				return
-			url = url + '?session=%s&episode=%s' % (season, episode)
-			return url
 		except:
 			return
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
+			sources = []
+			hostDict = hostDict + hostprDict
 			if url is None:
 				return sources
-			sources = []
-			hostDict = hostprDict + hostDict
-			headers = {'Referer': url}
-			r = self.scraper.get(url, headers=headers).content
-			u = client.parseDOM(r, "span", attrs={"class": "movie_version_link"})
-			for t in u:
-				match = client.parseDOM(t, 'a', ret='data-href')
-				for url in match:
-					if url in str(sources):
-						continue
-					valid, host = source_utils.is_host_valid(url, hostDict)
-					if valid:
-						quality, info = source_utils.get_release_quality(url, url)
-						sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
+			html = client.request(url)
+			links = re.compile('<div class="link_go">.+?<a href="(.+?)" target="_blank">', re.DOTALL).findall(html)
+			for link in links:
+				valid, host = source_utils.is_host_valid(link, hostDict)
+				if valid:
+					quality, info = source_utils.get_release_quality(link, link)
+					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'info': info,
+					                'direct': False, 'debridonly': False})
 			return sources
 		except:
-			source_utils.scraper_error('STREAMDREAMS')
 			return sources
 
 	def resolve(self, url):
