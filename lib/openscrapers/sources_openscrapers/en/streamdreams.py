@@ -38,8 +38,8 @@ class source:
 		self.language = ['en']
 		self.domains = ['streamdreams.org']
 		self.base_link = 'https://streamdreams.org'
-		self.search_movie = '/movies/bbb-%s/'
-		self.search_tv = '/shows/bbb-%s/'
+		self.search_movie = '/movies/lll-%s/'
+		self.search_tv = '/shows/lll-%s/'
 		self.scraper = cfscrape.create_scraper()
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -84,12 +84,10 @@ class source:
 					valid, host = source_utils.is_host_valid(url, hostDict)
 					if valid:
 						quality, info = source_utils.get_release_quality(url, url)
-						if source_utils.limit_hosts() is True and host in str(sources):
-							continue
-						sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url,
-						                'direct': False, 'debridonly': False})
+						sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
 			return sources
 		except:
+			source_utils.scraper_error('STREAMDREAMS')
 			return sources
 
 	def resolve(self, url):

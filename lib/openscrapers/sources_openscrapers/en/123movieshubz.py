@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -34,7 +33,6 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import dom_parser
 from openscrapers.modules import source_utils
-
 
 class source:
 	def __init__(self):
@@ -97,8 +95,6 @@ class source:
 				       'data-name': i.attrs['data-name']}
 				url = urllib.urlencode(url)
 				valid, host = source_utils.is_host_valid(i.content, hostDict)
-				if source_utils.limit_hosts() is True and host in str(sources):
-					continue
 				if valid:
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url,
 					                'direct': False, 'debridonly': False})

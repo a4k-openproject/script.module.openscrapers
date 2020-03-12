@@ -38,6 +38,7 @@ class source:
 		self.domains = ['seehd.pl']
 		self.base_link = 'http://www.seehd.pl'
 		self.search_link = '/%s-%s-watch-online/'
+		self.scraper = cfscrape.create_scraper()
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -71,8 +72,7 @@ class source:
 		try:
 			sources = []
 			hostDict = hostprDict + hostDict
-			scraper = cfscrape.create_scraper()
-			r = scraper.get(url).content
+			r = self.scraper.get(url).content
 			match = re.compile('<iframe.+?src="(.+?)://(.+?)/(.+?)"').findall(r)
 			for http, host, url in match:
 				host = host.replace('www.', '')
