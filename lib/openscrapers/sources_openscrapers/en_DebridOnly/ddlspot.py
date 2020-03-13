@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -143,13 +144,10 @@ class source:
 								quality, info = source_utils.get_release_quality(name, url)
 
 								try:
-									size = link[1]
-									div = 1 if size.endswith(('GB', 'GiB', 'Gb')) else 1024
-									size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', ''))) / div
-									size = '%.2f GB' % size
-									info.insert(0, size)
+									dsize, isize = source_utils._size(link[1])
+									info.insert(0, isize)
 								except:
-									size = '0'
+									dsize = 0
 									pass
 
 								info = ' | '.join(info)
@@ -162,7 +160,7 @@ class source:
 								host = host.encode('utf-8')
 
 								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
-															'info': info, 'direct': False, 'debridonly': True})
+															'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 					except:
 						source_utils.scraper_error('DDLSPOT')

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -32,7 +33,7 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import source_utils, log_utils
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -44,7 +45,6 @@ class source:
 		self.search_base_link = 'http://search.rlsbb.ru'
 		self.search_cookie = 'serach_mode=rlsbb'
 		self.search_link = '/lib/search526049.php?phrase=%s&pindex=1&content=true'
-		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -80,6 +80,7 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		scraper = cfscrape.create_scraper()
 		sources = []
 		try:
 			if url is None:
@@ -100,29 +101,29 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-			log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
+			# log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
 
 			# query = query.replace("&", "and").replace("  ", " ").replace(" ", "-")
 			# log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
 
 			query = query.replace("&", "and")
 			query = re.sub('\s', '-', query)
-			log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
+			# log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
 
 
 			url = self.search_link % urllib.quote_plus(query)
-			log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			url = urlparse.urljoin(self.base_link, url)
-			log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			url = "http://rlsbb.ru/" + query
-			log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 
 			if 'tvshowtitle' not in data:
 				url = url + "-1080p"
-			log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = self.scraper.get(url).content
+			r = scraper.get(url).content
 			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
 
 			if r is None and 'tvshowtitle' in data:
@@ -135,18 +136,22 @@ class source:
 				query = query.replace("  ", " ")
 				query = query.replace(" ", "-")
 				url = "http://rlsbb.ru/" + query
-				r = self.scraper.get(url).content
+				r = scraper.get(url).content
 
 			posts = client.parseDOM(r, "div", attrs={"class": "content"})
+			# log_utils.log('posts = %s' % posts, log_utils.LOGDEBUG)
 
 			items = []
 			for post in posts:
 				try:
+					# size = re.findall('>\nSize: (.+?)<', post, re.DOTALL)
+					# log_utils.log('size = %s' % size, log_utils.LOGDEBUG)
 					u = client.parseDOM(post, 'a', ret='href')
 
 					for i in u:
 						try:
-							name = str(i)
+							name = i.encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
+
 							tit = name.rsplit('/', 1)[1]
 							t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 							if cleantitle.get(t) != cleantitle.get(title):
@@ -173,11 +178,12 @@ class source:
 
 					if url in seen_urls:
 						continue
-
 					seen_urls.add(url)
 
 					host = url.replace("\\", "")
 					host2 = host.strip('"')
+					if url in str(sources):
+						continue
 					host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(host2.strip().lower()).netloc)[0]
 
 					if not host in hostDict:
@@ -188,13 +194,13 @@ class source:
 
 					quality, info = source_utils.get_release_quality(host2)
 
+# this site is an absolute nightmare to parse size.  Some comment section 16gb but size reflects all links in comment
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', name)[0]
-						div = 1 if size.endswith('GB') else 1024
-						size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-						size = '%.2f GB' % size
-						info.append(size)
+						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)[0]
+						dsize, isize = source_utils._size(size)
+						info.insert(0, isize)
 					except:
+						dsize = 0
 						pass
 
 					info = ' | '.join(info)
@@ -202,7 +208,7 @@ class source:
 					host = client.replaceHTMLCodes(host)
 					host = host.encode('utf-8')
 
-					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info, 'direct': False, 'debridonly': True})
+					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 				except:
 					source_utils.scraper_error('RLSBB')

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# created by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,15 +30,15 @@ import urllib
 import urlparse
 import json
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
-from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
 
 class source:
 	def __init__(self):
-		self.priority = 0
+		self.priority = 1
 		self.language = ['en']
 		self.domain = ['moviemagnet.unblockit.biz']
 		self.base_link = 'https://moviemagnet.unblockit.biz'
@@ -54,6 +55,7 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		scraper = cfscrape.create_scraper()
 		sources = []
 		try:
 			if url is None:
@@ -75,8 +77,8 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			try:
-				r = client.request(url)
-				if r == str([]):
+				r = scraper.get(url).content
+				if r == str([]) or r == '':
 					return sources
 				r = json.loads(r)
 
@@ -89,7 +91,7 @@ class source:
 				if id == '':
 					return sources
 				link = 'http://moviemagnet.co/movies/torrents?id=%s' % id
-				result = client.request(link)
+				result = scraper.get(link).content
 				if 'magnet' not in result:
 					return sources
 
@@ -110,7 +112,7 @@ class source:
 						continue
 
 					url = link[1]
-					url = urllib.unquote(url).decode('utf8').replace('&amp;', '&')
+					url = urllib.unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
 
 					quality, info = source_utils.get_release_quality(name, url)
@@ -120,7 +122,6 @@ class source:
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
-						isize = '0'
 						dsize = 0
 						pass
 

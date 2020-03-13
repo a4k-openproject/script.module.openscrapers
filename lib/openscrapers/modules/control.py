@@ -80,6 +80,8 @@ try:
 except:
 	addonPath = addonObject.getAddonInfo('path')
 
+SETTINGS_PATH = xbmc.translatePath(os.path.join(addonInfo('path'), 'resources', 'settings.xml'))
+
 # dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
 try:
 	dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
@@ -131,24 +133,34 @@ def version():
 	return int(num)
 
 
-try:
-	def openSettings(query=None, id=addonInfo('id')):
-		try:
-			idle()
-			execute('Addon.OpenSettings(%s)' % id)
-			if query is None:
-				raise Exception()
-			c, f = query.split('.')
-			if int(getKodiVersion()) >= 18:
-				execute('SetFocus(%i)' % (int(c) - 100))
-				execute('SetFocus(%i)' % (int(f) - 80))
-			else:
-				execute('SetFocus(%i)' % (int(c) + 100))
-				execute('SetFocus(%i)' % (int(f) + 200))
-		except:
-			return
-except:
-	pass
+def openSettings(query=None, id=addonInfo('id')):
+	try:
+		idle()
+		execute('Addon.OpenSettings(%s)' % id)
+		if query is None:
+			raise Exception()
+		c, f = query.split('.')
+		if int(getKodiVersion()) >= 18:
+			execute('SetFocus(%i)' % (int(c) - 100))
+			execute('SetFocus(%i)' % (int(f) - 80))
+		else:
+			execute('SetFocus(%i)' % (int(c) + 100))
+			execute('SetFocus(%i)' % (int(f) + 200))
+	except:
+		return
+
+
+def getSettingDefault(id):
+	import re
+	try:
+		settings = open(SETTINGS_PATH, 'r')
+		value = ' '.join(settings.readlines())
+		value.strip('\n')
+		settings.close()
+		value = re.findall(r'id=\"%s\".*?default=\"(.*?)\"' % (id), value)[0]
+		return value
+	except:
+		return None
 
 
 def getCurrentViewId():

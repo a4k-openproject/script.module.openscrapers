@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# created by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -140,8 +141,9 @@ class source:
 								quality, info = source_utils.get_release_quality(name, url)
 
 								# size info not available on onceddl
+								dsize = 0
 
-								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				except:
 					source_utils.scraper_error('ONCEDDL')
 					pass

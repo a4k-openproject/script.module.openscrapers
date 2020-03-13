@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -32,7 +33,6 @@ from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
-from openscrapers.modules import cfscrape
 
 
 class source:
@@ -42,7 +42,6 @@ class source:
 		self.domains = ['www.doublr.org']
 		self.base_link = 'https://www.doublr.org'
 		self.search_link = '/search?q=%s'
-		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -77,9 +76,8 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
-
 			if url is None:
 				return sources
 
@@ -101,67 +99,65 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
+			r = client.request(url)
+			posts = client.parseDOM(r, 'tr')
+
+		except:
+			source_utils.scraper_error('DOUBLR')
+			return sources
+
+		for post in posts:
 			try:
-				# r = client.request(url)
-				r = self.scraper.get(url).content
-				posts = client.parseDOM(r, 'tr')
+				links = re.findall('<a href="(/torrent/.+?)">(.+?)<', post, re.DOTALL)
 
-				for post in posts:
-					links = re.findall('<a href="(/torrent/.+?)">(.+?)<', post, re.DOTALL)
+				for link, ref in links:
+					link = urlparse.urljoin(self.base_link, link)
+					link = client.request(link)
+					link = re.findall('a class=".+?" rel=".+?" href="(magnet:.+?)"', link, re.DOTALL)
 
-					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
-						dsize, isize = source_utils._size(size)
-					except:
-						isize = '0'
-						dsize = 0
+					for url in link:
+						url = url.split('&tr')[0]
+						url = urllib.unquote_plus(urllib.unquote_plus(url)).split('&tr')[0].replace(' ', '.')
+						if url in str(sources):
+							continue
 
-					for link, ref in links:
-						link = urlparse.urljoin(self.base_link, link)
-						# link = client.request(link)
-						link = self.scraper.get(link).content
-						link = re.findall('a class=".+?" rel=".+?" href="(magnet:.+?)"', link, re.DOTALL)
+						name = url.split('&dn=')[1]
+						if source_utils.remove_lang(name):
+							continue
 
-						for url in link:
-							url = url.split('&tr')[0]
-							if url in str(sources):
-								continue
+						if name.startswith('www'):
+							try:
+								name = re.sub(r'www(.*?)\W{2,10}', '', name)
+							except:
+								name = name.split('-.', 1)[1].lstrip()
 
-							name = url.split('&dn=')[1]
-							name = urllib.unquote_plus(urllib.unquote_plus(name)).replace(' ', '.')
-							if source_utils.remove_lang(name):
-								continue
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+						if cleantitle.get(t) != cleantitle.get(title):
+							continue
 
-							if name.startswith('www.'):
-								try:
-									name = name.split(' - ')[1].lstrip()
-								except:
-									name = re.sub(r'\www..+? ', '', name)
+						if hdlr not in name:
+							continue
 
-							t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-							if cleantitle.get(t) != cleantitle.get(title):
-								continue
+						quality, info = source_utils.get_release_quality(name, url)
 
-							if hdlr not in name:
-								continue
-
-							quality, info = source_utils.get_release_quality(name, url)
-
+						try:
+							size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
-							info = ' | '.join(info)
+						except:
+							dsize = 0
+							pass
 
-							sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-														'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+						info = ' | '.join(info)
 
-				return sources
+						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 			except:
 				source_utils.scraper_error('DOUBLR')
 				return sources
 
-		except:
-			source_utils.scraper_error('DOUBLR')
-			return sources
+		return sources
 
 
 	def resolve(self, url):

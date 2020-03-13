@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -39,9 +40,9 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentdownloads.me', 'torrentsdl1.unblocked.lol']
-		self.base_link = 'https://torrentsdl1.unblocked.to/'
-		self.search = 'https://www.torrentdownloads.me/rss.xml?new=1&type=search&cid={0}&search={1}'
+		self.domains = ['torrentdownloads.info', 'torrentdownloads.me', 'torrentdownloads.d4.re']
+		self.base_link = 'https://torrentdownloads.info/' # not used anyways
+		self.search = 'https://www.torrentdownloads.info/rss.xml?new=1&type=search&cid={0}&search={1}'
 		self.min_seeders = 1
 
 
@@ -122,16 +123,19 @@ class source:
 
 	def _get_items(self, r):
 		try:
-			size = re.search(r'<size>([\d]+)</size>', r).groups()[0]
-			seeders = re.search(r'<seeders>([\d]+)</seeders>', r).groups()[0]
+			try:
+				seeders = int(re.search(r'<seeders>([\d]+)</seeders>', r).groups()[0].replace(',', ''))
+				if seeders < self.min_seeders:
+					return
+			except:
+				source_utils.scraper_error('TORRENTDOWNLOADS')
+				pass
 
-			_hash = re.search(r'<info_hash>([a-zA-Z0-9]+)</info_hash>', r).groups()[0]
+			hash = re.search(r'<info_hash>([a-zA-Z0-9]+)</info_hash>', r).groups()[0]
 			name = re.search(r'<title>(.+?)</title>', r).groups()[0]
 			name = urllib.unquote_plus(name).replace(' ', '.')
 			if source_utils.remove_lang(name):
 				return
-
-			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (_hash.upper(), urllib.quote_plus(name))
 
 			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 			if cleantitle.get(t) != cleantitle.get(self.title):
@@ -140,21 +144,22 @@ class source:
 			if self.hdlr not in name:
 				return
 
+			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+
 			quality, info = source_utils.get_release_quality(name, name)
 
 			try:
-				div = 1000 ** 3
-				dsize = float(size) / div
-				isize = '%.2f GB' % dsize
+				size = re.search(r'<size>([\d]+)</size>', r).groups()[0]
+				dsize, isize = source_utils.convert_size(float(size), to='GB')
 				info.insert(0, isize)
 			except:
+				dsize = 0
 				pass
 
 			info = ' | '.join(info)
 
-			if seeders > self.min_seeders:
-				self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOADS')
 			pass

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -35,72 +36,72 @@ from openscrapers.modules import source_utils
 
 
 class source:
-    def __init__(self):
-        self.priority = 1
-        self.language = ['en']
-        self.domains = ['123movie.nu', 'ganool.ws', 'ganol.si', 'ganool123.com']
-        self.base_link = 'https://123movie.nu'
-        self.search_link = '/search/?q=%s'
-        self.scraper = cfscrape.create_scraper()
+	def __init__(self):
+		self.priority = 1
+		self.language = ['en']
+		self.domains = ['fmovies.tw', '123movie.nu', 'ganool.ws', 'ganool123.com']
+		self.base_link = 'https://fmovies.tw'
+		self.search_link = '/search/?q=%s'
 
 
-    def movie(self, imdb, title, localtitle, aliases, year):
-        try:
-            url = {'imdb': imdb, 'title': title, 'year': year}
-            url = urllib.urlencode(url)
-            return url
-        except:
-            return
+	def movie(self, imdb, title, localtitle, aliases, year):
+		try:
+			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = urllib.urlencode(url)
+			return url
+		except:
+			return
 
 
-    def sources(self, url, hostDict, hostprDict):
-        sources = []
-        try:
-            if url is None:
-                return sources
+	def sources(self, url, hostDict, hostprDict):
+		scraper = cfscrape.create_scraper()
+		sources = []
+		try:
+			if url is None:
+				return sources
 
-            if debrid.status() is False:
-                return sources
+			if debrid.status() is False:
+				return sources
 
-            data = urlparse.parse_qs(url)
-            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+			data = urlparse.parse_qs(url)
+			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-            q = '%s' % cleantitle.get_gan_url(data['title'])
+			q = '%s' % cleantitle.get_gan_url(data['title'])
 
-            url = self.base_link + self.search_link % q
+			url = self.base_link + self.search_link % q
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-            r = self.scraper.get(url).content
+			r = scraper.get(url).content
+			v = re.compile('<a href="(.+?)" class="ml-mask jt" title="(.+?)">\s+<span class=".+?">(.+?)</span>').findall(r)
+			t = '%s (%s)' % (data['title'], data['year'])
 
-            v = re.compile(
-                '<a href="(.+?)" class="ml-mask jt" title="(.+?)">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=".+?">(.+?)</span>').findall(
-                r)
+			for url, check, quality in v:
+				if t not in check:
+					continue
 
-            for url, check, quality in v:
-                t = '%s (%s)' % (data['title'], data['year'])
+				key = url.split('-hd')[1]
 
-                if t not in check:
-                    raise Exception()
+				r = scraper.get('https://fmovies.tw/moviedownload.php?q=' + key).content
+				r = re.compile('<a rel=".+?" href="(.+?)" target=".+?">').findall(r)
 
-                key = url.split('-hd')[1]
+				for url in r:
+					if any(x in url for x in ['.rar']):
+						continue
 
-                r = self.scraper.get('https://ganool.ws/moviedownload.php?q=' + key).content
-                r = re.compile('<a rel=".+?" href="(.+?)" target=".+?">').findall(r)
+					quality = source_utils.check_url(quality)
 
-                for url in r:
-                    if any(x in url for x in ['.rar']):
-                        continue
+					valid, host = source_utils.is_host_valid(url, hostDict)
+					if not valid:
+						continue
 
-                    quality = source_utils.check_url(quality)
+# size info only available if I make a new 2nd request, line 83 skips directly to download links vs. loading info page, after query, where size is
+					dsize = 0
 
-                    valid, host = source_utils.is_host_valid(url, hostDict)
-                    if not valid:
-                        continue
+					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+									'debridonly': True, 'size': dsize})
+			return sources
+		except:
+			return sources
 
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-                                    'debridonly': True})
-            return sources
-        except:
-            return sources
-
-    def resolve(self, url):
-        return url
+	def resolve(self, url):
+		return url

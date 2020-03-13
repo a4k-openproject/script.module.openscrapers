@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# created by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -113,12 +114,13 @@ class source:
 
 			for link in links:
 				url = str(client.replaceHTMLCodes(link).split('&tr')[0])
-				url = urllib.unquote_plus(url)
+				url = urllib.unquote_plus(url).replace(' ', '.')
 				if url in str(sources):
 					continue
 
+				# hash = re.findall('magnet:\?xt=urn:btih:(.*?)&dn=', url)[0] # future dict add for hash only
+
 				name = url.split('&dn=')[1]
-				name = urllib.unquote_plus(name).replace(' ', '.')
 				if source_utils.remove_lang(name):
 					continue
 
@@ -136,6 +138,7 @@ class source:
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
+					dsize = 0
 					pass
 
 				info = ' | '.join(info)

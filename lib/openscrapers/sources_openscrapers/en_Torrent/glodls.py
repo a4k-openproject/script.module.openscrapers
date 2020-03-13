@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -115,7 +116,9 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name, url)
 
-					info.insert(0, item[2]) # if item[2] != '0'
+					if item[2] != '0':
+						info.insert(0, item[2])
+
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,

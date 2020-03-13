@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -121,7 +122,10 @@ class source:
 
 							info = ' | '.join(info)
 
-							sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': True, 'debridonly': False})
+# frankly just to burnt out to do a re-write and parse this bitch for size, site sucks anyway
+							dsize = 0
+
+							sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': True, 'debridonly': False}, 'size': dsize)
 						except:
 							source_utils.scraper_error('ULTRAHDINDIR')
 							pass

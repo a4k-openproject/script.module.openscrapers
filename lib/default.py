@@ -163,24 +163,13 @@ elif action == "toggleAllTorrent":
 	#    xbmc.log('All Torrent providers = %s' % sourceList,2)
 	control.openSettings(query, "script.module.openscrapers")
 
+
 if action == "Defaults":
-	sourceList = ['1putlocker', '5movies', '123movieshubz', 'alucxyz', 'animetoon', 'azmovie', 'bnwmovies',
-	              'cartoonhd', 'cartoonhdto', 'cmovieshd', 'coolmoviezone', 'divxcrawler', 'extramovies', 'filmxy',
-	              'fmovies',
-	              'freefmovies', 'ganoolcam', 'gomo', 'gomoviesink', 'gowatchseries', 'hdmto', 'hdpopcorneu',
-	              'hubmovie', 'iwaatch', 'iwannawatch',
-	              'movie4kis', 'myhdpopcorn', 'primewire', 'projectfreetv', 'putlockerfree', 'putlockeronl',
-	              'putlockeronline', 'seehd', 'series9',
-	              'seriesonline', 'sharemovies', 'solarmoviefree', 'streamdreams', 'timewatch', 'toonget',
-	              'tvbox', 'tvmovieflix', 'watchepisodes', 'watchserieshd', 'xwatchseries', 'yesmoviesgg',
-	              '300mbdownload', '300mbfilms', 'ddlspot', 'ganool', 'ganool2',
-	              'maxrls', 'mkvhub', 'mvrls', 'myvideolink', 'onlineseries', 'rapidmoviez', 'rlsbb',
-	              'sceneddl', 'scenerls',
-	              'ultrahdindir', '1337x', 'btdb', 'btscene', 'doublr', 'eztv', 'glodls', 'kickass2',
-	              'limetorrents', 'magnetdl', 'mkvccage', 'piratebay', 'torrentapi', 'torrentdownloads',
-	              'torrentgalaxy',
-	              'torrentquest', 'yifyddl', 'yts', 'zoogle']
+	sourceList = []
+	sourceList = sources_openscrapers.all_providers
 	for i in sourceList:
 		source_setting = 'provider.' + i
-		control.setSetting(source_setting, params['setting'])
+		value = control.getSettingDefault(source_setting)
+		control.setSetting(source_setting, value)
+		# xbmc.log('provider-default = %s-%s' % (source_setting, value), 2)
 	control.openSettings(query, "script.module.openscrapers")

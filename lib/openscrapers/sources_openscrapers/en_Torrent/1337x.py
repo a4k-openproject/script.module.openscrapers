@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -38,8 +39,8 @@ from openscrapers.modules import workers
 class source:
 	def __init__(self):
 		self.priority = 1
-		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']  # Old  1337x.se  1337x.eu  1337x.ws
-		self.domains = ['1337x.to', '1337x.st', '1337x.is']
+		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+		self.domains = ['1337x.to', '1337x.st', '1337x.is'] #.st and .is behind cloudflare while .to is not
 		self.base_link = 'https://1337x.to/'
 		self.tvsearch = 'https://1337x.to/sort-category-search/%s/TV/seeders/desc/1/'
 		self.moviesearch = 'https://1337x.to/sort-category-search/%s/Movies/seeders/desc/1/'
@@ -176,7 +177,8 @@ class source:
 
 			quality, info = source_utils.get_release_quality(item[1], name)
 
-			info.insert(0, item[2]) # if item[2] != '0'
+			if item[2] != '0':
+				info.insert(0, item[2])
 			info = ' | '.join(info)
 
 			data = client.request(item[1])

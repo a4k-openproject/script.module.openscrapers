@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# created by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -37,11 +38,14 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 0
+		self.priority = 1
 		self.language = ['en']
-		self.domain = ['torlock.cc']
-		self.base_link = 'https://torlock.cc'
-		self.search_link = '/all/torrents/%s/'
+		self.domain = ['torlock.cc', 'torlock.unblockit.red']
+		self.base_link = 'https://torlock.cc' # server response time sucks ass!
+		self.search_link = '/all/torrents/%s/?sort=seeds&order=desc'
+		# self.base_link = 'https://torlock.unblockit.red/'
+		# self.search_link = '/all/torrents/%s.html?sort=seeds&order=desc' # seeds sorting does not work behind proxy
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -105,7 +109,6 @@ class source:
 				div = client.parseDOM(r, 'div', attrs={'class': 'panel panel-default'})[0]
 				table = client.parseDOM(div, 'table', attrs={'class': 'table table-striped table-bordered table-hover table-condensed'})[0]
 				links = re.findall('<a href="(.+?)">', table, re.DOTALL)
-				# log_utils.log('links = %s' % links, log_utils.LOGDEBUG)
 
 				threads = []
 				for link in links:
@@ -126,18 +129,26 @@ class source:
 		try:
 			url = '%s%s' % (self.base_link, link)
 			result = client.request(url)
+			if result is None:
+				return
 			if 'magnet' not in result:
 				return
 
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
-			url = urllib.unquote(url).decode('utf8').replace('&amp;', '&')
-			url = url.split('&tr=')[0]
-
+			url = urllib.unquote_plus(url).decode('utf8').replace('&amp;', '&')
+			url = url.split('&tr=')[0].replace(' ', '.')
 			if url in str(self.sources):
 				return
 
+			# hash = re.findall('magnet:\?xt=urn:btih:(.*?)&dn=', url)[0] # future dict add for hash only
+
 			name = url.split('&dn=')[1]
-			name = urllib.unquote_plus(name).replace(' ', '.')
+			if name.startswith('www'):
+				try:
+					name = re.sub(r'www(.*?)\W{2,10}', '', name)
+				except:
+					name = name.split('-.', 1)[1].lstrip()
+
 			if source_utils.remove_lang(name):
 				return
 
@@ -148,20 +159,22 @@ class source:
 			if self.hdlr not in name:
 				return
 
-			size_list = re.findall('<dt>SIZE</dt><dd>(.+?)<', result, re.DOTALL)
+			try:
+				seeders = int(re.findall('<dt>SWARM</dt><dd>.*?>(.+?)</b>', result, re.DOTALL)[0].replace(',', ''))
+				if self.min_seeders > seeders:
+					return
+			except:
+				pass
+
 			quality, info = source_utils.get_release_quality(name, url)
 
-			for match in size_list:
-				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', match)[0]
-					dsize, isize = source_utils._size(size)
-					info.insert(0, isize)
-					if size:
-						break
-				except:
-					isize = '0'
-					dsize = 0
-					pass
+			try:
+				size = re.findall('<dt>SIZE</dt><dd>(.*? [a-zA-Z]{2})', result, re.DOTALL)[0]
+				dsize, isize = source_utils._size(size)
+				info.insert(0, isize)
+			except:
+				dsize = 0
+				pass
 
 			info = ' | '.join(info)
 

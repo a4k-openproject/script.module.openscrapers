@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -151,8 +152,9 @@ class source:
 			try:
 				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', result)[0]
 				dsize, isize = source_utils._size(size)
-				info.append(isize)
+				info.insert(0, isize)
 			except:
+				dsize = 0
 				pass
 
 			fileType = source_utils.getFileType(name)
@@ -203,10 +205,10 @@ class source:
 
 						if rd:
 							self._sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': i,
-																	'info': info, 'direct': False, 'debridonly': True})
+																	'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 						else:
 							self._sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': i,
-																	'info': info, 'direct': False, 'debridonly': False})
+																	'info': info, 'direct': False, 'debridonly': False, 'size': dsize})
 
 				elif 'torrent' in url:
 					# info = Torrent_info
@@ -216,7 +218,7 @@ class source:
 					url = url.split('&tr')[0]
 
 					self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-															'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+															'info': info, 'direct': False, 'debridonly': True})
 
 			except:
 				source_utils.scraper_error('MKVHUB')

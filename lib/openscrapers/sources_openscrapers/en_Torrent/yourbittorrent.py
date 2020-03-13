@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# created by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -37,11 +38,14 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 0
+		self.priority = 1
 		self.language = ['en']
-		self.domain = ['yourbittorrent2.com']
+		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
 		self.base_link = 'https://yourbittorrent2.com'
-		self.search_link = '/?v=&c=&q=%s'
+		self.search_link = '/?v=&c=&q=%s&sort=seeds'
+		# self.base_link = 'https://yourbittorrent.com'
+		# self.search_link = '/?q=%s'
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -121,18 +125,21 @@ class source:
 		try:
 			url = '%s%s' % (self.base_link, link)
 			result = client.request(url)
+
 			if result is None:
+				return
+			if '<kbd>' not in result:
 				return
 			info_hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
 			url = '%s%s' % ('magnet:?xt=urn:btih:', info_hash)
-			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0]
+			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
 			name = urllib.unquote_plus(name).replace(' ', '.')
-			url = '%s%s%s' % (url, '&dn=', str(name))
+
+			# import string
+			# printable = set(string.printable)
+			# name = filter(lambda x: x in printable, name)
 
 			if source_utils.remove_lang(name):
-				return
-
-			if url in str(self.sources):
 				return
 
 			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
@@ -142,15 +149,25 @@ class source:
 			if self.hdlr not in name:
 				return
 
+			url = '%s%s%s' % (url, '&dn=', str(name))
+			if url in str(self.sources):
+				return
+
 			size = re.findall('<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
 			quality, info = source_utils.get_release_quality(name, url)
 
 			try:
-				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', size)[0]
+				seeders = int(re.findall('<div class="col-3">Seeders:</div><div class="col"><span style="color:green">(.*?)<', result, re.DOTALL)[0].replace(',', ''))
+				# if self.min_seeders > seeders: # to many items with no value
+					# return
+			except:
+				pass
+
+			try:
+				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except:
-				isize = '0'
 				dsize = 0
 				pass
 
@@ -162,6 +179,7 @@ class source:
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 			pass
+
 
 	def resolve(self, url):
 		return url

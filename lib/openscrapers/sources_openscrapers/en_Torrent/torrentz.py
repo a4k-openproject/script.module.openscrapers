@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# created by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -28,6 +29,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -38,7 +40,7 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentz2.eu']
+		self.domains = ['torrentz2.eu', 'torrentz2.is']
 		self.base_link = 'https://torrentz2.eu'
 		self.search_link = '/search?f=%s'
 
@@ -75,6 +77,7 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		scraper = cfscrape.create_scraper()
 		sources = []
 		try:
 			if url is None:
@@ -99,8 +102,7 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			try:
-				r = client.request(url)
-
+				r = scraper.get(url).content
 				posts = client.parseDOM(r, 'div', attrs={'class': 'results'})[0]
 				posts = client.parseDOM(posts, 'dl')
 
@@ -110,11 +112,15 @@ class source:
 					for link in links:
 						magnet = link.split('</a>')[0]
 						hash = 'magnet:?xt=urn:btih:' + magnet.split('>')[0]
-						dn = '&dn=' + magnet.split('>')[1]
-						url = hash + dn
+						name = magnet.split('>')[1].replace(' ', '.')
+						if name.startswith('www'):
+							try:
+								name = re.sub(r'www(.*?)\W{2,10}', '', name)
+							except:
+								name = name.split('-.', 1)[1].lstrip()
 
-						name = url.split('&dn=')[1]
-						name = urllib.unquote_plus(name).replace(' ', '.')
+						url = '%s&dn=%s' % (hash, name)
+
 						if source_utils.remove_lang(name):
 							continue
 
@@ -132,6 +138,7 @@ class source:
 							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
 						except:
+							dsize = 0
 							pass
 
 						info = ' | '.join(info)
