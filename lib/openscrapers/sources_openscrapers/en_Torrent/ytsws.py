@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -41,7 +42,6 @@ class source:
 		self.domains = ['yts.ws']
 		self.base_link = 'https://yts.ws'
 		self.search_link = '/movie/%s'
-		# self.search_link = '/search?search=%s'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -95,9 +95,10 @@ class source:
 
 				for url, ref in link:
 					url = str(client.replaceHTMLCodes(url).split('&tr')[0])
-
+					url = url.replace(' ', '')
 					name = url.split('&dn=')[1]
-					name = urllib.unquote_plus(name).replace(' ', '.')
+					name = urllib.unquote_plus(name)
+
 					if source_utils.remove_lang(name):
 						continue
 
@@ -115,6 +116,7 @@ class source:
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
+						dsize = 0
 						pass
 
 					p += 1

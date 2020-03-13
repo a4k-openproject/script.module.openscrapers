@@ -28,7 +28,7 @@ import urlparse
 from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import pyaes
-from openscrapers.modules import trakt, log_utils
+
 
 RES_4K = ['4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra-hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
           '1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
@@ -41,7 +41,6 @@ RES_SD = ['576', '576p', '576i', 'sd576', '576sd', '480', '480p', '480i', 'sd480
           '360i', 'sd360', '360sd', '240', '240p', '240i', 'sd240', '240sd']
 
 SCR = ['dvdscr', 'screener', 'r5', 'r6']
-
 CAM = ['camrip', 'cam rip', 'tsrip', 'ts rip', 'dvdcam', 'dvd cam', 'dvdts', 'dvd ts', 'cam', 'telesync', 'tele sync',
        'ts']
 HDCAM = ['hdcam', 'hd cam', 'hd-cam', 'hd.cam', 'hdts', 'hd ts', 'hcam']
@@ -69,21 +68,24 @@ MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng'
               'gtm.eng', 'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng',
               'lat.eng', 'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
               'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual audio', 'dual-audio',
-              'dual.audio']
+              'dual.audio', 'multi']
 
-LANG = ['arabic', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'polish', 'portuguese', 'spanish',
-              'truefrech', 'hebrew']
+LANG = ['arabic', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'polish', 'portuguese', 'russian', 'spanish',
+              'truefrech', 'truespanish', 'turkish', 'hebrew']
 
-UNDESIREABLES = ['coldfilm', 'lostfilm', 'newstudio', 'vostfr']
+
+UNDESIREABLES = ['baibako', 'coldfilm', 'extras.only', 'jaskier', 'hamsterstudio', 'ideafilm', 'lakefilm', 'lostfilm',
+              'newstudio', 'sample', 'soundtrack', 'teaser', 'vostfr']
 
 DUBBED = ['dublado', 'dubbed']
 
-SUBS = ['subs', 'subtitula']
+SUBS = ['subs', 'subtitula', 'subfrench', 'subspanish', 'swesub']
 
-ADDS = ['1xbet']
+ADDS = ['1xbet', 'betwin']
 
 
 def is_anime(content, type, type_id):
+	from openscrapers.modules import trakt
 	try:
 		r = trakt.getGenre(content, type, type_id)
 		return 'anime' in r or 'animation' in r
@@ -126,6 +128,9 @@ def get_release_quality(release_name, release_link=None):
 		elif any(value in fmt for value in CAM):
 			quality = 'CAM'
 
+		elif any(value in fmt for value in HDCAM):
+			quality = 'CAM'
+
 		if not quality:
 			if release_link:
 				release_link = release_link.lower()
@@ -150,6 +155,9 @@ def get_release_quality(release_name, release_link=None):
 					quality = "SD"
 
 				elif any(value in release_link for value in CAM):
+					quality = 'CAM'
+
+				elif any(value in release_link for value in HDCAM):
 					quality = 'CAM'
 
 				else:
@@ -279,7 +287,7 @@ def getFileType(url):
 		type += ' MULTI-LANG /'
 
 	if any(value in url for value in ADDS):
-		type += ' IXBET /'
+		type += ' ADDS /'
 
 	if any(value in url for value in SUBS):
 		if type != '':
@@ -494,33 +502,34 @@ def append_headers(headers):
 def _size(siz):
 	if siz in ['0', 0, '', None]: return 0, ''
 	div = 1 if siz.lower().endswith(('gb', 'gib')) else 1024
-	float_size = float(re.sub('[^0-9|/.|/,]', '', siz.replace(',', '.'))) / div
+	float_size = float(re.sub('[^0-9|/.|/,]', '', siz.replace(',', ''))) / div
 	str_size = '%.2f GB' % float_size
 	return float_size, str_size
 
 
-def get_size(url):
+def get_size(url): # not called
 	try:
 		size = client.request(url, output='file_size')
 		if size == '0':
 			size = False
-		size = convert_size(size)
-		return size
+		float_size, str_size = convert_size(size)
+		return float_size, str_size
 	except:
 		return False
 
 
-def convert_size(size_bytes):
+def convert_size(size_bytes, to='GB'):
 	import math
 	if size_bytes == 0:
-		return "0B"
-	size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-	i = int(math.floor(math.log(size_bytes, 1024)))
+		return 0, ''
+	power = {'B' : 0, 'KB': 1, 'MB' : 2, 'GB': 3, 'TB' : 4, 'EB' : 5, 'ZB' : 6, 'YB': 7}
+	i = power[to]
 	p = math.pow(1024, i)
-	s = round(size_bytes / p, 2)
-	if size_name[i] == 'B' or size_name[i] == 'KB':
-		return None
-	return "%s %s" % (s, size_name[i])
+	float_size = round(size_bytes / p, 2)
+	# if to == 'B' or to  == 'KB':
+		# return 0, ''
+	str_size = "%s %s" % (float_size, to)
+	return float_size, str_size
 
 
 def check_directstreams(url, hoster='', quality='SD'):

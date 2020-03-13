@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -117,8 +118,8 @@ class source:
 					url = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
 					url = urllib.unquote(url).decode('utf8')
 
-					name = derka[1]
-					name = urllib.unquote_plus(name).replace(' ', '.')
+					magnet_title = derka[1]
+					name = urllib.unquote_plus(magnet_title).replace(' ', '.')
 					if source_utils.remove_lang(name):
 						continue
 
@@ -130,20 +131,20 @@ class source:
 						continue
 
 					try:
-						seeders = int(re.findall('<font color=".+?">(.+?)</font>', columns[5], re.DOTALL)[0])
+						seeders = int(re.findall('<font color=".+?">(.*?)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
+						if self.min_seeders > seeders:
+							continue
 					except:
-						continue
-
-					if self.min_seeders > seeders:
-						continue
+						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
 
 					try:
-						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', name)[-1]
+						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', magnet_title)[-1]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
+						dsize = 0
 						pass
 
 					info = ' | '.join(info)

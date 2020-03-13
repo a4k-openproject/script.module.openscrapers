@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -40,9 +39,9 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentgalaxy.to']
-		self.base_link = 'https://torrentgalaxy.to'
-		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
+		self.domains = ['nyaa.si']
+		self.base_link = 'https://nyaa.si'
+		self.search_link = '/?f=0&c=0_0&q=%s'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -77,7 +76,6 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
-		scraper = cfscrape.create_scraper()
 		sources = []
 		try:
 			if url is None:
@@ -93,59 +91,80 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			hdlr2 = 'S%d - %d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
+			query2 = '%s %s' % (title, hdlr2)
+			query2 = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query2)
+
+			urls = []
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			urls.append(url)
+			url2 = self.search_link % urllib.quote_plus(query2)
+			url2 = urlparse.urljoin(self.base_link, url2)
+			urls.append(url2)
 
-			r = scraper.get(url).content
-			posts = client.parseDOM(r, 'div', attrs={'class': 'tgxtable'})
+			for url in urls:
+				try:
+					r = client.request(url)
+					if 'magnet' not in r:
+						return sources
+					links = zip(re.findall('href="(magnet:.+?)"', r, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', r, re.DOTALL))
 
-			for post in posts:
-				links = zip(re.findall('a href="(magnet:.+?)"', post, re.DOTALL), re.findall(r"<span class='badge badge-secondary' style='border-radius:4px;'>(.*?)</span>", post, re.DOTALL), re.findall(r"<span title='Seeders/Leechers'>\[<font color='green'><b>(.*?)<", post, re.DOTALL))
+					for link in links:
+						url = link[0].replace('&amp;', '&')
+						url = url.split('&tr')[0]
 
-				for link in links:
-					url = urllib.unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
+						name = url.split('&dn=')[1]
+						name = urllib.unquote_plus(name)
 
-					name = url.split('&dn=')[1]
-					if source_utils.remove_lang(name):
-						continue
+						# if name.startswith('www'):
+							# try:
+								# name = re.sub(r'www(.*?)\W{2,10}', '', name)
+							# except:
+								# name = name.split('-.', 1)[1].lstrip()
 
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-					if cleantitle.get(t) != cleantitle.get(title):
-						continue
-
-					if hdlr not in name:
-						continue
-
-					try:
-						seeders = int(link[2].replace(',', ''))
-						if self.min_seeders > seeders:
+						if hdlr not in name and hdlr2 not in name:
 							continue
-					except:
-						pass
 
-					quality, info = source_utils.get_release_quality(name, url)
+						if source_utils.remove_lang(name):
+							continue
 
-					try:
-						dsize, isize = source_utils._size(link[1])
-						info.insert(0, isize)
-					except:
-						dsize = 0
-						pass
+						if hdlr in name:
+							t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 
-					info = ' | '.join(info)
+						if hdlr2 in name:
+							t = name.split(hdlr2)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+						# if cleantitle.get(t) != cleantitle.get(title):
+							# continue
+
+						quality, info = source_utils.get_release_quality(name, url)
+
+						try:
+							size = link[1]
+							dsize, isize = source_utils._size(size)
+							info.insert(0, isize)
+						except:
+							dsize = 0
+							pass
+
+						info = ' | '.join(info)
+
+						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
 												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+
+				except:
+					source_utils.scraper_error('NYAA')
+					return sources
 
 			return sources
 
 		except:
-			source_utils.scraper_error('TORRENTGALAXY')
+			source_utils.scraper_error('NYYAA')
 			return sources
 
 

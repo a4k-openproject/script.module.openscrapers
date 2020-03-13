@@ -28,8 +28,8 @@
 import re
 import urllib
 import urlparse
+import json
 
-from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -40,9 +40,10 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentgalaxy.to']
-		self.base_link = 'https://torrentgalaxy.to'
-		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
+		self.domains = ['solidtorrents.net']
+		self.base_link = 'https://solidtorrents.net'
+		self.search_link = '/api/v1/search?q=%s&category=all&sort=seeders'
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -77,7 +78,6 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
-		scraper = cfscrape.create_scraper()
 		sources = []
 		try:
 			if url is None:
@@ -93,6 +93,7 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
@@ -101,53 +102,69 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = scraper.get(url).content
-			posts = client.parseDOM(r, 'div', attrs={'class': 'tgxtable'})
+			r = client.request(url)
+			if r == str([]) or r == '' or r is None:
+				return sources
+			r = json.loads(r)
+			results = r['results']
+		except:
+			source_utils.scraper_error('SOLIDTORRENTS')
+			pass
 
-			for post in posts:
-				links = zip(re.findall('a href="(magnet:.+?)"', post, re.DOTALL), re.findall(r"<span class='badge badge-secondary' style='border-radius:4px;'>(.*?)</span>", post, re.DOTALL), re.findall(r"<span title='Seeders/Leechers'>\[<font color='green'><b>(.*?)<", post, re.DOTALL))
+		for item in results:
+			try:
+				url = urllib.unquote_plus(item['magnet']).replace(' ', '.')
+				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
 
-				for link in links:
-					url = urllib.unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
+				# hash = re.findall('magnet:\?xt=urn:btih:(.*?)&dn=', url)[0] # future dict add for hash only
 
-					name = url.split('&dn=')[1]
-					if source_utils.remove_lang(name):
-						continue
-
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-					if cleantitle.get(t) != cleantitle.get(title):
-						continue
-
-					if hdlr not in name:
-						continue
-
+				name = item['title']
+				if name.startswith('www'):
 					try:
-						seeders = int(link[2].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
+						name = re.sub(r'www(.*?)\W{2,10}', '', name)
 					except:
-						pass
+						name = name.split('-.', 1)[1].lstrip()
 
-					quality, info = source_utils.get_release_quality(name, url)
+				if source_utils.remove_lang(name):
+					continue
 
-					try:
-						dsize, isize = source_utils._size(link[1])
-						info.insert(0, isize)
-					except:
-						dsize = 0
-						pass
+				# some shows like "Power" have year and hdlr in name
+				t = name.split(hdlr)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+				if cleantitle.get(t) != cleantitle.get(title):
+					continue
 
-					info = ' | '.join(info)
+				if hdlr not in name:
+					continue
 
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
+				if url in str(sources):
+					continue
+
+				try:
+					seeders = int(item['swarm']['seeders'].replace(',', ''))
+					if self.min_seeders > seeders: 
+						continue
+				except:
+					pass
+
+				quality, info = source_utils.get_release_quality(name, url)
+
+				try:
+					dsize, isize = source_utils.convert_size(item["size"], to='GB')
+					info.insert(0, isize)
+				except:
+					dsize = 0
+					pass
+
+				info = ' | '.join(info)
+
+				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
 												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
-			return sources
+			except:
+				source_utils.scraper_error('SOLIDTORRENTS')
+				pass
 
-		except:
-			source_utils.scraper_error('TORRENTGALAXY')
-			return sources
-
+		return sources
 
 	def resolve(self, url):
 		return url

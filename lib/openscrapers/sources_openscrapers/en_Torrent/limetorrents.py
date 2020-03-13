@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -28,6 +29,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -77,8 +79,9 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		self.scraper = cfscrape.create_scraper()
+		self._sources = []
 		try:
-			self._sources = []
 			self.items = []
 
 			if url is None:
@@ -131,7 +134,7 @@ class source:
 	def _get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers)
+			r = self.scraper.get(url,headers=headers).content
 
 			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			posts = client.parseDOM(posts, 'tr')
@@ -183,13 +186,13 @@ class source:
 	def _get_sources(self, item):
 		try:
 			name = item[0]
-
 			quality, info = source_utils.get_release_quality(name, name)
 
-			info.insert(0, item[2]) # if item[2] != '0'
+			if item[2] != '0':
+				info.insert(0, item[2])
 			info = ' | '.join(info)
 
-			data = client.request(item[1])
+			data = self.scraper.get(item[1]).content
 			if data is None:
 				return
 

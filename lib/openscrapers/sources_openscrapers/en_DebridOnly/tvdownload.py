@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -28,11 +29,13 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import dom_parser
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
+from openscrapers.modules import workers
 
 
 class source:
@@ -85,108 +88,126 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
-		sources = []
-
+		self.scraper = cfscrape.create_scraper()
+		self.sources = []
 		try:
 			if url is None:
-				return sources
+				return self.sources
 
 			if debrid.status() is False:
-				return sources
+				return self.sources
 
-			hostDict = hostprDict + hostDict
+			self.hostDict = hostprDict + hostDict
 
 			data = urlparse.parse_qs(url)
+			self.data = data
+
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			ref_url = url = data['url']
+			url = data['url']
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.year = data['year']
 
-			_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/72.0'}
-			r = client.request(url, headers=_headers)
+			self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/72.0'}
+			r = self.scraper.get(url, headers=self.headers).content
+
+			if 'Nothing Found' in r:
+				return self.sources
+
 			posts = client.parseDOM(r, 'h2', attrs={'class': 'title'})
 			posts = zip(client.parseDOM(posts, 'a', ret='title'), client.parseDOM(posts, 'a', ret='href'))
+			# log_utils.log('posts = %s' % posts, log_utils.LOGDEBUG)
 
 			if posts == []:
-				return sources
+				return self.sources
 
+			threads = []
 			for item in posts:
-				try:
-					name = item[0].replace(' ', '.')
-					url = item[1]
-					r = client.request(url, headers=_headers)
-					list = client.parseDOM(r, 'div', attrs={'id': 'content'})
-
-					if 'tvshowtitle' in data:
-						regex = '(<strong>(.*?)</strong><br />\s?[A-Z,0-9]*?\s\|\s([A-Z,0-9,\s]*)\|\s((\d+\.\d+|\d*)\s?(?:GB|GiB|Gb|MB|MiB|Mb))?</p>(?:\s<p><a href=\".*?\" .*?_blank\">.*?</a></p>)+)'
-					else:
-						regex = '(<strong>Release Name:</strong>\s*(.*?)<br />\s?<strong>Size:</strong>\s?((\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+)\s(?:GB|GiB|Gb|MB|MiB|Mb))?<br />(.*\s)*)'
-
-					for match in re.finditer(regex, list[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')):
-						name = str(match.group(2))
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-						if cleantitle.get(t) != cleantitle.get(title):
-							continue
-
-						if hdlr not in name:
-							continue
-
-						if source_utils.remove_lang(name):
-							continue
-
-						# audio = str(match.group(3))
-
-						if 'tvshowtitle' in data:
-							size = str(match.group(4))
-						else:
-							size = str(match.group(3))
-
-						links = client.parseDOM(match.group(1), 'a', attrs={'class': 'autohyperlink'}, ret='href')
-
-						for url in links:
-							try:
-								if any(x in url for x in ['.rar', '.zip', '.iso', '.sample.']):
-									continue
-
-								if url in str(sources):
-									continue
-
-								valid, host = source_utils.is_host_valid(url, hostDict)
-								if not valid:
-									continue
-
-								host = client.replaceHTMLCodes(host)
-								host = host.encode('utf-8')
-
-								quality, info = source_utils.get_release_quality(name, url)
-
-								try:
-									div = 1 if size.endswith(('GB', 'GiB', 'Gb')) else 1024
-									size = float(re.sub('[^0-9|/.|/,]', '', size.replace(',', '.'))) / div
-									size = '%.2f GB' % size
-									info.insert(0, size)
-								except:
-									pass
-
-								info = ' | '.join(info)
-
-								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
-							except:
-								source_utils.scraper_error('TVDOWNLOADS')
-								pass
-				except:
-					source_utils.scraper_error('TVDOWNLOADS')
-					pass
-
-			return sources
+				threads.append(workers.Thread(self.get_sources, item))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
+			return self.sources
 
 		except:
 			source_utils.scraper_error('TVDOWNLOADS')
 			return sources
+
+
+	def get_sources(self, item):
+		try:
+			name = item[0].replace(' ', '.')
+			url = item[1]
+			r = self.scraper.get(url, headers=self.headers).content
+
+			list = client.parseDOM(r, 'div', attrs={'id': 'content'})
+
+			if 'tvshowtitle' in self.data:
+				regex = '(<strong>(.*?)</strong><br />\s?[A-Z,0-9]*?\s\|\s([A-Z,0-9,\s]*)\|\s((\d+\.\d+|\d*)\s?(?:GB|GiB|Gb|MB|MiB|Mb))?</p>(?:\s<p><a href=\".*?\" .*?_blank\">.*?</a></p>)+)'
+			else:
+				regex = '(<strong>Release Name:</strong>\s*(.*?)<br />\s?<strong>Size:</strong>\s?((\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+)\s(?:GB|GiB|Gb|MB|MiB|Mb))?<br />(.*\s)*)'
+
+			for match in re.finditer(regex, list[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')):
+				name = str(match.group(2))
+				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and')
+				if cleantitle.get(t) != cleantitle.get(self.title):
+					continue
+
+				if self.hdlr not in name:
+					continue
+
+				if source_utils.remove_lang(name):
+					continue
+
+				# audio = str(match.group(3))
+
+				if 'tvshowtitle' in self.data:
+					size = str(match.group(4))
+				else:
+					size = str(match.group(3))
+
+				links = client.parseDOM(match.group(1), 'a', attrs={'class': 'autohyperlink'}, ret='href')
+
+				for url in links:
+					try:
+						if any(x in url for x in ['.rar', '.zip', '.iso', '.sample.']):
+							continue
+
+						if url in str(self.sources):
+							continue
+
+						valid, host = source_utils.is_host_valid(url, self.hostDict)
+						if not valid:
+							continue
+
+						host = client.replaceHTMLCodes(host)
+						host = host.encode('utf-8')
+
+						quality, info = source_utils.get_release_quality(name, url)
+
+						try:
+							dsize, isize = source_utils._size(size)
+							info.insert(0, isize)
+						except:
+							dsize = 0
+							pass
+
+						info = ' | '.join(info)
+
+						self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+					except:
+						source_utils.scraper_error('TVDOWNLOADS')
+						pass
+
+			return self.sources
+
+		except:
+			source_utils.scraper_error('TVDOWNLOADS')
+			pass
 
 
 	def resolve(self, url):

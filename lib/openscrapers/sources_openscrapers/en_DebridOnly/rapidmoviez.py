@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -121,7 +122,7 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			# title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
 			hdlr = data['year']
 			hdlr2 = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ''
@@ -164,13 +165,14 @@ class source:
 			r = self.scraper.get(url, headers=headers).content
 
 			name = client.replaceHTMLCodes(name)
-			if ']' in name:
+			if name.startswith('['):
 				name = name.split(']')[1]
 			name = name.strip().replace(' ', '.')
 
 			l = dom_parser.parse_dom(r, 'div', {'class': 'ppu2h'})
+			if l == []:
+				return
 			s = ''
-
 			for i in l:
 				s += i.content
 
@@ -191,18 +193,17 @@ class source:
 
 				try:
 					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', name)[0]
-					div = 1 if size.endswith(('GB', 'GiB')) else 1024
-					size = float(re.sub('[^0-9|/.|/,]', '', size)) / div
-					size = '%.2f GB' % size
-					info.insert(0, size)
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
 				except:
+					dsize = 0
 					pass
 
 				fileType = source_utils.getFileType(name)
 				info.append(fileType)
 				info = ' | '.join(info) if fileType else info[0]
 
-				self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+				self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('RAPIDMOVIEZ')
 			pass

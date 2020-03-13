@@ -13,6 +13,7 @@ import ko
 import pl
 import ru
 
+
 scraper_source = os.path.dirname(__file__)
 __all__ = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
 

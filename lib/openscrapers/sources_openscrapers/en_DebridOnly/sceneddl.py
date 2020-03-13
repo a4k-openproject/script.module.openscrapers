@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -99,6 +100,7 @@ class source:
 
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url).replace('-', '+')
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
 
@@ -111,24 +113,37 @@ class source:
 			for loopCount in range(0, 2):
 				if loopCount == 1 or (r is None and 'tvshowtitle' in data):
 					r = client.request(url)
+
+				# test = zip(re.findall('<h2 class="entry-title"><a href="(.*?)" rel="bookmark">(.*?)<', r, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB|gb|mb))', r, re.DOTALL))
+				# log_utils.log('test = %s' % test, log_utils.LOGDEBUG)
+
 				posts = client.parseDOM(r, "h2", attrs={"class": "entry-title"})
 
 				items = []
 				for post in posts:
 					try:
-						tit = client.parseDOM(post, "a")[0]
-						t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
+						name = client.parseDOM(post, "a")[0]
+						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 						if cleantitle.get(t) != cleantitle.get(title):
 							continue
 
-						if hdlr not in tit:
+						if hdlr not in name:
 							continue
+
+						# check year for reboot/remake show issues if year is available-crap shoot
+						if 'tvshowtitle' in data:
+							if re.search(r'([1-3][0-9]{3})', name):
+								if not any(value in name for value in [data['year'], str(int(data['year'])+1), str(int(data['year'])-1)]):
+									continue
+
+						if source_utils.remove_lang(name):
+							return
 
 						u = client.parseDOM(post, 'a', ret='href')
 
 						for i in u:
-							name = str(i)
-							items.append(name)
+							link = str(i)
+							items.append(link)
 					except:
 						source_utils.scraper_error('SCENEDDL')
 						pass
@@ -140,6 +155,7 @@ class source:
 				try:
 					i = str(item)
 					r = client.request(i)
+
 					u = client.parseDOM(r, "div", attrs={"class": "entry-content"})
 
 					for t in u:
@@ -149,11 +165,25 @@ class source:
 							if '.rar' in url or 'imdb.com' in url:
 								continue
 
+							if url in str(self.sources):
+								return
+
 							quality, info = source_utils.get_release_quality(url)
+
+							try:
+								size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB|gb|mb))', t)[0]
+								dsize, isize = source_utils._size(size)
+								info.insert(0, isize)
+							except:
+								dsize = 0
+								pass
+
+							info = ' | '.join(info)
 
 							valid, host = source_utils.is_host_valid(url, hostDict)
 							if valid:
-								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True})
+								sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+
 				except:
 					source_utils.scraper_error('SCENEDDL')
 					pass

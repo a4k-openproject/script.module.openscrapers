@@ -127,7 +127,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 			if not ignore:
 				if response.code in [301, 307, 308, 503]:
 					cf_result = response.read(5242880)
-
 					try:
 						encoding = response.info().getheader('Content-Encoding')
 					except:
@@ -137,6 +136,7 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 						cf_result = gzip.GzipFile(fileobj=StringIO.StringIO(cf_result)).read()
 
 					if flare and 'cloudflare' in str(response.info()).lower():
+						log_utils.log('client module calling cfscrape: url=%s' % url, log_utils.LOGDEBUG)
 						try:
 							from openscrapers.modules import cfscrape
 							if isinstance(post, dict):

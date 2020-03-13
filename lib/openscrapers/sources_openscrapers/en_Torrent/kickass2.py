@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -48,7 +49,7 @@ class source:
 		self._base_link = None
 		self.search = '/usearch/{0}%20category:movies'
 		self.search2 = '/usearch/{0}%20category:tv'
-
+		self.min_seeders = 1
 
 	@property
 	def base_link(self):
@@ -164,6 +165,13 @@ class source:
 					continue
 
 				try:
+					seeders = int(re.findall('<td class="green center">(.*?)</td>', columns[5], re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders:
+						continue
+				except:
+					pass
+
+				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
 					dsize, isize = source_utils._size(size)
 				except:
@@ -183,11 +191,13 @@ class source:
 	def _get_sources(self, item):
 		try:
 			name = item[0]
-			url = item[1]
+			url = urllib.unquote_plus(item[1]).split('&tr=')[0].replace(' ', '.')
+			url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
 
 			quality, info = source_utils.get_release_quality(name, url)
 
-			info.insert(0, item[2]) # if item[2] != '0'
+			if item[2] != '0':
+				info.insert(0, item[2])
 			info = ' | '.join(info)
 
 			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
@@ -215,5 +225,3 @@ class source:
 		except:
 			pass
 		return fallback
-
-

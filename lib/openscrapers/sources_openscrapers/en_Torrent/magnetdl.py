@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -126,9 +127,9 @@ class source:
 
 				links = client.parseDOM(post, 'a', ret='href')
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
-				url = magnet.split('&tr')[0]
+				url = urllib.unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 
-				if any(x in url.lower() for x in ['french', 'italian', 'spanish', 'truefrench', 'dublado', 'dubbed']):
+				if url in str(sources):
 					continue
 
 				name = client.parseDOM(post, 'a', ret='title')[1]
@@ -150,6 +151,7 @@ class source:
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
+					dsize = 0
 					pass
 
 				info = ' | '.join(info)
