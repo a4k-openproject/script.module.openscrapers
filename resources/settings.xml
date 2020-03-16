@@ -27,7 +27,7 @@
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllHosters&amp;setting=true&amp;query=1.1)"
                  option="close"/>
         <setting type="sep"/>
-        <setting id="provider.5movies" type="bool" label="$NUMBER[5]MOVIES" default="true"/>
+        <setting id="provider.5movies" type="bool" label="$NUMBER[5]MOVIES" default="false"/>
         <setting id="provider.123movies" type="bool" label="$NUMBER[123]MOVIES" default="true"/>
         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="true"/>
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="true"/>
@@ -217,7 +217,6 @@
         <setting id="provider.sceneddl" type="bool" label="SCENEDDL" default="true"/>
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true"/>
         <setting id="provider.tvdownload" type="bool" label="TVDOWNLOAD" default="true"/>
-        <setting id="provider.ultrahdindir" type="bool" label="ULTRAHDINDIR" default="true"/>
     </category>
 
     <!-- Torrents-5 -->

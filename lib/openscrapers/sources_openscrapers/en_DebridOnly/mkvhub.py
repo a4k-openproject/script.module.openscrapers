@@ -213,10 +213,9 @@ class source:
 				elif 'torrent' in url:
 					# info = Torrent_info
 					data = client.parseDOM(r, 'a', ret='href')
-
 					url = [i for i in data if 'magnet:' in i][0]
+					url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
-
 					self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
 															'info': info, 'direct': False, 'debridonly': True})
 

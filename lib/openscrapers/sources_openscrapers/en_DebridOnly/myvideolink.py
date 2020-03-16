@@ -40,7 +40,7 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domains = ['myvideolinks.net', 's33k.myvideolinks.net', 'myvideolinks.69.mu', 'nothingcan.undo.it']
-		self.base_link = 'http://find.myvideolinks.net'
+		self.base_link = 'http://look.myvideolinks.net'
 		self.search_link = '/?s=%s'
 
 
