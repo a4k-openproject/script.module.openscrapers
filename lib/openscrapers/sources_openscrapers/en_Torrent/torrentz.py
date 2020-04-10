@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -30,7 +30,6 @@ import urllib
 import urlparse
 
 from openscrapers.modules import cfscrape
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -43,6 +42,7 @@ class source:
 		self.domains = ['torrentz2.eu', 'torrentz2.is']
 		self.base_link = 'https://torrentz2.eu'
 		self.search_link = '/search?f=%s'
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -108,28 +108,31 @@ class source:
 
 				for post in posts:
 					links = re.findall('<dt><a href=/(.+)</a>', post, re.DOTALL)
+					try:
+						seeders = int(re.findall('<span>([0-9]+|[0-9]+,[0-9]+)</span>', post, re.DOTALL)[0].replace(',', ''))
+						if self.min_seeders > seeders:
+							continue
+					except:
+						seeders = 0
+						pass
 
 					for link in links:
-						magnet = link.split('</a>')[0]
-						hash = 'magnet:?xt=urn:btih:' + magnet.split('>')[0]
-						name = magnet.split('>')[1].replace(' ', '.')
+						hash = link.split('>')[0]
+						name = link.split('>')[1].replace(' ', '.')
+
 						if name.startswith('www'):
 							try:
 								name = re.sub(r'www(.*?)\W{2,10}', '', name)
 							except:
 								name = name.split('-.', 1)[1].lstrip()
-
-						url = '%s&dn=%s' % (hash, name)
-
 						if source_utils.remove_lang(name):
 							continue
 
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-						if cleantitle.get(t) != cleantitle.get(title):
+						match = source_utils.check_title(title, name, hdlr, data['year'])
+						if not match:
 							continue
 
-						if hdlr not in name:
-							continue
+						url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 						quality, info = source_utils.get_release_quality(name, url)
 
@@ -143,15 +146,12 @@ class source:
 
 						info = ' | '.join(info)
 
-						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+						sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+													'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				return sources
-
 			except:
 				source_utils.scraper_error('TORRENTZ')
 				return
-
 		except:
 			source_utils.scraper_error('TORRENTZ')
 			return sources

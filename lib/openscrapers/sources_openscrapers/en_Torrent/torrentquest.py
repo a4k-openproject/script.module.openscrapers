@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -41,7 +41,8 @@ class source:
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = ['torrentquest.com']
 		self.base_link = 'https://torrentquest.com'
-		self.search_link = '/{0}/{1}'
+		self.search_link = '/{0}/{1}/size/desc/'
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -110,24 +111,29 @@ class source:
 
 			for post in posts:
 				post = post.replace('&nbsp;', ' ')
-
 				links = client.parseDOM(post, 'a', ret='href')
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = urllib.unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(sources):
 					continue
+				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 				name = client.parseDOM(post, 'a', ret='title')[1]
 				name = urllib.unquote_plus(name).replace(' ', '.')
 				if source_utils.remove_lang(name):
 					continue
 
-				t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-				if cleantitle.get(t) != cleantitle.get(title):
+				match = source_utils.check_title(title, name, hdlr, data['year'])
+				if not match:
 					continue
 
-				if hdlr not in name:
-					continue
+				try:
+					seeders = int(client.parseDOM(post, 'td', attrs={'class': 's'})[0].replace(',', ''))
+					if self.min_seeders > seeders:
+						continue
+				except:
+					seeders = 0
+					pass
 
 				quality, info = source_utils.get_release_quality(name, url)
 
@@ -141,9 +147,8 @@ class source:
 
 				info = ' | '.join(info)
 
-				sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+				sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			return sources
 		except:
 			source_utils.scraper_error('TORRENTQUEST')

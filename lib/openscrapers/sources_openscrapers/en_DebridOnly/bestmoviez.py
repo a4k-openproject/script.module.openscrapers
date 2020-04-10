@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (4/3/20)-slow server response time
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,6 +29,8 @@ import re
 import urllib
 import urlparse
 
+
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -40,9 +42,9 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['pirateiro.eu']
-		self.base_link = 'https://pirateiro.eu/'
-		self.search_link = '/torrents/?search=%s'
+		self.domains = ['best-moviez.ws']
+		self.base_link = 'http://www.best-moviez.ws'
+		self.search_link = '/?s=%s&submit=Search'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -65,8 +67,7 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if url is None:
-				return
+			if url == None: return
 			url = urlparse.parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -79,11 +80,16 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		self.sources = []
 		try:
-			if url is None:
+			self.scraper = cfscrape.create_scraper()
+			# scraper = cfscrape.create_scraper(debug=True) # throws globasl dump error (import issue)
+
+			if url == None:
 				return self.sources
 
 			if debrid.status() is False:
 				return self.sources
+
+			self.hostDict = hostprDict + hostDict
 
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -101,45 +107,54 @@ class source:
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			urls.append(url)
-			urls.append(url + '&page=2')
+			# urls.append(url.replace('/?s', '/page/2/?s')) # server is to slow to parse more than one page
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
+			links = []
+			for x in urls:
+				r = self.scraper.get(x).content
+				list = client.parseDOM(r, "h1", attrs={'class': 'entry-title'})
+				for item in list:
+					links.append(item)
+
 			threads = []
-			for url in urls:
-				threads.append(workers.Thread(self._get_sources, url))
+			for link in links:
+				threads.append(workers.Thread(self.get_sources, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
-
 		except:
-			source_utils.scraper_error('PIRATEIRO')
+			source_utils.scraper_error('BESTMOVIEZ')
 			return self.sources
 
 
-	def _get_sources(self, url):
+	def get_sources(self, link):
 		try:
-			r = client.request(url)
-			links = zip(re.findall('href="(magnet:.+?)"', r, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', r, re.DOTALL))
+			item = client.parseDOM(link, "a", ret="href")[0]
+			name = client.parseDOM(link, "a")[0]
+			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+			if cleantitle.get(t) != cleantitle.get(self.title):
+				return
 
-			for link in links:
-				url = urllib.unquote_plus(link[0]).decode('utf-8').split('&xl=')[0].replace(' ', '.')
-				url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+			if self.hdlr not in name:
+				return
 
-				name = url.split('&dn=')[1]
-				if source_utils.remove_lang(name):
+			r = self.scraper.get(item).content
+			links = client.parseDOM(r, "div", attrs={'class': 'entry-content'})
+			links = client.parseDOM(links, "a", ret="href")
+			meta = client.parseDOM(r, "meta", ret="content", attrs={'property': 'og:description'})[0]
+
+			for url in links:
+				if 'imdb.com' in url:
 					continue
 
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-				if cleantitle.get(t) != cleantitle.get(self.title):
-					continue
-
-				if self.hdlr not in name:
+				if any(x in url for x in ['.rar', '.zip', '.iso', '.sample', '.html', '.jpg']):
 					continue
 
 				quality, info = source_utils.get_release_quality(name, url)
 
 				try:
-					size = link[1]
+					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', meta)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -148,12 +163,17 @@ class source:
 
 				info = ' | '.join(info)
 
-				self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-										'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				valid, host = source_utils.is_host_valid(url, self.hostDict)
+				if not valid:
+					continue
 
+				host = client.replaceHTMLCodes(host)
+				host = host.encode('utf-8')
+
+				self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
+								'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
-			source_utils.scraper_error('PIRATEIRO')
-			pass
+			source_utils.scraper_error('BESTMOVIEZ')
 
 
 	def resolve(self, url):

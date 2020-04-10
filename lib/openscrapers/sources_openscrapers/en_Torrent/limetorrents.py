@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -30,7 +30,6 @@ import urllib
 import urlparse
 
 from openscrapers.modules import cfscrape
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -45,6 +44,7 @@ class source:
 		self.base_link = 'https://www.limetorrents.info'
 		self.tvsearch = 'https://www.limetorrents.info/search/tv/{0}/1/'
 		self.moviesearch = 'https://www.limetorrents.info/search/movies/{0}/1/'
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -159,12 +159,17 @@ class source:
 				if source_utils.remove_lang(name):
 					continue
 
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-				if cleantitle.get(t) != cleantitle.get(self.title):
+				match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+				if not match:
 					continue
 
-				if self.hdlr not in name:
-					continue
+				try:
+					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
+					if self.min_seeders > seeders:
+						continue
+				except:
+					seeders = 0
+					pass
 
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
@@ -174,7 +179,7 @@ class source:
 					dsize = 0
 					pass
 
-				self.items.append((name, link, isize, dsize))
+				self.items.append((name, link, isize, dsize, seeders))
 
 			return self.items
 
@@ -198,11 +203,15 @@ class source:
 
 			try:
 				url = re.search('''href=["'](magnet:\?[^"']+)''', data).groups()[0]
+				url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+				url = url.split('&tr')[0]
 			except:
 				return
 
-			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
+			hash = re.compile('btih:(.*?)&').findall(url)[0]
+
+			self._sources.append({'source': 'torrent', 'seeders': item[4], 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			pass

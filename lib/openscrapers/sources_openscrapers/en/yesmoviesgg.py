@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 # -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
 # vidnode could be improved but resolve redirect works for now.
+# modified by Venom (added cfscrape 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -40,6 +41,7 @@ class source:
 		self.movie_link = '/film/%s/watching.html?ep=0'
 		self.tvshow_link = '/film/%s-season-%s/watching.html?ep=%s'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			title = cleantitle.geturl(title).replace('--', '-')
@@ -48,12 +50,14 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = cleantitle.geturl(tvshowtitle).replace('--', '-')
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -65,19 +69,20 @@ class source:
 		except:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
 			if url is None:
 				return sources
 			hostDict = hostprDict + hostDict
-			r = getSum.get(url)
+			r = getSum.get(url,Type='cfscrape')
 			qual = getSum.findThat(r, 'class="quality">(.+?)<')[0]
 			quality, info = source_utils.get_release_quality(qual, qual)
 			match = getSum.findSum(r)
 			for url in match:
 				if 'vidcloud' in url:
-					r = getSum.get(url)
+					r = getSum.get(url, Type='cfscrape')
 					match = getSum.findSum(r)
 					for url in match:
 						valid, host = source_utils.is_host_valid(url, hostDict)
@@ -94,7 +99,8 @@ class source:
 		except:
 			return sources
 
+
 	def resolve(self, url):
 		if 'api.vidnode.net' in url:
-			url = getSum.get(url, type='redirect')
+			url = getSum.get(url, Type='redirect')
 		return url

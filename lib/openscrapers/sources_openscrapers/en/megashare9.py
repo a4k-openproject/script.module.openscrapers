@@ -11,8 +11,9 @@ class source:
     def __init__(self):
         self.priority = 1
         self.language = ['en']
-        self.domains = ['megashare9.su']
-        self.base_link = 'http://megashare9.su'
+        self.domains = ['megashare9.yt']
+        self.base_link = 'http://megashare9.yt'
+
         self.movie_link = '/%s-%s-online'
         self.movie2_link = '/%s-%s-watch-online'
         self.headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3555.0 Safari/537.36"}

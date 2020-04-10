@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -30,7 +30,6 @@ import urllib
 import urlparse
 
 from openscrapers.modules import cache
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -40,12 +39,10 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['pirateproxy.live', 'thepiratebay.org', 'thepiratebay.fun', 'thepiratebay.asia', 'tpb.party',
-								'thehiddenbay.com', 'piratebay.live', 'thepiratebay.zone'] #-- 'thepiratebayz.org' and 'thepiratebay3.org' seem dead
-
+		self.domains = ['pirateproxy.live', 'thepiratebay.zone', 'piratebay1.live', 'thepiratebay10.org',
+								'piratebay1.xyz', 'thepiratebay1.top', 'piratebay1.info', 'tpb.party']
 		self._base_link = None
-		# self.search_link = '/s/?q=%s&page=1&&video=on&orderby=99' #-page flip does not work
-		self.search_link = '/search/%s/1/99/200' #-direct link can flip pages
+		self.search_link = '/search/%s/0/5/200'
 		self.min_seeders = 1
 
 
@@ -120,8 +117,7 @@ class source:
 			except:
 				return sources
 
-			url2 = url.replace('/1/', '/2/')
-
+			url2 = url.replace('/0/', '/1/')
 			html2 = client.request(url2)
 			html2 = html2.replace('&nbsp;', ' ')
 
@@ -137,33 +133,29 @@ class source:
 				return sources
 
 			for entry in rows:
+				if 'magnet' not in entry:
+					continue
 				try:
-					try:
-						url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', entry, re.DOTALL)[0])
-						url = urllib.unquote_plus(url).split('&tr')[0].replace(' ', '.')
-					except:
+					url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', entry, re.DOTALL)[0])
+					url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+					url = url.split('&tr')[0]
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
+
+					name = re.findall('class="detLink" title=".+?">(.+?)</a>', entry, re.DOTALL)[0]
+					name = urllib.unquote_plus(name).replace(' ', '.')
+					if source_utils.remove_lang(name):
+						continue
+
+					match = source_utils.check_title(title, name, hdlr, data['year'])
+					if not match:
 						continue
 
 					try:
-						name = re.findall('class="detLink" title=".+?">(.+?)</a>', entry, re.DOTALL)[0]
-						name = urllib.unquote_plus(name).replace(' ', '.')
-						if source_utils.remove_lang(name):
-							continue
-
-						t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-						if cleantitle.get(t) != cleantitle.get(title):
-							continue
-					except:
-						continue
-
-					if hdlr not in name:
-						continue
-
-					try:
-						seeders = int(re.findall('<td align="right">(.+?)</td>', entry, re.DOTALL)[0].replace(',', ''))
+						seeders = int(re.findall('<td align="right">([0-9]+|[0-9]+,[0-9]+)</td>', entry, re.DOTALL)[0].replace(',', ''))
 						if self.min_seeders > seeders:
 							continue
 					except:
+						seeders = 0
 						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
@@ -178,14 +170,12 @@ class source:
 
 					info = ' | '.join(info)
 
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+					sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				except:
 					source_utils.scraper_error('PIRATEBAY')
 					continue
-
 			return sources
-
 		except:
 			source_utils.scraper_error('PIRATEBAY')
 			return sources

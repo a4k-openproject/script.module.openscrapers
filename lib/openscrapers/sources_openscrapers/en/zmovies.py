@@ -37,6 +37,7 @@ class source:
                 valid, host = source_utils.is_host_valid(url, hostDict)
                 if valid:
                     quality, info = source_utils.get_release_quality(url, url)
+
                     sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url, 'direct': False, 'debridonly': False})
             return sources
         except:

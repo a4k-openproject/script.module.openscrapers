@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -127,20 +126,21 @@ class source:
 			for post in posts:
 				# file_name = client.parseDOM(post, 'span', attrs={'class': 'file-name'}) # file_name and &dn= differ 25% of the time.  May add check
 				try:
-					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">(.*?)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders:
 						return
 				except:
+					seeders = 0
 					pass
 
 				link = re.findall('<a href="(magnet:.+?)"', post, re.DOTALL)
 
 				for url in link:
-					url = url.replace('&amp;', '&').replace(' ', '.')
+					url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
-					name = urllib.unquote_plus(name)
 					if source_utils.remove_lang(name):
 						continue
 
@@ -150,11 +150,8 @@ class source:
 						except:
 							name = name.split('-.', 1)[1].lstrip()
 
-					t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-					if cleantitle.get(t) != cleantitle.get(self.title):
-						continue
-
-					if self.hdlr not in name:
+					match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+					if not match:
 						continue
 
 					quality, info = source_utils.get_release_quality(url)
@@ -169,8 +166,8 @@ class source:
 
 					info = ' | '.join(info)
 
-					self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+													'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('BTDB')
 			pass

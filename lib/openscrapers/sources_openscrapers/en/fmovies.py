@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 # -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
+# modified by Venom for Openscrapers  (updated 4-3-2020) # links don't play
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -40,10 +41,18 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['fmovies.sc']
-		self.base_link = 'http://fmovies.sc'
-		self.search_link = '/watch/%s-%s-online.html'
+		self.domains = ['fmovies.ag']
+		# self.base_link = 'http://fmovies.sc' #reCaptcha
+		self.base_link = 'http://www9.fmovies.ag'
+
+# http://www9.fmovies.ag
+# https://www5.f-movies.to
+# https://fmovies.top
+# https://ww5.fmovie.sc
+
+		self.search_link = '/watch/%s-%s-online-fmovies.html'
 		self.scraper = cfscrape.create_scraper()
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -80,21 +89,28 @@ class source:
 		except:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
+
 			if url is None:
 				return sources
 			r = self.scraper.get(url).content
 			qual = re.findall(">(\w+)<\/p", r)
+
 			for i in qual:
 				quality, info = source_utils.get_release_quality(i, i)
+
 			r = dom_parser.parse_dom(r, 'div', {'id': 'servers-list'})
 			r = [dom_parser.parse_dom(i, 'a', req=['href']) for i in r if i]
+
 			for i in r[0]:
 				url = {'url': i.attrs['href'], 'data-film': i.attrs['data-film'], 'data-server': i.attrs['data-server'],
 				       'data-name': i.attrs['data-name']}
 				url = urllib.urlencode(url)
+				# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+
 				valid, host = source_utils.is_host_valid(i.content, hostDict)
 				if valid:
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info, 'url': url,
@@ -103,6 +119,7 @@ class source:
 		except:
 			return sources
 
+
 	def resolve(self, url):
 		try:
 			urldata = urlparse.parse_qs(url)
@@ -110,21 +127,20 @@ class source:
 			post = {'ipplugins': 1, 'ip_film': urldata['data-film'], 'ip_server': urldata['data-server'],
 			        'ip_name': urldata['data-name'], 'fix': "0"}
 			self.scraper.headers.update({'Referer': urldata['url'], 'X-Requested-With': 'XMLHttpRequest'})
-			p1 = self.scraper.post('http://fmovies.sc/ip.file/swf/plugins/ipplugins.php', data=post).content
+			p1 = self.scraper.post('http://fmovies.ag/ip.file/swf/plugins/ipplugins.php', data=post).content
 			p1 = json.loads(p1)
-			p2 = self.scraper.get('http://fmovies.sc/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' % (
-			p1['s'], urldata['data-server'])).content
+			p2 = self.scraper.get('http://fmovies.ag/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=0' % (p1['s'], urldata['data-server'])).content
 			p2 = json.loads(p2)
-			p3 = self.scraper.get('http://fmovies.sc/ip.file/swf/ipplayer/api.php?hash=%s' % (p2['hash'])).content
+			p3 = self.scraper.get('http://fmovies.ag/ip.file/swf/ipplayer/api.php?hash=%s' % (p2['hash'])).content
 			p3 = json.loads(p3)
 			n = p3['status']
 			if n is False:
-				p2 = self.scraper.get('http://fmovies.sc/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=1' % (
-				p1['s'], urldata['data-server'])).content
+				p2 = self.scraper.get('http://fmovies.ag/ip.file/swf/ipplayer/ipplayer.php?u=%s&s=%s&n=1' % (p1['s'], urldata['data-server'])).content
 				p2 = json.loads(p2)
 			url = p2["data"].replace("\/", "/")
 			if not url.startswith('http'):
 				url = "https:" + url
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			return url
 		except:
 			return

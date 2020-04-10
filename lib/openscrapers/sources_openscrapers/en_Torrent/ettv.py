@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -40,8 +39,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domain = ['ettv.to']
-		self.base_link = 'https://ettv.to'
+		self.domain = ['ettvdl.com', 'ettv.to']
+		self.base_link = 'https://ettvdl.com'
 		self.search_link = '/torrents-search.php?search=%s'
 		self.min_seeders = 1
 
@@ -132,9 +131,10 @@ class source:
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
 			url = urllib.unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
 			url = url.split('&xl=')[0]
-
 			if url in str(self.sources):
 				return
+
+			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]
 			if name.startswith('www'):
@@ -146,18 +146,16 @@ class source:
 			if source_utils.remove_lang(name):
 				return
 
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-			if cleantitle.get(t) != cleantitle.get(self.title):
-				return
-
-			if self.hdlr not in name:
+			match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+			if not match:
 				return
 
 			try:
-				seeders = int(re.findall(r'<b>Seeds: </b>.*?>(.*?)</font>', result, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'<b>Seeds: </b>.*?>([0-9]+|[0-9]+,[0-9]+)</font>', result, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders:
 					return
 			except:
+				seeders = 0
 				pass
 
 			quality, info = source_utils.get_release_quality(name, url)
@@ -172,12 +170,12 @@ class source:
 
 			info = ' | '.join(info)
 
-			self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+			self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('ETTV')
 			pass
+
 
 	def resolve(self, url):
 		return url

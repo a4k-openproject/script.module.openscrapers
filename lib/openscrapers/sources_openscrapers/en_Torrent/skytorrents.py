@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -42,6 +41,7 @@ class source:
 		self.domains = ['www.skytorrents.lol']
 		self.base_link = 'https://www.skytorrents.lol/'
 		self.search_link = '?query=%s'
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -112,10 +112,15 @@ class source:
 
 		for post in posts:
 			try:
-				link = re.findall('a href="(magnet:.+?)" title="(.+?)"', post, re.DOTALL)
-				for url, ref in link:
-					url = urllib.unquote_plus(url).split('&tr=')[0].replace(' ', '.')
+				post = re.sub(r'\n', '', post)
+				post = re.sub(r'\t', '', post)
+				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
+
+				for url, seeders, in link:
+					url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+					url = url.split('&tr')[0]
 					url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					if name.startswith('www'):
@@ -127,12 +132,17 @@ class source:
 					if source_utils.remove_lang(name):
 						continue
 
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-					if cleantitle.get(t) != cleantitle.get(title):
+					match = source_utils.check_title(title, name, hdlr, data['year'])
+					if not match:
 						continue
 
-					if hdlr not in name:
-						continue
+					try:
+						seeders = int(seeders)
+						if self.min_seeders > seeders:
+							continue
+					except:
+						seeders = 0
+						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
 
@@ -146,13 +156,11 @@ class source:
 
 					info = ' | '.join(info)
 
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+					sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('SKYTORRENTS')
 				return sources
-
 		return sources
 
 

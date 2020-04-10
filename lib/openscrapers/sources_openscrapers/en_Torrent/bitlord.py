@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -114,9 +113,10 @@ class source:
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 					url = url.split('&tr=')[0]
 					url = url.split('&xl=')[0]
-
 					if 'magnet' not in url:
 						continue
+
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					if name.startswith('www'):
@@ -128,11 +128,8 @@ class source:
 					if source_utils.remove_lang(name):
 						continue
 
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-					if cleantitle.get(t) != cleantitle.get(title):
-						continue
-
-					if hdlr not in name:
+					match = source_utils.check_title(title, name, hdlr, data['year'])
+					if not match:
 						continue
 
 					try:
@@ -140,24 +137,25 @@ class source:
 						if self.min_seeders > seeders:
 							continue
 					except:
+						seeders = 0
 						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
 
 					try:
 						size = int(link[1])
-						if size < 5.12: raise Exception()
-						dsize = float(size) / 1024
-						isize = '%.2f GB' % dsize
+						size = str(size) + ' GB' if len(str(size)) == 1 else str(size) + ' MB'
+						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
+						source_utils.scraper_error('BITLORD')
 						dsize = 0
 						pass
 
 					info = ' | '.join(info)
 
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+					sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 				except:
 					source_utils.scraper_error('BITLORD')

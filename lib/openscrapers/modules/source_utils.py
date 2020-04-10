@@ -25,6 +25,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import pyaes
@@ -70,9 +71,8 @@ MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng'
               'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual audio', 'dual-audio',
               'dual.audio', 'multi']
 
-LANG = ['arabic', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'polish', 'portuguese', 'russian', 'spanish',
+LANG = ['arabic', 'bgaudio', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'polish', 'portuguese', 'russian', 'spanish',
               'truefrech', 'truespanish', 'turkish', 'hebrew']
-
 
 UNDESIREABLES = ['baibako', 'coldfilm', 'extras.only', 'jaskier', 'hamsterstudio', 'ideafilm', 'lakefilm', 'lostfilm',
               'newstudio', 'sample', 'soundtrack', 'teaser', 'vostfr']
@@ -418,6 +418,23 @@ def check_url(url):
 		return 'SD'
 
 
+def check_title(title, name, hdlr, year):
+	# from openscrapers.modules import log_utils
+	try:
+		match = True
+		n = name.lower()
+		h = hdlr.lower()
+		t = n.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.us.', '.')
+		# log_utils.log('cleantitle.get(t) = %s' % cleantitle.get(t), log_utils.LOGDEBUG)
+		# log_utils.log('cleantitle.get(title) = %s' % cleantitle.get(title), log_utils.LOGDEBUG)
+		if cleantitle.get(t) != cleantitle.get(title):
+			match = False
+		if h not in n:
+			match = False
+		return match
+	except:
+		match = False
+
 def label_to_quality(label):
 	try:
 		try:
@@ -426,13 +443,11 @@ def label_to_quality(label):
 			label = 0
 		if label >= 2160:
 			return '4K'
-		elif label >= 1440:
-			return '1440p'
-		elif label >= 1080:
+		elif 1920 <= label:
 			return '1080p'
-		elif 720 <= label < 1080:
+		elif 1280 <= label:
 			return '720p'
-		elif label < 720:
+		elif label <= 576:
 			return 'SD'
 	except:
 		return 'SD'

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -40,11 +39,9 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domain = ['torlock.cc', 'torlock.unblockit.red']
-		self.base_link = 'https://torlock.cc' # server response time sucks ass!
-		self.search_link = '/all/torrents/%s/?sort=seeds&order=desc'
-		# self.base_link = 'https://torlock.unblockit.red/'
-		# self.search_link = '/all/torrents/%s.html?sort=seeds&order=desc' # seeds sorting does not work behind proxy
+		self.domain = ['torlock.com', 'torlock.unblockit.pro', 'torlock.cc']
+		self.base_link = 'https://torlock.com'
+		self.search_link = '/all/torrents/%s.html?'
 		self.min_seeders = 1
 
 
@@ -106,9 +103,7 @@ class source:
 
 			try:
 				r = client.request(url)
-				div = client.parseDOM(r, 'div', attrs={'class': 'panel panel-default'})[0]
-				table = client.parseDOM(div, 'table', attrs={'class': 'table table-striped table-bordered table-hover table-condensed'})[0]
-				links = re.findall('<a href="(.+?)">', table, re.DOTALL)
+				links = re.findall('<a href=(/torrent/.+?)>', r, re.DOTALL)
 
 				threads = []
 				for link in links:
@@ -139,8 +134,7 @@ class source:
 			url = url.split('&tr=')[0].replace(' ', '.')
 			if url in str(self.sources):
 				return
-
-			# hash = re.findall('magnet:\?xt=urn:btih:(.*?)&dn=', url)[0] # future dict add for hash only
+			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]
 			if name.startswith('www'):
@@ -152,18 +146,16 @@ class source:
 			if source_utils.remove_lang(name):
 				return
 
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-			if cleantitle.get(t) != cleantitle.get(self.title):
-				return
-
-			if self.hdlr not in name:
+			match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+			if not match:
 				return
 
 			try:
-				seeders = int(re.findall('<dt>SWARM</dt><dd>.*?>(.+?)</b>', result, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall('<dt>SWARM</dt><dd>.*?>([0-9]+)</b>', result, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders:
 					return
 			except:
+				seeders = 0
 				pass
 
 			quality, info = source_utils.get_release_quality(name, url)
@@ -178,9 +170,8 @@ class source:
 
 			info = ' | '.join(info)
 
-			self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+			self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('TORLOCK')
 			pass

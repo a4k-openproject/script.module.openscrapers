@@ -128,8 +128,10 @@ class source:
 					if not valid:
 						continue
 					urls, host, direct = source_utils.check_directstreams(link, hoster)
-					if source_utils.limit_hosts() is True and host in str(sources):
-						continue
+
+					# if source_utils.limit_hosts() is True and host in str(sources): # function does not exist
+						# continue
+
 					for x in urls:
 						sources.append({'source': host, 'quality': x['quality'], 'language': 'en', 'url': x['url'],
 						                'direct': direct, 'debridonly': False})

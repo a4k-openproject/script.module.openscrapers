@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers  (added cfscrape 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -30,6 +30,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -77,8 +78,9 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
+			self.scraper = cfscrape.create_scraper()
 
 			if url is None:
 				return sources
@@ -103,17 +105,17 @@ class source:
 			url = urlparse.urljoin(self.base_link, url).replace('%3A+', '+')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = client.request(url)
+			r = self.scraper.get(url).content
 
 			if r is None and 'tvshowtitle' in data:
 				season = re.search('S(.*?)E', hdlr)
 				season = season.group(1)
 				url = title
-				r = client.request(url)
+				r = self.scraper.get(url).content
 
 			for loopCount in range(0, 2):
 				if loopCount == 1 or (r is None and 'tvshowtitle' in data):
-					r = client.request(url)
+					r = self.scraper.get(url).content
 				posts = client.parseDOM(r, "h2", attrs={"class": "postTitle"})
 
 				items = []
@@ -151,7 +153,7 @@ class source:
 			for item in items:
 				try:
 					i = str(item)
-					r = client.request(i)
+					r = self.scraper.get(url).content
 					u = client.parseDOM(r, "div", attrs={"class": "postContent"})
 
 					for t in u:

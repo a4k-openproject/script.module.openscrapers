@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -42,6 +42,7 @@ class source:
 		self.domains = ['nyaa.si']
 		self.base_link = 'https://nyaa.si'
 		self.search_link = '/?f=0&c=0_0&q=%s'
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -106,63 +107,73 @@ class source:
 			url2 = self.search_link % urllib.quote_plus(query2)
 			url2 = urlparse.urljoin(self.base_link, url2)
 			urls.append(url2)
+			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			for url in urls:
 				try:
 					r = client.request(url)
 					if 'magnet' not in r:
 						return sources
-					links = zip(re.findall('href="(magnet:.+?)"', r, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', r, re.DOTALL))
+					r = re.sub(r'\n', '', r)
+					r = re.sub(r'\t', '', r)
+					tbody = client.parseDOM(r, 'tbody')
+					rows = client.parseDOM(tbody, 'tr')
 
-					for link in links:
-						url = link[0].replace('&amp;', '&')
-						url = url.split('&tr')[0]
 
-						name = url.split('&dn=')[1]
-						name = urllib.unquote_plus(name)
+					for row in rows:
+						links = zip(re.findall('href="(magnet:.+?)"', row, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL), [re.findall('<td class="text-center">([0-9]+)</td>', row, re.DOTALL)])
 
-						# if name.startswith('www'):
-							# try:
-								# name = re.sub(r'www(.*?)\W{2,10}', '', name)
-							# except:
-								# name = name.split('-.', 1)[1].lstrip()
+						for link in links:
+							url = urllib.unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.')
+							url = url.split('&tr')[0]
+							url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+							hash = re.compile('btih:(.*?)&').findall(url)[0]
 
-						if hdlr not in name and hdlr2 not in name:
-							continue
+							name = url.split('&dn=')[1]
 
-						if source_utils.remove_lang(name):
-							continue
+							seeders = int(link[2][0])
+							if self.min_seeders > seeders:
+								continue
 
-						if hdlr in name:
-							t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+							# if name.startswith('www'):
+								# try:
+									# name = re.sub(r'www(.*?)\W{2,10}', '', name)
+								# except:
+									# name = name.split('-.', 1)[1].lstrip()
 
-						if hdlr2 in name:
-							t = name.split(hdlr2)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+							if hdlr not in name and hdlr2 not in name:
+								continue
 
-						# if cleantitle.get(t) != cleantitle.get(title):
-							# continue
+							if source_utils.remove_lang(name):
+								continue
 
-						quality, info = source_utils.get_release_quality(name, url)
+							if hdlr in name:
+								t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 
-						try:
-							size = link[1]
-							dsize, isize = source_utils._size(size)
-							info.insert(0, isize)
-						except:
-							dsize = 0
-							pass
+							if hdlr2 in name:
+								t = name.split(hdlr2)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 
-						info = ' | '.join(info)
+							# if cleantitle.get(t) != cleantitle.get(title):
+								# continue
 
-						sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+							quality, info = source_utils.get_release_quality(name, url)
 
+							try:
+								size = link[1]
+								dsize, isize = source_utils._size(size)
+								info.insert(0, isize)
+							except:
+								dsize = 0
+								pass
+
+							info = ' | '.join(info)
+
+							sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+														'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				except:
 					source_utils.scraper_error('NYAA')
 					return sources
-
 			return sources
-
 		except:
 			source_utils.scraper_error('NYYAA')
 			return sources

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# modified by Venom for Openscrapers (4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -42,6 +43,7 @@ class source:
 		self.base_link = 'https://iwaatch.com/'
 		self.search_link = 'api/api.php?page=moviesearch&q={0}'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -50,9 +52,9 @@ class source:
 		except BaseException:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
-
 		try:
 			if not url: return sources
 
@@ -67,6 +69,7 @@ class source:
 
 			url = self.search_link.format(urllib.quote_plus(query))
 			url = urlparse.urljoin(self.base_link, url)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
 			items = client.parseDOM(r, 'li')
@@ -76,7 +79,8 @@ class source:
 
 			html = client.request(item)
 			streams = re.findall('sources\:\s*\[(.+?)\]\,', html, re.DOTALL)[0]
-			streams = re.findall('file:\s*[\'"](.+?)[\'"].+?label:\s*[\'"](.+?)[\'"]', streams, re.DOTALL)
+			# streams = re.findall('file:\s*[\'"](.+?)[\'"].+?label:\s*[\'"](.+?)[\'"]', streams, re.DOTALL)
+			streams = re.findall('src:\s*[\'"](.+?)[\'"].+?size:\s*[\'"](.+?)[\'"]', streams, re.DOTALL)
 
 			for link, label in streams:
 				quality = source_utils.get_release_quality(label, label)[0]
@@ -86,7 +90,9 @@ class source:
 
 			return sources
 		except BaseException:
+			source_utils.scraper_error('IWAATCH')
 			return sources
+
 
 	def resolve(self, url):
 		return url

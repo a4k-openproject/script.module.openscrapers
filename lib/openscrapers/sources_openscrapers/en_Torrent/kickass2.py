@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -30,7 +30,6 @@ import urllib
 import urlparse
 
 from openscrapers.modules import cache
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -40,7 +39,7 @@ from openscrapers.modules import workers
 class source:
 	def __init__(self):
 		self.priority = 1
-		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
+		self.language = ['en']
 		self.domains = ['kickasshydra.net', 'kickasstrusty.com', 'kickassindia.com',
 			'kickassmovies.net', 'torrentskickass.org', 'kickasstorrents.li', 'kkat.net',
 			'kickassdb.com', 'kickassaustralia.com', 'kickasspk.com', 'kkickass.com',
@@ -157,18 +156,16 @@ class source:
 				if source_utils.remove_lang(name):
 					continue
 
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-				if cleantitle.get(t) != cleantitle.get(self.title):
-					continue
-
-				if self.hdlr not in name:
+				match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+				if not match:
 					continue
 
 				try:
-					seeders = int(re.findall('<td class="green center">(.*?)</td>', columns[5], re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall('<td class="green center">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders:
 						continue
 				except:
+					seeders = 0
 					pass
 
 				try:
@@ -179,10 +176,8 @@ class source:
 					dsize = 0
 					pass
 
-				self.items.append((name, link, isize, dsize))
-
+				self.items.append((name, link, isize, dsize, seeders))
 			return self.items
-
 		except:
 			source_utils.scraper_error('KICKASS2')
 			return self.items
@@ -191,8 +186,11 @@ class source:
 	def _get_sources(self, item):
 		try:
 			name = item[0]
-			url = urllib.unquote_plus(item[1]).split('&tr=')[0].replace(' ', '.')
+			url = urllib.unquote_plus(item[1]).replace('&amp;', '&').replace(' ', '.')
+			url = url.split('&tr')[0]
 			url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+
+			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			quality, info = source_utils.get_release_quality(name, url)
 
@@ -200,8 +198,8 @@ class source:
 				info.insert(0, item[2])
 			info = ' | '.join(info)
 
-			self._sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
+			self._sources.append({'source': 'torrent', 'seeders': item[4], 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
 		except:
 			source_utils.scraper_error('KICKASS2')
 			pass

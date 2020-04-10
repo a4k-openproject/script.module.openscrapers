@@ -38,6 +38,7 @@ class source:
 		self.domains = ['hdpopcorns.eu']
 		self.base_link = 'https://hdpopcorns.eu'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			title = cleantitle.geturl(title)
@@ -47,12 +48,14 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = cleantitle.geturl(tvshowtitle)
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -62,14 +65,21 @@ class source:
 			# https://hdpopcorns.eu/episode/the-originals-season-1-episode-1/
 			return url
 		except:
+			source_utils.scraper_error('HDPOPCORNEU')
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			r = client.request(url)
+			if r is None:
+				return sources
+
 			try:
-				match = re.compile('<iframe src=".+?//(.+?)/(.+?)"').findall(r)
+				# match = re.compile('<iframe src=".+?//(.+?)/(.+?)"').findall(r)
+				match = re.compile('<iframe src=".*//(.+?)/(.+?)"').findall(r)
 				for host, url in match:
 					url = 'https://%s/%s' % (host, url)
 					quality = source_utils.check_url(url)
@@ -79,10 +89,13 @@ class source:
 						sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
 						                'direct': False, 'debridonly': False})
 			except:
+				source_utils.scraper_error('HDPOPCORNEU')
 				return
 		except Exception:
+			source_utils.scraper_error('HDPOPCORNEU')
 			return
 		return sources
+
 
 	def resolve(self, url):
 		return url

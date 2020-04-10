@@ -29,7 +29,7 @@ import re
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_tools
+from openscrapers.modules import source_utils
 
 
 class source:
@@ -75,6 +75,8 @@ class source:
 				return sources
 			r = client.request(url)
 			match = re.compile('<iframe src="(.+?)"').findall(r)
+			# log_utils.log('match = %s' % match, log_utils.LOGDEBUG)
+
 			for url in match:
 				r = client.request(url)
 				if 'playpanda' in url:
@@ -85,13 +87,18 @@ class source:
 					url = url.replace('\\', '')
 					if url in str(sources):
 						continue
-					info = source_tools.get_info(url)
-					quality = source_tools.get_quality(url)
+
+					quality, info = source_utils.get_release_quality(url)
+					fileType = source_utils.getFileType(url)
+					info.append(fileType)
+					info = ' | '.join(info) if fileType else info[0]
+
 					sources.append({'source': 'Direct', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
 					                'direct': False, 'debridonly': False})
 			return sources
 		except:
 			return sources
+
 
 	def resolve(self, url):
 		return url

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers  (added cfscrape 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,6 +29,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -77,8 +78,9 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		self._sources = []
 		try:
-			self._sources = []
+			self.scraper = cfscrape.create_scraper()
 
 			if url is None:
 				return self._sources
@@ -98,8 +100,7 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = client.request(url)
-
+			r = self.scraper.get(url).content
 			posts = client.parseDOM(r, 'figure')
 
 			items = []
@@ -137,7 +138,7 @@ class source:
 	def _get_sources(self, url, name, hostDict, hostprDict):
 		try:
 			urls = []
-			result = client.request(url)
+			result = self.scraper.get(url).content
 
 			urls = [(client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn watch'})[0],
 						client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn blue'})[0],

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -43,6 +42,7 @@ class source:
 		self.base_link = 'https://glodls.to/'
 		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -111,9 +111,10 @@ class source:
 				try:
 					name = item[0]
 
-					url = item[1]
+					url = urllib.unquote_plus(item[1]).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
 
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
 					quality, info = source_utils.get_release_quality(name, url)
 
 					if item[2] != '0':
@@ -121,14 +122,12 @@ class source:
 
 					info = ' | '.join(info)
 
-					sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
+					sources.append({'source': 'torrent', 'seeders': item[4], 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
 				except:
 					source_utils.scraper_error('GLODLS')
 					pass
-
 			return sources
-
 		except:
 			source_utils.scraper_error('GLODLS')
 			return sources
@@ -151,12 +150,17 @@ class source:
 				if source_utils.remove_lang(name):
 					continue
 
-				t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-				if cleantitle.get(t) != cleantitle.get(self.title):
+				match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+				if not match:
 					continue
 
-				if self.hdlr not in name:
-					continue
+				try:
+					seeders = int(re.findall("<td.*?<font color='green'><b>([0-9]+|[0-9]+,[0-9]+)</b>", post)[0].replace(',', ''))
+					if self.min_seeders > seeders:
+						continue
+				except:
+					seeders = 0
+					pass
 
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
@@ -166,7 +170,7 @@ class source:
 					dsize = 0
 					pass
 
-				items.append((name, url, isize, dsize))
+				items.append((name, url, isize, dsize, seeders))
 
 			return items
 		except:

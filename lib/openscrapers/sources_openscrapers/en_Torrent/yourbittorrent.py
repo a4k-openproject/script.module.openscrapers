@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -42,10 +41,9 @@ class source:
 		self.language = ['en']
 		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
 		self.base_link = 'https://yourbittorrent2.com'
-		self.search_link = '/?v=&c=&q=%s&sort=seeds'
-		# self.base_link = 'https://yourbittorrent.com'
-		# self.search_link = '/?q=%s'
-		self.min_seeders = 1
+		self.search_link = '?q=%s&page=1&v=&c=&sort=size&o=desc'
+		# self.search_link = '?q=%s&page=1&v=&c=&sort=seeds&o=desc'
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -91,17 +89,17 @@ class source:
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			self.title = data['tvshowtitle'].lower() if 'tvshowtitle' in data else data['title'].lower()
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.hdlr = 's%02de%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
 			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url)
+			url = urlparse.urljoin(self.base_link, url).replace('+', '-')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
@@ -130,8 +128,8 @@ class source:
 				return
 			if '<kbd>' not in result:
 				return
-			info_hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
-			url = '%s%s' % ('magnet:?xt=urn:btih:', info_hash)
+			hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
+			url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
 			name = urllib.unquote_plus(name).replace(' ', '.')
 
@@ -142,11 +140,8 @@ class source:
 			if source_utils.remove_lang(name):
 				return
 
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-			if cleantitle.get(t) != cleantitle.get(self.title):
-				return
-
-			if self.hdlr not in name:
+			match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+			if not match:
 				return
 
 			url = '%s%s%s' % (url, '&dn=', str(name))
@@ -157,10 +152,11 @@ class source:
 			quality, info = source_utils.get_release_quality(name, url)
 
 			try:
-				seeders = int(re.findall('<div class="col-3">Seeders:</div><div class="col"><span style="color:green">(.*?)<', result, re.DOTALL)[0].replace(',', ''))
-				# if self.min_seeders > seeders: # to many items with no value
-					# return
+				seeders = int(re.findall('<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
+				if self.min_seeders > seeders: # to many items with no value
+					return
 			except:
+				seeders = 0
 				pass
 
 			try:
@@ -173,9 +169,8 @@ class source:
 
 			info = ' | '.join(info)
 
-			self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+			self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 			pass

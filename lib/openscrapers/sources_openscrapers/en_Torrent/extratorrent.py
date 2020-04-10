@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (added cfscrape 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,7 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -80,6 +80,8 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		self.sources = []
 		try:
+			scraper = cfscrape.create_scraper()
+
 			if url is None:
 				return self.sources
 
@@ -108,7 +110,7 @@ class source:
 
 			links = []
 			for x in urls:
-				r = client.request(x)
+				r = scraper.get(x).content
 				list = client.parseDOM(r, 'tr', attrs={'class': 'tlz'})
 				for item in list:
 					links.append(item)
@@ -127,19 +129,18 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', link, re.DOTALL)[0])
-			url = urllib.unquote_plus(url).split('&tr=')[0].replace(' ', '.')
+			url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+			url = url.split('&tr')[0]
 			url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+
+			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]
 			if source_utils.remove_lang(name):
 				return
 
-			# some shows like "Power" have year and hdlr in name
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-			if cleantitle.get(t) != cleantitle.get(self.title):
-				return
-
-			if self.hdlr not in name:
+			match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+			if not match:
 				return
 
 			if url in str(self.sources):
@@ -150,6 +151,7 @@ class source:
 				if self.min_seeders > seeders:
 					return
 			except:
+				seeders = 0
 				pass
 
 			quality, info = source_utils.get_release_quality(name, url)
@@ -164,9 +166,8 @@ class source:
 
 			info = ' | '.join(info)
 
-			self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+			self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
 			pass

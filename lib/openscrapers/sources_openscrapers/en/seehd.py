@@ -37,16 +37,20 @@ class source:
 		self.language = ['en']
 		self.domains = ['seehd.pl']
 		self.base_link = 'http://www.seehd.pl'
-		self.search_link = '/%s-%s-watch-online/'
+		# self.search_link = '/%s-%s-watch-online/' # most movie titles do not have year in link on seehd.pl then do have year
+		self.movie_link = '/%s-watch-online/'
+		self.episode_link = '/%s-%s/'
 		self.scraper = cfscrape.create_scraper()
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			title = cleantitle.geturl(title)
-			url = self.base_link + self.search_link % (title, year)
+			url = self.base_link + self.movie_link % (title)
 			return url
 		except:
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
@@ -55,24 +59,27 @@ class source:
 		except:
 			return
 
+
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
 			if not url:
 				return
 			title = url
-			season = '%02d' % int(season)
-			episode = '%02d' % int(episode)
-			se = 's%se%s' % (season, episode)
-			url = self.base_link + self.search_link % (title, se)
+			season = '%01d' % int(season)
+			episode = '%01d' % int(episode)
+			se = 'season-%s-episode-%s' % (season, episode)
+			url = self.base_link + self.episode_link % (title, se)
 			return url
 		except:
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
 			hostDict = hostprDict + hostDict
 			r = self.scraper.get(url).content
+
 			match = re.compile('<iframe.+?src="(.+?)://(.+?)/(.+?)"').findall(r)
 			for http, host, url in match:
 				host = host.replace('www.', '')

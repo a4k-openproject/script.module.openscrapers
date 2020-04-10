@@ -37,7 +37,7 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domains = ['putlocker.onl']
-		self.base_link = 'http://ww0.putlocker.onl'
+		self.base_link = 'http://ww1.putlocker.onl'
 		self.tv_link = '/show/%s/season/%s/episode/%s'
 		self.movie_link = '/movie/%s'
 		self.scraper = cfscrape.create_scraper()
@@ -45,7 +45,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			movietitle = cleantitle.geturl(title)
-			url = self.base_link + self.movie_link % movietitle
+			url = self.base_link + self.movie_link % movietitle + '/watching.html'
 			return url
 		except:
 			return
@@ -71,23 +71,16 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
-
 			if url is None:
 				return sources
-
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			r = self.scraper.get(url).content
-
 			try:
 				match = re.compile('<IFRAME.+?SRC=.+?//(.+?)/(.+?)"').findall(r)
 				for host, url in match:
 					url = 'http://%s/%s' % (host, url)
-
 					host = host.replace('www.', '')
 					valid, host = source_utils.is_host_valid(host, hostDict)
-
-					if source_utils.limit_hosts() is True and host in str(sources):
-						continue
-
 					if valid:
 						sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
 						                'debridonly': False})

@@ -24,114 +24,133 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import requests
+import re
 import urllib
 import urlparse
+import requests
 import json
 
-from openscrapers.modules import cfscrape
+from openscrapers.modules import control
+from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
 
 
 class source:
-    def __init__(self):
-        self.priority = 1
-        self.language = ['en']
-        self.base_link = 'https://api.filepursuit.com/'
-        self.search_link = '?type=video&q=%s'
-        self.scraper = cfscrape.create_scraper()
+	def __init__(self):
+		self.priority = 1
+		self.language = ['en']
+		self.base_link = 'https://filepursuit.p.rapidapi.com'
+		# 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
+		self.search_link = '/?type=video&q=%s'
 
-    def movie(self, imdb, title, localtitle, aliases, year):
-        try:
-            url = {'imdb': imdb, 'title': title, 'year': year}
-            url = urllib.urlencode(url)
-            return url
-        except:
-            return
 
-    def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
-        try:
-            url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-            url = urllib.urlencode(url)
-            return url
-        except BaseException:
-            return
+	def movie(self, imdb, title, localtitle, aliases, year):
+		try:
+			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = urllib.urlencode(url)
+			return url
+		except:
+			return
 
-    def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-        try:
-            if url == None: return
-            url = urlparse.parse_qs(url)
-            url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-            url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-            url = urllib.urlencode(url)
-            return url
-        except BaseException:
-            return
 
-    def sources(self, url, hostDict, hostprDict):
-        try:
-            sources = []
-            if url == None: return sources
-            data = urlparse.parse_qs(url)
-            data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-            if 'tvshowtitle' in data: query = '%s S%02dE%02d' %(data['tvshowtitle'], int(data['season']), int(data['episode']))
-            else: query = '%s %s' % (data['title'], data['year'])
-            url = self.search_link % urllib.quote(query)
-            url = self.base_link + self.search_link % query
-            url = urlparse.urljoin(self.base_link, url).replace('%20', '-')
-            r = self.scraper.get(url).content
-            r = r.split('Array')[0]
-            r = json.loads(r)
-            if not r.get('paired', False):
-                return sources
-            results = r['files_found']
-            for item in results:
-                try: size = item['file_size_bytes']
-                except: size = None
-                try: name = item['file_name']
-                except: name = item['file_link'].split('/')[-1]
-                url = item['file_link']
-                details = self.details(name, size)
-                details = '%s | %s' % (details, name)
-                quality = source_utils.get_release_quality(name, url)
-                sources.append({'source': 'DL',
-                                'quality': quality[0],
-                                'language': "en",
-                                'url': url,
-                                'info': details,
-                                'direct': True,
-                                'debridonly': False})
-            return sources
-        except:
-            return sources
+	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+		try:
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = urllib.urlencode(url)
+			return url
+		except BaseException:
+			return
 
-    def details(self, name, size):
-        import HTMLParser, re
-        name = re.sub("(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", name)
-        name = HTMLParser.HTMLParser().unescape(name)
-        name = name.replace("&quot;", "\"")
-        name = name.replace("&amp;", "&")
-        if size: size = float(size) / 1073741824
-        fmt = re.sub('(.+)(\.|\(|\[|\s)(\d{4}|S\d*E\d*)(\.|\)|\]|\s)', '', name)
-        fmt = re.split('\.|\(|\)|\[|\]|\s|\-', fmt)
-        fmt = [x.lower() for x in fmt]
-        if '3d' in fmt:
-            q = '  | 3D'
-        else:
-            q = ''
-        try:
-            if any(i in ['hevc', 'h265', 'x265'] for i in fmt): v = 'HEVC'
-            else: v = 'h264'
-            if size: info = '%.2f GB%s | %s' % (size, q, v)
-            else: '%s | %s' % (q, v)
-            return info
-        except: pass
-        try:
-            if size: info = '%.2f GB | %s' % (size, name.replace('.', ' '))
-            else: info = '| %s' % (name.replace('.', ' '))
-            return info
-        except: pass
 
-    def resolve(self, url):
-        return url
+	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
+		try:
+			if url is None:
+				return
+			url = urlparse.parse_qs(url)
+			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
+			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
+			url = urllib.urlencode(url)
+			return url
+		except BaseException:
+			return
+
+
+	def sources(self, url, hostDict, hostprDict):
+		sources = []
+		try:
+			api_key = control.setting('filepursuit.api')
+			if api_key == '':
+				return sources
+			headers = {"x-rapidapi-host": "filepursuit.p.rapidapi.com",
+				"x-rapidapi-key": api_key}
+
+			if url is None:
+				return sources
+
+			data = urlparse.parse_qs(url)
+			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
+			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			self.year = data['year']
+
+			query = '%s %s' % (self.title, self.hdlr)
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+
+			url = self.search_link % urllib.quote_plus(query)
+			url = urlparse.urljoin(self.base_link, url)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+
+			r = client.request(url, headers=headers)
+			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
+			r = json.loads(r)
+
+			if 'not_found' in r['status']:
+				return sources
+
+			results = r['files_found']
+			for item in results:
+				try:
+					size = int(item['file_size_bytes'])
+				except:
+					size = 0
+
+				try:
+					name = item['file_name']
+				except:
+					name = item['file_link'].split('/')[-1]
+
+				if source_utils.remove_lang(name):
+					continue
+
+				match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+				if not match:
+					continue
+
+				url = item['file_link']
+
+				quality, info = source_utils.get_release_quality(name, url)
+				try:
+					dsize, isize = source_utils.convert_size(size, to='GB')
+					if isize:
+						info.insert(0, isize)
+				except:
+					source_utils.scraper_error('FILEPURSUIT')
+					dsize = 0
+					pass
+
+				info = ' | '.join(info)
+
+				sources.append({'source': 'Direct', 'quality': quality, 'name': name, 'language': "en",
+							'url': url, 'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
+			return sources
+		except:
+			source_utils.scraper_error('FILEPURSUIT')
+			return sources
+
+
+	def resolve(self, url):
+		return url

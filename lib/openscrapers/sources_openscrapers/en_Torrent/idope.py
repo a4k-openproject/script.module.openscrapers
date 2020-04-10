@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -141,20 +140,18 @@ class source:
 						continue
 
 					try:
-						seeders = int(re.findall('<div class="resultdivbottonseed">(.*?)<', post, re.DOTALL)[0].replace(',', ''))
+						seeders = int(re.findall('<div class="resultdivbottonseed">([0-9]+|[0-9]+,[0-9]+)<', post, re.DOTALL)[0].replace(',', ''))
 						if self.min_seeders > seeders:
 							continue
 					except:
+						seeders = 0
 						pass
 
 					if source_utils.remove_lang(name):
 						continue
 
-					t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-					if cleantitle.get(t) != cleantitle.get(self.title):
-						continue
-
-					if self.hdlr not in url:
+					match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+					if not match:
 						continue
 
 					quality, info = source_utils.get_release_quality(name, url)
@@ -169,9 +166,8 @@ class source:
 
 					info = ' | '.join(info)
 
-					self.sources.append({'source': 'Torrent', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-													'direct': False, 'debridonly': True, 'size': dsize})
-
+					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+													'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('IDOPE')
 			pass

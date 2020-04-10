@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated url 4-3-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -42,8 +41,8 @@ class source:
 		self.language = ['en']
 		self.domains = ['torrentfunk.com', 'torrentfunk2.com']
 		self.base_link = 'https://www.torrentfunk.com'
-		self.search_link = '/all/torrents/%s.html?&sort=seeds&o=desc' # seeder low counts, site sucks
-		self.min_seeders = 1
+		self.search_link = '/all/torrents/%s.html?v=&smi=&sma=&i=100&sort=size&o=desc'
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -127,12 +126,8 @@ class source:
 			if source_utils.remove_lang(name):
 				return
 
-			# some shows like "Power" have year and hdlr in name
-			t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-			if cleantitle.get(t) != cleantitle.get(self.title):
-				return
-
-			if self.hdlr not in name:
+			match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+			if not match:
 				return
 
 			if not url.startswith('http'): 
@@ -141,16 +136,17 @@ class source:
 			link = client.request(link)
 			if link is None:
 				return
-			infohash = re.findall('<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
-			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (infohash, name)
+			hash = re.findall('<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
+			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources):
 				return
 
 			try:
-				seeders = int(re.findall('<font color=red>(.*?)</font>.+Seeds', link, re.DOTALL)[0].replace(',', ''))
-				if self.min_seeders > seeders: 
+				seeders = int(re.findall('<b>Swarm:</b></td><td valign=top><font color=red>([0-9]+)</font>', link, re.DOTALL)[0].replace(',', ''))
+				if self.min_seeders > seeders: # site does not seem to report seeders
 					return
 			except:
+				seeders = 0
 				pass
 
 			quality, info = source_utils.get_release_quality(name, url)
@@ -165,9 +161,8 @@ class source:
 
 			info = ' | '.join(info)
 
-			self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
+			self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
 			pass

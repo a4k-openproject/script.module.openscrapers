@@ -39,8 +39,8 @@ class source:
 		self.priority = 1
 		self.language = ['en']  # Old  tinklepad.is  movie25.hk
 		self.domains = ['5movies.club']
-		self.base_link = 'https://5movies.club'
-		self.search_link = '/s=%s'
+		self.base_link = 'https://5movies.to'
+		self.search_link = '/search.php?q=%s'
 		self.video_link = '/getlink.php?Action=get&lk=%s'
 
 	def matchAlias(self, title, aliases):

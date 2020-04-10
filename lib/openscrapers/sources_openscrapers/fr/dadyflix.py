@@ -98,8 +98,9 @@ class source:
 			for url in r:
 				valid, host = source_utils.is_host_valid(url, hostDict)
 				if valid:
-					if source_utils.limit_hosts() is True and host in str(sources):
-						continue
+
+					# if source_utils.limit_hosts() is True and host in str(sources): # function does not exist
+						# continue
 
 					quality, info = source_utils.get_release_quality(url, url)
 

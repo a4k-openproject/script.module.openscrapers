@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -78,9 +77,8 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		self.sources = []
 		try:
-			self.sources = []
-
 			if url is None:
 				return self.sources
 
@@ -103,7 +101,7 @@ class source:
 
 			urls = []
 			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url) + str(category)
+			url = urlparse.urljoin(self.base_link, url) + str(category) + '&v=t&s=sz&sd=d'
 			urls.append(url)
 			urls.append(url.replace('pg=1', 'pg=2'))
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
@@ -114,7 +112,6 @@ class source:
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
-
 		except:
 			source_utils.scraper_error('ZOOGLE')
 			return self.sources
@@ -126,33 +123,42 @@ class source:
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
 			html = client.request(url, ignoreErrors = 404)
 			if html == str([]) or html == '' or html is None:
-				return self.sources
+				return
+
 			html = html.replace('&nbsp;', ' ')
 
 			try:
 				results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
 			except:
-				return self.sources
+				return
 
 			rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
 
 			if rows is None:
-				return self.sources
+				return
 
 			for entry in rows:
 				try:
 					try:
+						if 'magnet:' not in entry:
+							continue
 						url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
-						url = str(client.replaceHTMLCodes(url).split('&tr')[0])
+						url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+						url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+						url = url.split('&tr')[0]
 						if url in str(self.sources):
 							continue
 					except:
 						continue
 
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
+
 					try:
 						name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
 						name = urllib.unquote_plus(name).replace(' ', '.')
+						name = name.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+						# name = url.split('&dn=')[1]
 					except:
 						continue
 
@@ -169,11 +175,8 @@ class source:
 						except:
 							name = name.split('-.', 1)[1].lstrip()
 
-					t = name.split(self.hdlr)[0].replace(self.year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-					if cleantitle.get(t) != cleantitle.get(self.title):
-						continue
-
-					if self.hdlr not in name:
+					match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+					if not match:
 						continue
 
 					try:
@@ -181,6 +184,7 @@ class source:
 						if self.min_seeders > seeders:
 							continue
 					except:
+						seeders = 0
 						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
@@ -195,14 +199,14 @@ class source:
 
 					info = ' | '.join(info)
 
-					self.sources.append({'source': 'torrent', 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				except:
 					continue
-
 		except:
 			source_utils.scraper_error('ZOOGLE')
 			pass
+
 
 	def resolve(self, url):
 		return url

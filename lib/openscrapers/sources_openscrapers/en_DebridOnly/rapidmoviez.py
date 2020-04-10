@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers  (updated 4/3/20)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -43,11 +43,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		# self.domains = ['rmz.cr']
-		self.domains = ['rapidmoviez.cr']
-		# self.base_link = 'http://rmz.cr/' # reCaptcha
-		self.base_link = 'http://rapidmoviez.cr/'
-		self.search_link = 'search/%s'
+		self.domains = ['rmz.cr']
+		self.base_link = 'http://rmz.cr/' # cloudflare IUAM challenge
+		# self.domains = ['rapidmoviez.cr']
+		# self.base_link = 'http://rapidmoviez.cr/' # reCaptcha 
+		self.search_link = 'search/%s/titles'
 		self.scraper = cfscrape.create_scraper()
 
 
