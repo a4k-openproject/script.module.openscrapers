@@ -39,8 +39,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['myvideolinks.net', 's33k.myvideolinks.net', 'myvideolinks.69.mu', 'nothingcan.undo.it']
-		self.base_link = 'http://look.myvideolinks.net'
+		self.domains = ['kita.myvideolinks.net', 'myvideolinks.69.mu', 'nothingcan.undo.it', 'look.myvideolinks.net', 'go.myvideolinks.net']
+		self.base_link = 'http://kita.myvideolinks.net'
 		self.search_link = '/?s=%s'
 
 
@@ -133,7 +133,6 @@ class source:
 			for item in items:
 				try:
 					url = item[1]
-
 					url = client.replaceHTMLCodes(url)
 					url = url.encode('utf-8')
 
@@ -149,11 +148,8 @@ class source:
 
 					name = item[0]
 					name = client.replaceHTMLCodes(name).replace(' ', '.')
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-					if cleantitle.get(t) != cleantitle.get(title):
-						continue
-
-					if hdlr not in name:
+					match = source_utils.check_title(title, name, hdlr, data['year'])
+					if not match:
 						continue
 
 					quality, info = source_utils.get_release_quality(name, url)

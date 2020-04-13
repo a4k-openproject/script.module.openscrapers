@@ -71,16 +71,14 @@ MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng'
               'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual audio', 'dual-audio',
               'dual.audio', 'multi']
 
-LANG = ['arabic', 'bgaudio', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'polish', 'portuguese', 'russian', 'spanish',
-              'truefrech', 'truespanish', 'turkish', 'hebrew']
+LANG = ['arabic', 'bgaudio', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
+              'russian', 'spanish', 'truefrech', 'truespanish', 'turkish', 'hebrew']
 
-UNDESIREABLES = ['baibako', 'coldfilm', 'extras.only', 'jaskier', 'hamsterstudio', 'ideafilm', 'lakefilm', 'lostfilm',
-              'newstudio', 'sample', 'soundtrack', 'teaser', 'vostfr']
+UNDESIREABLES = ['alexfilm', 'baibako', 'coldfilm', 'eniahd', 'extras.only', 'gears media', 'jaskier', 'hamsterstudio',
+              'ideafilm', 'kerob', 'lakefilm', 'lostfilm', 'newstudio', 'profix media', 'sample', 'soundtrack', 'teaser', 'vostfr']
 
 DUBBED = ['dublado', 'dubbed']
-
 SUBS = ['subs', 'subtitula', 'subfrench', 'subspanish', 'swesub']
-
 ADDS = ['1xbet', 'betwin']
 
 
@@ -550,7 +548,6 @@ def convert_size(size_bytes, to='GB'):
 def check_directstreams(url, hoster='', quality='SD'):
 	urls = []
 	host = hoster
-
 	if 'google' in url or any(x in url for x in ['youtube.', 'docid=']):
 		urls = directstream.google(url)
 		if not urls:
@@ -559,26 +556,20 @@ def check_directstreams(url, hoster='', quality='SD'):
 				urls = [{'quality': tag[0]['quality'], 'url': url}]
 		if urls:
 			host = 'gvideo'
-
 	elif 'ok.ru' in url:
 		urls = directstream.odnoklassniki(url)
 		if urls:
 			host = 'vk'
-
 	elif 'vk.com' in url:
 		urls = directstream.vk(url)
 		if urls:
 			host = 'vk'
-
 	elif any(x in url for x in ['akamaized', 'blogspot', 'ocloud.stream']):
 		urls = [{'url': url}]
 		if urls: host = 'CDN'
-
 	direct = True if urls else False
-
 	if not urls:
 		urls = [{'quality': quality, 'url': url}]
-
 	return urls, host, direct
 
 
@@ -600,24 +591,19 @@ def evpKDF(passwd, salt, key_size=8, iv_size=4, iterations=1, hash_algorithm="md
 	number_of_derived_words = 0
 	block = None
 	hasher = hashlib.new(hash_algorithm)
-
 	while number_of_derived_words < target_key_size:
 		if block is not None:
 			hasher.update(block)
-
 		hasher.update(passwd)
 		hasher.update(salt)
 		block = hasher.digest()
 		hasher = hashlib.new(hash_algorithm)
-
 		for _i in range(1, iterations):
 			hasher.update(block)
 			block = hasher.digest()
 			hasher = hashlib.new(hash_algorithm)
-
 		derived_bytes += block[0: min(len(block), (target_key_size - number_of_derived_words) * 4)]
 		number_of_derived_words += len(block) / 4
-
 	return {"key": derived_bytes[0: key_size * 4], "iv": derived_bytes[key_size * 4:]}
 
 
@@ -627,7 +613,6 @@ def remove_lang(name):
 		name = name.replace(' ', '.')
 	except:
 		name = str(name)
-
 	if any(value in name for value in LANG):
 		return True
 	elif any(value in name for value in UNDESIREABLES):

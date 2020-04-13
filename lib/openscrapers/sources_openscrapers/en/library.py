@@ -1,34 +1,40 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
+
+#  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
+#  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
+#  .##.....#.##.....#.##......####..#.##......##......##.....#..##...##.##.....#.##......##.....#.##......
+#  .##.....#.########.######..##.##.#..######.##......########.##.....#.########.######..########..######.
+#  .##.....#.##.......##......##..###.......#.##......##...##..########.##.......##......##...##........##
+#  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
+#  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-    Covenant Add-on
-
+    OpenScrapers Project
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-import urllib,urlparse,json
+import urllib
+import urlparse
+import json
 
-from openscrapers.modules import cleantitle
 from openscrapers.modules import control
-
-
+from openscrapers.modules import cleantitle
+from openscrapers.modules import source_utils
 
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'de', 'fr', 'gr', 'ko', 'pl', 'pt', 'ru']
+        self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
         self.domains = []
 
     def movie(self, imdb, title, localtitle, aliases, year):
@@ -70,30 +76,30 @@ class source:
             years = (data['year'], str(int(data['year'])+1), str(int(data['year'])-1))
 
             if content_type == 'movie':
-                title = cleantitle.get(data['title'])
-                localtitle = cleantitle.get(data['localtitle'])
+                title = cleantitle.get_simple(data['title']).lower()
+                localtitle = cleantitle.get_simple(data['localtitle']).lower()
                 ids = [data['imdb']]
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "originaltitle", "file"]}, "id": 1}' % years)
                 r = unicode(r, 'utf-8', errors='ignore')
                 r = json.loads(r)['result']['movies']
 
-                r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get(i['title'].encode('utf-8')), cleantitle.get(i['originaltitle'].encode('utf-8'))]]
+                r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get_simple(i['title']), cleantitle.get_simple(i['originaltitle'])]]
                 r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')][0]
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"properties": ["streamdetails", "file"], "movieid": %s }, "id": 1}' % str(r['movieid']))
                 r = unicode(r, 'utf-8', errors='ignore')
                 r = json.loads(r)['result']['moviedetails']
             elif content_type == 'episode':
-                title = data['tvshowtitle']
-                localtitle = data['localtvshowtitle']
+                title = cleantitle.get_simple(data['tvshowtitle']).lower()
+                localtitle = cleantitle.get_simple(data['localtvshowtitle']).lower()
                 season, episode = data['season'], data['episode']
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title"]}, "id": 1}' % years)
                 r = unicode(r, 'utf-8', errors='ignore')
                 r = json.loads(r)['result']['tvshows']
 
-                r = [i for i in r if title in (i['title'].encode('utf-8'))][0]
+                r = [i for i in r if title in (cleantitle.get_simple(i['title']).lower() if not ' (' in i['title'] else cleantitle.get_simple(i['title']).split(' (')[0])][0]
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["file"], "tvshowid": %s }, "id": 1}' % (str(season), str(episode), str(r['tvshowid'])))
                 r = unicode(r, 'utf-8', errors='ignore')
@@ -110,8 +116,8 @@ class source:
             try: quality = int(r['streamdetails']['video'][0]['width'])
             except: quality = -1
 
-            if quality >= 2160: quality = '4K'
-            if 1920 <= quality < 2000: quality = '1080p'
+            if quality > 1920: quality = '4K'
+            if quality >= 1920: quality = '1080p'
             if 1280 <= quality < 1900: quality = '720p'
             if quality < 1280: quality = 'SD'
 
@@ -119,9 +125,12 @@ class source:
 
             try:
                 f = control.openFile(url) ; s = f.size() ; f.close()
-                s = '%.2f GB' % (float(s)/1024/1024/1024)
-                info.append(s)
-            except: pass
+                dsize = float(s)/1024/1024/1024
+                isize = '%.2f GB' % dsize
+                info.insert(0, isize)
+            except:
+                dsize = 0
+                pass
 
             try:
                 c = r['streamdetails']['video'][0]['codec']
@@ -148,13 +157,13 @@ class source:
             info = ' | '.join(info)
             info = info.encode('utf-8')
 
-            sources.append({'source': 'Local', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'local': True, 'direct': True, 'debridonly': False})
+            sources.append({'source': '0', 'quality': quality, 'language': 'en', 'url': url,
+                            'info': info, 'local': True, 'direct': True, 'debridonly': False, 'size': dsize})
 
             return sources
         except:
+            source_utils.scraper_error('library')
             return sources
 
     def resolve(self, url):
         return url
-
-
