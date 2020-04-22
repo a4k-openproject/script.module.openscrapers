@@ -77,7 +77,7 @@ class source:
 			for url in match:
 				host = url.split('//')[1].replace('www.', '')
 				host = host.split('/')[0].split('.')[0].title()
-				quality = source_utils.check_sd_url(url)
+				quality = source_utils.check_url(url)
 				r = self.scraper.get(url).content
 				if 'http' in url:
 					match = re.compile("url: '(.+?)',").findall(r)

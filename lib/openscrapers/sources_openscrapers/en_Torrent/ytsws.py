@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -94,10 +94,11 @@ class source:
 				for url, ref in link:
 					url = str(client.replaceHTMLCodes(url).split('&tr')[0])
 					url = url.replace(' ', '')
-					name = url.split('&dn=')[1]
-					name = urllib.unquote_plus(name)
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
+					name = url.split('&dn=')[1]
+					name = urllib.unquote_plus(name)
+					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if source_utils.remove_lang(name):
 						continue
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -113,15 +113,14 @@ class source:
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
-			self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/72.0'}
-			r = self.scraper.get(url, headers=self.headers).content
+			self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; …) Gecko/20100101 Firefox/75.0'}
 
+			r = self.scraper.get(url, headers=self.headers).content
 			if 'Nothing Found' in r:
 				return self.sources
 
 			posts = client.parseDOM(r, 'h2', attrs={'class': 'title'})
 			posts = zip(client.parseDOM(posts, 'a', ret='title'), client.parseDOM(posts, 'a', ret='href'))
-			# log_utils.log('posts = %s' % posts, log_utils.LOGDEBUG)
 
 			if posts == []:
 				return self.sources
@@ -142,14 +141,19 @@ class source:
 		try:
 			name = item[0].replace(' ', '.')
 			url = item[1]
+
 			r = self.scraper.get(url, headers=self.headers).content
+			r = re.sub(r'\n', '', r)
+			r = re.sub(r'\t', '', r)
 
 			list = client.parseDOM(r, 'div', attrs={'id': 'content'})
+			# log_utils.log('list = %s' % list, log_utils.LOGDEBUG)
 
 			if 'tvshowtitle' in self.data:
-				regex = '(<strong>(.*?)</strong><br />\s?[A-Z,0-9]*?\s\|\s([A-Z,0-9,\s]*)\|\s((\d+\.\d+|\d*)\s?(?:GB|GiB|Gb|MB|MiB|Mb))?</p>(?:\s<p><a href=\".*?\" .*?_blank\">.*?</a></p>)+)'
+				regex = '(<p><strong>(.*?)</strong><br />([A-Z]*)\s*\|\s*([A-Z,0-9,\s*]*)\|\s*((\d+\.\d+|\d*)\s*(?:GB|GiB|Gb|MB|MiB|Mb))?</p>(?:\s*<p><a href=\".*?\" .*?_blank\">.*?</a></p>)+)'
 			else:
-				regex = '(<strong>Release Name:</strong>\s*(.*?)<br />\s?<strong>Size:</strong>\s?((\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+)\s(?:GB|GiB|Gb|MB|MiB|Mb))?<br />(.*\s)*)'
+				regex = '(<strong>Release Name:</strong>\s*(.*?)<br />.*<strong>Size:</strong>\s*((\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))?<br />(.*\s)*)'
+				# regex = '(<strong>Release Name:</strong>\s*(.*?)<br />.*<strong>Size:</strong>\s*((\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))?<br />.*<strong>Audio:</strong>\s*[A-Z]*[a-z]*\s*\|\s*([A-z]*[0-9]*)(.*\s)*)'
 
 			for match in re.finditer(regex, list[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')):
 				name = str(match.group(2))
@@ -163,10 +167,8 @@ class source:
 				if source_utils.remove_lang(name):
 					continue
 
-				# audio = str(match.group(3))
-
 				if 'tvshowtitle' in self.data:
-					size = str(match.group(4))
+					size = str(match.group(5))
 				else:
 					size = str(match.group(3))
 
@@ -189,13 +191,15 @@ class source:
 
 						quality, info = source_utils.get_release_quality(name, url)
 
+						if 'tvshowtitle' in self.data:
+							info.append(str(match.group(4)))
+
 						try:
 							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
 						except:
 							dsize = 0
 							pass
-
 						info = ' | '.join(info)
 
 						self.sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})

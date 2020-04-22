@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-3-2020)
+# modified by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -67,9 +67,8 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
-
 			if url is None:
 				return sources
 
@@ -89,9 +88,7 @@ class source:
 			url = self.search_link % (urllib.quote_plus(query).replace('+', '-'))
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 			html = client.request(url)
-
 			try:
 				results = client.parseDOM(html, 'table', attrs={'class': 'forum_header_border'})
 				for result in results:
@@ -102,7 +99,6 @@ class source:
 				return sources
 
 			rows = re.findall('<tr name="hover" class="forum_header_border">(.+?)</tr>', results, re.DOTALL)
-
 			if rows is None:
 				return sources
 
@@ -119,7 +115,8 @@ class source:
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					magnet_title = derka[1]
-					name = urllib.unquote_plus(magnet_title).replace(' ', '.')
+					name = urllib.unquote_plus(magnet_title)
+					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if source_utils.remove_lang(name):
 						continue
 

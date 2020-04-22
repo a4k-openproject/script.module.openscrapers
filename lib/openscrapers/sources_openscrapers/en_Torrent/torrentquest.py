@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-3-2020)
+# modified by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -119,7 +119,8 @@ class source:
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 				name = client.parseDOM(post, 'a', ret='title')[1]
-				name = urllib.unquote_plus(name).replace(' ', '.')
+				name = urllib.unquote_plus(name)
+				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 				if source_utils.remove_lang(name):
 					continue
 

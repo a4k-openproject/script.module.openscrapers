@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-3-2020)
+# modified by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -122,7 +122,6 @@ class source:
 			[i.start() for i in threads2]
 			[i.join() for i in threads2]
 			return self._sources
-
 		except:
 			source_utils.scraper_error('1337X')
 			return self._sources
@@ -151,7 +150,8 @@ class source:
 					pass
 
 				name = client.parseDOM(post, 'a')[1]
-				name = urllib.unquote_plus(name).replace(' ', '.')
+				name = urllib.unquote_plus(name)
+				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 				if source_utils.remove_lang(name):
 					continue
 
@@ -179,7 +179,7 @@ class source:
 	def _get_sources(self, item):
 		try:
 			name = item[0]
-			quality, info = source_utils.get_release_quality(item[1], name)
+			quality, info = source_utils.get_release_quality(name, item[1])
 
 			if item[2] != '0':
 				info.insert(0, item[2])

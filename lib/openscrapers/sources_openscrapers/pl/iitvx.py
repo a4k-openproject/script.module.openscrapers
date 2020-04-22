@@ -83,7 +83,7 @@ class source:
 	def work(self, link, testDict):
 		if str(link).startswith("http"):
 			link = self.getlink(link)
-			q = source_utils.check_sd_url(link)
+			q = source_utils.check_url(link)
 			valid, host = source_utils.is_host_valid(link, testDict)
 			if not valid: return 0
 			return host, q, link

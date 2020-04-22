@@ -172,7 +172,7 @@ class source:
 					info = test[(2 + (3 * counter))]
 					info = self.get_lang_by_type(info)
 					quality = test[(1 + (3 * counter))]
-					quality = source_utils.check_sd_url(quality)
+					quality = source_utils.check_url(quality)
 					try:
 						id = re.findall("""ShowMovie\('(.*?)'\)""", item)[0]
 					except:

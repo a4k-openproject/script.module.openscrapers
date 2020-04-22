@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -101,30 +101,17 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-			# log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
-
-			# query = query.replace("&", "and").replace("  ", " ").replace(" ", "-")
-			# log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
-
 			query = query.replace("&", "and")
 			query = re.sub('\s', '-', query)
 			# log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
 
-
 			url = self.search_link % urllib.quote_plus(query)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			url = urlparse.urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			url = "http://rlsbb.ru/" + query
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 
 			if 'tvshowtitle' not in data:
 				url = url + "-1080p"
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 			r = scraper.get(url).content
-			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
 
 			if r is None and 'tvshowtitle' in data:
 				season = re.search('S(.*?)E', hdlr)
@@ -139,7 +126,6 @@ class source:
 				r = scraper.get(url).content
 
 			posts = client.parseDOM(r, "div", attrs={"class": "content"})
-			# log_utils.log('posts = %s' % posts, log_utils.LOGDEBUG)
 
 			items = []
 			for post in posts:
@@ -151,7 +137,6 @@ class source:
 					for i in u:
 						try:
 							name = i.encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
-
 							tit = name.rsplit('/', 1)[1]
 							t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 							if cleantitle.get(t) != cleantitle.get(title):

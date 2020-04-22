@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 10-16-2019 by JewBMX in Scrubs.
+# modified by Venom for Openscrapers (updated 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -26,8 +26,9 @@
 '''
 
 import re
-import requests
 
+
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
 
@@ -38,8 +39,9 @@ class source:
 		self.language = ['en']
 		self.domains = ['gomovies.onl']
 		self.base_link = 'http://ww.gomovies.onl'
-		self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0', 'Referer': self.base_link}
-		self.session = requests.Session()
+		# self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0', 'Referer': self.base_link}
+		self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0', 'Referer': self.base_link}
+		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -76,10 +78,16 @@ class source:
 			if url is None:
 				return sources
 			hostDict = hostDict + hostprDict
-			r = self.session.get(url, headers=self.headers).content
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+
+			# r = self.scraper.get(url, headers=self.headers).content
+			r = self.scraper.get(url).content
 			match = re.compile('<IFRAME.+?SRC="(.+?)"', re.DOTALL | re.IGNORECASE).findall(r)
+
 			for url in match:
 				url =  "https:" + url if not url.startswith('http') else url
+				if any(x in url.lower() for x in ['youtube', 'sample', 'trailer', 'embed']):
+					continue
 				valid, host = source_utils.is_host_valid(url, hostDict)
 				if valid:
 					if host in str(sources):

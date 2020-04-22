@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-3-2020)
+# modified by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -77,9 +77,8 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		self._sources = []
 		try:
-			self._sources = []
-
 			if url is None:
 				return self._sources
 
@@ -113,7 +112,6 @@ class source:
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self._sources
-
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOADS')
 			return self._sources
@@ -131,7 +129,8 @@ class source:
 
 			hash = re.search(r'<info_hash>([a-zA-Z0-9]+)</info_hash>', r).groups()[0]
 			name = re.search(r'<title>(.+?)</title>', r).groups()[0]
-			name = urllib.unquote_plus(name).replace(' ', '.')
+			name = urllib.unquote_plus(name)
+			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 			if source_utils.remove_lang(name):
 				return
 
@@ -141,7 +140,7 @@ class source:
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
-			quality, info = source_utils.get_release_quality(name, name)
+			quality, info = source_utils.get_release_quality(name, url)
 
 			try:
 				size = re.search(r'<size>([\d]+)</size>', r).groups()[0]

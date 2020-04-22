@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated url 4-3-2020)
+# created by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -104,14 +104,12 @@ class source:
 			try:
 				r = client.request(url)
 				links = client.parseDOM(r, "td", attrs={"nowrap": "nowrap"})
-
 				threads = []
 				for link in links:
 					threads.append(workers.Thread(self.get_sources, link))
 				[i.start() for i in threads]
 				[i.join() for i in threads]
 				return self.sources
-
 			except:
 				source_utils.scraper_error('ETTV')
 				return self.sources
@@ -125,6 +123,8 @@ class source:
 			url = re.compile('href="(.+?)"').findall(link)[0]
 			url = '%s%s' % (self.base_link, url)
 			result = client.request(url)
+			if result is None:
+				return
 			if 'magnet' not in result:
 				return
 
@@ -137,6 +137,7 @@ class source:
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]
+			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 			if name.startswith('www'):
 				try:
 					name = re.sub(r'www(.*?)\W{2,10}', '', name)

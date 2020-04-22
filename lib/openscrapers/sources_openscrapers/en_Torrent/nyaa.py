@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated url 4-3-2020)
+# created by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -130,11 +130,7 @@ class source:
 							hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 							name = url.split('&dn=')[1]
-
-							seeders = int(link[2][0])
-							if self.min_seeders > seeders:
-								continue
-
+							name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 							# if name.startswith('www'):
 								# try:
 									# name = re.sub(r'www(.*?)\W{2,10}', '', name)
@@ -155,6 +151,10 @@ class source:
 
 							# if cleantitle.get(t) != cleantitle.get(title):
 								# continue
+
+							seeders = int(link[2][0])
+							if self.min_seeders > seeders:
+								continue
 
 							quality, info = source_utils.get_release_quality(name, url)
 

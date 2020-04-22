@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated 4-20-2020)
+# created by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -28,6 +28,7 @@
 import re
 import urllib
 import urlparse
+import json
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -39,10 +40,10 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentdownload.info']
-		self.base_link = 'https://www.torrentdownload.info'
-		self.search_link = '/search?q=%s'
-		self.min_seeders = 1
+		self.domains = ['solidtorrents.net']
+		self.base_link = 'https://solidtorrents.net'
+		self.search_link = '/api/v1/search?q=%s&category=all&sort=size'
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -101,39 +102,44 @@ class source:
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			urls.append(url)
-			urls.append(url + '&p=2')
+			urls.append(url + '&skip=20')
+			urls.append(url + '&skip=40')
+			urls.append(url + '&skip=60')
+			urls.append(url + '&skip=80')
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			threads = []
 			for url in urls:
-				threads.append(workers.Thread(self._get_sources, url))
+				threads.append(workers.Thread(self.get_sources, url))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('TORRENTDOWNLOAD')
+			source_utils.scraper_error('SOLIDTORRENTS')
 			return self.sources
 
 
-	def _get_sources(self, url):
+	def get_sources(self, url):
 		try:
 			r = client.request(url)
-			r = re.sub(r'\n', '', r)
-			r = re.sub(r'\t', '', r)
-			posts = re.compile('<table class="table2" cellspacing="0">(.*?)</table>').findall(r)
-			posts = client.parseDOM(posts, 'tr')
+			if r == str([]) or r == '' or r is None:
+				return
+			r = json.loads(r)
+			results = r['results']
 
-			for post in posts:
-				if '<th' in post:
-					continue
-				links = re.compile('<a href="(.+?)">.*?<td class="tdnormal">((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class="tdseed">([0-9]+|[0-9]+,[0-9]+)</td>').findall(post)
+			for item in results:
+				try:
+					url = urllib.unquote_plus(item['magnet']).replace(' ', '.')
+					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
+					hash = item['infohash']
 
-				for items in links:
-					link = items[0].split("/")
-					hash = link[1].lower()
-					name = link[2].replace('+MB+', '')
+					name = item['title']
 					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-					name = name.replace('Worldfree4u.Wiki.', '').replace('Bolly4u.pro.', '')
+					if name.startswith('www'):
+						try:
+							name = re.sub(r'www(.*?)\W{2,10}', '', name)
+						except:
+							name = name.split('-.', 1)[1].lstrip()
 					if source_utils.remove_lang(name):
 						continue
 
@@ -141,30 +147,35 @@ class source:
 					if not match:
 						continue
 
-					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+					if url in str(self.sources):
+						continue
 
 					try:
-						seeders = int(items[2].replace(',', ''))
-						if self.min_seeders > seeders:
+						seeders = int(item['swarm']['seeders'])
+						if self.min_seeders > seeders: 
 							continue
 					except:
 						seeders = 0
 						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
+
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1])[0]
-						dsize, isize = source_utils._size(size)
+						dsize, isize = source_utils.convert_size(item["size"], to='GB')
 						info.insert(0, isize)
 					except:
 						dsize = 0
 						pass
+
 					info = ' | '.join(info)
 
 					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-														'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				except:
+					source_utils.scraper_error('SOLIDTORRENTS')
+					pass
 		except:
-			source_utils.scraper_error('TORRENTDOWNLOAD')
+			source_utils.scraper_error('SOLIDTORRENTS')
 			pass
 
 

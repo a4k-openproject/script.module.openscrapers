@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers
+# modified by Venom for Openscrapers (updated 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -156,8 +156,9 @@ class source:
 					try:
 						name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
 						name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
-						name = urllib.unquote_plus(name).replace(' ', '.')
+						name = urllib.unquote_plus(name)
 						name = name.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+						name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 						# name = url.split('&dn=')[1]
 					except:
 						continue

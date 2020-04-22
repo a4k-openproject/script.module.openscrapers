@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
+# modified by Venom for Openscrapers (4-20-2020)
 # Created by Tempest
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
@@ -38,8 +38,8 @@ class source:
 		self.language = ['en']
 		self.domains = ['streamdreams.org']
 		self.base_link = 'https://streamdreams.org'
-		self.search_movie = '/movies/lll-%s/'
-		self.search_tv = '/shows/lll-%s/'
+		self.search_movie = '/movies/nnn-%s/'
+		self.search_tv = '/shows/nnn-%s/'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -79,9 +79,7 @@ class source:
 			headers = {'Referer': url}
 
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			# r = self.scraper.get(url, headers=headers).content
 			r = scraper.get(url).content
-
 			if r is None:
 				return sources
 

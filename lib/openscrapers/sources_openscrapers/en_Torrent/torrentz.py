@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated url 4-3-2020)
+# created by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -118,8 +118,8 @@ class source:
 
 					for link in links:
 						hash = link.split('>')[0]
-						name = link.split('>')[1].replace(' ', '.')
-
+						name = link.split('>')[1]
+						name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 						if name.startswith('www'):
 							try:
 								name = re.sub(r'www(.*?)\W{2,10}', '', name)

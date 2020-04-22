@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated 4-20-2020)
+# created by Venom for Openscrapers (4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,6 +29,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -39,9 +40,9 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['torrentdownload.info']
-		self.base_link = 'https://www.torrentdownload.info'
-		self.search_link = '/search?q=%s'
+		self.domains = ['magnet4you.me']
+		self.base_link = 'http://magnet4you.me'
+		self.search_link = '/search.php?s=%s'
 		self.min_seeders = 1
 
 
@@ -97,74 +98,71 @@ class source:
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			urls = []
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
-			urls.append(url)
-			urls.append(url + '&p=2')
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+
+			r = client.request(url)
+			rows = client.parseDOM(r, 'div', attrs={'id': 'profile1'})
 
 			threads = []
-			for url in urls:
-				threads.append(workers.Thread(self._get_sources, url))
+			for row in rows:
+				threads.append(workers.Thread(self.get_sources, row))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('TORRENTDOWNLOAD')
+			source_utils.scraper_error('MAGNET4YOU')
 			return self.sources
 
 
-	def _get_sources(self, url):
+	def get_sources(self, row):
 		try:
-			r = client.request(url)
-			r = re.sub(r'\n', '', r)
-			r = re.sub(r'\t', '', r)
-			posts = re.compile('<table class="table2" cellspacing="0">(.*?)</table>').findall(r)
-			posts = client.parseDOM(posts, 'tr')
+			if 'magnet' not in row:
+				return
 
-			for post in posts:
-				if '<th' in post:
-					continue
-				links = re.compile('<a href="(.+?)">.*?<td class="tdnormal">((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class="tdseed">([0-9]+|[0-9]+,[0-9]+)</td>').findall(post)
+			url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
+			url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+			url = url.split('&tr')[0]
+			url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
-				for items in links:
-					link = items[0].split("/")
-					hash = link[1].lower()
-					name = link[2].replace('+MB+', '')
-					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-					name = name.replace('Worldfree4u.Wiki.', '').replace('Bolly4u.pro.', '')
-					if source_utils.remove_lang(name):
-						continue
+			name = url.split('&dn=')[1]
+			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
+			if source_utils.remove_lang(name):
+				return
 
-					match = source_utils.check_title(self.title, name, self.hdlr, self.year)
-					if not match:
-						continue
+			match = source_utils.check_title(self.title, name, self.hdlr, self.year)
+			if not match:
+				return
 
-					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+			if url in str(self.sources):
+				return
 
-					try:
-						seeders = int(items[2].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
-					except:
-						seeders = 0
-						pass
+			try:
+				seeders = int(re.findall('<span style="color:#008000"><strong>\s*([0-9]+)\s*</strong>', row, re.DOTALL)[0].replace(',', ''))
+				if self.min_seeders > seeders: 
+					return
+			except:
+				seeders = 0
+				pass
 
-					quality, info = source_utils.get_release_quality(name, url)
-					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1])[0]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-						pass
-					info = ' | '.join(info)
+			quality, info = source_utils.get_release_quality(name, url)
 
-					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-														'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			try:
+				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
+				dsize, isize = source_utils._size(size)
+				info.insert(0, isize)
+			except:
+				dsize = 0
+				pass
+
+			info = ' | '.join(info)
+
+			self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
-			source_utils.scraper_error('TORRENTDOWNLOAD')
+			source_utils.scraper_error('MAGNET4YOU')
 			pass
 
 

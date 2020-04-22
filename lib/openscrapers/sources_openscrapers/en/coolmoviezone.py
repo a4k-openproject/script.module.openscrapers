@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+# modified by Venom for Openscrapers (4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -35,8 +36,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['coolmoviezone.xyz', 'coolmoviezone.watch']
-		self.base_link = 'https://coolmoviezone.watch'
+		self.domains = ['coolmoviezone.digital']
+		self.base_link = 'https://coolmoviezone.digital'
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -52,6 +53,8 @@ class source:
 			hostDict = hostprDict + hostDict
 			r = client.request(url)
 			match = re.compile('<td align="center"><strong><a href="(.+?)"').findall(r)
+			# log_utils.log('match = %s' % match, log_utils.LOGDEBUG)
+
 			for url in match:
 				valid, host = source_utils.is_host_valid(url, hostDict)
 				if valid:
@@ -59,7 +62,8 @@ class source:
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
 					                'direct': False, 'debridonly': False})
 			return sources
-		except Exception:
+		except:
+			source_utils.scraper_error('COOLMOVIEZONE')
 			return sources
 
 	def resolve(self, url):

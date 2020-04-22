@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated url 4-3-2020)
+# created by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -119,6 +119,7 @@ class source:
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
+					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if name.startswith('www'):
 						try:
 							name = re.sub(r'www(.*?)\W{2,10}', '', name)
@@ -156,13 +157,10 @@ class source:
 
 					sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
 												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-
 				except:
 					source_utils.scraper_error('BITLORD')
 					return sources
-
 			return sources
-
 		except:
 			source_utils.scraper_error('BITLORD')
 			return sources

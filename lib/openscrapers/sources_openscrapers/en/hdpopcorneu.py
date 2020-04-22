@@ -43,7 +43,6 @@ class source:
 		try:
 			title = cleantitle.geturl(title)
 			url = self.base_link + '/%s/' % title
-			# https://hdpopcorns.eu/avengers-infinity-war/
 			return url
 		except:
 			return
@@ -80,6 +79,7 @@ class source:
 			try:
 				# match = re.compile('<iframe src=".+?//(.+?)/(.+?)"').findall(r)
 				match = re.compile('<iframe src=".*//(.+?)/(.+?)"').findall(r)
+
 				for host, url in match:
 					url = 'https://%s/%s' % (host, url)
 					quality = source_utils.check_url(url)

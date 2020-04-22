@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-3-2020)
+# modified by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -125,7 +125,6 @@ class source:
 			[i.start() for i in threads2]
 			[i.join() for i in threads2]
 			return self._sources
-
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return self._sources
@@ -144,18 +143,17 @@ class source:
 				if '/search/' in data:
 					continue
 
-				# Remove non-ASCII characters...freakin limetorrents
 				try:
 					data = data.encode('ascii', 'ignore')
 				except:
 					pass
 
-				# some broken links with withespace
 				data = re.sub('\s', '', data).strip()
 				link = urlparse.urljoin(self.base_link, data)
 
 				name = client.parseDOM(post, 'a')[1]
-				name = urllib.unquote_plus(name).replace(' ', '.')
+				name = urllib.unquote_plus(name)
+				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 				if source_utils.remove_lang(name):
 					continue
 
@@ -180,9 +178,7 @@ class source:
 					pass
 
 				self.items.append((name, link, isize, dsize, seeders))
-
 			return self.items
-
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return self.items

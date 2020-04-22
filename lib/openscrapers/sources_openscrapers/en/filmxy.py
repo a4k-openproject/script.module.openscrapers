@@ -61,7 +61,7 @@ class source:
 				result)
 
 			for link in streams:
-				quality = source_utils.check_sd_url(link)
+				quality = source_utils.check_url(link)
 				host = link.split('//')[1].replace('www.', '')
 				host = host.split('/')[0].lower()
 

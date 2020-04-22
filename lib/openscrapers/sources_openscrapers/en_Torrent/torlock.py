@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated url 4-3-2020)
+# created by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -77,6 +77,7 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		# startTime = time.time()
 		self.sources = []
 		try:
 			if url is None:
@@ -110,11 +111,12 @@ class source:
 					threads.append(workers.Thread(self.get_sources, link))
 				[i.start() for i in threads]
 				[i.join() for i in threads]
+				# endTime = time.time()
+				# log_utils.log('TORLOCK scrape time = %s' % str(endTime - startTime), __name__, log_utils.LOGDEBUG)
 				return self.sources
 			except:
 				source_utils.scraper_error('TORLOCK')
 				return self.sources
-
 		except:
 			source_utils.scraper_error('TORLOCK')
 			return self.sources
@@ -137,12 +139,12 @@ class source:
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]
+			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 			if name.startswith('www'):
 				try:
 					name = re.sub(r'www(.*?)\W{2,10}', '', name)
 				except:
 					name = name.split('-.', 1)[1].lstrip()
-
 			if source_utils.remove_lang(name):
 				return
 

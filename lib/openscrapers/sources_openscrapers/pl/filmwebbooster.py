@@ -255,7 +255,7 @@ class source:
 						urls = client.parseDOM(test, 'a', ret='href')
 						for url in urls:
 							valid, host = source_utils.is_host_valid(url, hostDict)
-							q = source_utils.check_sd_url(url)
+							q = source_utils.check_url(url)
 							sources.append({'source': host, 'quality': q, 'language': lang, 'url': url, 'info': info,
 							                'direct': False, 'debridonly': False})
 						continue
@@ -269,14 +269,14 @@ class source:
 						for i in range(1, numGroups):
 							url = test[i]
 							valid, host = source_utils.is_host_valid(url, hostDict)
-							q = source_utils.check_sd_url(url)
+							q = source_utils.check_url(url)
 							sources.append({'source': host, 'quality': q, 'language': lang, 'url': url, 'info': info,
 							                'direct': False, 'debridonly': False})
 						continue
 					except:
 						pass
 				valid, host = source_utils.is_host_valid(link, hostDict)
-				q = source_utils.check_sd_url(link)
+				q = source_utils.check_url(link)
 				sources.append(
 					{'source': host, 'quality': q, 'language': lang, 'url': link, 'info': info, 'direct': False,
 					 'debridonly': False})

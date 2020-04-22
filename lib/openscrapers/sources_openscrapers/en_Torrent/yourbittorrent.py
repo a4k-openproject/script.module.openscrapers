@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers
+# created by Venom for Openscrapers (updated 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -131,12 +131,8 @@ class source:
 			hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
 			url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
-			name = urllib.unquote_plus(name).replace(' ', '.')
-
-			# import string
-			# printable = set(string.printable)
-			# name = filter(lambda x: x in printable, name)
-
+			name = urllib.unquote_plus(name)
+			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 			if source_utils.remove_lang(name):
 				return
 

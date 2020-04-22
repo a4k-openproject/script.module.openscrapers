@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (4-3-2020)
+# modified by Venom for Openscrapers (4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -56,7 +56,8 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
 		try:
-			if not url: return sources
+			if not url:
+				return sources
 
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -72,6 +73,10 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
+			if r is None:
+				return sources
+			if 'Not Found' in r:
+				return sources
 			items = client.parseDOM(r, 'li')
 			items = [(dom.parse_dom(i, 'a', req='href')[0]) for i in items if year in i]
 			items = [(i.attrs['href'], re.sub('<.+?>|\n', '', i.content).strip()) for i in items]
@@ -79,7 +84,6 @@ class source:
 
 			html = client.request(item)
 			streams = re.findall('sources\:\s*\[(.+?)\]\,', html, re.DOTALL)[0]
-			# streams = re.findall('file:\s*[\'"](.+?)[\'"].+?label:\s*[\'"](.+?)[\'"]', streams, re.DOTALL)
 			streams = re.findall('src:\s*[\'"](.+?)[\'"].+?size:\s*[\'"](.+?)[\'"]', streams, re.DOTALL)
 
 			for link, label in streams:
@@ -89,7 +93,7 @@ class source:
 				                'direct': True, 'debridonly': False})
 
 			return sources
-		except BaseException:
+		except:
 			source_utils.scraper_error('IWAATCH')
 			return sources
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (added cfscrape 4-3-2020)
+# created by Venom for Openscrapers (added cfscrape 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -28,6 +28,7 @@
 import re
 import urllib
 import urlparse
+
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import client
@@ -136,6 +137,7 @@ class source:
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]
+			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 			if source_utils.remove_lang(name):
 				return
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (4-3-2020)
+# created by Venom for Openscrapers (4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -101,7 +101,7 @@ class source:
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			urls.append(url)
-			# urls.append(url.replace('page=0', 'page=40')) # server response with 2 requests might be bit slow to parse 2 pages deep
+			# urls.append(url.replace('page=0', 'page=40')) # server response time WAY to slow to parse 2 pages deep, site sucks.
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			threads = []
@@ -128,7 +128,8 @@ class source:
 
 				for items in links:
 					link = urlparse.urljoin(self.base_link, items[0])
-					name = items[1].replace(' ', '.')
+					name = items[1]
+					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if source_utils.remove_lang(name):
 						continue
 

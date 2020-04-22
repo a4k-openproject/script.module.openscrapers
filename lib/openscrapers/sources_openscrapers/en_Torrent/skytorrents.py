@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-3-2020)
+# modified by Venom for Openscrapers (updated url 4-20-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -123,12 +123,12 @@ class source:
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
+					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if name.startswith('www'):
 						try:
 							name = re.sub(r'www(.*?)\W{2,10}', '', name)
 						except:
 							name = name.split('-.', 1)[1].lstrip()
-
 					if source_utils.remove_lang(name):
 						continue
 

@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
-# Addon Name: OpenScrapers Module
-# Addon id: script.module.openscrapers
-
 import StringIO
 import cProfile
+import inspect
 import json
 import os
 import pstats
@@ -72,49 +70,18 @@ def log(msg, caller=None, level=LOGNOTICE):
 			pass
 
 
-# def error(message=None, exception=True):
-	# try:
-		# import sys
-		# if exception:
-			# type, value, traceback = sys.exc_info()
-			# errortype = type.__name__
-			# errormessage = value.message
-
-			# if errormessage == '':
-				# raise Exception()
-
-			# if message:
-				# message += ' -> '
-			# else:
-				# message = ''
-			# message += str(errortype) + ' -> ' + str(errormessage)
-
-		# else:
-			# caller = None
-
-		# log(msg=message, caller=__name__, level=LOGERROR)
-	# except:
-		# pass
-
-
 def error(message=None, exception=True):
 	try:
 		import sys
 		if exception:
 			type, value, traceback = sys.exc_info()
-
 			sysaddon = sys.argv[0].split('//')[1].replace('/', '.')
-
 			filename = (traceback.tb_frame.f_code.co_filename).replace('\\', '.').replace('.py', '')
 			filename = filename.split(sysaddon)[1].replace('\\', '.')
-
 			name = traceback.tb_frame.f_code.co_name
-
 			linenumber = traceback.tb_lineno
-
 			errortype = type.__name__
 			errormessage = value.message
-
 			if errormessage == '':
 				raise Exception()
 			if message:
@@ -123,14 +90,11 @@ def error(message=None, exception=True):
 				message = ''
 			message += str(errortype) + ' -> ' + str(errormessage)
 			caller = [filename, name, linenumber]
-
 		else:
 			caller = None
 		log(msg=message, caller=caller, level = LOGERROR)
 	except:
 		pass
-
-
 
 
 class Profiler(object):
