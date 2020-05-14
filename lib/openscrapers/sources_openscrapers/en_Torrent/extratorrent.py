@@ -39,7 +39,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 2
 		self.language = ['en']
 		self.domains = ['extratorrent.cm']
 		self.base_link = 'https://extratorrent.cm'
@@ -81,7 +81,7 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		self.sources = []
 		try:
-			scraper = cfscrape.create_scraper()
+			scraper = cfscrape.create_scraper(delay=5)
 
 			if url is None:
 				return self.sources

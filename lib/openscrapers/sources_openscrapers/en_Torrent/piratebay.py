@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 2
 		self.language = ['en']
 		self.domains = ['pirateproxy.live', 'thepiratebay.zone', 'piratebay1.live', 'thepiratebay10.org',
 								'piratebay1.xyz', 'thepiratebay1.top', 'piratebay1.info', 'tpb.party']

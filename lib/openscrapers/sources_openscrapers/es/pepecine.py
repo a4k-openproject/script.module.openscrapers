@@ -128,7 +128,7 @@ class source:
 		if '1080' in quality:
 			return '1080p'
 		elif '720' in quality:
-			return 'HD'
+			return '720p'
 		else:
 			return 'SD'
 

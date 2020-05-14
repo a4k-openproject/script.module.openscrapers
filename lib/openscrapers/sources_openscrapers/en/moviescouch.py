@@ -34,7 +34,7 @@ from openscrapers.modules import source_utils
 
 class source:
     def __init__(self):
-        self.priority = 1
+        self.priority = 32
         self.language = ['en']
         self.domains = ['moviescouch.vip', 'moviescouch.xyz', 'moviescouch.pro', 'moviescouch.pw']
         self.base_link = 'https://moviescouch.vip'

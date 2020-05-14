@@ -34,7 +34,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 31
 		self.language = ['en']
 		self.domains = ['putlocker.onl']
 		self.base_link = 'http://ww1.putlocker.onl'
@@ -82,8 +82,8 @@ class source:
 					host = host.replace('www.', '')
 					valid, host = source_utils.is_host_valid(host, hostDict)
 					if valid:
-						sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
-						                'debridonly': False})
+						sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'info': '', 'url': url, 'direct': False, 'debridonly': False})
+
 			except:
 				return
 		except Exception:

@@ -82,7 +82,7 @@ class source:
 					if '1080p' in i[0]['title']:
 						quality = '1080p'
 					elif 'HD' in i[0]['title']:
-						quality = 'HD'
+						quality = '720p'
 					else:
 						quality = 'SD'
 					url = i[0]['id']

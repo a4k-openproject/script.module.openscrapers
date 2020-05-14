@@ -39,10 +39,11 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 32
 		self.language = ['en']
-		self.domains = ['extramovies.wiki', 'extramovies.casa']
-		self.base_link = 'http://extramovies.wiki'
+		self.domains = ['extramovies.casa', 'extramovies.wiki']
+		# self.base_link = 'http://extramovies.wiki'
+		self.base_link = 'http://extramovies.casa'
 		self.search_link = '/?s=%s'
 		self.scraper = cfscrape.create_scraper()
 

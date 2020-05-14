@@ -89,7 +89,6 @@ class source:
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ('(' + data['year'] + ')')
 
 			query = '%s %s' % (title, hdlr)
@@ -103,13 +102,13 @@ class source:
 			if 'No results were found' in r:
 				return sources
 
-			r = client.parseDOM(r, 'table', attrs={'class': 'each_card_table'})
+			# r = client.parseDOM(r, 'table', attrs={'class': 'each_card_table'})
+			r = client.parseDOM(r, 'div', attrs={'class': 'card'})
 			r = client.parseDOM(r, 'a', ret='href')[0]
 			post = urlparse.urljoin(self.base_link, r)
 			r = client.request(post)
 
 			links = re.findall('href="(magnet:.+?)"', r, re.DOTALL)
-
 			for link in links:
 				url = str(client.replaceHTMLCodes(link).split('&tr')[0])
 				url = urllib.unquote_plus(url).replace(' ', '.')
@@ -122,12 +121,11 @@ class source:
 				if source_utils.remove_lang(name):
 					continue
 
-				match = source_utils.check_title(title, name, hdlr, data['year'])
+				match = source_utils.check_title(title, name, hdlr.replace('(', '').replace(')', ''), data['year'])
 				if not match:
 					continue
 
 				seeders = 0 # seeders not available on topnow
-				# quality, info = source_utils.get_release_quality(link, link)
 				quality, info = source_utils.get_release_quality(name, url)
 
 				try:
@@ -142,6 +140,7 @@ class source:
 
 				sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
 										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+
 			return sources
 		except:
 			source_utils.scraper_error('TOPNOW')

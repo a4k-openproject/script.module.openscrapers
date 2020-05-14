@@ -125,7 +125,7 @@ class source:
 						continue
 
 					q = 'SD'
-					if 'Wysoka' in cols[2]: q = 'HD'
+					if 'Wysoka' in cols[2]: q = '720p'
 
 					lang, info = self.get_lang_by_type(cols[3])
 

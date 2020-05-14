@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 32
 		self.language = ['en']
 		self.domains = ['iwaatch.com']
 		self.base_link = 'https://iwaatch.com/'
@@ -89,7 +89,7 @@ class source:
 			for link, label in streams:
 				quality = source_utils.get_release_quality(label, label)[0]
 				link += '|User-Agent=%s&Referer=%s' % (urllib.quote(client.agent()), item)
-				sources.append({'source': 'Direct', 'quality': quality, 'language': 'en', 'url': link,
+				sources.append({'source': 'direct', 'quality': quality, 'info': '', 'language': 'en', 'url': link,
 				                'direct': True, 'debridonly': False})
 
 			return sources

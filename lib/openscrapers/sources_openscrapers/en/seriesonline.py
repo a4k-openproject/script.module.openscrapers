@@ -28,9 +28,9 @@
 import re
 import urllib
 import urlparse
-
 import requests
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import directstream
@@ -40,11 +40,13 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 39
 		self.language = ['en']
 		self.domains = ['123movieshub.gg', 'seriesonline8.co']
 		self.base_link = 'https://www5.123movieshub.gg'
 		self.search_link = '/movie/search/%s'
+		self.scraper = cfscrape.create_scraper(delay=5)
+
 
 	def matchAlias(self, title, aliases):
 		try:
@@ -53,6 +55,7 @@ class source:
 					return True
 		except:
 			return False
+
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -63,6 +66,7 @@ class source:
 		except:
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			aliases.append({'country': 'us', 'title': tvshowtitle})
@@ -71,6 +75,7 @@ class source:
 			return url
 		except:
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -84,12 +89,14 @@ class source:
 		except:
 			return
 
+
 	def searchShow(self, title, season, aliases):
 		try:
 			title = cleantitle.normalize(title)
 			search = '%s Season %01d' % (title, int(season))
 			url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(search))
-			r = client.request(url, timeout='10')
+			# r = client.request(url, timeout='10')
+			r = self.scraper.get(url).content
 			r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
 			r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
 			r = [(i[0], i[1], re.findall('(.*?)\s+-\s+Season\s+(\d)', i[1])) for i in r]
@@ -100,11 +107,13 @@ class source:
 		except:
 			return
 
+
 	def searchMovie(self, title, year, aliases):
 		try:
 			title = cleantitle.normalize(title)
 			url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(title))
-			r = client.request(url, timeout='10')
+			# r = client.request(url, timeout='10')
+			r = self.scraper.get(url).content
 			r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
 			r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
 			results = [(i[0], i[1], re.findall('\((\d{4})', i[1])) for i in r]
@@ -121,6 +130,7 @@ class source:
 		except:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
@@ -134,6 +144,7 @@ class source:
 				url = '%s/film/%s-season-%01d/watching.html?ep=%s' % (
 				self.base_link, cleantitle.geturl(data['tvshowtitle']), int(data['season']), ep)
 				r = client.request(url, timeout='10', output='geturl')
+				# r = self.scraper.get(url).content
 				if url is None:
 					url = self.searchShow(data['tvshowtitle'], data['season'], aliases)
 			else:
@@ -142,7 +153,8 @@ class source:
 					url = '%s/film/%s/watching.html?ep=0' % (self.base_link, cleantitle.geturl(data['title']))
 			if url is None:
 				raise Exception()
-			r = client.request(url, timeout='10')
+			# r = client.request(url, timeout='10')
+			r = self.scraper.get(url).content
 			r = client.parseDOM(r, 'div', attrs={'class': 'les-content'})
 			if 'tvshowtitle' in data:
 				ep = data['episode']
@@ -152,7 +164,8 @@ class source:
 			for link in links:
 				link = "https:" + link if not link.startswith('http') else link
 				if 'vidcloud' in link:
-					r = client.request(link, timeout='10')
+					# r = client.request(link, timeout='10')
+					r = self.scraper.get(url).content
 					match = getSum.findSum(r)
 					for url in match:
 						url = "https:" + url if not url.startswith('http') else url
@@ -173,11 +186,13 @@ class source:
 		except:
 			return sources
 
+
 	def resolve(self, url):
 		if "google" in url:
 			return directstream.googlepass(url)
 		elif 'vidcloud' in url:
-			r = client.request(url)
+			# r = client.request(url)
+			r = self.scraper.get(url).content
 			url = re.findall("file: '(.+?)'", r)[0]
 			return url
 		else:

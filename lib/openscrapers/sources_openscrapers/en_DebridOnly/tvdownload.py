@@ -40,7 +40,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 26
 		self.language = ['en']
 		self.domains = ['tvdownload.net']
 		self.base_link = 'http://tvdownload.net/'
@@ -69,7 +69,8 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if url is None: return
+			if not url:
+				return
 			data = urlparse.parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -91,10 +92,10 @@ class source:
 		self.scraper = cfscrape.create_scraper()
 		self.sources = []
 		try:
-			if url is None:
+			if not url:
 				return self.sources
 
-			if debrid.status() is False:
+			if not debrid.status():
 				return self.sources
 
 			self.hostDict = hostprDict + hostDict
@@ -121,8 +122,7 @@ class source:
 
 			posts = client.parseDOM(r, 'h2', attrs={'class': 'title'})
 			posts = zip(client.parseDOM(posts, 'a', ret='title'), client.parseDOM(posts, 'a', ret='href'))
-
-			if posts == []:
+			if not posts:
 				return self.sources
 
 			threads = []
@@ -134,7 +134,7 @@ class source:
 
 		except:
 			source_utils.scraper_error('TVDOWNLOADS')
-			return sources
+			return self.sources
 
 
 	def get_sources(self, item):
@@ -147,7 +147,6 @@ class source:
 			r = re.sub(r'\t', '', r)
 
 			list = client.parseDOM(r, 'div', attrs={'id': 'content'})
-			# log_utils.log('list = %s' % list, log_utils.LOGDEBUG)
 
 			if 'tvshowtitle' in self.data:
 				regex = '(<p><strong>(.*?)</strong><br />([A-Z]*)\s*\|\s*([A-Z,0-9,\s*]*)\|\s*((\d+\.\d+|\d*)\s*(?:GB|GiB|Gb|MB|MiB|Mb))?</p>(?:\s*<p><a href=\".*?\" .*?_blank\">.*?</a></p>)+)'
@@ -185,7 +184,6 @@ class source:
 						valid, host = source_utils.is_host_valid(url, self.hostDict)
 						if not valid:
 							continue
-
 						host = client.replaceHTMLCodes(host)
 						host = host.encode('utf-8')
 
@@ -206,7 +204,6 @@ class source:
 					except:
 						source_utils.scraper_error('TVDOWNLOADS')
 						pass
-
 			return self.sources
 
 		except:

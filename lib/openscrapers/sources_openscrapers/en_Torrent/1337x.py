@@ -37,7 +37,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 5
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = ['1337x.to', '1337x.st', '1337x.is'] #.st and .is behind cloudflare while .to is not
 		self.base_link = 'https://1337x.to/'

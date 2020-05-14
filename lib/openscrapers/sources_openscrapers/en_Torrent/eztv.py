@@ -129,7 +129,6 @@ class source:
 						if self.min_seeders > seeders:
 							continue
 					except:
-						source_utils.scraper_error('EZTV')
 						seeders = 0
 						pass
 

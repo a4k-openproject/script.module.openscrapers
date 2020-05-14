@@ -33,7 +33,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 31
 		self.language = ['en']
 		self.domains = ['hdm.to']
 		self.base_link = 'https://hdm.to'
@@ -42,6 +42,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			t = cleantitle.geturl(title).replace('-', '+').replace('++', '+')
+			self.title = t
 			url = self.base_link + self.search_link % (t, year)
 			r = client.request(url)
 			u = client.parseDOM(r, "div", attrs={"class": "col-md-2 col-sm-2 mrgb"})
@@ -55,6 +56,7 @@ class source:
 			return
 
 	def sources(self, url, hostDict, hostprDict):
+		# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 		sources = []
 		try:
 			hostDict = hostDict + hostprDict
@@ -67,10 +69,12 @@ class source:
 
 			for url in r:
 				url = url.replace(" ", "+")
-				valid, host = source_utils.is_host_valid(url, hostDict)
-				if valid:
-					sources.append({'source': host, 'quality': 'HD', 'language': 'en', 'url': url, 'direct': False,
-					                'debridonly': False})
+				url = url.split('//1o.to/')[1]
+				url = 'https://hls.1o.to/vod/%s/playlist.m3u8' % url
+				# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+				sources.append({'source': 'direct', 'quality': '720p', 'info': '', 'language': 'en', 'url': url, 'direct': True,
+				                'debridonly': False})
+
 			return sources
 		except:
 			return sources

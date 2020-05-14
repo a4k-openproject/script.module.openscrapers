@@ -38,7 +38,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 26
 		self.language = ['en']
 		self.domains = ['rlsbb.ru','rlsbb.to','rlsbb.com','rlsbb.unblocked.cx']
 		self.base_link = 'http://rlsbb.ru'
@@ -80,7 +80,7 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
-		scraper = cfscrape.create_scraper()
+		scraper = cfscrape.create_scraper(delay=5)
 		sources = []
 		try:
 			if url is None:

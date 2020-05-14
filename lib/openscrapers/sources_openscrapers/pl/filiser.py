@@ -163,7 +163,7 @@ class source:
 			quality = client.parseDOM(el, 'span', attrs={'class': 'quality'})[0]
 			q = 'SD'
 			if quality.endswith('720p'):
-				q = 'HD'
+				q = '720p'
 			elif quality.endswith('1080p'):
 				q = '1080p'
 

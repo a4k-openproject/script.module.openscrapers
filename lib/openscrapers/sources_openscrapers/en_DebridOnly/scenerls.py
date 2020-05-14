@@ -38,7 +38,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 21
 		self.language = ['en']
 		self.domains = ['scene-rls.com', 'scene-rls.net']
 		self.base_link = 'http://scene-rls.net'

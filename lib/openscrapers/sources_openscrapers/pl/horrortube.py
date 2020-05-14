@@ -116,7 +116,7 @@ class source:
 					info = self.get_lang_by_type(tabela[1])
 					quality = tabela[2]
 					if 'wysoka' in quality.lower():
-						quality = 'HD'
+						quality = '720p'
 					else:
 						quality = 'SD'
 					try:

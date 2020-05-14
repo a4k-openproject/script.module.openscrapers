@@ -38,7 +38,7 @@ from openscrapers.modules import directstream
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 39
 		self.language = ['en']
 		self.domains = ['series9.to']
 		self.base_link = 'https://www5.series9.to'
@@ -173,7 +173,7 @@ class source:
 							raise Exception()
 						host = client.replaceHTMLCodes(host)
 						host = host.encode('utf-8')
-						sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': link, 'direct': False,
+						sources.append({'source': host, 'quality': 'SD', 'info': '', 'language': 'en', 'url': link, 'direct': False,
 						                'debridonly': False})
 					except:
 						pass

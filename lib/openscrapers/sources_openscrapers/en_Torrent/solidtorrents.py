@@ -131,7 +131,7 @@ class source:
 				try:
 					url = urllib.unquote_plus(item['magnet']).replace(' ', '.')
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
-					hash = item['infohash']
+					hash = item['infohash'].lower()
 
 					name = item['title']
 					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')

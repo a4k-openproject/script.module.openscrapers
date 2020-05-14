@@ -37,12 +37,11 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 2
 		self.language = ['en']
 		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
 		self.base_link = 'https://yourbittorrent2.com'
 		self.search_link = '?q=%s&page=1&v=&c=&sort=size&o=desc'
-		# self.search_link = '?q=%s&page=1&v=&c=&sort=seeds&o=desc'
 		self.min_seeders = 0
 
 
@@ -102,7 +101,7 @@ class source:
 			url = urlparse.urljoin(self.base_link, url).replace('+', '-')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = client.request(url)
+			r = client.request(url, timeout='5')
 			if r is None:
 				return self.sources
 
@@ -122,7 +121,7 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
-			result = client.request(url)
+			result = client.request(url, timeout='5')
 
 			if result is None:
 				return

@@ -37,7 +37,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 3
 		self.language = ['en']
 		self.domains = ['torrentfunk.com', 'torrentfunk2.com']
 		self.base_link = 'https://www.torrentfunk.com'
@@ -101,9 +101,12 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = client.request(url)
+			r = client.request(url, timeout='5')
+			if r is None:
+				return self.sources
+
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
-			links = re.findall('<a href="(/torrent/.+?)">(.+?)<', r, re.DOTALL)
+			links = re.findall('<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
 
 			threads = []
 			for link in links:
@@ -122,7 +125,12 @@ class source:
 			if '/torrent/' not in url:
 				return
 
-			name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.').replace(' ', '.')
+			name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.')
+			if '<span' in name:
+				nam = name.split('<span')[0].replace(' ', '.')
+				span = client.parseDOM(name, 'span')[0].replace('-', '.')
+				name = '%s%s' % (nam, span)
+
 			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 			if source_utils.remove_lang(name):
 				return
@@ -134,7 +142,7 @@ class source:
 			if not url.startswith('http'): 
 				link = urlparse.urljoin(self.base_link, url)
 
-			link = client.request(link)
+			link = client.request(link, timeout='5')
 			if link is None:
 				return
 			hash = re.findall('<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]

@@ -37,12 +37,12 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 25
 		self.language = ['en']
 		self.domains = ['onceddl.org']
 		self.base_link = 'https://onceddl.org'
-		self.search_link = '/search/keyword/%s'
-
+		# self.search_link = '/search/keyword/%s'
+		self.search_link = '/find/keyword/%s'
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:

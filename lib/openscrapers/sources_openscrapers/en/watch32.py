@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
     def __init__(self):
-        self.priority = 1
+        self.priority = 31
         self.language = ['en']
         self.domains = ['watch32hd.co']
         self.base_link = 'https://watch32hd.co/'
@@ -100,7 +100,7 @@ class source:
                     url = re.findall('''frame_url\s*=\s*["']([^']+)['"]\;''', r, re.DOTALL)[0]
                     url = url if url.startswith('http') else urlparse.urljoin('https://', url)
 
-                    sources.append({'source': 'GVIDEO', 'quality': quality, 'language': 'en', 'url': url,
+                    sources.append({'source': 'gvideo', 'quality': quality, 'info': '', 'language': 'en', 'url': url,
                                     'direct': False, 'debridonly': False})
 
                 except BaseException:

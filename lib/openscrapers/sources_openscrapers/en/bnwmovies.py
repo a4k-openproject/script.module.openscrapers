@@ -31,7 +31,7 @@ from openscrapers.modules import client
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 35
 		self.language = ['en']
 		self.domains = ['bnwmovies.com']
 		self.base_link = 'http://www.bnwmovies.com'
@@ -41,14 +41,14 @@ class source:
 		try:
 			scrape = title.lower().replace(' ', '+').replace(':', '')
 			start_url = self.base_link + self.search_link % scrape
-			html = client.request(start_url)
+			html = client.request(start_url, timeout='5')
 			results = re.compile('href="(.+?)"', re.DOTALL).findall(html)
 			for url in results:
 				if self.base_link in url:
 					if 'webcache' in url:
 						continue
 					if cleantitle.geturl(title) in url:
-						chkhtml = client.request(url)
+						chkhtml = client.request(url, timeout='5')
 						chktitle = re.compile('<title.+?>(.+?)</title>', re.DOTALL).findall(chkhtml)[0]
 						if title in chktitle:
 							if str(year) in chktitle:
@@ -62,10 +62,10 @@ class source:
 			sources = []
 			if url is None:
 				return sources
-			html = client.request(url)
+			html = client.request(url, timeout='5')
 			Links = re.compile('<source.+?src="(.+?)"', re.DOTALL).findall(html)
 			for link in Links:
-				sources.append({'source': 'BNW', 'quality': 'SD', 'language': 'en', 'url': link, 'direct': True,
+				sources.append({'source': 'BNW', 'quality': 'SD', 'info': '', 'language': 'en', 'url': link, 'direct': True,
 				                'debridonly': False})
 			return sources
 		except:

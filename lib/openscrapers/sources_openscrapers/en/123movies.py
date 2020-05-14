@@ -37,12 +37,12 @@ from openscrapers.modules import source_utils
 
 class source:
     def __init__(self):
-        self.priority = 1
+        self.priority = 37
         self.language = ['en']
         self.domains = ['123123movies.net']
         self.base_link = 'http://www6.123123movies.net'
         self.search_link = '/watch/%s-%s-123movies.html'
-        self.scraper = cfscrape.create_scraper()
+        self.scraper = cfscrape.create_scraper(delay=5)
 
     def movie(self, imdb, title, localtitle, aliases, year):
         try:

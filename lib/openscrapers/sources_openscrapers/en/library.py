@@ -34,7 +34,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 35
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = []
 
@@ -85,7 +85,7 @@ class source:
 				r = unicode(r, 'utf-8', errors='ignore')
 				r = json.loads(r)['result']['movies']
 				r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get_simple(i['title']), cleantitle.get_simple(i['originaltitle'])]]
-				if r == []:
+				if not r:
 					return sources
 				r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')][0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"properties": ["streamdetails", "file"], "movieid": %s }, "id": 1}' % str(r['movieid']))

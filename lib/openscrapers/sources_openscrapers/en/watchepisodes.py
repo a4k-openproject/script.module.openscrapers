@@ -35,7 +35,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 32
 		self.language = ['en']
 		self.domains = ['watchepisodes.com', 'watchepisodes.unblocked.pl']
 		self.base_link = 'http://www.watchepisodes4.com/'
@@ -62,6 +62,7 @@ class source:
 		except BaseException:
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
 		try:
@@ -72,12 +73,10 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle']
-
 			hdlr = 's%02de%02d' % (int(data['season']), int(data['episode']))
-
 			query = urllib.quote_plus(cleantitle.getsearch(title))
-
 			surl = urlparse.urljoin(self.base_link, self.search_link % query)
+			# log_utils.log('surl = %s' % surl, log_utils.LOGDEBUG)
 
 			r = client.request(surl, XHR=True)
 			r = json.loads(r)
@@ -90,7 +89,6 @@ class source:
 					raise Exception()
 				slink = i['seo']
 				slink = urlparse.urljoin(self.base_link, slink)
-
 				r = client.request(slink)
 
 				if not data['imdb'] in r:
@@ -110,11 +108,10 @@ class source:
 						if not valid:
 							raise Exception()
 
-						sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url,
+						sources.append({'source': host, 'quality': 'SD', 'info': '', 'language': 'en', 'url': url,
 						                'direct': False, 'debridonly': False})
 					except BaseException:
 						return sources
-
 			return sources
 		except BaseException:
 			return sources

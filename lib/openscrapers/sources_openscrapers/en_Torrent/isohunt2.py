@@ -37,7 +37,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 10
 		self.language = ['en']
 		self.domains = ['isohunt2.net']
 		self.base_link = 'https://isohunt2.net'
@@ -117,7 +117,7 @@ class source:
 
 	def _get_sources(self, url):
 		try:
-			r = client.request(url)
+			r = client.request(url, timeout='5')
 			posts = client.parseDOM(r, 'tbody')[0]
 			posts = client.parseDOM(posts, 'tr')
 
@@ -145,7 +145,7 @@ class source:
 						seeders = 0
 						pass
 
-					link = client.request(link)
+					link = client.request(link, timeout='5')
 					magnet = re.compile('(magnet.+?)"').findall(link)[0]
 					url = urllib.unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]

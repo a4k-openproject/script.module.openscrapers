@@ -39,7 +39,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 28
 		self.language = ['en']
 		self.domains = ['max-rls.com']
 		self.base_link = 'http://max-rls.com'
@@ -80,7 +80,7 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
 		try:
-			self.scraper = cfscrape.create_scraper()
+			self.scraper = cfscrape.create_scraper(delay=5)
 
 			if url is None:
 				return sources

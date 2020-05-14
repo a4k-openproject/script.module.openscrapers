@@ -47,7 +47,7 @@ SEARCH_PARAMS.update(SORT)
 
 class source:
 	def __init__(self):
-		self.priority = 0
+		self.priority = 35
 		self.language = ['en']
 		self.domain = 'easynews.com'
 		self.base_link = 'https://members.easynews.com'
@@ -120,7 +120,7 @@ class source:
 				info = source_utils.getFileType(file_name)
 				info = '%.2f GB | %s | %s' % (size, info, file_name.replace('.', ' ').upper())
 				
-				sources.append({'source': 'Direct',
+				sources.append({'source': 'direct',
 								'quality': quality,
 								'language': "en",
 								'url': file_dl,

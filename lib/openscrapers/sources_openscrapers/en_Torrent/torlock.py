@@ -37,7 +37,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 4
 		self.language = ['en']
 		self.domain = ['torlock.com', 'torlock.unblockit.pro', 'torlock.cc']
 		self.base_link = 'https://torlock.com'
@@ -77,7 +77,6 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
-		# startTime = time.time()
 		self.sources = []
 		try:
 			if url is None:
@@ -103,7 +102,9 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			try:
-				r = client.request(url)
+				r = client.request(url, timeout='5')
+				if r is None:
+					return self.sources
 				links = re.findall('<a href=(/torrent/.+?)>', r, re.DOTALL)
 
 				threads = []
@@ -111,8 +112,6 @@ class source:
 					threads.append(workers.Thread(self.get_sources, link))
 				[i.start() for i in threads]
 				[i.join() for i in threads]
-				# endTime = time.time()
-				# log_utils.log('TORLOCK scrape time = %s' % str(endTime - startTime), __name__, log_utils.LOGDEBUG)
 				return self.sources
 			except:
 				source_utils.scraper_error('TORLOCK')
@@ -125,7 +124,7 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
-			result = client.request(url)
+			result = client.request(url, timeout='5')
 			if result is None:
 				return
 			if 'magnet' not in result:

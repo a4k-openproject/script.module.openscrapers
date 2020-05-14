@@ -27,7 +27,6 @@
 
 import re
 
-
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
@@ -35,7 +34,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 36
 		self.language = ['en']
 		self.domains = ['gomovies.onl']
 		self.base_link = 'http://ww.gomovies.onl'

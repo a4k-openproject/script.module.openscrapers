@@ -29,15 +29,16 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape
+from openscrapers.modules import cfscrape # fails IUAM_challenge as of 5-12-20
 from openscrapers.modules import client
 from openscrapers.modules import debrid
+# from openscrapers.modules import log_utils # temp to capture IUAM failure because cfscrape 1.2.34 no longer does
 from openscrapers.modules import source_utils
 
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 15
 		self.language = ['en']
 		self.domains = ['torrentz2.eu', 'torrentz2.is']
 		self.base_link = 'https://torrentz2.eu'
@@ -77,7 +78,7 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
-		scraper = cfscrape.create_scraper()
+		scraper = cfscrape.create_scraper(delay=5)
 		sources = []
 		try:
 			if url is None:
@@ -103,6 +104,10 @@ class source:
 
 			try:
 				r = scraper.get(url).content
+				# if 'DDoS protection by <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=iuam" target="_blank">Cloudflare</a>' in r:
+					# log_utils.log('TORRENTZ - Failed to solve IUAM challenge', log_utils.LOGDEBUG)
+					# return sources
+
 				posts = client.parseDOM(r, 'div', attrs={'class': 'results'})[0]
 				posts = client.parseDOM(posts, 'dl')
 

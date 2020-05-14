@@ -34,7 +34,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 31
 		self.language = ['en']
 		self.domains = ['filmxy.nl', 'filmxy.me', 'filmxy.one', 'filmxy.ws', 'filmxy.live']
 		self.base_link = 'https://www.filmxy.nl'
@@ -66,10 +66,10 @@ class source:
 				host = host.split('/')[0].lower()
 
 				if quality == 'SD':
-					sources.append({'source': host, 'quality': '720p', 'language': 'en', 'url': link, 'direct': False,
+					sources.append({'source': host, 'quality': '720p', 'info': '', 'language': 'en', 'url': link, 'direct': False,
 					                'debridonly': False})
 				else:
-					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False,
+					sources.append({'source': host, 'quality': quality, 'info': '', 'language': 'en', 'url': link, 'direct': False,
 					                'debridonly': False})
 
 			return sources

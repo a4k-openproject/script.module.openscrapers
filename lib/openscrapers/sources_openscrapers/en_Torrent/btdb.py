@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-20-2020)
+# modified by Venom for Openscrapers (updated url 4-29-2020)-switched to cfscrape
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,6 +29,7 @@ import re
 import urllib
 import urlparse
 
+from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -37,7 +38,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 15
 		self.language = ['en']
 		self.domains = ['btdb.io', 'btdb.eu']
 		# self.base_link = 'https://btdb.eu'
@@ -120,7 +121,8 @@ class source:
 
 	def _get_sources(self, url):
 		try:
-			r = client.request(url)
+			scraper = cfscrape.create_scraper()
+			r = scraper.get(url).content
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 
 			for post in posts:

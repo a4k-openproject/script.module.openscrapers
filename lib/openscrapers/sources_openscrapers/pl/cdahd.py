@@ -134,7 +134,7 @@ class source:
 
 		q = 'SD'
 		if len(sources) == 0 and (len(client.parseDOM(result, 'span', attrs={'class': 'calidad2'})) > 0):
-			q = 'HD'
+			q = '720p'
 		player2 = client.parseDOM(result, 'div', attrs={'id': 'player2'})
 		links = client.parseDOM(player2, 'iframe', ret='src')
 
@@ -167,7 +167,7 @@ class source:
 			host = client.parseDOM(row, 'img', ret='alt')[0]
 			lang, info = self.get_lang_by_type(lang_type)
 			q = 'SD'
-			if quality_type == 'Wysoka': q = 'HD'
+			if quality_type == 'Wysoka': q = '720p'
 			sources.append(
 				{'source': host, 'quality': q, 'language': lang, 'url': src_url, 'info': info, 'direct': False,
 				 'debridonly': False})

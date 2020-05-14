@@ -38,7 +38,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 3
 		self.language = ['en']
 		self.domains = ['limetorrents.info']
 		self.base_link = 'https://www.limetorrents.info'

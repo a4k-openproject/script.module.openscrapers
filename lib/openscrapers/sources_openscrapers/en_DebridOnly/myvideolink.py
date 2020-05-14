@@ -37,10 +37,11 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 22
 		self.language = ['en']
 		self.domains = ['kita.myvideolinks.net', 'myvideolinks.69.mu', 'nothingcan.undo.it']
-		self.base_link = 'http://kita.myvideolinks.net'
+		# self.base_link = 'http://kita.myvideolinks.net'
+		self.base_link = 'http://looka.myvideolinks.net'
 		self.search_link = '/?s=%s'
 
 
@@ -99,8 +100,7 @@ class source:
 			url = urlparse.urljoin(self.base_link, self.search_link)
 			url = url % urllib.quote_plus(query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
-			r = client.request(url)
+			r = client.request(url, timeout='5')
 			if r is None:
 				return sources
 			if 'Nothing Found' in r:
@@ -109,7 +109,6 @@ class source:
 			r = client.parseDOM(r, 'article')
 			r1 = client.parseDOM(r, 'h2')
 			r2 = client.parseDOM(r, 'div', attrs={'class': 'entry-excerpt'})
-
 			if 'tvshowtitle' in data: # fuckers removed file size for episodes
 				posts = zip(client.parseDOM(r1, 'a', ret='href'), client.parseDOM(r1, 'a'))
 			else:
@@ -120,7 +119,7 @@ class source:
 			items = []
 			for post in posts:
 				try:
-					base_u = client.request(post[0])
+					base_u = client.request(post[0], timeout='5')
 
 					if 'tvshowtitle' in data:
 						regex = '<b>(' + title + '.*)</b>'
@@ -182,13 +181,11 @@ class source:
 					fileType = source_utils.getFileType(name)
 					info.append(fileType)
 					info = ' | '.join(info) if fileType else info[0]
-
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
 												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				except:
 					source_utils.scraper_error('MYVIDEOLINK')
 					pass
-
 			return sources
 		except:
 			source_utils.scraper_error('MYVIDEOLINK')

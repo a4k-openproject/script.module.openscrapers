@@ -38,7 +38,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 2
 		self.language = ['en']
 		self.domains = ['kickasshydra.net', 'kickasstrusty.com', 'kickassindia.com',
 			'kickassmovies.net', 'torrentskickass.org', 'kickasstorrents.li', 'kkat.net',

@@ -31,11 +31,11 @@ from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 from openscrapers.modules import proxy
-
+from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 0
+		self.priority = 39
 		self.language = ['en']
 		self.domains = ['on.mywatchseries.stream', 'xwatchseries.to', 'onwatchseries.to', 'itswatchseries.to']
 		self.base_link = 'https://on.mywatchseries.stream'
@@ -52,6 +52,7 @@ class source:
 			r = [(i[0][0], i[1][0], i[2][0]) for i in r if i[0] and i[1] and i[2]]
 			return r[0][0]
 		except:
+			source_utils.scraper_error('XWATCHSERIES')
 			return
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -60,9 +61,7 @@ class source:
 				return
 
 			r = self.scraper.get(url, headers={'referer': self.base_link}).content
-
 			r = client.parseDOM(r, 'li', attrs={'itemprop': 'episode'})
-
 			t = cleantitle.get(title)
 
 			r = [(client.parseDOM(i, 'a', ret='href'), client.parseDOM(i, 'span', attrs={'itemprop': 'name'}),
@@ -82,12 +81,12 @@ class source:
 
 			return url[0][0]
 		except:
+			source_utils.scraper_error('XWATCHSERIES')
 			return
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
-
 			if url is None:
 				return sources
 
@@ -108,13 +107,15 @@ class source:
 					if host not in hostDict:
 						continue;
 					host = host.encode('utf-8')
-					sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False,
+					sources.append({'source': host, 'quality': 'SD', 'info': '', 'language': 'en', 'url': url, 'direct': False,
 					                'debridonly': False})
 				except:
+					source_utils.scraper_error('XWATCHSERIES')
 					pass
 
 			return sources
 		except:
+			source_utils.scraper_error('XWATCHSERIES')
 			return sources
 
 	def resolve(self, url):
