@@ -89,7 +89,7 @@ class source:
 			r = dom_parser.parse_dom(r, 'tr')
 			for i in r:
 				if re.search('(?<=<td>)(HD)(?=</td>)', i[1]):
-					quality = 'HD'
+					quality = '720p'
 				else:
 					quality = 'SD'
 				x = dom_parser.parse_dom(i, 'td', attrs={'class': 'name'}, req='data-bind')
@@ -99,7 +99,7 @@ class source:
 				url = url.group()
 				valid, hoster = source_utils.is_host_valid(hoster, hostDict)
 				if not valid: continue
-				sources.append({'source': hoster, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False,
+				sources.append({'source': hoster, 'quality': quality, 'language': 'de', 'url': url, 'direct': False,
 				                'debridonly': False})
 			return sources
 		except:

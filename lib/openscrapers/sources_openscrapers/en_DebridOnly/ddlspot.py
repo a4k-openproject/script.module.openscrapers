@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 25
 		self.language = ['en']
 		self.domains = ['www.ddlspot.com']
 		self.base_link = 'http://www.ddlspot.com/'

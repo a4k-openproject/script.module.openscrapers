@@ -80,7 +80,7 @@ def more_vidlink(link, hostDict):
 				url = stream_link + '/' + url + '.m3u8'
 				quality, info = source_utils.get_release_quality(qual, url)
 				sources.append(
-					{'source': 'GVIDEO', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': True,
+					{'source': 'gvideo', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': True,
 					 'debridonly': False})
 		return sources
 	except:

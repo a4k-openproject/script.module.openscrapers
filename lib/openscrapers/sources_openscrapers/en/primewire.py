@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 31
 		self.language = ['en']
 		self.domains = ['primewire.ac', 'primewire.ink']
 		self.base_link = 'https://primewire.ink/'
@@ -141,6 +141,7 @@ class source:
 
 					sources.append({'source': host,
 					                'quality': quality,
+					                'info': '',
 					                'language': 'en',
 					                'url': url,
 					                'direct': False,

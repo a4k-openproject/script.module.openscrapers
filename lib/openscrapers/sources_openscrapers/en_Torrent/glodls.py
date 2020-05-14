@@ -114,7 +114,7 @@ class source:
 					url = urllib.unquote_plus(item[1]).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
 
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					hash = re.compile('btih:(.*?)&').findall(url)[0].lower()
 					quality, info = source_utils.get_release_quality(name, url)
 
 					if item[2] != '0':

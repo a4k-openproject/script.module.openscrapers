@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 26
 		self.language = ['en']
 		self.domains = ['fmovies.tw', '123movie.nu', 'ganool.ws', 'ganool123.com']
 		self.base_link = 'https://fmovies.tw'
@@ -97,8 +97,8 @@ class source:
 # size info only available if I make a new 2nd request, line 83 skips directly to download links vs. loading info page, after query, where size is
 					dsize = 0
 
-					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
-									'debridonly': True, 'size': dsize})
+					sources.append({'source': host, 'quality': quality, 'info': '', 'language': 'en', 'url': url, 'direct': False,
+										'debridonly': True, 'size': dsize})
 			return sources
 		except:
 			return sources

@@ -29,27 +29,50 @@ import urlparse
 from openscrapers.modules import client
 
 
-def google(url):
+def google(url, ref=None):
 	try:
-		if any(x in url for x in ['youtube.', 'docid=']): url = 'https://drive.google.com/file/d/%s/view' % \
-		                                                        re.compile('docid=([\w-]+)').findall(url)[0]
+		if 'lh3.googleusercontent' in url or 'bp.blogspot' in url:
+			newheaders = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
+						'Accept': '*/*',
+						'Host': 'lh3.googleusercontent.com',
+						'Accept-Language': 'en-US,en;q=0.8,de;q=0.6,es;q=0.4',
+						'Accept-Encoding': 'identity;q=1, *;q=0',
+						'Referer': ref,
+						'Connection': 'Keep-Alive',
+						'X-Client-Data': 'CJK2yQEIo7bJAQjEtskBCPqcygEIqZ3KAQjSncoBCKijygE=',
+						'Range': 'bytes=0-'
+						}
+			resp = client.request(url, headers=newheaders, redirect=False, output='extended', timeout='10')
+			loc = resp[2]['Location']
+			c = resp[2]['Set-Cookie'].split(';')[0]
+			url = '%s|Cookie=%s' % (loc, c)
+			return url
+		if any(x in url for x in ['youtube.', 'docid=']): url = 'https://drive.google.com/file/d/%s/view' % re.compile('docid=([\w-]+)').findall(url)[0]
+
 		netloc = urlparse.urlparse(url.strip().lower()).netloc
 		netloc = netloc.split('.google')[0]
+
 		if netloc == 'docs' or netloc == 'drive':
 			url = url.split('/preview', 1)[0]
 			url = url.replace('drive.google.com', 'docs.google.com')
+
 		headers = {'User-Agent': client.agent()}
+
 		result = client.request(url, output='extended', headers=headers)
+
 		try:
 			headers['Cookie'] = result[2]['Set-Cookie']
 		except:
 			pass
+
 		result = result[0]
+
 		if netloc == 'docs' or netloc == 'drive':
 			result = re.compile('"fmt_stream_map",(".+?")').findall(result)[0]
 			result = json.loads(result)
 			result = [i.split('|')[-1] for i in result.split(',')]
 			result = sum([googletag(i, append_height=True) for i in result], [])
+
 		elif netloc == 'photos':
 			result = result.replace('\r', '').replace('\n', '').replace('\t', '')
 			result = re.compile('"\d*/\d*x\d*.+?","(.+?)"').findall(result)[0]
@@ -57,6 +80,7 @@ def google(url):
 			result = re.compile('url=(.+?)&').findall(result)
 			result = [urllib.unquote(i) for i in result]
 			result = sum([googletag(i, append_height=True) for i in result], [])
+
 		elif netloc == 'picasaweb':
 			id = re.compile('#(\d*)').findall(url)[0]
 			result = re.search('feedPreload:\s*(.*}]}})},', result, re.DOTALL).group(1)
@@ -65,31 +89,99 @@ def google(url):
 				result = [i for i in result if str(id) in i['link'][0]['href']][0]
 			elif len(result) == 1:
 				result = result[0]
+
 			result = result['media']['content']
 			result = [i['url'] for i in result if 'video' in i['type']]
 			result = sum([googletag(i, append_height=True) for i in result], [])
+
 		elif netloc == 'plus':
-			id = urlparse.urlparse(url).path.split('/')[-1]
+			id = (urlparse.urlparse(url).path).split('/')[-1]
 			result = result.replace('\r', '').replace('\n', '').replace('\t', '')
 			result = result.split('"%s"' % id)[-1].split(']]')[0]
 			result = result.replace('\\u003d', '=').replace('\\u0026', '&')
 			result = re.compile('url=(.+?)&').findall(result)
 			result = [urllib.unquote(i) for i in result]
 			result = sum([googletag(i, append_height=True) for i in result], [])
-		result = sorted(result, key=lambda i: i.get('height', 0), reverse=True)
+			result = sorted(result, key=lambda i: i.get('height', 0), reverse=True)
+
 		url = []
-		for q in ['4K', '1440p', '1080p', 'HD', 'SD']:
+		for q in ['4K', '1440p', '1080p', '720p', 'SD']:
 			try:
 				url += [[i for i in result if i.get('quality') == q][0]]
 			except:
 				pass
+
 		for i in url:
 			i.pop('height', None)
 			i.update({'url': i['url'] + '|%s' % urllib.urlencode(headers)})
+
 		if not url: return
 		return url
 	except:
 		return
+
+
+# def google(url):
+	# try:
+		# if any(x in url for x in ['youtube.', 'docid=']): url = 'https://drive.google.com/file/d/%s/view' % \
+		                                                        # re.compile('docid=([\w-]+)').findall(url)[0]
+		# netloc = urlparse.urlparse(url.strip().lower()).netloc
+		# netloc = netloc.split('.google')[0]
+		# if netloc == 'docs' or netloc == 'drive':
+			# url = url.split('/preview', 1)[0]
+			# url = url.replace('drive.google.com', 'docs.google.com')
+		# headers = {'User-Agent': client.agent()}
+		# result = client.request(url, output='extended', headers=headers)
+		# try:
+			# headers['Cookie'] = result[2]['Set-Cookie']
+		# except:
+			# pass
+		# result = result[0]
+		# if netloc == 'docs' or netloc == 'drive':
+			# result = re.compile('"fmt_stream_map",(".+?")').findall(result)[0]
+			# result = json.loads(result)
+			# result = [i.split('|')[-1] for i in result.split(',')]
+			# result = sum([googletag(i, append_height=True) for i in result], [])
+		# elif netloc == 'photos':
+			# result = result.replace('\r', '').replace('\n', '').replace('\t', '')
+			# result = re.compile('"\d*/\d*x\d*.+?","(.+?)"').findall(result)[0]
+			# result = result.replace('\\u003d', '=').replace('\\u0026', '&')
+			# result = re.compile('url=(.+?)&').findall(result)
+			# result = [urllib.unquote(i) for i in result]
+			# result = sum([googletag(i, append_height=True) for i in result], [])
+		# elif netloc == 'picasaweb':
+			# id = re.compile('#(\d*)').findall(url)[0]
+			# result = re.search('feedPreload:\s*(.*}]}})},', result, re.DOTALL).group(1)
+			# result = json.loads(result)['feed']['entry']
+			# if len(result) > 1:
+				# result = [i for i in result if str(id) in i['link'][0]['href']][0]
+			# elif len(result) == 1:
+				# result = result[0]
+			# result = result['media']['content']
+			# result = [i['url'] for i in result if 'video' in i['type']]
+			# result = sum([googletag(i, append_height=True) for i in result], [])
+		# elif netloc == 'plus':
+			# id = urlparse.urlparse(url).path.split('/')[-1]
+			# result = result.replace('\r', '').replace('\n', '').replace('\t', '')
+			# result = result.split('"%s"' % id)[-1].split(']]')[0]
+			# result = result.replace('\\u003d', '=').replace('\\u0026', '&')
+			# result = re.compile('url=(.+?)&').findall(result)
+			# result = [urllib.unquote(i) for i in result]
+			# result = sum([googletag(i, append_height=True) for i in result], [])
+		# result = sorted(result, key=lambda i: i.get('height', 0), reverse=True)
+		# url = []
+		# for q in ['4K', '1080p', '720p', 'SD']:
+			# try:
+				# url += [[i for i in result if i.get('quality') == q][0]]
+			# except:
+				# pass
+		# for i in url:
+			# i.pop('height', None)
+			# i.update({'url': i['url'] + '|%s' % urllib.urlencode(headers)})
+		# if not url: return
+		# return url
+	# except:
+		# return
 
 
 def googletag(url, append_height=False):
@@ -220,7 +312,7 @@ def odnoklassniki(url):
 		result = re.sub(r'[^\x00-\x7F]+', ' ', result)
 		result = json.loads(result).get('videos', [])
 		hd = []
-		for name, quali in {'ultra': '4K', 'quad': '1440p', 'full': '1080p', 'hd': 'HD'}.items():
+		for name, quali in {'ultra': '4K', 'quad': '1440p', 'full': '1080p', 'hd': '720p'}.items():
 			hd += [{'quality': quali, 'url': i.get('url')} for i in result if i.get('name').lower() == name]
 		sd = []
 		for name, quali in {'sd': 'SD', 'low': 'SD', 'lowest': 'SD', 'mobile': 'SD'}.items():

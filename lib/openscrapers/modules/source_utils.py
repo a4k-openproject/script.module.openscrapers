@@ -245,7 +245,6 @@ def check_url(url):
 
 
 def check_title(title, name, hdlr, year):
-	# from openscrapers.modules import log_utils
 	try:
 		match = True
 		n = name.lower()
@@ -457,6 +456,16 @@ def remove_lang(name):
 
 def scraper_error(provider):
 	import traceback
-	from openscrapers.modules import log_utils
 	failure = traceback.format_exc()
 	log_utils.log(provider.upper() + ' - Exception: \n' + str(failure), log_utils.LOGDEBUG)
+
+
+def timeIt(func):
+	import time
+	fnc_name = func.__name__
+	def wrap(*args, **kwargs):
+		started_at = time.time()
+		result = func(*args, **kwargs)
+		log_utils.log('%s.%s = %s' % (__name__ , fnc_name, time.time() - started_at), log_utils.LOGDEBUG)
+		return result
+	return wrap

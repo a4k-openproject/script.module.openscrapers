@@ -33,7 +33,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 35
 		self.language = ['en']
 		self.domains = ['seehd.pl']
 		self.base_link = 'http://www.seehd.pl'
@@ -86,7 +86,7 @@ class source:
 				url = '%s://%s/%s' % (http, host, url)
 				valid, host = source_utils.is_host_valid(url, hostDict)
 				if valid:
-					sources.append({'source': host, 'quality': '720p', 'language': 'en', 'url': url, 'direct': False,
+					sources.append({'source': host, 'quality': '720p', 'info': '', 'language': 'en', 'url': url, 'direct': False,
 					                'debridonly': False})
 			return sources
 		except Exception:

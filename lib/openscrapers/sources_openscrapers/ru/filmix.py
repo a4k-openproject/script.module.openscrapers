@@ -115,7 +115,7 @@ class source:
 										        x.get('season') == '0' and x.get('serieId') == abs_episode)][0]
 						urls = [(source_utils.label_to_quality(q), self.format_direct_link(link, q)) for q in
 						        self.get_qualitys(link)]
-						urls = [{'quality': x[0], 'url': x[1]} for x in urls if x[0] in ['SD', 'HD']]  # filter premium
+						urls = [{'quality': x[0], 'url': x[1]} for x in urls if x[0] in ['SD', '720p']]  # filter premium
 						for i in urls:
 							sources.append({'source': 'CDN', 'quality': i['quality'], 'info': title, 'language': 'ru',
 							                'url': i['url'], 'direct': True, 'debridonly': False})

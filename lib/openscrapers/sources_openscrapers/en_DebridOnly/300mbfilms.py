@@ -37,13 +37,12 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 29
 		self.language = ['en']
 		self.domains = ['300mbfilms.io', '300mbfilms.co']
 		self.base_link = 'https://www.300mbfilms.io'
 		self.search_link = '/?s=%s'
 		# self.search_link = '/search/%s/feed/rss2/'
-
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -75,7 +74,6 @@ class source:
 		except:
 			return
 
-
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
@@ -102,9 +100,7 @@ class source:
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 			r = client.request(url)
-
 			posts = client.parseDOM(r, 'h2')
 
 			urls = []
@@ -152,15 +148,12 @@ class source:
 			for item in urls:
 				if 'earn-money' in item[0]:
 					continue
-
 				if any(x in item[0] for x in ['.rar', '.zip', '.iso']):
 					continue
-
 				url = client.replaceHTMLCodes(item[0])
 				url = url.encode('utf-8')
 
 				valid, host = source_utils.is_host_valid(url, hostDict)
-
 				if not valid:
 					continue
 
@@ -178,7 +171,6 @@ class source:
 	def links(self, url):
 		urls = []
 		try:
-
 			if url is None:
 				return
 
@@ -186,6 +178,9 @@ class source:
 				r = client.request(url)
 				r = client.parseDOM(r, 'div', attrs={'class': 'entry'})
 				r = client.parseDOM(r, 'a', ret='href')
+
+				if 'money' not in str(r):
+					continue
 
 				r1 = [i for i in r if 'money' in i][0]
 				r = client.request(r1)
@@ -196,10 +191,8 @@ class source:
 					post = {'post_password': '300mbfilms', 'Submit': 'Submit'}
 					send_post = client.request(plink, post=post, output='cookie')
 					link = client.request(r1, cookie=send_post)
-
 				else:
 					link = client.request(r1)
-
 				if '<strong>Single' not in link:
 					continue
 

@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 2
 		self.language = ['en']
 		self.domains = ['torrentgalaxy.to']
 		self.base_link = 'https://torrentgalaxy.to'

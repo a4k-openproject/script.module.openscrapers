@@ -34,7 +34,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 35
 		self.language = ['en']
 		self.genre_filter = ['animation', 'anime']
 		self.domains = ['toonget.net']
@@ -93,7 +93,7 @@ class source:
 					info.append(fileType)
 					info = ' | '.join(info) if fileType else info[0]
 
-					sources.append({'source': 'Direct', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+					sources.append({'source': 'direct', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
 					                'direct': False, 'debridonly': False})
 			return sources
 		except:

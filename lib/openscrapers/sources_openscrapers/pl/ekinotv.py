@@ -147,7 +147,7 @@ class source:
 				lang_type = client.parseDOM(row, 'i ', ret='title')
 				q = 'SD'
 				if qual and 'Wysoka' in qual[0]:
-					q = 'HD'
+					q = '720p'
 				lang, info = self.get_lang_by_type(lang_type)
 				host = data.splitlines()[0].strip()
 				sources.append(

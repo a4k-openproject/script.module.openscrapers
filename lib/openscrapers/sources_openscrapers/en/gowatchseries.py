@@ -37,7 +37,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 33
 		self.language = ['en']
 		self.domains = ['gowatchseries.video', 'gowatchseries.tv', 'gowatchseries.co', 'gowatchseries.io']
 		self.base_link = 'https://www6.gowatchseries.video'
@@ -127,7 +127,7 @@ class source:
 							quality = source_utils.check_url(slink)
 							valid, hoster = source_utils.is_host_valid(slink, hostDict)
 							if valid:
-								sources.append({'source': hoster, 'quality': quality, 'language': 'en', 'url': slink,
+								sources.append({'source': hoster, 'quality': quality, 'info': '', 'language': 'en', 'url': slink,
 								                'direct': False, 'debridonly': False})
 					except:
 						pass

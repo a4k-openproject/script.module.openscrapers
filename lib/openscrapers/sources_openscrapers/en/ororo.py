@@ -35,7 +35,7 @@ from openscrapers.modules import control
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 35
 		self.language = ['en']
 		self.domains = ['ororo.tv']
 		self.base_link = 'https://ororo.tv'

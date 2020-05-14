@@ -36,7 +36,7 @@ from openscrapers.modules import dom_parser
 
 class source:
     def __init__(self):
-        self.priority = 0
+        self.priority = 31
         self.language = ['en']
         self.domains = ['watchseries.movie', 'watch-series.co']
         self.base_link = 'https://www5.watchseries.movie'
@@ -76,7 +76,7 @@ class source:
                 if not valid: continue
                 try:
                     url.decode('utf-8')
-                    sources.append({'source': hoster, 'quality': 'SD', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
+                    sources.append({'source': hoster, 'quality': 'SD', 'info': '', 'language': 'en', 'url': url, 'direct': False, 'debridonly': False})
                 except:
                     pass
             return sources

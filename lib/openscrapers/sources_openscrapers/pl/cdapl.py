@@ -175,7 +175,7 @@ class source:
 							{'source': host, 'quality': '1080p', 'language': lang, 'url': url + "?wersja=1080p",
 							 'info': info, 'direct': False, 'debridonly': False})
 					if "?wersja=720p" in result:
-						sources.append({'source': host, 'quality': 'HD', 'language': lang, 'url': url + "?wersja=720p",
+						sources.append({'source': host, 'quality': '720p', 'language': lang, 'url': url + "?wersja=720p",
 						                'info': info, 'direct': False, 'debridonly': False})
 					if "?wersja=480p" in result:
 						sources.append({'source': host, 'quality': 'SD', 'language': lang, 'url': url + "?wersja=480p",

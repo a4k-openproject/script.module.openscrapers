@@ -116,7 +116,7 @@ class source:
 				url = urllib.unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(sources):
 					continue
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile('btih:(.*?)&').findall(url)[0].lower()
 
 				name = client.parseDOM(post, 'a', ret='title')[1]
 				name = urllib.unquote_plus(name)

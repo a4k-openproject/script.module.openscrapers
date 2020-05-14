@@ -34,7 +34,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 35
 		self.language = ['en']
 		self.genre_filter = ['animation', 'anime']
 		self.domains = ['animetoon.org', 'animetoon.tv']
@@ -84,8 +84,7 @@ class source:
 				else:
 					match = re.compile('file: "(.+?)",').findall(r)
 				for url in match:
-					sources.append(
-						{'source': host, 'quality': quality, 'language': 'en', 'url': url, 'direct': False,
+					sources.append({'source': host, 'quality': quality, 'info': '', 'language': 'en', 'url': url, 'direct': False,
 						 'debridonly': False})
 		except:
 			return

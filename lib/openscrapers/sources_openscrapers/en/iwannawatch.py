@@ -33,7 +33,7 @@ from openscrapers.modules import source_utils
 
 class source:
     def __init__(self):
-        self.priority = 1
+        self.priority = 32
         self.language = ['en']
         self.domains = ['iwannawatch.is']
         self.base_link = 'https://www.iwannawatch.is'
@@ -77,7 +77,7 @@ class source:
                     link = 'https://' + link
                 valid, host = source_utils.is_host_valid(link, hostDict)
                 if valid and link not in str(sources):
-                    sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
+                    sources.append({'source': host, 'quality': quality, 'info': '', 'language': 'en', 'url': link, 'direct': False, 'debridonly': False})
             return sources
         except:
             return sources

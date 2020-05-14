@@ -86,7 +86,7 @@ class source:
 
 	def quality_fixer(self, quality):
 		if '1080p' in quality:
-			return 'HD'
+			return '720p'
 		elif '720p' in quality:
 			return 'SD'
 		else:

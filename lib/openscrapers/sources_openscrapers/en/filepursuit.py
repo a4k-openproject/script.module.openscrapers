@@ -38,7 +38,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 35
 		self.language = ['en']
 		self.base_link = 'https://filepursuit.p.rapidapi.com'
 		# 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
@@ -144,7 +144,7 @@ class source:
 
 				info = ' | '.join(info)
 
-				sources.append({'source': 'Direct', 'quality': quality, 'name': name, 'language': "en",
+				sources.append({'source': 'direct', 'quality': quality, 'name': name, 'language': "en",
 							'url': url, 'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
 			return sources
 		except:

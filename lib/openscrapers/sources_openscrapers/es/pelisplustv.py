@@ -104,7 +104,7 @@ class source:
 			links = client.parseDOM(links, 'a', ret='href')
 			for url in links:
 				lang, info = 'es', 'LAT'
-				qual = 'HD'
+				qual = '720p'
 				if not 'http' in url: continue
 				if 'elrey' in url: continue
 				valid, host = source_utils.is_host_valid(url, hostDict)

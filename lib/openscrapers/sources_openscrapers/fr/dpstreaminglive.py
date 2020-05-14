@@ -142,7 +142,7 @@ class source:
 				if '1080p' in quality2:
 					quality = '1080p'
 				elif '720p' in quality2 or 'bdrip' in quality2 or 'hdrip' in quality2:
-					quality = 'HD'
+					quality = '720p'
 				else:
 					quality = 'SD'
 				if 'dvdscr' in quality2 or 'r5' in quality2 or 'r6' in quality2:

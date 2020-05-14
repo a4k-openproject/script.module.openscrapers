@@ -39,7 +39,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 39
 		self.language = ['en']
 		self.domains = ['fmovies.ag']
 		# self.base_link = 'http://fmovies.sc' #reCaptcha

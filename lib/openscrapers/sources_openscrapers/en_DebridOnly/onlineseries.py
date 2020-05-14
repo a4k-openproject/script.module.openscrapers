@@ -40,7 +40,7 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 26
 		self.language = ['en']
 		self.domains = ['onlineseries.ucoz.com']
 		self.base_link = 'https://onlineseries.ucoz.com'

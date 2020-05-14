@@ -9,7 +9,7 @@ from openscrapers.modules import source_utils
 
 class source:
     def __init__(self):
-        self.priority = 1
+        self.priority = 31
         self.language = ['en']
         self.domains = ['zmovies.me']
         self.base_link = 'https://zmovies.me'

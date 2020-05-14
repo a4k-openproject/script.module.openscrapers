@@ -41,14 +41,14 @@ from openscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 29
 		self.language = ['en']
 		# self.domains = ['rmz.cr']
 		# self.base_link = 'http://rmz.cr/' # reCaptcha
 		self.domains = ['rapidmoviez.cr']
 		self.base_link = 'http://rapidmoviez.cr/' # cloudflare IUAM challenge 
 		self.search_link = 'search/%s/titles'
-		self.scraper = cfscrape.create_scraper()
+		self.scraper = cfscrape.create_scraper(delay=5)
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -73,7 +73,6 @@ class source:
 		try:
 			if url is None:
 				return
-
 			url = urlparse.parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -89,7 +88,6 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			headers = {'User-Agent': client.agent()}
 			r = self.scraper.get(url, headers=headers).content
-
 				# switch to client.parseDOM() to rid import
 			r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
 			r = dom_parser.parse_dom(r.content, 'li')
@@ -114,7 +112,7 @@ class source:
 				return self.sources
 
 			if debrid.status() is False:
-				raise Exception()
+				return self.sources
 
 			self.hostDict = hostDict + hostprDict
 
@@ -129,8 +127,12 @@ class source:
 			imdb = data['imdb']
 
 			url = self.search(title, hdlr)
+			if url is None:
+				return self.sources
 			headers = {'User-Agent': client.agent()}
 			r = self.scraper.get(url, headers=headers).content
+			if r is None:
+				return self.sources
 
 			if hdlr2 == '':
 				r = dom_parser.parse_dom(r, 'ul', {'id': 'releases'})[0]
@@ -207,6 +209,7 @@ class source:
 		except:
 			source_utils.scraper_error('RAPIDMOVIEZ')
 			pass
+
 
 	def resolve(self, url):
 		return url

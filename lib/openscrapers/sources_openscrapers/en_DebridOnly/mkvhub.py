@@ -32,13 +32,13 @@ import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import source_utils, log_utils
+from openscrapers.modules import source_utils
 from openscrapers.modules import workers
 
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 28
 		self.language = ['en']
 		self.domains = ['www.mkvhub.com']
 		self.base_link = 'https://www.mkvhub.com'
@@ -101,13 +101,16 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = self.scraper.get(url).content
-			posts = client.parseDOM(r, 'figure')
+			if '404 Not found' in r:
+				return self._sources
 
+			posts = client.parseDOM(r, 'figure')
 			items = []
 			for post in posts:
 				try:
 					url = client.parseDOM(post, 'a', ret='href')[0]
 					name = client.parseDOM(post, 'img', ret='title')[0].replace(' ', '.')
+
 					if source_utils.remove_lang(name):
 						continue
 					match = source_utils.check_title(title, name, hdlr, data['year'])
@@ -133,7 +136,8 @@ class source:
 		try:
 			urls = []
 			result = self.scraper.get(url).content
-
+			if 'dbuttn watch' not in result:
+				return
 			urls = [(client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn watch'})[0],
 						client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn blue'})[0],
 						client.parseDOM(result, 'a', ret='href', attrs={'class': 'dbuttn magnet'})[0])]

@@ -141,7 +141,7 @@ class source:
 					if self.contains_word(found_title, '1080p') or self.contains_word(found_title, 'FHD'):
 						q = '1080p'
 					elif self.contains_word(found_title, '720p'):
-						q = 'HD'
+						q = '720p'
 
 					link = client.parseDOM(el, 'a', attrs={'class': 'link'}, ret='href')[0]
 					transl_type = client.parseDOM(el, 'span', attrs={'class': 'version'})[0]
