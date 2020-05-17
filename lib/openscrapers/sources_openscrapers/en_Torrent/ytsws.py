@@ -38,7 +38,7 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['yts.ws']
+		self.domains = ['yts.ws', 'yts.mx', 'yts.pm']
 		self.base_link = 'https://yts.ws'
 		self.search_link = '/movie/%s'
 

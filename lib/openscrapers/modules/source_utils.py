@@ -25,8 +25,8 @@ import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
-from openscrapers.modules import log_utils
 from openscrapers.modules import directstream
+from openscrapers.modules import log_utils
 from openscrapers.modules import pyaes
 
 
@@ -247,6 +247,7 @@ def check_url(url):
 def check_title(title, name, hdlr, year):
 	try:
 		match = True
+		title = title.replace('!', '')
 		n = name.lower()
 		h = hdlr.lower()
 		t = n.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.us.', '.')

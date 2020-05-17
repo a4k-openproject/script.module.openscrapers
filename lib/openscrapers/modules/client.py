@@ -147,7 +147,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 								except:
 									data = None
 
-							# scraper = cfscrape.CloudflareScraper()
 							scraper = cfscrape.CloudScraper()
 							response = scraper.request(method='GET' if post is None else 'POST', url=url,
 							                           headers=headers, data=data, timeout=int(timeout))
@@ -398,8 +397,7 @@ def randomagent():
 
 
 def agent():
-	# return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'
-	return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
+	return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
 
 
 class cfcookie:

@@ -39,7 +39,7 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
-		self.domains = ['torrentgalaxy.to']
+		self.domains = ['torrentgalaxy.to', 'torrentgalaxy.pw']
 		self.base_link = 'https://torrentgalaxy.to'
 		self.search_link = '/torrents.php?search=%s&sort=size&order=desc'
 		self.min_seeders = 1

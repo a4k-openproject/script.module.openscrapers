@@ -29,10 +29,9 @@ import re
 import urllib
 import urlparse
 
-from openscrapers.modules import cfscrape # fails IUAM_challenge as of 5-12-20
+from openscrapers.modules import cfscrape # fails IUAM_challenge as of 5-17-20
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-# from openscrapers.modules import log_utils # temp to capture IUAM failure because cfscrape 1.2.34 no longer does
 from openscrapers.modules import source_utils
 
 
@@ -42,6 +41,7 @@ class source:
 		self.language = ['en']
 		self.domains = ['torrentz2.eu', 'torrentz2.is']
 		self.base_link = 'https://torrentz2.eu'
+		# self.base_link = 'https://torrentz2.is'
 		self.search_link = '/search?f=%s'
 		self.min_seeders = 1
 

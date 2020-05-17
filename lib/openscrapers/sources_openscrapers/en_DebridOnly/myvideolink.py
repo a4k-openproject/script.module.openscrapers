@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated 4-20-2020)
+# modified by Venom for Openscrapers (updated 5-16-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -39,7 +39,7 @@ class source:
 	def __init__(self):
 		self.priority = 22
 		self.language = ['en']
-		self.domains = ['kita.myvideolinks.net', 'myvideolinks.69.mu', 'nothingcan.undo.it']
+		self.domains = ['looka.myvideolinks.net', 'myvideolinks.69.mu', 'nothingcan.undo.it']
 		# self.base_link = 'http://kita.myvideolinks.net'
 		self.base_link = 'http://looka.myvideolinks.net'
 		self.search_link = '/?s=%s'
@@ -109,10 +109,11 @@ class source:
 			r = client.parseDOM(r, 'article')
 			r1 = client.parseDOM(r, 'h2')
 			r2 = client.parseDOM(r, 'div', attrs={'class': 'entry-excerpt'})
+
 			if 'tvshowtitle' in data: # fuckers removed file size for episodes
 				posts = zip(client.parseDOM(r1, 'a', ret='href'), client.parseDOM(r1, 'a'))
 			else:
-				posts = zip(client.parseDOM(r1, 'a', ret='href'), client.parseDOM(r1, 'a'), re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', r2[0]))
+				posts = zip(client.parseDOM(r1, 'a', ret='href'), client.parseDOM(r1, 'a'))
 
 			hostDict = hostprDict + hostDict
 
@@ -120,7 +121,6 @@ class source:
 			for post in posts:
 				try:
 					base_u = client.request(post[0], timeout='5')
-
 					if 'tvshowtitle' in data:
 						regex = '<b>(' + title + '.*)</b>'
 						lists = zip(re.findall(regex, base_u), re.findall('<ul>(.+?)</ul>', base_u, re.DOTALL))
@@ -130,17 +130,17 @@ class source:
 							s = 0
 							items += [(t, i, s) for i in u]
 					else:
-						u = re.findall('\'(http.+?)\'', base_u) + re.findall('\"(http.+?)\"', base_u)
+						list = client.parseDOM(base_u, 'div', attrs={'class': 'entry-content cf'})
+						u = client.parseDOM(list, 'ul')[0]
+						u = re.findall('\'(http.+?)\'', u) + re.findall('\"(http.+?)\"', u)
 						u = [i for i in u if '/embed/' not in i]
 						u = [i for i in u if 'youtube' not in i]
-
 						try:
 							t = post[1].encode('utf-8')
 						except:
 							t = post[1]
-						s = post[2]
+						s = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', list[0])[0]
 						items += [(t, i, s) for i in u]
-
 				except:
 					source_utils.scraper_error('MYVIDEOLINK')
 					pass
@@ -150,7 +150,6 @@ class source:
 					url = item[1]
 					url = client.replaceHTMLCodes(url)
 					url = url.encode('utf-8')
-
 					if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')):
 						continue
 
@@ -162,16 +161,15 @@ class source:
 					host = host.encode('utf-8')
 
 					name = item[0]
-
 					name = client.replaceHTMLCodes(name).replace(' ', '.')
-					match = source_utils.check_title(title, name, hdlr, data['year'])
+					match = source_utils.check_title(title.replace('!', ''), name, hdlr, data['year'])
 					if not match:
 						continue
 
 					quality, info = source_utils.get_release_quality(name, url)
 
 					try:
-						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+) (?:GB|GiB|MB|MiB))', item[2])[-1]
+						size = item[2]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:

@@ -43,12 +43,11 @@ class source:
 	def __init__(self):
 		self.priority = 29
 		self.language = ['en']
-		# self.domains = ['rmz.cr']
-		# self.base_link = 'http://rmz.cr/' # reCaptcha
-		self.domains = ['rapidmoviez.cr']
-		self.base_link = 'http://rapidmoviez.cr/' # cloudflare IUAM challenge 
-		self.search_link = 'search/%s/titles'
-		self.scraper = cfscrape.create_scraper(delay=5)
+		self.domains = ['rapidmoviez.cr', 'rmz.cr']
+		self.base_link = 'http://rmz.cr/'
+		self.search_link = 'search/%s'
+		# self.base_link = 'http://rapidmoviez.cr/' # cloudflare IUAM challenge failure
+		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -88,13 +87,13 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			headers = {'User-Agent': client.agent()}
 			r = self.scraper.get(url, headers=headers).content
+
 				# switch to client.parseDOM() to rid import
 			r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
 			r = dom_parser.parse_dom(r.content, 'li')
 			r = [(dom_parser.parse_dom(i, 'a', {'class': 'title'})) for i in r]
 			r = [(i[0].attrs['href'], i[0].content) for i in r]
 			r = [(urlparse.urljoin(self.base_link, i[0])) for i in r if cleantitle.get(title) in cleantitle.get(i[1]) and year in i[1]]
-
 			if r:
 				return r[0]
 			else:
@@ -165,7 +164,6 @@ class source:
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = self.scraper.get(url, headers=headers).content
-
 			name = client.replaceHTMLCodes(name)
 			if name.startswith('['):
 				name = name.split(']')[1]

@@ -27,7 +27,7 @@
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllHosters&amp;setting=true&amp;query=1.1)"
                  option="close"/>
         <setting type="sep"/>
-<!--         <setting id="provider.5movies" type="bool" label="$NUMBER[5]MOVIES" default="true"/> -->
+<!--         <setting id="provider.5movies" type="bool" label="$NUMBER[5]MOVIES" default="true"/> needs fixing -->
         <setting id="provider.123movies" type="bool" label="$NUMBER[123]MOVIES" default="true"/>
         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="false"/>
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="false"/>
@@ -43,17 +43,17 @@
         <setting id="provider.gomoviesonl" type="bool" label="GOMOVIESONL" default="true"/>
         <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true"/>
         <setting id="provider.hdmto" type="bool" label="HDMTO" default="false"/>
-<!--         <setting id="provider.hdpopcorneu" type="bool" label="HDPOPCORNEU" default="false"/> -->
+<!--         <setting id="provider.hdpopcorneu" type="bool" label="HDPOPCORNEU" default="false"/>"/> needs fixing -->
         <setting id="provider.iwaatch" type="bool" label="IWAATCH" default="true"/>
         <setting id="provider.iwannawatch" type="bool" label="IWANNAWATCH" default="true"/>
         <setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
-<!--         <setting id="provider.megashare9" type="bool" label="MEGASHARE$NUMBER[9]" default="false"/> -->
+<!--         <setting id="provider.megashare9" type="bool" label="MEGASHARE$NUMBER[9]" default="false"/>"/> needs fixing -->
         <setting id="provider.moviescouch" type="bool" label="MOVIESCOUCH" default="true"/>
         <setting id="provider.ororo" type="bool" label="ORORO" default="false"/>
         <setting id="provider.primewire" type="bool" label="PRIMEWIRE" default="true"/>
-<!--         <setting id="provider.projectfreetv" type="bool" label="PROJECTFREETV" default="true"/> -->
+<!--         <setting id="provider.projectfreetv" type="bool" label="PROJECTFREETV" default="true"/>"/> needs fixing -->
         <setting id="provider.putlockeronl" type="bool" label="PUTLOCKERONL" default="true"/>
-<!--         <setting id="provider.putlockersonline" type="bool" label="PUTLOCKERSONLINE" default="false"/> -->
+<!--         <setting id="provider.putlockersonline" type="bool" label="PUTLOCKERSONLINE" default="false"/>"/> needs fixing -->
         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/>
         <setting id="provider.series9" type="bool" label="SERIES9" default="true"/>
         <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/>
@@ -192,20 +192,19 @@
         <setting label="Enable All Debrid Providers" type="action" option="close"
                  action="RunPlugin(plugin://script.module.openscrapers/?action=toggleAllDebrid&amp;setting=true&amp;query=4.1)"/>
         <setting type="sep"/>
-        <setting id="provider.300mbfilms" type="bool" label="$NUMBER[300]MBFILMS" default="true"/>
+        <setting id="provider.300mbfilms" type="bool" label="$NUMBER[300]MBFILMS" default="false"/>
         <setting id="provider.ddlspot" type="bool" label="DDLSPOT" default="true"/>
         <setting id="provider.ganool" type="bool" label="GANOOL" default="true"/>
-        <setting id="provider.maxrls" type="bool" label="MAXRLS" default="true"/>
+        <setting id="provider.maxrls" type="bool" label="MAXRLS" default="false"/><!-- random server problems-->
         <setting id="provider.mkvhub" type="bool" label="MKVHUB" default="true"/>
         <setting id="provider.mvrls" type="bool" label="MVRLS" default="false"/>
-        <setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="false"/>
+        <setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="true"/>
         <setting id="provider.onceddl" type="bool" label="ONCEDDL" default="true"/>
         <setting id="provider.onlineseries" type="bool" label="ONLINESERIES" default="true"/>
         <setting id="provider.rapidmoviez" type="bool" label="RAPIDMOVIEZ" default="false"/>
         <setting id="provider.rlsbb" type="bool" label="RLSBB" default="true"/>
-<!--         <setting id="provider.sceneddl" type="bool" label="SCENEDDL" default="false"/> seems dead-->
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true"/>
-        <setting id="provider.tvdownload" type="bool" label="TVDOWNLOAD" default="false"/>
+        <setting id="provider.tvdownload" type="bool" label="TVDOWNLOAD" default="true"/>
     </category>
 
     <!-- Torrents-5 -->
@@ -222,7 +221,7 @@
         <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
         <setting id="provider.btscene" type="bool" label="BTSCENE" default="true"/>
         <setting id="provider.ettv" type="bool" label="ETTV" default="false"/>
-        <setting id="provider.extratorrent" type="bool" label="EXTRATORRENT" default="false"/>
+        <setting id="provider.extratorrent" type="bool" label="EXTRATORRENT" default="false"/><!-- slow as shit now-->
         <setting id="provider.eztv" type="bool" label="EZTV" default="true"/>
         <setting id="provider.glodls" type="bool" label="GLODLS" default="true"/>
         <setting id="provider.idope" type="bool" label="IDOPE" default="true"/>

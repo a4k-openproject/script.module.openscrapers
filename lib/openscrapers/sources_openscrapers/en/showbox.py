@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 # -Cleaned and Checked on 10-16-2019 by JewBMX in Scrubs.
+# modified by Venom for Openscrapers
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -127,7 +128,7 @@ class source:
 				url = self.searchMovie(title, data['year'], aliases, headers)
 			r = client.request(url, headers=headers, output='extended', timeout='10')
 			if not imdb in r[0]:
-				raise Exception()
+				return sources
 			cookie = r[4]; headers = r[3]; result = r[0]
 			try:
 				r = re.findall('(https:.*?redirector.*?)[\'\"]', result)

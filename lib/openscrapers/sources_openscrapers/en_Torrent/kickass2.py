@@ -40,11 +40,10 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
-		self.domains = ['kickasshydra.net', 'kickasstrusty.com', 'kickassindia.com',
-			'kickassmovies.net', 'torrentskickass.org', 'kickasstorrents.li', 'kkat.net',
-			'kickassdb.com', 'kickassaustralia.com', 'kickasspk.com', 'kkickass.com',
-			'kathydra.com', 'kickasst.org', 'kickasstorrents.id', 'kickasst.net', 'thekat.cc',
-			'thekat.ch', 'kickasstorrents.bz', 'kickass-kat.com', 'kickass-usa.com']
+		self.domains = ['thekat.app', 'kat.li', 'thekat.info', 'kickass.cm', 'kat.how', 'kickass.vc',
+								'kickass2.biz', 'kickass2.st', 'kickasshydra.net', 'kkickass.com',
+								'kathydra.com', 'kickasstorrents.id', 'kickasst.net', 'thekat.cc',
+								'thekat.ch', 'kickasstorrents.bz', 'kickass-kat.com']
 		self._base_link = None
 		self.search = '/usearch/{0}%20category:movies'
 		self.search2 = '/usearch/{0}%20category:tv'

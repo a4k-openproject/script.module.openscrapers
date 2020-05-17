@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (added cfscrape 4-20-2020)
+# created by Venom for Openscrapers (added cfscrape 4-20-2020)(updated 5-16-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -41,9 +41,13 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
-		self.domains = ['extratorrent.cm']
-		self.base_link = 'https://extratorrent.cm'
-		self.search_link = '/search/1/?search=%s&new=1&x=48&y=14'
+		self.domains = ['extratorrent.ag']
+		self.base_link = 'https://extratorrent.ag'
+# https://www.extratorrents-cc.com (junk-broken search)
+# https://extratorrents.ch (junk-broken search)
+# https://extratorrent.ag
+# https://extratorrent.to (junk-broken search)
+		self.search_link = '/search/?search=%s&new=1&x=53&y=11'
 		self.min_seeders = 1
 
 
@@ -105,8 +109,8 @@ class source:
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			urls.append(url)
-			urls.append(url.replace('/1/', '/2/'))
-			urls.append(url.replace('/1/', '/3/'))
+			# urls.append('%s%s' % (url, '&page=2')) till new site fully comes online sucker is to slow for 3 pages deep
+			# urls.append('%s%s' % (url, '&page=3'))
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			links = []
