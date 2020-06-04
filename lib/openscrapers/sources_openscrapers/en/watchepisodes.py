@@ -41,13 +41,16 @@ class source:
 		self.base_link = 'http://www.watchepisodes4.com/'
 		self.search_link = 'search/ajax_search?q=%s'
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
 			url = urllib.urlencode(url)
 			return url
-		except BaseException:
+		except:
+			source_utils.scraper_error('WATCHEPISODES')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -59,7 +62,8 @@ class source:
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
 			url = urllib.urlencode(url)
 			return url
-		except BaseException:
+		except:
+			source_utils.scraper_error('WATCHEPISODES')
 			return
 
 
@@ -86,13 +90,13 @@ class source:
 				tit = i['value']
 
 				if cleantitle.get(title) != cleantitle.get(tit):
-					raise Exception()
+					continue
 				slink = i['seo']
 				slink = urlparse.urljoin(self.base_link, slink)
 				r = client.request(slink)
 
 				if not data['imdb'] in r:
-					raise Exception()
+					continue
 
 				data = client.parseDOM(r, 'div', {'class': 'el-item\s*'})
 
@@ -110,11 +114,14 @@ class source:
 
 						sources.append({'source': host, 'quality': 'SD', 'info': '', 'language': 'en', 'url': url,
 						                'direct': False, 'debridonly': False})
-					except BaseException:
+					except:
+						source_utils.scraper_error('WATCHEPISODES')
 						return sources
 			return sources
-		except BaseException:
+		except:
+			source_utils.scraper_error('WATCHEPISODES')
 			return sources
+
 
 	def resolve(self, url):
 		return url

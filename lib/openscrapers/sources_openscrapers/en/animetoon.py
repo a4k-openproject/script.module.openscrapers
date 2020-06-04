@@ -41,6 +41,7 @@ class source:
 		self.base_link = 'http://www.animetoon.org'
 		self.scraper = cfscrape.create_scraper()
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			title = cleantitle.geturl(title)
@@ -48,14 +49,18 @@ class source:
 			url = self.base_link + '/' + url
 			return url
 		except:
+			source_utils.scraper_error('ANIMETOON')
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = cleantitle.geturl(tvshowtitle)
 			return url
 		except:
+			source_utils.scraper_error('ANIMETOON')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -67,7 +72,9 @@ class source:
 				url = self.base_link + '/' + url + '-season-' + season + '-episode-' + episode
 			return url
 		except:
+			source_utils.scraper_error('ANIMETOON')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
@@ -87,8 +94,10 @@ class source:
 					sources.append({'source': host, 'quality': quality, 'info': '', 'language': 'en', 'url': url, 'direct': False,
 						 'debridonly': False})
 		except:
+			source_utils.scraper_error('ANIMETOON')
 			return
 		return sources
+
 
 	def resolve(self, url):
 		return url

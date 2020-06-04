@@ -42,13 +42,16 @@ class source:
 		self.movie_link = '/movie/%s'
 		self.scraper = cfscrape.create_scraper()
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			movietitle = cleantitle.geturl(title)
 			url = self.base_link + self.movie_link % movietitle + '/watching.html'
 			return url
 		except:
+			source_utils.scraper_error('PUTLOCKERONL')
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
@@ -56,7 +59,9 @@ class source:
 			url = tvshowtitle
 			return url
 		except:
+			source_utils.scraper_error('PUTLOCKERONL')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -66,7 +71,9 @@ class source:
 			url = self.base_link + self.tv_link % (tvshowtitle, season, episode)
 			return url
 		except:
+			source_utils.scraper_error('PUTLOCKERONL')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -83,12 +90,13 @@ class source:
 					valid, host = source_utils.is_host_valid(host, hostDict)
 					if valid:
 						sources.append({'source': host, 'quality': 'SD', 'language': 'en', 'info': '', 'url': url, 'direct': False, 'debridonly': False})
-
 			except:
 				return
-		except Exception:
+		except:
+			source_utils.scraper_error('PUTLOCKERONL')
 			return
 		return sources
+
 
 	def resolve(self, url):
 		return url

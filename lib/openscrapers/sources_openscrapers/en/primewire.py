@@ -45,6 +45,7 @@ class source:
 		self.tvsearch_link = '?keywords=%s&type=tv'
 		self.search_link = '?search_keywords=%s'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			query = self.search_link % urllib.quote_plus(title)
@@ -61,8 +62,10 @@ class source:
 			url = client.replaceHTMLCodes(result)
 			url = url.encode('utf-8')
 			return url
-		except Exception:
+		except:
+			source_utils.scraper_error('PRIMEWIRE')
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
@@ -84,8 +87,10 @@ class source:
 			url = client.replaceHTMLCodes(result)
 			url = url.encode('utf-8')
 			return url
-		except Exception:
+		except:
+			source_utils.scraper_error('PRIMEWIRE')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -99,8 +104,10 @@ class source:
 			url = client.replaceHTMLCodes(url)
 			url = url.encode('utf-8')
 			return url
-		except BaseException:
+		except:
+			source_utils.scraper_error('PRIMEWIRE')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
@@ -133,7 +140,7 @@ class source:
 					host = data[1]
 					valid, host = source_utils.is_host_valid(host, hostDict)
 					if not valid:
-						raise Exception()
+						continue
 
 					quality = client.parseDOM(i, 'span', ret='class')[0]
 					quality, info = source_utils.get_release_quality(
@@ -146,23 +153,23 @@ class source:
 					                'url': url,
 					                'direct': False,
 					                'debridonly': False})
-				except BaseException:
+				except:
+					source_utils.scraper_error('PRIMEWIRE')
 					pass
 
 			return sources
-		except Exception:
+		except:
+			source_utils.scraper_error('PRIMEWIRE')
 			return sources
+
 
 	def resolve(self, url):
 		try:
-
 			if '/stream/' in url or '/watch/' in url:
-
 				r = client.request(url, referer=self.base_link)
 				link = client.parseDOM(r, 'a', ret='data-href', attrs={'id': 'iframe_play'})[0]
 			else:
 				try:
-
 					data = client.request(url, referer=self.base_link)
 					data = re.findall(r'\s*(eval.+?)\s*</script', data, re.DOTALL)[0]
 					link = jsunpack.unpack(data)
@@ -179,14 +186,15 @@ class source:
 						link = 'https://openload.co/embed/{0}'.format(loc)
 					else:
 						link = re.findall('''loc\s*=\s*['"](.+?)['"]\;''', re.DOTALL)[0]
-				except BaseException:
+				except:
+					source_utils.scraper_error('PRIMEWIRE')
 					link = client.request(url, output='geturl', timeout=10)
 					print link
 					if link == url:
 						return
 					else:
 						return link
-
 			return link
-		except Exception:
+		except:
+			source_utils.scraper_error('PRIMEWIRE')
 			return

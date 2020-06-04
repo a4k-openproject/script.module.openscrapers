@@ -131,7 +131,9 @@ class source:
 			for post in posts:
 				try:
 					# size = re.findall('>\nSize: (.+?)<', post, re.DOTALL)
+					# size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)
 					# log_utils.log('size = %s' % size, log_utils.LOGDEBUG)
+
 					u = client.parseDOM(post, 'a', ret='href')
 
 					for i in u:

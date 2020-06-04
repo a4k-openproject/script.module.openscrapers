@@ -29,7 +29,6 @@ import re
 import urllib
 import urlparse
 
-
 from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -43,10 +42,6 @@ class source:
 		self.language = ['en']
 		self.domains = ['extratorrent.ag']
 		self.base_link = 'https://extratorrent.ag'
-# https://www.extratorrents-cc.com (junk-broken search)
-# https://extratorrents.ch (junk-broken search)
-# https://extratorrent.ag
-# https://extratorrent.to (junk-broken search)
 		self.search_link = '/search/?search=%s&new=1&x=53&y=11'
 		self.min_seeders = 1
 
@@ -57,6 +52,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('EXTRATORRENT')
 			return
 
 
@@ -66,6 +62,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('EXTRATORRENT')
 			return
 
 
@@ -79,13 +76,14 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('EXTRATORRENT')
 			return
 
 
 	def sources(self, url, hostDict, hostprDict):
 		self.sources = []
 		try:
-			scraper = cfscrape.create_scraper(delay=5)
+			scraper = cfscrape.create_scraper()
 
 			if url is None:
 				return self.sources
@@ -109,14 +107,17 @@ class source:
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			urls.append(url)
-			# urls.append('%s%s' % (url, '&page=2')) till new site fully comes online sucker is to slow for 3 pages deep
+			# urls.append('%s%s' % (url, '&page=2')) # next page seems broken right now
 			# urls.append('%s%s' % (url, '&page=3'))
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			links = []
 			for x in urls:
 				r = scraper.get(x).content
-				list = client.parseDOM(r, 'tr', attrs={'class': 'tlz'})
+				if not r:
+					continue
+				list = client.parseDOM(r, 'tr', attrs={'class': 'tlr'})
+				list += client.parseDOM(r, 'tr', attrs={'class': 'tlz'})
 				for item in list:
 					links.append(item)
 
@@ -167,6 +168,7 @@ class source:
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except:
+				source_utils.scraper_error('EXTRATORRENT')
 				dsize = 0
 				pass
 

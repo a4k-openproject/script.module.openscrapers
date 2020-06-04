@@ -51,6 +51,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('FILEPURSUIT')
 			return
 
 
@@ -59,7 +60,8 @@ class source:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
 			url = urllib.urlencode(url)
 			return url
-		except BaseException:
+		except:
+			source_utils.scraper_error('FILEPURSUIT')
 			return
 
 
@@ -72,7 +74,8 @@ class source:
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
 			url = urllib.urlencode(url)
 			return url
-		except BaseException:
+		except:
+			source_utils.scraper_error('FILEPURSUIT')
 			return
 
 
@@ -105,7 +108,6 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url, headers=headers)
-			# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
 			r = json.loads(r)
 
 			if 'not_found' in r['status']:

@@ -28,6 +28,7 @@ import re
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
+from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
@@ -37,11 +38,14 @@ class source:
 		self.base_link = 'http://www.bnwmovies.com'
 		self.search_link = '/?s=%s'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			scrape = title.lower().replace(' ', '+').replace(':', '')
 			start_url = self.base_link + self.search_link % scrape
 			html = client.request(start_url, timeout='5')
+			if not html:
+				return
 			results = re.compile('href="(.+?)"', re.DOTALL).findall(html)
 			for url in results:
 				if self.base_link in url:
@@ -55,7 +59,9 @@ class source:
 								return url
 			return
 		except:
+			source_utils.scraper_error('BNWMOVIES')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -69,7 +75,9 @@ class source:
 				                'debridonly': False})
 			return sources
 		except:
+			source_utils.scraper_error('BNWMOVIES')
 			return sources
+
 
 	def resolve(self, url):
 		return url

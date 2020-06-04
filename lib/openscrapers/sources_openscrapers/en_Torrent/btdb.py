@@ -32,7 +32,7 @@ import urlparse
 from openscrapers.modules import cfscrape
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import source_utils
+from openscrapers.modules import source_utils, log_utils
 from openscrapers.modules import workers
 
 
@@ -105,7 +105,7 @@ class source:
 			url = urlparse.urljoin(self.base_link, url)
 			urls.append(url)
 			urls.append(url + '&page=2')
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls, __name__, log_utils.LOGDEBUG)
 
 			threads = []
 			for url in urls:
@@ -123,6 +123,8 @@ class source:
 		try:
 			scraper = cfscrape.create_scraper()
 			r = scraper.get(url).content
+			if not r:
+				return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 
 			for post in posts:

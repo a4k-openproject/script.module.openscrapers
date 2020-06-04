@@ -77,12 +77,10 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
+		sources = []
 		try:
-			sources = []
-
 			if url is None:
 				return sources
-
 			if debrid.status() is False:
 				return sources
 
@@ -111,8 +109,8 @@ class source:
 
 			try:
 				next_page = [i for i in results if 'Next Page' in i]
-				if next_page == []:
-					raise Exception()
+				if not next_page:
+					return sources
 
 				page = client.parseDOM(next_page, 'a', ret='href', attrs={'title': 'Downloads | Page 2'})[0]
 

@@ -48,6 +48,7 @@ class source:
 			url = self.base_link + self.movie_link % title
 			return url
 		except:
+			source_utils.scraper_error('YESMOVIESGG')
 			return
 
 
@@ -56,6 +57,7 @@ class source:
 			url = cleantitle.geturl(tvshowtitle).replace('--', '-')
 			return url
 		except:
+			source_utils.scraper_error('YESMOVIESGG')
 			return
 
 
@@ -67,6 +69,7 @@ class source:
 			url = self.base_link + self.tvshow_link % (tvshowtitle, season, episode)
 			return url
 		except:
+			source_utils.scraper_error('YESMOVIESGG')
 			return
 
 
@@ -97,6 +100,7 @@ class source:
 						                'direct': False, 'debridonly': False})
 			return sources
 		except:
+			source_utils.scraper_error('YESMOVIESGG')
 			return sources
 
 

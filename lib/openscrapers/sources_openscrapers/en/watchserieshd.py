@@ -26,7 +26,6 @@
 '''
 
 import re
-
 import requests
 
 from openscrapers.modules import cleantitle
@@ -49,7 +48,9 @@ class source:
 			url = cleantitle.geturl(tvshowtitle)
 			return url
 		except:
+			source_utils.scraper_error('WATCHSERIESHD')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -59,7 +60,9 @@ class source:
 			url = self.base_link + self.search_link % (tvshowtitle, season, episode)
 			return url
 		except:
+			source_utils.scraper_error('WATCHSERIESHD')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -90,7 +93,9 @@ class source:
 						                'direct': False, 'debridonly': False})
 			return sources
 		except:
+			source_utils.scraper_error('WATCHSERIESHD')
 			return sources
+
 
 	def resolve(self, url):
 		if "google" in url:

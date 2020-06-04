@@ -30,7 +30,7 @@ from openscrapers.modules import log_utils
 from openscrapers.modules import pyaes
 
 
-RES_4K = ['4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra-hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
+RES_4K = ['.4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra-hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
           '1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
           '3112i', 'hd3112', '3112hd', '2880p', '2880i', 'hd2880', '2880hd']
 RES_1080 = ['1080', '1080p', '1080i', 'hd1080', '1080hd', '1200p', '1200i', 'hd1200', '1200hd']
@@ -70,8 +70,8 @@ MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng'
 LANG = ['arabic', 'bgaudio', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
               'russian', 'spanish', 'truefrech', 'truespanish', 'turkish', 'hebrew']
 
-UNDESIREABLES = ['alexfilm', 'baibako', 'coldfilm', 'eniahd', 'extras.only', 'gears media', 'jaskier', 'hamsterstudio',
-              'ideafilm', 'kerob', 'lakefilm', 'lostfilm', 'newstudio', 'profix media', 'sample', 'soundtrack', 'teaser', 'vostfr']
+UNDESIREABLES = ['alexfilm', 'baibako', 'bonus.disc', 'coldfilm', 'eniahd', 'extras.only', 'gears media', 'jaskier', 'hamsterstudio',
+              'ideafilm', 'kerob', 'lakefilm', 'lostfilm', 'newstudio', 'profix media', 'sample', 'soundtrack', 'subtitle.only', 'teaser', 'vostfr']
 
 DUBBED = ['dublado', 'dubbed']
 SUBS = ['subs', 'subtitula', 'subfrench', 'subspanish', 'swesub']
@@ -348,6 +348,7 @@ def _size(siz):
 def get_size(url): # not called
 	try:
 		size = client.request(url, output='file_size')
+		# size = client.request(url, output='chunk')
 		if size == '0':
 			size = False
 		float_size, str_size = convert_size(size)
@@ -447,9 +448,11 @@ def remove_lang(name):
 		return True
 	elif any(value in name for value in UNDESIREABLES):
 		return True
+	elif name.endswith('.srt') and not any(value in name for value in ['with.srt', '.avi', '.mkv', '.mp4']):
+		return True
 	elif any(value in name for value in DUBBED):
 		return True
-	elif 'rus' in name and 'eng' not in name.lower():
+	elif 'rus' in name and 'eng' not in name:
 		return True
 	else:
 		return False

@@ -49,6 +49,7 @@ class source:
 			url = self.base_link + self.movie_link % (title)
 			return url
 		except:
+			source_utils.scraper_error('SEEHD')
 			return
 
 
@@ -57,6 +58,7 @@ class source:
 			url = cleantitle.geturl(tvshowtitle)
 			return url
 		except:
+			source_utils.scraper_error('SEEHD')
 			return
 
 
@@ -71,6 +73,7 @@ class source:
 			url = self.base_link + self.episode_link % (title, se)
 			return url
 		except:
+			source_utils.scraper_error('SEEHD')
 			return
 
 
@@ -90,7 +93,9 @@ class source:
 					                'debridonly': False})
 			return sources
 		except Exception:
+			source_utils.scraper_error('SEEHD')
 			return sources
+
 
 	def resolve(self, url):
 		return url

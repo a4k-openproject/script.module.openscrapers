@@ -23,14 +23,15 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
+import json
 import urllib
 import urlparse
-import json
+
 
 from openscrapers.modules import control
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
+
 
 class source:
 	def __init__(self):
@@ -38,29 +39,35 @@ class source:
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = []
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			return urllib.urlencode({'imdb': imdb, 'title': title, 'localtitle': localtitle,'year': year})
 		except:
+			source_utils.scraper_error('library')
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			return urllib.urlencode({'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'year': year})
 		except:
+			source_utils.scraper_error('library')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
 			if url is None:
 				return
-
 			url = urlparse.parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url.update({'premiered': premiered, 'season': season, 'episode': episode})
 			return urllib.urlencode(url)
 		except:
+			source_utils.scraper_error('library')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
@@ -114,8 +121,11 @@ class source:
 
 			url = r['file'].encode('utf-8')
 
-			try: quality = int(r['streamdetails']['video'][0]['width'])
-			except: quality = -1
+			try:
+				quality = int(r['streamdetails']['video'][0]['width'])
+			except:
+				source_utils.scraper_error('library')
+				quality = -1
 
 			if quality > 1920: quality = '4K'
 			if quality >= 1920: quality = '1080p'
@@ -123,13 +133,13 @@ class source:
 			if quality < 1280: quality = 'SD'
 
 			info = []
-
 			try:
 				f = control.openFile(url) ; s = f.size() ; f.close()
 				dsize = float(s)/1024/1024/1024
 				isize = '%.2f GB' % dsize
 				info.insert(0, isize)
 			except:
+				source_utils.scraper_error('library')
 				dsize = 0
 				pass
 
@@ -137,14 +147,18 @@ class source:
 				c = r['streamdetails']['video'][0]['codec']
 				if c == 'avc1': c = 'h264'
 				info.append(c)
-			except: pass
+			except:
+				source_utils.scraper_error('library')
+				pass
 
 			try:
 				ac = r['streamdetails']['audio'][0]['codec']
 				if ac == 'dca': ac = 'dts'
 				if ac == 'dtshd_ma': ac = 'dts-hd ma'
 				info.append(ac)
-			except: pass
+			except:
+				source_utils.scraper_error('library')
+				pass
 
 			try:
 				ach = r['streamdetails']['audio'][0]['channels']
@@ -153,18 +167,20 @@ class source:
 				if ach == 6: ach = '5.1'
 				if ach == 8: ach = '7.1'
 				info.append(ach)
-			except: pass
-			
+			except:
+				source_utils.scraper_error('library')
+				pass
+
 			info = ' | '.join(info)
 			info = info.encode('utf-8')
 
 			sources.append({'source': '0', 'quality': quality, 'language': 'en', 'url': url,
 							'info': info, 'local': True, 'direct': True, 'debridonly': False, 'size': dsize})
-
 			return sources
 		except:
 			source_utils.scraper_error('library')
 			return sources
+
 
 	def resolve(self, url):
 		return url

@@ -70,15 +70,15 @@ class source:
 			title = data['title']
 			year = data['year']
 
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', title)
-
+			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\||!)', '', title)
 			url = self.search_link % urllib.quote_plus(query)
 			url = urlparse.urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 			try:
 				r = scraper.get(url).content
-				if r == str([]) or r == '':
+				if not r:
+					return sources
+				if any(value in str(r) for value in ['No movies found', 'something went wrong']):
 					return sources
 				r = json.loads(r)
 
@@ -87,14 +87,13 @@ class source:
 					if i['original_title'] == title and i['release_date'] == year:
 						id = i['id']
 						break
-
 				if id == '':
 					return sources
-				link = 'http://moviemagnet.co/movies/torrents?id=%s' % id
+				link = '%s%s%s' % (self.base_link, '/movies/torrents?id=', id)
+
 				result = scraper.get(link).content
 				if 'magnet' not in result:
 					return sources
-
 				result = re.sub(r'\n', '', result)
 				links = re.findall(r'<tr>.*?<a title="Download:\s*(.+?)"href="(magnet:.+?)">.*?title="File Size">\s*(.+?)\s*</td>.*?title="Seeds">([0-9]+|[0-9]+,[0-9]+)\s*<', result)
 
@@ -104,8 +103,7 @@ class source:
 					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if source_utils.remove_lang(name):
 						continue
-
-					match = source_utils.check_title(title, name, year, year)
+					match = source_utils.check_title(title.replace('&', 'and'), name, year, year)
 					if not match:
 						continue
 

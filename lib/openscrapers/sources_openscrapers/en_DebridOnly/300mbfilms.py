@@ -44,12 +44,14 @@ class source:
 		self.search_link = '/?s=%s'
 		# self.search_link = '/search/%s/feed/rss2/'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('300MBFILMS')
 			return
 
 
@@ -59,6 +61,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('300MBFILMS')
 			return
 
 
@@ -72,6 +75,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('300MBFILMS')
 			return
 
 
@@ -125,6 +129,7 @@ class source:
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
+						source_utils.scraper_error('300MBFILMS')
 						dsize = 0
 						pass
 

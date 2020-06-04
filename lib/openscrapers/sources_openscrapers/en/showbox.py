@@ -46,12 +46,6 @@ class source:
 		self.domains = ['showbox.space']
 		self.base_link = 'https://ww2.showbox.space'
 
-# https://showbox.space/movie/porkys
-# https://popcorntime.watch/movie/porkys
-# https://putlockers.app/movie/porkys
-# https://gomovies.trade/movie/porkys
-# https://fmovies.press/movie/porkys
-# https://gostream.mobi/movie/porkys
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
@@ -60,7 +54,9 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('SHOWBOX')
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
@@ -69,7 +65,9 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('SHOWBOX')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -81,7 +79,9 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
+			source_utils.scraper_error('SHOWBOX')
 			return
+
 
 	def searchShow(self, title, season, episode, aliases, headers):
 		try:
@@ -92,7 +92,9 @@ class source:
 					break
 			return url
 		except:
+			source_utils.scraper_error('SHOWBOX')
 			return
+
 
 	def searchMovie(self, title, year, aliases, headers):
 		try:
@@ -109,7 +111,9 @@ class source:
 						break
 			return url
 		except:
+			source_utils.scraper_error('SHOWBOX')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -127,6 +131,8 @@ class source:
 			else:
 				url = self.searchMovie(title, data['year'], aliases, headers)
 			r = client.request(url, headers=headers, output='extended', timeout='10')
+			if not r:
+				return sources
 			if not imdb in r[0]:
 				return sources
 			cookie = r[4]; headers = r[3]; result = r[0]
@@ -140,6 +146,7 @@ class source:
 			try:
 				auth = re.findall('__utmx=(.+)', cookie)[0].split(';')[0]
 			except:
+				source_utils.scraper_error('SHOWBOX')
 				auth = 'false'
 			auth = 'Bearer %s' % urllib.unquote_plus(auth)
 			headers['Authorization'] = auth
@@ -179,6 +186,7 @@ class source:
 		except:
 			source_utils.scraper_error('SHOWBOX')
 			return sources
+
 
 	def resolve(self, url):
 		try:

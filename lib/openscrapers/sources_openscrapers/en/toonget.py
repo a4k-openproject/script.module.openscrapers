@@ -40,6 +40,7 @@ class source:
 		self.domains = ['toonget.net']
 		self.base_link = 'https://toonget.net'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			title = cleantitle.geturl(title)
@@ -47,14 +48,18 @@ class source:
 			url = self.base_link + '/' + url
 			return url
 		except:
+			source_utils.scraper_error('TOONGET')
 			return
+
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = cleantitle.geturl(tvshowtitle)
 			return url
 		except:
+			source_utils.scraper_error('TOONGET')
 			return
+
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -66,7 +71,9 @@ class source:
 				url = self.base_link + '/' + url + '-season-' + season + '-episode-' + episode
 			return url
 		except:
+			source_utils.scraper_error('TOONGET')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
@@ -97,6 +104,7 @@ class source:
 					                'direct': False, 'debridonly': False})
 			return sources
 		except:
+			source_utils.scraper_error('TOONGET')
 			return sources
 
 

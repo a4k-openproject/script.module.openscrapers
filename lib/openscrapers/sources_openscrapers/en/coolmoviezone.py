@@ -39,19 +39,24 @@ class source:
 		self.domains = ['coolmoviezone.digital']
 		self.base_link = 'https://coolmoviezone.digital'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			mtitle = cleantitle.geturl(title)
 			url = self.base_link + '/%s-%s' % (mtitle, year)
 			return url
 		except:
+			source_utils.scraper_error('COOLMOVIEZONE')
 			return
+
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
 			hostDict = hostprDict + hostDict
 			r = client.request(url)
+			if not r:
+				return sources
 			match = re.compile('<td align="center"><strong><a href="(.+?)"').findall(r)
 			# log_utils.log('match = %s' % match, log_utils.LOGDEBUG)
 
@@ -65,6 +70,7 @@ class source:
 		except:
 			source_utils.scraper_error('COOLMOVIEZONE')
 			return sources
+
 
 	def resolve(self, url):
 		return url

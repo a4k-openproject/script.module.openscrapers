@@ -39,6 +39,7 @@ class source:
 		self.base_link = 'https://hdm.to'
 		self.search_link = '/search/%s+%s'
 
+
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			t = cleantitle.geturl(title).replace('-', '+').replace('++', '+')
@@ -53,10 +54,12 @@ class source:
 						continue
 					return url
 		except:
+			source_utils.scraper_error('HDMTO')
 			return
 
+
 	def sources(self, url, hostDict, hostprDict):
-		# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+		# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 		sources = []
 		try:
 			hostDict = hostDict + hostprDict
@@ -65,19 +68,44 @@ class source:
 				return sources
 
 			t = client.request(url)
+
+#site has magnets also
+			# t = re.sub(r'\n|\t', '', t)
+			# torrents = re.compile(r'Torrent:\s*(.*)</span><div').findall(t)[0]
+			# tor_list = re.findall(r'href="(.+?)">(.+?)</a', torrents)
+			# name = re.compile('<h2 class="movieTitle">(.+?)</h2>').findall(t)[0]
+			# name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
+
+			# for torrent, qual in tor_list:
+				# hash = torrent.split('download/')[1]
+				# url = 'magnet:%s' % hash
+				# url = 'magnet:?xt=urn:btih:%s&dn=Avengers.Endgame.%s' % (hash, qual)
+				# quality, info = source_utils.get_release_quality(name, url)
+
+				# if qual == '3D':
+					# quality = '1080p'
+				# dsize = 0
+
+				# info = ' | '.join(info)
+
+				# sources.append({'source': 'torrent', 'seeders': 1, 'hash': hash, 'name': name + '.' + quality, 'quality': quality,
+											# 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+
 			r = re.compile('<iframe.+?src="(.+?)"').findall(t)
 
 			for url in r:
 				url = url.replace(" ", "+")
+				if 'youtube' in url:
+					continue
 				url = url.split('//1o.to/')[1]
 				url = 'https://hls.1o.to/vod/%s/playlist.m3u8' % url
-				# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 				sources.append({'source': 'direct', 'quality': '720p', 'info': '', 'language': 'en', 'url': url, 'direct': True,
 				                'debridonly': False})
-
 			return sources
 		except:
+			source_utils.scraper_error('HDMTO')
 			return sources
+
 
 	def resolve(self, url):
 		return url

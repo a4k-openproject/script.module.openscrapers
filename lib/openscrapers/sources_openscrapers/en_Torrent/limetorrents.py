@@ -134,7 +134,8 @@ class source:
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = self.scraper.get(url,headers=headers).content
-
+			if not r:
+				return
 			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			posts = client.parseDOM(posts, 'tr')
 

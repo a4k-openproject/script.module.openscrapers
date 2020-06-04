@@ -39,7 +39,7 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['7torr.com']
+		self.domains = ['7torr.com'] # 7torrents.cc seems to be a magnetdl mirror but not 7torr.com
 		self.base_link = 'http://7torr.com'
 		self.search_link = '/search?q=%s'
 		self.min_seeders = 1
@@ -118,6 +118,8 @@ class source:
 	def _get_sources(self, url):
 		try:
 			r = client.request(url)
+			if r is None:
+				return self.sources
 			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
 			table = client.parseDOM(table, 'tbody')
 			rows = client.parseDOM(table, 'tr')

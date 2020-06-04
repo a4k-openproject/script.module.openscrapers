@@ -46,7 +46,8 @@ class source:
 			title = cleantitle.geturl(title)
 			url = urlparse.urljoin(self.base_link, (self.search_link % (title, year)))
 			return url
-		except Exception:
+		except:
+			source_utils.scraper_error('FILEXY')
 			return
 
 	def sources(self, url, hostDict, hostprDict):
@@ -73,7 +74,8 @@ class source:
 					                'debridonly': False})
 
 			return sources
-		except Exception:
+		except:
+			source_utils.scraper_error('FILEXY')
 			return sources
 
 	def resolve(self, url):

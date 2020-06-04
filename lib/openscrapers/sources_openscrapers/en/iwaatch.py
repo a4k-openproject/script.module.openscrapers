@@ -50,6 +50,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except BaseException:
+			source_utils.scraper_error('IWAATCH')
 			return
 
 

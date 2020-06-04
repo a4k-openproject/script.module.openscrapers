@@ -112,11 +112,11 @@ class source:
 				except:
 					source_utils.scraper_error('XWATCHSERIES')
 					pass
-
 			return sources
 		except:
 			source_utils.scraper_error('XWATCHSERIES')
 			return sources
+
 
 	def resolve(self, url):
 		return url

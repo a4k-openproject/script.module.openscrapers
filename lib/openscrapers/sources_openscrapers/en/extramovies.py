@@ -27,7 +27,6 @@
 
 import base64
 import re
-import traceback
 import urllib
 import urlparse
 
@@ -41,8 +40,7 @@ class source:
 	def __init__(self):
 		self.priority = 32
 		self.language = ['en']
-		self.domains = ['extramovies.casa', 'extramovies.wiki']
-		# self.base_link = 'http://extramovies.wiki'
+		self.domains = ['extramovies.casa']
 		self.base_link = 'http://extramovies.casa'
 		self.search_link = '/?s=%s'
 		self.scraper = cfscrape.create_scraper()
@@ -55,8 +53,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except Exception:
-			failure = traceback.format_exc()
-			log_utils.log('ExtraMovies - Exception: \n' + str(failure))
+			source_utils.scraper_error('EXTRAMOVIES')
 			return
 
 
@@ -67,8 +64,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except Exception:
-			failure = traceback.format_exc()
-			log_utils.log('ExtraMovies - Exception: \n' + str(failure))
+			source_utils.scraper_error('EXTRAMOVIES')
 			return
 
 
@@ -82,8 +78,7 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except Exception:
-			failure = traceback.format_exc()
-			log_utils.log('ExtraMovies - Exception: \n' + str(failure))
+			source_utils.scraper_error('EXTRAMOVIES')
 			return
 
 
@@ -130,17 +125,18 @@ class source:
 							if 'server=' not in link:
 								try:
 									link = base64.b64decode(link)
-								except Exception:
+								except:
+									source_utils.scraper_error('EXTRAMOVIES')
 									pass
 								valid, host = source_utils.is_host_valid(link, self.hostDict)
 								if valid:
 									sources.append({'source': host, 'quality': quality, 'language': 'en', 'info': info,
 									                'url': link, 'direct': False, 'debridonly': False})
 			return sources
-		except Exception:
-			failure = traceback.format_exc()
-			log_utils.log('ExtraMovies - Exception: \n' + str(failure))
+		except:
+			source_utils.scraper_error('EXTRAMOVIES')
 			return sources
+
 
 	def resolve(self, url):
 		return url

@@ -46,6 +46,7 @@ class source:
 			url = self.base_link + self.search_link % title
 			return url
 		except:
+			source_utils.scraper_error('CMOVIESHD')
 			return
 
 

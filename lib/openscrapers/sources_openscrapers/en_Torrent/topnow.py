@@ -41,6 +41,7 @@ class source:
 		self.domains = ['topnow.se']
 		self.base_link = 'http://topnow.se'
 		self.search_link = '/index.php?search=%s'
+		self.show_link = '/index.php?show=%s'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -91,46 +92,55 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ('(' + data['year'] + ')')
 
-			query = '%s %s' % (title, hdlr)
+			# query = '%s %s' % (title, hdlr)
+			query = title
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			url = self.search_link % urllib.quote_plus(query)
+			if 'tvshowtitle' in data:
+				url = self.show_link % query.replace(' ', '-')
+			else:
+				url = self.search_link % urllib.quote_plus(query)
+
 			url = urlparse.urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 
 			r = client.request(url)
+			if not r:
+				return sources
 			if 'No results were found' in r:
 				return sources
-			r = client.parseDOM(r, 'div', attrs={'class': 'card'})[0]
-			url = re.compile('href="(magnet.+?)\s*?"').findall(r)[0]
-			url = urllib.unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
-			url = url.split('&tr=')[0].replace(' ', '.')
-			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
-			name = url.split('&dn=')[1]
-			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-			if source_utils.remove_lang(name):
-				return sources
+			r = client.parseDOM(r, 'div', attrs={'class': 'card'})
+			for i in r:
+				url = re.compile('href="(magnet.+?)\s*?"').findall(i)[0]
+				url = urllib.unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
+				url = url.split('&tr=')[0].replace(' ', '.')
+				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
-			match = source_utils.check_title(title, name, hdlr.replace('(', '').replace(')', ''), data['year'])
-			if not match:
-				return sources
+				name = url.split('&dn=')[1]
+				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
+				if source_utils.remove_lang(name):
+					continue
 
-			seeders = 0 # seeders not available on topnow
-			quality, info = source_utils.get_release_quality(name, url)
+				match = source_utils.check_title(title, name, hdlr.replace('(', '').replace(')', ''), data['year'])
+				if not match:
+					continue
 
-			try:
-				size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', r)[-1] # file size is no longer available on topnow's new site
-				dsize, isize = source_utils._size(size)
-				info.insert(0, isize)
-			except:
-				dsize = 0
-				pass
+				seeders = 0 # seeders not available on topnow
+				quality, info = source_utils.get_release_quality(name, url)
 
-			info = ' | '.join(info)
+				try:
+					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', i)[-1] # file size is no longer available on topnow's new site
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except:
+					dsize = 0
+					pass
 
-			sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-									'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				info = ' | '.join(info)
+
+				sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 
 			return sources
 		except:
