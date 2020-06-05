@@ -2,8 +2,11 @@
 # --[getSum v1.4]--|--[From JewBMX]--
 # Lazy Module to make life a little easier.
 
-import HTMLParser
 import re
+try:
+    import HTMLParser
+except ImportError:
+    import html.parser as HTMLParser
 
 from openscrapers.modules import log_utils
 
@@ -180,7 +183,7 @@ def get_video(text):
 
 def replaceHTMLCodes(text):
 	text = re.sub("(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", text)
-	text = HTMLParser.HTMLParser().unescape(text)
+	text = HTMLParser().unescape(text)
 	text = text.replace("&quot;", "\"")
 	text = text.replace("&amp;", "&")
 	text = text.replace("%2B", "+")

@@ -21,7 +21,8 @@
 
 
 import json
-import urllib
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cache
 from openscrapers.modules import client
@@ -42,7 +43,7 @@ class tvMaze:
 		try:
 			# Encode the queries, if there is any...
 			if (query != None):
-				query = '?' + urllib.urlencode(query)
+				query = '?' + urlencode(query)
 			else:
 				query = ''
 			# Make the request

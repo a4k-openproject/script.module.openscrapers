@@ -22,8 +22,10 @@
 
 import json
 import re
-import urllib
-import urlparse
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import parse_qs, urlparse
+try: from urllib import quote_plus
+except ImportError: from urllib.parse import quote_plus
 
 from openscrapers.modules import cache
 from openscrapers.modules import cleandate
@@ -40,7 +42,7 @@ REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
 def __getTrakt(url, post=None):
 	try:
-		url = urlparse.urljoin(BASE_URL, url)
+		url = urljoin(BASE_URL, url)
 		post = json.dumps(post) if post else None
 		headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': 2}
 		if getTraktCredentialsInfo():
@@ -60,7 +62,7 @@ def __getTrakt(url, post=None):
 			return
 		if resp_code not in ['401', '405']:
 			return result, resp_header
-		oauth = urlparse.urljoin(BASE_URL, '/oauth/token')
+		oauth = urljoin(BASE_URL, '/oauth/token')
 		opost = {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'redirect_uri': REDIRECT_URI,
 		         'grant_type': 'refresh_token', 'refresh_token': control.setting('trakt.refresh')}
 		result = client.request(oauth, post=json.dumps(opost), headers=headers)
@@ -116,7 +118,7 @@ def getTraktAsJson(url, post=None):
 #         except: pass
 #         token, refresh = r['access_token'], r['refresh_token']
 #         headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': 2, 'Authorization': 'Bearer %s' % token}
-#         result = client.request(urlparse.urljoin(BASE_URL, '/users/me'), headers=headers)
+#         result = client.request(urljoin(BASE_URL, '/users/me'), headers=headers)
 #         result = utils.json_loads_as_str(result)
 #         user = result['username']
 #         control.setSetting(id='trakt.user', value=user)
@@ -450,7 +452,7 @@ def SearchAll(title, year, full=True):
 
 def SearchMovie(title, year, full=True):
 	try:
-		url = '/search/movie?query=%s' % urllib.quote_plus(title)
+		url = '/search/movie?query=%s' % quote_plus(title)
 		if year: url += '&year=%s' % year
 		if full: url += '&extended=full'
 		return getTraktAsJson(url)
@@ -460,7 +462,7 @@ def SearchMovie(title, year, full=True):
 
 def SearchTVShow(title, year, full=True):
 	try:
-		url = '/search/show?query=%s' % urllib.quote_plus(title)
+		url = '/search/show?query=%s' % quote_plus(title)
 		if year: url += '&year=%s' % year
 		if full: url += '&extended=full'
 		return getTraktAsJson(url)

@@ -19,8 +19,10 @@
 # Addon Name: OpenScrapers Module
 # Addon id: script.module.openscrapers
 
-import urllib
-import urlparse
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
@@ -30,7 +32,7 @@ from openscrapers.modules import utils
 
 def _getAniList(url):
 	try:
-		url = urlparse.urljoin('https://anilist.co', '/api%s' % url)
+		url = urljoin('https://anilist.co', '/api%s' % url)
 		return client.request(url, headers={'Authorization': '%s %s' % cache.get(_getToken, 1),
 		                                    'Content-Type': 'application/x-www-form-urlencoded'})
 	except:
@@ -38,7 +40,7 @@ def _getAniList(url):
 
 
 def _getToken():
-	result = urllib.urlencode({'grant_type': 'client_credentials', 'client_id': 'kodiexodus-7erse',
+	result = urlencode({'grant_type': 'client_credentials', 'client_id': 'kodiexodus-7erse',
 	                           'client_secret': 'XelwkDEccpHX2uO8NpqIjVf6zeg'})
 	result = client.request('https://anilist.co/api/auth/access_token', post=result,
 	                        headers={'Content-Type': 'application/x-www-form-urlencoded'}, error=True)
