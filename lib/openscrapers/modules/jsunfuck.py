@@ -23,7 +23,8 @@
 import re
 import string
 import sys
-import urllib
+try: from urllib import quote, unquote
+except ImportError: from urllib.parse import quote, unquote
 
 
 class JSUnfuck(object):
@@ -141,7 +142,7 @@ class JSUnfuck(object):
 			offset = self.js.find(key) + len(key)
 			if self.js[offset] == '(' and self.js[offset + 2] == ')':
 				c = self.js[offset + 1]
-				self.js = self.js.replace('%s(%s)' % (key, c), urllib.quote(c))
+				self.js = self.js.replace('%s(%s)' % (key, c), quote(c))
 
 			if start_js == self.js:
 				break
@@ -170,7 +171,7 @@ class JSUnfuck(object):
 				last_c = c
 
 			if not abort:
-				self.js = self.js.replace(key + extra, urllib.unquote(expr))
+				self.js = self.js.replace(key + extra, unquote(expr))
 
 				if start_js == self.js:
 					break

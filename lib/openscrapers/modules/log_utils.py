@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import cProfile
 import inspect
 import json
@@ -127,7 +130,7 @@ class Profiler(object):
 
 	def dump_stats(self):
 		if self._profiler is not None:
-			s = StringIO.StringIO()
+			s = StringIO()
 			params = (self.sort_by,) if isinstance(self.sort_by, basestring) else self.sort_by
 			ps = pstats.Stats(self._profiler, stream=s).sort_stats(*params)
 			ps.print_stats()

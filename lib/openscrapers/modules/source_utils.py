@@ -20,8 +20,8 @@
 import base64
 import hashlib
 import re
-import urllib
-import urlparse
+try: from urlparse import urlparse
+except ImportError: from urllib.parse import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -314,7 +314,7 @@ def is_host_valid(url, domains):
 
 
 def __top_domain(url):
-	elements = urlparse.urlparse(url)
+	elements = urlparse(url)
 	domain = elements.netloc or elements.path
 	domain = domain.split('@')[-1].split(':')[0]
 	regex = "(?:www\.)?([\w\-]*\.[\w\-]{2,3}(?:\.[\w\-]{2,3})?)$"
