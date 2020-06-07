@@ -42,7 +42,7 @@ class source:
 		self.domain = ['torlock.com', 'torlock.unblockit.pro', 'torlock.cc']
 		self.base_link = 'https://torlock.com'
 		self.search_link = '/all/torrents/%s.html?'
-		self.min_seeders = 1
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):

@@ -43,7 +43,7 @@ class source:
 		self.domains = ['magnet4you.me']
 		self.base_link = 'http://magnet4you.me'
 		self.search_link = '/search.php?s=%s'
-		self.min_seeders = 1
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -103,6 +103,8 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
+			if not r:
+				return self.sources
 			rows = client.parseDOM(r, 'div', attrs={'id': 'profile1'})
 
 			threads = []

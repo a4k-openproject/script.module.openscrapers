@@ -42,7 +42,7 @@ class source:
 		self.domains = ['torrentgalaxy.to', 'torrentgalaxy.pw']
 		self.base_link = 'https://torrentgalaxy.to'
 		self.search_link = '/torrents.php?search=%s&sort=size&order=desc'
-		self.min_seeders = 1
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):

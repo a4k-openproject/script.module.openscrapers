@@ -43,7 +43,7 @@ class source:
 		self.search_link = '/search?q=%s'
 		# bitlords api-possible future switch
 		# self.search_link = '/get_list'
-		self.min_seeders = 1
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
