@@ -44,7 +44,7 @@ class source:
 		self.base_link = 'https://www.limetorrents.info'
 		self.tvsearch = 'https://www.limetorrents.info/search/tv/{0}/1/'
 		self.moviesearch = 'https://www.limetorrents.info/search/movies/{0}/1/'
-		self.min_seeders = 0
+		self.min_seeders = 1
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):

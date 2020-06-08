@@ -49,7 +49,6 @@ class source:
 		self.search2 = '/usearch/{0}%20category:tv'
 		self.min_seeders = 1
 
-
 	@property
 	def base_link(self):
 		if not self._base_link:
