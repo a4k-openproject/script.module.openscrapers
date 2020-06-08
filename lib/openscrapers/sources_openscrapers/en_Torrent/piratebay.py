@@ -43,7 +43,7 @@ class source:
 								'piratebay1.xyz', 'thepiratebay1.top', 'piratebay1.info', 'tpb.party']
 		self._base_link = None
 		self.search_link = '/search/%s/0/5/200'
-		self.min_seeders = 1
+		self.min_seeders = 0
 
 
 	@property
