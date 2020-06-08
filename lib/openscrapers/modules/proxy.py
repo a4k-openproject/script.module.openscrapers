@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-    OpenScrapers Module
+	OpenScrapers Module
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 # Addon Name: OpenScrapers Module
@@ -32,11 +32,11 @@ from openscrapers.modules import utils
 
 
 def request(url, check, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False,
-            XHR=False, limit=None, referer=None, cookie=None, compression=True, output='', timeout='30'):
+			XHR=False, limit=None, referer=None, cookie=None, compression=True, output='', timeout='30'):
 	try:
 		r = client.request(url, close=close, redirect=redirect, proxy=proxy, post=post, headers=headers, mobile=mobile,
-		                   XHR=XHR, limit=limit, referer=referer, cookie=cookie, compression=compression, output=output,
-		                   timeout=timeout)
+						   XHR=XHR, limit=limit, referer=referer, cookie=cookie, compression=compression, output=output,
+						   timeout=timeout)
 		if r is not None and error is not False: return r
 		if check in str(r) or str(r) == '': return r
 		proxies = sorted(get(), key=lambda x: random.random())
@@ -50,8 +50,8 @@ def request(url, check, close=True, redirect=True, error=False, proxy=None, post
 					post = urlencode(post)
 				p += quote_plus('?%s' % post)
 			r = client.request(p, close=close, redirect=redirect, proxy=proxy, headers=headers, mobile=mobile, XHR=XHR,
-			                   limit=limit, referer=referer, cookie=cookie, compression=compression, output=output,
-			                   timeout='20')
+							   limit=limit, referer=referer, cookie=cookie, compression=compression, output=output,
+							   timeout='20')
 			if check in str(r) or str(r) == '': return r
 	except:
 		pass

@@ -26,22 +26,12 @@
 '''
 
 import re
-
 import requests
 
 try:
-	import urlparse
-except:
-	import urllib.parse as urlparse
-try:
-	import HTMLParser
 	from HTMLParser import HTMLParser
 except:
 	from html.parser import HTMLParser
-try:
-	import urllib2
-except:
-	import urllib.request as urllib2
 
 from openscrapers.modules import source_utils
 from openscrapers.modules import client

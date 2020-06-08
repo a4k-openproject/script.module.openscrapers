@@ -8,27 +8,27 @@ import sys
 import time
 
 try:
-    import HTMLParser
+	from HTMLParser import HTMLParser
 except ImportError:
-    import html.parser as HTMLParser
+	from html.parser import HTMLParser
 try:
-    from StringIO import StringIO
+	from StringIO import StringIO
 except ImportError:
-    from io import StringIO
+	from io import StringIO
 try:
-    import cookielib
+	import cookielib
 except ImportError:
-    import http.cookiejar as cookielib
+	import http.cookiejar as cookielib
 try:
-    from urllib2 import HTTPErrorProcessor, ProxyHandler, Request, build_opener, install_opener, HTTPSHandler, \
-                        HTTPCookieProcessor, HTTPHandler, urlopen
+	from urllib2 import HTTPErrorProcessor, ProxyHandler, Request, build_opener, install_opener, HTTPSHandler, \
+						HTTPCookieProcessor, HTTPHandler, urlopen
 except ImportError:
-    from urllib.request import HTTPErrorProcessor, ProxyHandler, Request, build_opener, install_opener, HTTPSHandler, \
-                        HTTPCookieProcessor, HTTPHandler, urlopen
+	from urllib.request import HTTPErrorProcessor, ProxyHandler, Request, build_opener, install_opener, HTTPSHandler, \
+						HTTPCookieProcessor, HTTPHandler, urlopen
 try:
-    from urllib2 import HTTPError
+	from urllib2 import HTTPError
 except ImportError:
-    from urllib.error import HTTPError
+	from urllib.error import HTTPError
 
 try: from urlparse import parse_qs, urlparse, urljoin
 except ImportError: from urllib.parse import parse_qs, urlparse, urljoin
@@ -43,8 +43,8 @@ from openscrapers.modules import workers
 
 
 def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False,
-            limit=None, referer=None, cookie=None, compression=True, output='', timeout='30', ignoreSsl=False,
-            flare=True, ignoreErrors=None):
+			limit=None, referer=None, cookie=None, compression=True, output='', timeout='30', ignoreSsl=False,
+			flare=True, ignoreErrors=None):
 	try:
 		if url is None:
 			return None
@@ -172,7 +172,7 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 
 							scraper = cfscrape.CloudScraper()
 							response = scraper.request(method='GET' if post is None else 'POST', url=url,
-							                           headers=headers, data=data, timeout=int(timeout))
+													   headers=headers, data=data, timeout=int(timeout))
 							result = response.content
 							flare = 'cloudflare'  # Used below
 							try:
@@ -416,15 +416,15 @@ def randomagent():
 		['11.0'],
 		['8.0', '9.0', '10.0', '10.6']]
 	WIN_VERS = ['Windows NT 10.0', 'Windows NT 7.0', 'Windows NT 6.3', 'Windows NT 6.2', 'Windows NT 6.1',
-	            'Windows NT 6.0', 'Windows NT 5.1', 'Windows NT 5.0']
+				'Windows NT 6.0', 'Windows NT 5.1', 'Windows NT 5.0']
 	FEATURES = ['; WOW64', '; Win64; IA64', '; Win64; x64', '']
 	RAND_UAS = ['Mozilla/5.0 ({win_ver}{feature}; rv:{br_ver}) Gecko/20100101 Firefox/{br_ver}',
-	            'Mozilla/5.0 ({win_ver}{feature}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{br_ver} Safari/537.36',
-	            'Mozilla/5.0 ({win_ver}{feature}; Trident/7.0; rv:{br_ver}) like Gecko',
-	            'Mozilla/5.0 (compatible; MSIE {br_ver}; {win_ver}{feature}; Trident/6.0)']
+				'Mozilla/5.0 ({win_ver}{feature}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{br_ver} Safari/537.36',
+				'Mozilla/5.0 ({win_ver}{feature}; Trident/7.0; rv:{br_ver}) like Gecko',
+				'Mozilla/5.0 (compatible; MSIE {br_ver}; {win_ver}{feature}; Trident/6.0)']
 	index = random.randrange(len(RAND_UAS))
 	return RAND_UAS[index].format(win_ver=random.choice(WIN_VERS), feature=random.choice(FEATURES),
-	                              br_ver=random.choice(BR_VERS[index]))
+								  br_ver=random.choice(BR_VERS[index]))
 
 
 def agent():

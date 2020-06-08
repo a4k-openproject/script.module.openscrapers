@@ -28,20 +28,6 @@
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
 
-try:
-	import HTMLParser
-	from HTMLParser import HTMLParser
-except:
-	from html.parser import HTMLParser
-try:
-	import urlparse
-except:
-	import urllib.parse as urlparse
-try:
-	import urllib2
-except:
-	import urllib.request as urllib2
-
 
 class source:
 	def __init__(self):

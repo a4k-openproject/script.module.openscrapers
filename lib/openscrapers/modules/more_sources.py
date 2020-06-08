@@ -30,10 +30,10 @@ def more_vidnode(link, hostDict):
 	sources = []  # By Shellc0de
 	try:
 		headers = {'Host': 'vidnode.net',
-		           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-		           'Upgrade-Insecure-Requests': '1',
-		           'Accept-Language': 'en-US,en;q=0.9'
-		           }
+				   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
+				   'Upgrade-Insecure-Requests': '1',
+				   'Accept-Language': 'en-US,en;q=0.9'
+				   }
 		response = client.request(link, headers=headers, timeout=5)
 		urls = re.findall('''\{file:\s*['"]([^'"]+).*?label:\s*['"](\d+\s*P)['"]''', response, re.DOTALL | re.I)
 		if urls:
@@ -72,7 +72,7 @@ def more_vidlink(link, hostDict):
 		links = re.findall(r'var file1="(.+?)"', linkcode)[0]
 		stream_link = links.split('/pl/')[0]
 		headers = {'Referer': 'https://vidlink.org/',
-		           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0'}
+				   'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0'}
 		response = client.request(links, headers=headers)
 		urls = re.findall(r'[A-Z]{10}=\d+x(\d+)\W[A-Z]+=\"\w+\"\s+\/(.+?)\.', response)
 		if urls:
@@ -114,7 +114,7 @@ def more_gomo(link, hostDict):
 					quality, info = source_utils.get_release_quality(url, url)
 					valid, host = source_utils.is_host_valid(url, hostDict)
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-					                'direct': False, 'debridonly': False})
+									'direct': False, 'debridonly': False})
 		return sources
 	except:
 		return sources
@@ -171,17 +171,17 @@ def more_cdapl(link, hostDict, lang, info):
 """Example...
 from openscrapers.modules import more_sources
 for source in more_sources.more_gomo(url, hostDict):
-    sources.append(source)
+	sources.append(source)
 
 
 more = False
 for source in more_sources.more_cdapl(video_link[0],hostDict,lang,info[0]):
-    sources.append(source)
-    more = True
+	sources.append(source)
+	more = True
 for source in more_sources.more_rapidvideo(video_link[0],hostDict,lang,info[0]):
-    sources.append(source)
-    more = True
+	sources.append(source)
+	more = True
 if not more:
-    sources.append({'source': host, 'quality': quality, 'language': lang, 'url': video_link[0], 'info': info[0], 'direct': False, 'debridonly': False})
+	sources.append({'source': host, 'quality': quality, 'language': lang, 'url': video_link[0], 'info': info[0], 'direct': False, 'debridonly': False})
 
 """
