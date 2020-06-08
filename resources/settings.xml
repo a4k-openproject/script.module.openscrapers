@@ -218,7 +218,7 @@
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="false"/>
         <setting id="provider.7torrents" type="bool" label="$NUMBER[7]TORRENTS" default="false"/>
         <setting id="provider.bitlord" type="bool" label="BITLORD" default="true"/>
-        <setting id="provider.btdb" type="bool" label="BTDB" default="false"/>
+        <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
         <setting id="provider.btscene" type="bool" label="BTSCENE" default="false"/><!-- 7 torrents mirror-->
         <setting id="provider.ettv" type="bool" label="ETTV" default="true"/>
         <setting id="provider.extratorrent" type="bool" label="EXTRATORRENT" default="true"/>

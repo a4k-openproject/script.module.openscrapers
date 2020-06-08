@@ -42,7 +42,7 @@ class source:
 		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
 		self.base_link = 'https://yourbittorrent2.com'
 		self.search_link = '?q=%s&page=1&v=&c=&sort=size&o=desc'
-		self.min_seeders = 0
+		self.min_seeders = 0  # to many items with no value but cached links
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -148,7 +148,7 @@ class source:
 
 			try:
 				seeders = int(re.findall('<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
-				if self.min_seeders > seeders: # to many items with no value
+				if self.min_seeders > seeders:
 					return
 			except:
 				seeders = 0

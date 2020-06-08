@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.002" provider-name="Addons4Kodi">
+<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.003" provider-name="Addons4Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -23,6 +23,11 @@
 			<icon>icon.png</icon>
 			<fanart></fanart>
 		</assets>
-		<news></news>
+		<news>
+0.0.2.003
+- PR # 139 begin work for py3 compatibility - tikipete
+- BTDB fix for domain change
+- torrents updates
+		</news>
 	</extension>
 </addon>

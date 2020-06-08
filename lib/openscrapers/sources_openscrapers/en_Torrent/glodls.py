@@ -42,7 +42,7 @@ class source:
 		self.base_link = 'https://glodls.to/'
 		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
-		self.min_seeders = 1
+		self.min_seeders = 0 # to many items with no value but cached links
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
