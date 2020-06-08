@@ -4,9 +4,9 @@
 
 import re
 try:
-    import HTMLParser
+	from HTMLParser import HTMLParser
 except ImportError:
-    import html.parser as HTMLParser
+	from html.parser import HTMLParser
 
 from openscrapers.modules import log_utils
 

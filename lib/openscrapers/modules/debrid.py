@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-    OpenScrapers Module
+	OpenScrapers Module
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from openscrapers.modules import control
@@ -23,14 +23,14 @@ try:
 	import resolveurl
 
 	debrid_resolvers = [resolver() for resolver in resolveurl.relevant_resolvers(order_matters=True) if
-	                    resolver.isUniversal()]
+						resolver.isUniversal()]
 	if len(debrid_resolvers) == 0:
 		# Support Rapidgator accounts! Unfortunately, `sources.py` assumes that rapidgator.net is only ever
 		# accessed via a debrid service, so we add rapidgator as a debrid resolver and everything just works.
 		# As a bonus(?), rapidgator links will be highlighted just like actual debrid links
 		debrid_resolvers = [resolver() for resolver in
-		                    resolveurl.relevant_resolvers(order_matters=True, include_universal=False) if
-		                    'rapidgator.net' in resolver.domains]
+							resolveurl.relevant_resolvers(order_matters=True, include_universal=False) if
+							'rapidgator.net' in resolver.domains]
 except:
 	debrid_resolvers = []
 

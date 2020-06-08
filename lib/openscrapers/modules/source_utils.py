@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-    OpenScrapers Module
+	OpenScrapers Module
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 
@@ -31,12 +31,12 @@ from openscrapers.modules import pyaes
 
 
 RES_4K = ['.4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra-hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
-          '1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
-          '3112i', 'hd3112', '3112hd', '2880p', '2880i', 'hd2880', '2880hd']
+		  '1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
+		  '3112i', 'hd3112', '3112hd', '2880p', '2880i', 'hd2880', '2880hd']
 RES_1080 = ['1080', '1080p', '1080i', 'hd1080', '1080hd', '1200p', '1200i', 'hd1200', '1200hd']
 RES_720 = ['720', '720p', '720i', 'hd720', '720hd', 'hdtv', '.hd.']
 RES_SD = ['576', '576p', '576i', 'sd576', '576sd', '480', '480p', '480i', 'sd480', '480sd', '360', '360p',
-          '360i', 'sd360', '360sd', '240', '240p', '240i', 'sd240', '240sd']
+		  '360i', 'sd360', '360sd', '240', '240p', '240i', 'sd240', '240sd']
 
 SCR = ['dvdscr', 'screener', '.scr.', 'r5', 'r6']
 
@@ -48,7 +48,7 @@ CODEC_H264 = ['avc', 'h264', 'h.264', 'x264', 'x.264']
 CODEC_XVID = ['xvid', 'x.vid', 'x-vid']
 CODEC_DIVX = ['divx', 'divx ', 'div2', 'div2 ', 'div3']
 CODEC_MPEG = ['mp4', 'mpeg', 'm4v', 'mpg', 'mpg1', 'mpg2', 'mpg3', 'mpg4', 'mp4 ', 'msmpeg', 'msmpeg4',
-              'mpegurl']
+			  'mpegurl']
 CODEC_AVI = ['avi']
 CODEC_MKV = ['mkv', '.mkv', 'matroska']
 
@@ -59,19 +59,19 @@ AUDIO_2CH = ['ch2', '2ch', '2.0', 'stereo']
 AUDIO_1CH = ['ch1', '1ch', 'mono', 'monoaudio']
 
 VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom',
-            'top.and.bottom']
+			'top.and.bottom']
 
 MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng', 'dut.eng', 'ell.eng', 'esl.eng',
-              'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng',
-              'gtm.eng', 'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng',
-              'lat.eng', 'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
-              'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual.audio', 'multi']
+			  'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng',
+			  'gtm.eng', 'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng',
+			  'lat.eng', 'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
+			  'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual.audio', 'multi']
 
 LANG = ['arabic', 'bgaudio', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
-              'russian', 'spanish', 'truefrech', 'truespanish', 'turkish', 'hebrew']
+			  'russian', 'spanish', 'truefrech', 'truespanish', 'turkish', 'hebrew']
 
 UNDESIREABLES = ['alexfilm', 'baibako', 'bonus.disc', 'coldfilm', 'eniahd', 'extras.only', 'gears media', 'jaskier', 'hamsterstudio',
-              'ideafilm', 'kerob', 'lakefilm', 'lostfilm', 'newstudio', 'profix media', 'sample', 'soundtrack', 'subtitle.only', 'teaser', 'vostfr']
+			  'ideafilm', 'kerob', 'lakefilm', 'lostfilm', 'newstudio', 'profix media', 'sample', 'soundtrack', 'subtitle.only', 'teaser', 'vostfr']
 
 DUBBED = ['dublado', 'dubbed']
 SUBS = ['subs', 'subtitula', 'subfrench', 'subspanish', 'swesub']

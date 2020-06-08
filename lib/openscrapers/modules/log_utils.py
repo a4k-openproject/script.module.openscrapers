@@ -2,9 +2,9 @@
 
 
 try:
-    from StringIO import StringIO
+	from StringIO import StringIO
 except ImportError:
-    from io import StringIO
+	from io import StringIO
 import cProfile
 import inspect
 import json
@@ -145,8 +145,8 @@ def trace(method):
 		result = method(*args, **kwargs)
 		end = time.time()
 		log('{name!r} time: {time:2.4f}s args: |{args!r}| kwargs: |{kwargs!r}|'.format(name=method.__name__,
-		                                                                               time=end - start, args=args,
-		                                                                               kwargs=kwargs), LOGDEBUG)
+																					   time=end - start, args=args,
+																					   kwargs=kwargs), LOGDEBUG)
 		return result
 
 	def method_trace_off(*args, **kwargs):
@@ -160,7 +160,7 @@ def trace(method):
 
 def _is_debugging():
 	command = {'jsonrpc': '2.0', 'id': 1, 'method': 'Settings.getSettings',
-	           'params': {'filter': {'section': 'system', 'category': 'logging'}}}
+			   'params': {'filter': {'section': 'system', 'category': 'logging'}}}
 	js_data = execute_jsonrpc(command)
 	for item in js_data.get('result', {}).get('settings', {}):
 		if item['id'] == 'debug.showloginfo':
