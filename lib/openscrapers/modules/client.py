@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+	OpenScrapers Module
+"""
 
 import base64
 import gzip
@@ -30,11 +33,15 @@ try:
 except ImportError:
 	from urllib.error import HTTPError
 
-try: from urlparse import parse_qs, urlparse, urljoin
-except ImportError: from urllib.parse import parse_qs, urlparse, urljoin
+try:
+	from urlparse import parse_qs, urlparse, urljoin
+except ImportError:
+	from urllib.parse import parse_qs, urlparse, urljoin
 
-try: from urllib import urlencode, quote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus
+try:
+	from urllib import urlencode, quote_plus
+except ImportError:
+	from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cache
 from openscrapers.modules import dom_parser

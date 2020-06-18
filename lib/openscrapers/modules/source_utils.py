@@ -1,27 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 	OpenScrapers Module
-
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 
 import base64
 import hashlib
 import re
-try: from urlparse import urlparse
-except ImportError: from urllib.parse import urlparse
+
+try:
+	from urlparse import urlparse
+except ImportError:
+	from urllib.parse import urlparse
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -130,14 +119,11 @@ def get_release_quality(release_name, release_link=None):
 					quality = 'SD'
 			else:
 				quality = 'SD'
-
 		info = []
 		if any(value in fmt for value in VIDEO_3D):
 			info.append('3D')
-
 		if any(value in fmt for value in CODEC_H265):
 			info.append('HEVC')
-
 		return quality, info
 	except:
 		log_utils.error()

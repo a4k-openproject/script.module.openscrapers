@@ -48,8 +48,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
-			if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
-			                                                        year)
+			if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
 			if not url: url = self.__search(self.search_link + trakt.getMovieTranslation(imdb, 'el'), year)
 			return url
 		except:

@@ -53,8 +53,9 @@ class source:
 			print query
 			result = client.request(query, referer=self.base_link)
 			result = client.parseDOM(result, 'div', attrs={'class': 'index_item.+?'})
-
 			result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
+			if not result:
+				return
 			result = [(i.attrs['href']) for i in result if
 			          cleantitle.get(title) == cleantitle.get(
 				          re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '',

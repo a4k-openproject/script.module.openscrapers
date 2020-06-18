@@ -7,14 +7,12 @@ from openscrapers.modules import log_utils
 
 try:
 	import xbmcaddon
-
 	__addon__ = xbmcaddon.Addon(id='script.module.openscrapers')
 except:
 	__addon__ = None
 	pass
 
-debug = True if __addon__.getSetting('debug.enabled') == 'true' else False
-
+debug = __addon__.getSetting('debug.enabled') == 'true'
 
 def sources(specified_folders=None):
 	try:

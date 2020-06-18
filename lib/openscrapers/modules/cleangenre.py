@@ -1,24 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     OpenScrapers Module
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-
-# Addon Name: OpenScrapers Module
-# Addon id: script.module.openscrapers
 
 
 def lang(i, lang):
@@ -53,7 +36,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0412\u043e\u0435\u043d\u0435\u043d')
 		i = i.replace('Western', u'\u0423\u0435\u0441\u0442\u044a\u0440\u043d')
 
-
 	elif lang == 'cs':
 		i = i.replace('Action', u'\u0041\u006b\u010d\u006e\u00ed')
 		i = i.replace('Adventure', u'\u0044\u006f\u0062\u0072\u006f\u0064\u0072\u0075\u017e\u006e\u00fd')
@@ -85,7 +67,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0056\u00e1\u006c\u0065\u010d\u006e\u00fd')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'da':
 		i = i.replace('Action', u'\u0041\u0063\u0074\u0069\u006f\u006e')
 		i = i.replace('Adventure', u'\u0045\u0076\u0065\u006e\u0074\u0079\u0072')
@@ -114,7 +95,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
 		i = i.replace('War', u'\u004b\u0072\u0069\u0067')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
-
 
 	elif lang == 'de':
 		i = i.replace('Action', u'\u0041\u0063\u0074\u0069\u006f\u006e')
@@ -148,7 +128,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u004b\u0072\u0069\u0065\u0067\u0073\u0066\u0069\u006c\u006d')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'el':
 		i = i.replace('Action', u'\u0394\u03c1\u03ac\u03c3\u03b7')
 		i = i.replace('Adventure', u'\u03a0\u03b5\u03c1\u03b9\u03c0\u03ad\u03c4\u03b5\u03b9\u03b1')
@@ -178,7 +157,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u0398\u03c1\u03af\u03bb\u03b5\u03c1')
 		i = i.replace('War', u'\u03a0\u03bf\u03bb\u03b5\u03bc\u03b9\u03ba\u03ae')
 		i = i.replace('Western', u'\u0393\u03bf\u03c5\u03ad\u03c3\u03c4\u03b5\u03c1\u03bd')
-
 
 	elif lang == 'es':
 		i = i.replace('Action', u'\u0041\u0063\u0063\u0069\u00f3\u006e')
@@ -211,7 +189,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0047\u0075\u0065\u0072\u0072\u0061')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'fr':
 		i = i.replace('Action', u'\u0041\u0063\u0074\u0069\u006f\u006e')
 		i = i.replace('Adventure', u'\u0041\u0076\u0065\u006e\u0074\u0075\u0072\u0065')
@@ -243,7 +220,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0047\u0075\u0065\u0072\u0072\u0065')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'he':
 		i = i.replace('Action', u'\u05d0\u05e7\u05e9\u05df')
 		i = i.replace('Adventure', u'\u05d4\u05e8\u05e4\u05ea\u05e7\u05d0\u05d5\u05ea')
@@ -272,7 +248,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u05de\u05d5\u05ea\u05d7\u05df')
 		i = i.replace('War', u'\u05de\u05dc\u05d7\u05de\u05d4')
 		i = i.replace('Western', u'\u05de\u05e2\u05e8\u05d1\u05d5\u05df')
-
 
 	elif lang == 'hu':
 		i = i.replace('Action', u'\u0041\u006b\u0063\u0069\u00f3')
@@ -303,7 +278,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0048\u00e1\u0062\u006f\u0072\u00fa\u0073')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'it':
 		i = i.replace('Action', u'\u0041\u007a\u0069\u006f\u006e\u0065')
 		i = i.replace('Adventure', u'\u0041\u0076\u0076\u0065\u006e\u0074\u0075\u0072\u0061')
@@ -332,7 +306,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
 		i = i.replace('War', u'\u0047\u0075\u0065\u0072\u0072\u0061')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
-
 
 	elif lang == 'ja':
 		i = i.replace('Action', u'\u30a2\u30af\u30b7\u30e7\u30f3')
@@ -363,7 +336,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u6226\u4e89')
 		i = i.replace('Western', u'\u897f\u6d0b')
 
-
 	elif lang == 'ko':
 		i = i.replace('Action', u'\uc561\uc158')
 		i = i.replace('Adventure', u'\ubaa8\ud5d8')
@@ -392,7 +364,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\uc2a4\ub9b4\ub7ec')
 		i = i.replace('War', u'\uc804\uc7c1')
 		i = i.replace('Western', u'\uc11c\ubd80')
-
 
 	elif lang == 'nl':
 		i = i.replace('Action', u'\u0041\u0063\u0074\u0069\u0065')
@@ -424,7 +395,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u004f\u006f\u0072\u006c\u006f\u0067')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'pl':
 		i = i.replace('Action', u'\u0041\u006b\u0063\u006a\u0061')
 		i = i.replace('Adventure', u'\u0050\u0072\u007a\u0079\u0067\u006f\u0064\u006f\u0077\u0079')
@@ -453,7 +423,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
 		i = i.replace('War', u'\u0057\u006f\u006a\u0065\u006e\u006e\u0079')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
-
 
 	elif lang == 'pt':
 		i = i.replace('Action', u'\u0041\u00e7\u00e3\u006f')
@@ -486,7 +455,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0047\u0075\u0065\u0072\u0072\u0061')
 		i = i.replace('Western', u'\u0046\u0061\u0072\u006f\u0065\u0073\u0074\u0065')
 
-
 	elif lang == 'ro':
 		i = i.replace('Action', u'\u0041\u0063\u021b\u0069\u0075\u006e\u0065')
 		i = i.replace('Adventure', u'\u0041\u0076\u0065\u006e\u0074\u0075\u0072\u0069')
@@ -515,7 +483,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u0054\u0068\u0072\u0069\u006c\u006c\u0065\u0072')
 		i = i.replace('War', u'\u0052\u0103\u007a\u0062\u006f\u0069')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
-
 
 	elif lang == 'ru':
 		i = i.replace('Action', u'\u0431\u043e\u0435\u0432\u0438\u043a')
@@ -546,7 +513,6 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u0442\u0440\u0438\u043b\u043b\u0435\u0440')
 		i = i.replace('War', u'\u0432\u043e\u0435\u043d\u043d\u044b\u0439')
 		i = i.replace('Western', u'\u0432\u0435\u0441\u0442\u0435\u0440\u043d')
-
 
 	elif lang == 'sl':
 		i = i.replace('Action', u'\u0041\u006b\u0063\u0069\u006a\u0061')
@@ -580,7 +546,6 @@ def lang(i, lang):
 		              u'\u0056\u006f\u006a\u006e\u006f\u002d\u0070\u006f\u006c\u0069\u0074\u0069\u010d\u006e\u0069')
 		i = i.replace('Western', u'\u0057\u0065\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'sr':
 		i = i.replace('Action', u'\u0410\u043a\u0446\u0438\u043e\u043d\u0438')
 		i = i.replace('Adventure',
@@ -613,7 +578,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0420\u0430\u0442\u043d\u0438')
 		i = i.replace('Western', u'\u0412\u0435\u0441\u0442\u0435\u0440\u043d')
 
-
 	elif lang == 'sv':
 		i = i.replace('Action', u'\u0041\u0063\u0074\u0069\u006f\u006e')
 		i = i.replace('Adventure', u'\u00c4\u0076\u0065\u006e\u0074\u0079\u0072')
@@ -645,7 +609,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u004b\u0072\u0069\u0067')
 		i = i.replace('Western', u'\u0056\u00e4\u0073\u0074\u0065\u0072\u006e')
 
-
 	elif lang == 'tr':
 		i = i.replace('Action', u'\u0041\u006b\u0073\u0069\u0079\u006f\u006e')
 		i = i.replace('Adventure', u'\u004d\u0061\u0063\u0065\u0072\u0061')
@@ -675,7 +638,6 @@ def lang(i, lang):
 		i = i.replace('War', u'\u0053\u0061\u0076\u0061\u015f')
 		i = i.replace('Western', u'\u0056\u0061\u0068\u015f\u0069 \u0042\u0061\u0074\u0131')
 
-
 	elif lang == 'zh':
 		i = i.replace('Action', u'\u52a8\u4f5c')
 		i = i.replace('Adventure', u'\u5192\u9669')
@@ -704,5 +666,4 @@ def lang(i, lang):
 		i = i.replace('Thriller', u'\u60ca\u609a')
 		i = i.replace('War', u'\u6218\u4e89')
 		i = i.replace('Western', u'\u897f\u90e8')
-
 	return i

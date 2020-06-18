@@ -149,9 +149,9 @@ def trace(method):
 																					   kwargs=kwargs), LOGDEBUG)
 		return result
 
+
 	def method_trace_off(*args, **kwargs):
 		return method(*args, **kwargs)
-
 	if _is_debugging():
 		return method_trace_on
 	else:

@@ -2,7 +2,6 @@
 
 import json
 import re
-
 import requests
 
 from openscrapers.modules import client

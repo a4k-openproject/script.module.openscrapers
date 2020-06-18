@@ -1,8 +1,28 @@
-OpenScrapers Module Changelog:
+0.0.2.005
+- Update cfscrape to 1.2.41
+- Added option to Settings "Show Changelog"
+- Added option to Settings "Notify Me About Available Updates"
+- Removed SEEHD, v2 cloudflare challenge
+- Added new free hoster WATCHEPISODESERIES1
+- fixed and brought back 5MOVIES
+
+0.0.2.004
+- PR # 141 fix for py3 compatibility - tikipete
+
 0.0.2.003
 - PR # 139 begin work for py3 compatibility - tikipete
 - BTDB fix for domain change
-- torrents updates
+- Torrents update
+- update cfscrape to 1.2.40
+- removed 123MOVIES, v2 cloudflare challenge
+- removed 123MOVIESHUBZ, v2 cloudflare challenge
+- removed FMOVIES, (.ag) v2 cloudflare challenge
+- removed GOMOVIESONL, v2 cloudflare challenge
+- removed TIMEWATCH, v2 cloudflare challenge
+- removed RAPIDMOVIEZ, v2 cloudflare challenge
+- removed TVDOWNLOADS, v2 cloudflare challenge
+- removed MVRLS, dead site
+- removed TORRENTZ, v2 cloudflare challenge
 
 0.0.1.99
 - Updated torrent scrapers, fixed meta info and much more! (Ty 123Venom!)
