@@ -39,7 +39,7 @@ class source:
 		self.priority = 31
 		self.language = ['en']
 		self.domains = ['watchseries.movie', 'watch-series.co']
-		self.base_link = 'https://www5.watchseries.movie'
+		self.base_link = 'https://www6.watchseries.movie'
 		self.search_link = '/series/%s-season-%s-episode-%s'
 
 

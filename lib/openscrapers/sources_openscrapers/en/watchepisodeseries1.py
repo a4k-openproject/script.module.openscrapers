@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Openscrapers (updated url 6-13-2020)
+# created by Venom for Openscrapers (updated url 6-22-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -36,7 +36,7 @@ from openscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 32
+		self.priority = 39
 		self.language = ['en']
 		self.domains = ['watchepisodeseries1.com']
 		self.base_link = 'https://www.watchepisodeseries1.com'
@@ -45,7 +45,6 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			# url = tvshowtitle.replace(" ", "+")
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
 			url = urllib.urlencode(url)
 			return url
@@ -81,7 +80,9 @@ class source:
 			hdlr = 's%02de%02d' % (int(data['season']), int(data['episode']))
 			query = urllib.quote_plus(cleantitle.getsearch(title))
 			surl = urlparse.urljoin(self.base_link, self.search_link % query)
-			r = client.request(surl, XHR=True)
+			r = client.request(surl, XHR=True, timeout='10')
+			if not r:
+				return sources
 			r = json.loads(r)
 			r = r['series']
 
@@ -91,14 +92,16 @@ class source:
 					continue
 				slink = '/' + i['seo_name']
 				slink = urlparse.urljoin(self.base_link, slink)
-				r = client.request(slink)
+				r = client.request(slink, timeout='10')
 				data = client.parseDOM(r, 'div', attrs={'class': 'el-item\s*'})
 				ep = [i for i in client.parseDOM(data, 'a', ret='href') if hdlr in i.lower()][0]
-				r = client.request(ep)
+				r = client.request(ep, timeout='10')
 				links = client.parseDOM(r, 'a', attrs={'class': 'watch-button'}, ret='href')
 
 				for link in links:
-					list = client.request(link)
+					list = client.request(link, timeout='10')
+					if not list:
+						continue
 					url = client.parseDOM(list, 'a', attrs={'class': 'watch-button actWatched'}, ret='href')[0]
 					try:
 						valid, host = source_utils.is_host_valid(url, hostDict)

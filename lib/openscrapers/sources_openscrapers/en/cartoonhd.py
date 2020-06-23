@@ -1,5 +1,4 @@
-# -*- coding: UTF-8 -*-
-# -Cleaned and Checked on 10-16-2019 by JewBMX in Scrubs.
+# -*- coding: utf-8 -*-
 # modified by Venom for Openscrapers (updated url 6-22-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
@@ -11,19 +10,19 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-	OpenScrapers Project
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    OpenScrapers Project
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import base64
@@ -33,18 +32,18 @@ import time
 import urllib
 import urlparse
 
-from openscrapers.modules import client
 from openscrapers.modules import cleantitle
+from openscrapers.modules import client
 from openscrapers.modules import directstream
 from openscrapers.modules import source_utils
 
 
 class source:
 	def __init__(self):
-		self.priority = 33
+		self.priority = 1
 		self.language = ['en']
-		self.domains = ['showbox.space']
-		self.base_link = 'https://ww2.showbox.space'
+		self.domains = ['cartoonhd.com']
+		self.base_link = 'https://cartoonhd.com'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -54,7 +53,6 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
-			source_utils.scraper_error('SHOWBOX')
 			return
 
 
@@ -65,7 +63,6 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
-			source_utils.scraper_error('SHOWBOX')
 			return
 
 
@@ -79,7 +76,6 @@ class source:
 			url = urllib.urlencode(url)
 			return url
 		except:
-			source_utils.scraper_error('SHOWBOX')
 			return
 
 
@@ -92,26 +88,26 @@ class source:
 					break
 			return url
 		except:
-			source_utils.scraper_error('SHOWBOX')
+			source_utils.scraper_error('CARTOONHD')
 			return
 
 
 	def searchMovie(self, title, year, aliases, headers):
 		try:
 			for alias in aliases:
-				url = '%s/movie/%s' % (self.base_link, cleantitle.geturl(alias['title']))
+				url = '%s/film/%s' % (self.base_link, cleantitle.geturl(alias['title']))
 				url = client.request(url, headers=headers, output='geturl', timeout='10')
 				if not url is None and url != self.base_link:
 					break
 			if url is None:
 				for alias in aliases:
-					url = '%s/movie/%s-%s' % (self.base_link, cleantitle.geturl(alias['title']), year)
+					url = '%s/film/%s-%s' % (self.base_link, cleantitle.geturl(alias['title']), year)
 					url = client.request(url, headers=headers, output='geturl', timeout='10')
 					if not url is None and url != self.base_link:
 						break
 			return url
 		except:
-			source_utils.scraper_error('SHOWBOX')
+			source_utils.scraper_error('CARTOONHD')
 			return
 
 
@@ -131,17 +127,19 @@ class source:
 			else:
 				url = self.searchMovie(title, data['year'], aliases, headers)
 			r = client.request(url, headers=headers, output='extended', timeout='10')
-			if not r:
+			if r is None:
 				return sources
 			if not imdb in r[0]:
 				return sources
-			cookie = r[4]; headers = r[3]; result = r[0]
+			cookie = r[4]
+			headers = r[3]
+			result = r[0]
 			try:
 				r = re.findall('(https:.*?redirector.*?)[\'\"]', result)
 				for i in r:
 					sources.append({'source': 'gvideo', 'quality': directstream.googletag(i)[0]['quality'], 'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
 			except:
-				source_utils.scraper_error('SHOWBOX')
+				source_utils.scraper_error('CARTOONHD')
 				pass
 			try:
 				auth = re.findall('__utmx=(.+)', cookie)[0].split(';')[0]
@@ -178,20 +176,17 @@ class source:
 					sources.append({'source': 'CDN', 'quality': quality, 'language': 'en', 'url': i, 'direct': True, 'debridonly': False})
 				else:
 					valid, hoster = source_utils.is_host_valid(i, hostDict)
-					if valid:
-						quality = source_utils.check_url(i)
-						sources.append({'source': hoster, 'quality': quality, 'language': 'en', 'url': i, 'direct': False, 'debridonly': False})
+					if not valid:
+						continue
+					sources.append({'source': hoster, 'quality': '720p', 'language': 'en', 'url': i, 'direct': False, 'debridonly': False})
 			return sources
 		except:
-			source_utils.scraper_error('SHOWBOX')
+			source_utils.scraper_error('CARTOONHD')
 			return sources
 
 
 	def resolve(self, url):
-		try:
-			if 'google' in url and not 'googleapis' in url:
-				return directstream.googlepass(url)
-			else:
-				return url
-		except:
-			source_utils.scraper_error('SHOWBOX')
+		if 'google' in url and 'googleapis' not in url:
+			return directstream.googlepass(url)
+		else:
+			return url

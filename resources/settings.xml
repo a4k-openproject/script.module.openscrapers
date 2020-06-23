@@ -36,6 +36,7 @@
 <!--         <setting id="provider.123movieshubz" type="bool" label="$NUMBER[123]MOVIESHUBZ" default="false"/> --><!--v2 challenge-->
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="false"/>
         <setting id="provider.bnwmovies" type="bool" label="BNWMOVIES" default="false"/>
+        <setting id="provider.cartoonhd" type="bool" label="CARTOONHD" default="true"/>
         <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="true"/>
         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/>
         <setting id="provider.easynews" type="bool" label="EASYNEWS" default="false"/>
@@ -54,25 +55,27 @@
         <setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
 <!--         <setting id="provider.megashare9" type="bool" label="MEGASHARE$NUMBER[9]" default="false"/> --><!-- needs fixing -->
         <setting id="provider.moviescouch" type="bool" label="MOVIESCOUCH" default="true"/>
+        <setting id="provider.myputlockers" type="bool" label="MYPUTLOCKERS" default="true"/>
         <setting id="provider.ororo" type="bool" label="ORORO" default="false"/>
         <setting id="provider.primewire" type="bool" label="PRIMEWIRE" default="true"/>
 <!--         <setting id="provider.projectfreetv" type="bool" label="PROJECTFREETV" default="true"/> --><!-- needs fixing -->
         <setting id="provider.putlockeronl" type="bool" label="PUTLOCKERONL" default="true"/>
 <!--         <setting id="provider.putlockersonline" type="bool" label="PUTLOCKERSONLINE" default="false"/> --><!-- needs fixing -->
 <!--         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/> --><!--v2 challenge-->
-        <setting id="provider.series9" type="bool" label="SERIES9" default="true"/>
+        <setting id="provider.series9" type="bool" label="SERIES9" default="false"/>
 <!--         <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/> --><!--hCaptcha-->
         <setting id="provider.showbox" type="bool" label="SHOWBOX" default="true"/>
 <!--         <setting id="provider.timewatch" type="bool" label="TIMEWATCH" default="true"/> --><!--v2 challenge-->
-        <setting id="provider.toonget" type="bool" label="TOONGET" default="true"/>
-        <setting id="provider.watch32" type="bool" label="WATCH$NUMBER[32]" default="true"/>
+        <setting id="provider.toonget" type="bool" label="TOONGET" default="false"/>
+        <setting id="provider.watch32" type="bool" label="WATCH$NUMBER[32]" default="false"/>
         <setting id="provider.watchepisodes" type="bool" label="WATCHEPISODES" default="true"/>
-        <setting id="provider.watchepisodeseries1" type="bool" label="WATCHEPISODESERIES$NUMBER[1]" default="true"/>
+        <setting id="provider.watchepisodeseries1" type="bool" label="WATCHEPISODESERIES$NUMBER[1]" default="false"/>
         <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="true"/>
         <setting id="provider.watchserieshd" type="bool" label="WATCHSERIESHD" default="true"/>
+        <setting id="provider.watchseriestv" type="bool" label="WATCHSERIESTV" default="true"/>
         <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="false"/>
         <setting id="provider.yesmoviesgg" type="bool" label="YESMOVIESGG" default="true"/>
-        <setting id="provider.zmovies" type="bool" label="ZMOVIES" default="true"/>
+        <setting id="provider.zmovies" type="bool" label="ZMOVIES" default="false"/>
     </category>
 
     <!-- Providers/Foreign-2 -->
@@ -225,7 +228,7 @@
         <setting id="provider.7torrents" type="bool" label="$NUMBER[7]TORRENTS" default="false"/>
         <setting id="provider.bitlord" type="bool" label="BITLORD" default="true"/>
         <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
-        <setting id="provider.btscene" type="bool" label="BTSCENE" default="false"/><!-- 7 torrents mirror-->
+        <setting id="provider.btscene" type="bool" label="BTSCENE" default="false"/>
         <setting id="provider.ettv" type="bool" label="ETTV" default="true"/>
         <setting id="provider.extratorrent" type="bool" label="EXTRATORRENT" default="true"/>
         <setting id="provider.eztv" type="bool" label="EZTV" default="true"/>

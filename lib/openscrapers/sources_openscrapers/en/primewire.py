@@ -75,15 +75,12 @@ class source:
 			query = urlparse.urljoin(self.base_link, query.lower())
 			result = client.request(query, referer=self.base_link)
 			result = client.parseDOM(result, 'div', attrs={'class': 'index_item.+?'})
-
 			result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
+			if not result:
+				return
 			result = [
 				(i.attrs['href']) for i in result if cleantitle.get(tvshowtitle) == cleantitle.get(
-					re.sub(
-						'(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)',
-						'',
-						i.attrs['title'],
-						flags=re.I))][0]
+					re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '', i.attrs['title'], flags=re.I))][0]
 
 			url = client.replaceHTMLCodes(result)
 			url = url.encode('utf-8')

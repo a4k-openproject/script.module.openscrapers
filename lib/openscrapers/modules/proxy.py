@@ -3,7 +3,6 @@
 	OpenScrapers Module
 """
 
-
 import random
 import re
 try:

@@ -131,7 +131,7 @@ def more_rapidvideo(link, hostDict, lang, info):
 			for i in range(1, numGroups):
 				url = test[i]
 				valid, host = source_utils.is_host_valid(url, hostDict)
-				q = source_utils.check_sd_url(url)
+				q = source_utils.check_url(url)
 				sources.append(
 					{'source': host, 'quality': q, 'language': lang, 'url': url, 'info': info, 'direct': False,
 					 'debridonly': False})
@@ -154,7 +154,7 @@ def more_cdapl(link, hostDict, lang, info):
 			if urls:
 				for url in urls:
 					valid, host = source_utils.is_host_valid(url, hostDict)
-					q = source_utils.check_sd_url(url)
+					q = source_utils.check_url(url)
 					direct = re.findall("""file":"(.*)","file_cast""", requests.get(url, headers=headers).content)[
 						0].replace("\\/", "/")
 					sources.append(

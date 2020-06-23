@@ -115,7 +115,8 @@ class source:
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["file"], "tvshowid": %s }, "id": 1}' % (str(season), str(episode), str(r['tvshowid'])))
 				r = unicode(r, 'utf-8', errors='ignore')
 				r = json.loads(r)['result']['episodes']
-
+				if not r:
+					return sources
 				r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')][0]
 
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodeDetails", "params": {"properties": ["streamdetails", "file"], "episodeid": %s }, "id": 1}' % str(r['episodeid']))

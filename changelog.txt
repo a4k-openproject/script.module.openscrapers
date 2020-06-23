@@ -1,3 +1,10 @@
+0.0.2.006
+- Small fix to client module for Referer link
+- Added new free hoster WATCHSERIESTV
+- fixed and brought back CARTOONHD
+- small fix for SHOWBOX vid quality
+- Added new free hoster MYPUTLOCKERS
+
 0.0.2.005
 - Update cfscrape to 1.2.41
 - Added option to Settings "Show Changelog"

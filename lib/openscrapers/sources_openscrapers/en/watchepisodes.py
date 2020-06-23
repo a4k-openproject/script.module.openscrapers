@@ -110,8 +110,7 @@ class source:
 					try:
 						valid, host = source_utils.is_host_valid(url, hostDict)
 						if not valid:
-							raise Exception()
-
+							continue
 						sources.append({'source': host, 'quality': 'SD', 'info': '', 'language': 'en', 'url': url,
 						                'direct': False, 'debridonly': False})
 					except:

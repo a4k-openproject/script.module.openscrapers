@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 
-
-try:
-	from StringIO import StringIO
-except ImportError:
-	from io import StringIO
 import cProfile
+from datetime import datetime
 import inspect
 import json
 import os
 import pstats
+try:
+	from StringIO import StringIO
+except ImportError:
+	from io import StringIO
 import time
-from datetime import datetime
 
 from openscrapers.modules import control
 
 try:
 	import xbmc
 	from xbmc import LOGDEBUG, LOGERROR, LOGNOTICE, LOGWARNING  # @UnusedImport
-
 	LOGPATH = xbmc.translatePath('special://logpath/')
 	name = control.addonInfo('name')
 except:

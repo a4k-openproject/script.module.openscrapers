@@ -339,12 +339,12 @@ def _basic_request(url, headers=None, post=None, timeout='30', limit=None):
 			headers.update(headers)
 		except:
 			headers = {}
-
 		request = Request(url, data=post)
 		_add_request_header(request, headers)
 		response = urlopen(request, timeout=int(timeout))
 		return _get_result(response, limit)
 	except:
+		log_utils.error()
 		return
 
 
@@ -357,13 +357,17 @@ def _add_request_header(_request, headers):
 		except:
 			scheme = 'http'
 
-		referer = headers.get('Referer') if 'Referer' in headers else '%s://%s' % (scheme, _request.get_host())
+		# Gaia removed trailing forward slash...why?  seems to break scrapers like cartoonhd
+		# referer = headers.get('Referer') if 'Referer' in headers else '%s://%s' % (scheme, _request.get_host())
+		referer = headers.get('Referer') if 'Referer' in headers else '%s://%s/' % (scheme, _request.get_host())
+
 		_request.add_unredirected_header('Host', _request.get_host())
 		_request.add_unredirected_header('Referer', referer)
 
 		for key in headers:
 			_request.add_header(key, headers[key])
 	except:
+		log_utils.error()
 		return
 
 
