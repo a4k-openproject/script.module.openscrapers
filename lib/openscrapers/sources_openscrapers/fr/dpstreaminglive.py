@@ -27,8 +27,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urlparse
+except ImportError: from urllib.parse import parse_qs, urlparse
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -47,7 +50,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -55,7 +58,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -65,10 +68,10 @@ class source:
 			if url is None:
 				return
 
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -78,7 +81,7 @@ class source:
 			print '-------------------------------    -------------------------------'
 			sources = []
 			print url
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			season = data['season'] if 'season' in data else False
 			episode = data['episode'] if 'episode' in data else False
@@ -90,7 +93,7 @@ class source:
 			else:
 				self.search_link = 'query=%s&submit=Submit+Query'
 				aTitle = data['title']
-			post = self.search_link % (urllib.quote_plus(cleantitle.query(aTitle)))
+			post = self.search_link % (quote_plus(cleantitle.query(aTitle)))
 			url = 'https://dpstreaming.live/recherche/'
 			t = cleantitle.get(aTitle)
 			r = client.request(url, XHR=True, referer=url, post=post)
@@ -126,7 +129,7 @@ class source:
 			for unLienUrl in unLien0b:
 				if 'gf-' in unLienUrl:
 					continue
-				dataUrl = urllib.urlencode({'pid': unLienUrl[1:]})
+				dataUrl = urlencode({'pid': unLienUrl[1:]})
 				dataUrl = client.request(url0, post=dataUrl, XHR=True, referer=url0)
 				try:
 					url = client.parseDOM(dataUrl, 'iframe', ret='src')[1]
@@ -134,7 +137,7 @@ class source:
 					url = client.parseDOM(dataUrl, 'iframe', ret='src')[0]
 				if url.startswith('//'):
 					url = url.replace('//', '', 1)
-				host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+				host = re.findall('([\w]+[.][\w]+)$', urlparse(url.strip().lower()).netloc)[0]
 				if not host in hostDict: continue
 				host = client.replaceHTMLCodes(host)
 				host = host.encode('utf-8')

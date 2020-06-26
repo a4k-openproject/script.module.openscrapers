@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -53,7 +56,7 @@ class source:
 		try:
 			if not url:
 				return
-			r = client.request(urlparse.urljoin(self.base_link, url))
+			r = client.request(urljoin(self.base_link, url))
 			r = client.parseDOM(r, 'a', attrs={'class': 'item',
 			                                   'href': '[^\'"]*/saison-%s/episode-%s[^\'"]*' % (season, episode)},
 			                    ret='href')[0]
@@ -72,7 +75,7 @@ class source:
 			hostDict = [(i.rsplit('.', 1)[0], i) for i in hostDict]
 			hostDict.append(['okru', 'ok.ru'])
 			locDict = [i[0] for i in hostDict]
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			r = client.request(url)
 			r = client.parseDOM(r, 'ul', attrs={'class': '[^\'"]*lecteurs nop[^\'"]*'})
 			r = client.parseDOM(r, 'li')
@@ -83,7 +86,7 @@ class source:
 				if host not in locDict:
 					continue
 				host = [x[1] for x in hostDict if x[0] == host][0]
-				link = urlparse.urljoin(self.base_link, '/%s/%s/%s' % (
+				link = urljoin(self.base_link, '/%s/%s/%s' % (
 				('streamerSerie' if '/series/' in url else 'streamer'), id, streamer))
 				sources.append(
 					{'source': host, 'quality': 'SD', 'url': link, 'language': 'FR', 'info': info if info else '',
@@ -107,8 +110,8 @@ class source:
 			t = cleantitle.get(title)
 			tq = cleantitle.get(localtitle)
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
-			query = urlparse.urljoin(self.base_link, self.search_link)
-			post = urllib.urlencode({'k': "%s"}) % tq
+			query = urljoin(self.base_link, self.search_link)
+			post = urlencode({'k': "%s"}) % tq
 			r = client.request(query, post=post)
 			r = json.loads(r)
 			r = [i.get('result') for i in r if i.get('type', '').encode('utf-8') == content_type]

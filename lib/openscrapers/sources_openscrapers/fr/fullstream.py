@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -48,14 +51,14 @@ class source:
 			url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
 			                                                        year)
-			if url: return urllib.urlencode({'url': url})
+			if url: return urlencode({'url': url})
 		except:
 			return
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'aliases': aliases, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -65,7 +68,7 @@ class source:
 			if not url:
 				return
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			tvshowtitle = data['tvshowtitle']
 			localtvshowtitle = data['localtvshowtitle']
@@ -76,7 +79,7 @@ class source:
 			if not url and tvshowtitle != localtvshowtitle: url = self.__search(
 				[tvshowtitle] + source_utils.aliases_to_array(aliases), year, season)
 
-			if url: return urllib.urlencode({'url': source_utils.strip_domain(url), 'episode': episode})
+			if url: return urlencode({'url': source_utils.strip_domain(url), 'episode': episode})
 		except:
 			return
 
@@ -87,12 +90,12 @@ class source:
 			if not url:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			url = data['url']
 			episode = data.get('episode')
 
-			r = client.request(urlparse.urljoin(self.base_link, url))
+			r = client.request(urljoin(self.base_link, url))
 
 			if episode:
 				rel = dom_parser.parse_dom(r, 'a',
@@ -122,7 +125,7 @@ class source:
 
 	def __search(self, titles, year, season='0'):
 		try:
-			query = urlparse.urljoin(self.base_link, self.search_link)
+			query = urljoin(self.base_link, self.search_link)
 
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
