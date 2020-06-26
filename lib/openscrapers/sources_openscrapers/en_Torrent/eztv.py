@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus, unquote, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus, unquote, unquote_plus
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -47,7 +50,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -57,10 +60,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -75,7 +78,7 @@ class source:
 			if debrid.status() is False:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -85,8 +88,8 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			url = self.search_link % (urllib.quote_plus(query).replace('+', '-'))
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link % (quote_plus(query).replace('+', '-'))
+			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			html = client.request(url)
 			try:
@@ -111,11 +114,14 @@ class source:
 						continue
 
 					url = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
-					url = urllib.unquote(url).decode('utf8')
+					try:
+						url = unquote(url).decode('utf8')
+					except:
+						pass
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					magnet_title = derka[1]
-					name = urllib.unquote_plus(magnet_title)
+					name = unquote_plus(magnet_title)
 					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if source_utils.remove_lang(name):
 						continue

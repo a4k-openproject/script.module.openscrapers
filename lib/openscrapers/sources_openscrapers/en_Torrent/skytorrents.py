@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -47,7 +50,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -56,7 +59,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -66,10 +69,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -84,7 +87,7 @@ class source:
 			if debrid.status() is False:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -95,8 +98,8 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link % quote_plus(query)
+			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
@@ -117,9 +120,12 @@ class source:
 				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
 
 				for url, seeders, in link:
-					url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
-					url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+					try:
+						url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+					except:
+						pass
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
