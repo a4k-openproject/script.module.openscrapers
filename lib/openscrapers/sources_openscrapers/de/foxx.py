@@ -29,8 +29,11 @@
 import base64
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
+try: from urllib import quote_plus
+except ImportError: from urllib.parse import quote_plus
 
 from openscrapers.modules import anilist
 from openscrapers.modules import cache
@@ -79,7 +82,7 @@ class source:
 		try:
 			if not url:
 				return
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			url = client.request(url, output='geturl')
 			if season == 1 and episode == 1:
 				season = episode = ''
@@ -96,7 +99,7 @@ class source:
 		try:
 			if not url:
 				return sources
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			r = client.request(url, output='extended')
 			headers = r[3]
 			headers.update({'Cookie': r[2].get('Set-Cookie'), 'Referer': self.base_link})
@@ -118,7 +121,7 @@ class source:
 				try:
 					i = re.sub('\[.+?\]|\[/.+?\]', '', i)
 					i = client.replaceHTMLCodes(i)
-					if '/play/' in i: i = urlparse.urljoin(self.base_link, i)
+					if '/play/' in i: i = urljoin(self.base_link, i)
 					if self.domains[0] in i:
 						i = client.request(i, headers=headers, referer=url)
 						for x in re.findall('''\(["']?(.*)["']?\)''', i):
@@ -171,8 +174,8 @@ class source:
 	def __search(self, titles, year):
 		try:
 			n = cache.get(self.__get_nonce, 24)
-			query = self.search_link % (urllib.quote_plus(cleantitle.query(titles[0])), n)
-			query = urlparse.urljoin(self.base_link, query)
+			query = self.search_link % (quote_plus(cleantitle.query(titles[0])), n)
+			query = urljoin(self.base_link, query)
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 			r = client.request(query)

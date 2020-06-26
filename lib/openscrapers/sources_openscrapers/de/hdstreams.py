@@ -29,8 +29,11 @@
 import base64
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
@@ -51,14 +54,14 @@ class source:
 			url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
 			                                                        year)
-			return urllib.urlencode({'url': url}) if url else None
+			return urlencode({'url': url}) if url else None
 		except:
 			return
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'aliases': aliases}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -67,7 +70,7 @@ class source:
 		try:
 			if not url:
 				return
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			tvshowtitle = data['tvshowtitle']
 			localtvshowtitle = data['localtvshowtitle']
@@ -77,7 +80,7 @@ class source:
 			url = self.__search([localtvshowtitle] + aliases, year, season)
 			if not url and tvshowtitle != localtvshowtitle: url = self.__search([tvshowtitle] + aliases, year, season)
 			if not url: return
-			return urllib.urlencode({'url': url, 'episode': episode})
+			return urlencode({'url': url, 'episode': episode})
 		except:
 			return
 
@@ -86,9 +89,9 @@ class source:
 		try:
 			if not url:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-			url = urlparse.urljoin(self.base_link, data.get('url'))
+			url = urljoin(self.base_link, data.get('url'))
 			episode = data.get('episode')
 			r = client.request(url)
 			aj = self.__get_ajax_object(r)

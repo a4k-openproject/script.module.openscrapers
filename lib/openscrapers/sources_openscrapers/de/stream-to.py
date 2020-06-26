@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -66,7 +69,7 @@ class source:
 				return sources
 			# load player
 			query = self.get_player % (video_id)
-			query = urlparse.urljoin(self.base_link, query)
+			query = urljoin(self.base_link, query)
 			r = client.request(query)
 			r = dom_parser.parse_dom(r, 'div', attrs={'class': 'le-server'})
 			# for each hoster
@@ -96,7 +99,7 @@ class source:
 	def resolve(self, url):
 		try:
 			query = self.get_link % (url)
-			query = urlparse.urljoin(self.base_link, query)
+			query = urljoin(self.base_link, query)
 			r = client.request(query)
 			url = dom_parser.parse_dom(r, 'iframe', req='src')
 			url = url[0][0]['src']
@@ -106,8 +109,8 @@ class source:
 
 	def __search(self, titles):
 		try:
-			query = urlparse.urljoin(self.base_link, self.search_link)
-			post = urllib.urlencode({'keyword': titles[0]})
+			query = urljoin(self.base_link, self.search_link)
+			post = urlencode({'keyword': titles[0]})
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			r = client.request(query, post=post)
 			r = json.loads(r)

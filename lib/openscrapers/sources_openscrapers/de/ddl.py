@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -48,7 +51,7 @@ class source:
 			url = self.__get_direct_url(imdb)
 			if not url:
 				return
-			return urllib.urlencode({'url': url})
+			return urlencode({'url': url})
 		except:
 			return
 
@@ -67,7 +70,7 @@ class source:
 			j = [v['info'] for k, v in j.items()]
 			j = [(i['nr'], i['staffel'], i['sid']) for i in j]
 			j = [(i[2]) for i in j if int(i[0]) == int(episode) and int(i[1]) == int(season)][0]
-			return urllib.urlencode({'url': url, 'sid': j})
+			return urlencode({'url': url, 'sid': j})
 		except:
 			return
 
@@ -77,7 +80,7 @@ class source:
 			if url is None:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			j = self.__get_json(data['url'])
@@ -111,7 +114,7 @@ class source:
 
 	def __get_direct_url(self, imdb):
 		try:
-			query = urlparse.urljoin(self.base_link, self.search_link % imdb)
+			query = urljoin(self.base_link, self.search_link % imdb)
 			r = client.request(query, output='geturl')
 			if self.search_link in r: return
 			return r

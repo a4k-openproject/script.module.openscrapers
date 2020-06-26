@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -46,7 +49,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			return urllib.urlencode({'imdb': imdb})
+			return urlencode({'imdb': imdb})
 		except:
 			return
 
@@ -56,10 +59,10 @@ class source:
 			if url is None:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-			data = urllib.urlencode({'ID': re.sub('[^0-9]', '', str(data['imdb'])), 'lang': 'de'})
-			data = client.request(urlparse.urljoin(self.base_link, self.request_link), post=data, XHR=True)
+			data = urlencode({'ID': re.sub('[^0-9]', '', str(data['imdb'])), 'lang': 'de'})
+			data = client.request(urljoin(self.base_link, self.request_link), post=data, XHR=True)
 			data = json.loads(data)
 			data = [(i, data['links'][i]) for i in data['links'] if 'links' in data]
 			data = [(i[0], i[1][0], (i[1][1:])) for i in data]
@@ -79,7 +82,7 @@ class source:
 
 	def resolve(self, url):
 		try:
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			url = client.request(url, output='geturl')
 			if self.out_link not in url:
 				return url

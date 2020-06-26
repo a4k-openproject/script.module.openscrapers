@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import client
 from openscrapers.modules import source_utils
@@ -45,13 +48,13 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			return urllib.urlencode({'mID': re.sub('[^0-9]', '', imdb)})
+			return urlencode({'mID': re.sub('[^0-9]', '', imdb)})
 		except:
 			return
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			return urllib.urlencode({'mID': re.sub('[^0-9]', '', imdb)})
+			return urlencode({'mID': re.sub('[^0-9]', '', imdb)})
 		except:
 			return
 
@@ -59,7 +62,7 @@ class source:
 		try:
 			if url is None:
 				return
-			return urllib.urlencode({'mID': re.sub('[^0-9]', '', imdb), 'season': season, 'episode': episode})
+			return urlencode({'mID': re.sub('[^0-9]', '', imdb), 'season': season, 'episode': episode})
 		except:
 			return
 
@@ -68,11 +71,11 @@ class source:
 		try:
 			if url is None:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			data.update({'raw': 'true', 'language': 'de'})
-			data = urllib.urlencode(data)
-			data = client.request(urlparse.urljoin(self.base_link, self.request_link), post=data)
+			data = urlencode(data)
+			data = client.request(urljoin(self.base_link, self.request_link), post=data)
 			data = json.loads(data)
 			data = [i[1] for i in data[1].items()]
 			data = [(i['name'].lower(), i['links']) for i in data]

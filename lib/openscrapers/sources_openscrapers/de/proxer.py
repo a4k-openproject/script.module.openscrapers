@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import anilist
 from openscrapers.modules import cleantitle
@@ -55,7 +58,7 @@ class source:
 			url = self.__search([alt_title] + aliases, year, 'movie')
 			if not url and localtitle != alt_title: url = self.__search([localtitle] + aliases, year, 'movie')
 			if not url and title != localtitle: url = self.__search([title] + aliases, year, 'movie')
-			return urllib.urlencode({'url': url, 'episode': '1'}) if url else None
+			return urlencode({'url': url, 'episode': '1'}) if url else None
 		except:
 			return
 
@@ -76,7 +79,7 @@ class source:
 		try:
 			if not url:
 				return
-			return urllib.urlencode(
+			return urlencode(
 				{'url': url, 'episode': tvmaze.tvMaze().episodeAbsoluteNumber(tvdb, int(season), int(episode))})
 		except:
 			return
@@ -86,10 +89,10 @@ class source:
 		try:
 			if not url:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			for item_id, episode, content_type in self.__get_episode(data.get('url'), data.get('episode')):
-				stream_link = urlparse.urljoin(self.base_link, '/watch/%s/%s/%s' % (item_id, episode, content_type))
+				stream_link = urljoin(self.base_link, '/watch/%s/%s/%s' % (item_id, episode, content_type))
 				info = 'subbed' if content_type.endswith('sub') else ''
 				r = client.request(stream_link)
 				r = dom_parser.parse_dom(r, 'script')
@@ -101,7 +104,7 @@ class source:
 					if stream_link.startswith('/'): stream_link = 'http:%s' % stream_link
 					if self.domains[0] in stream_link:
 						stream_link = client.request(stream_link,
-						                             cookie=urllib.urlencode({'proxerstream_player': 'flash'}))
+						                             cookie=urlencode({'proxerstream_player': 'flash'}))
 						i = [(match[0], match[1]) for match in re.findall(
 							'''["']?\s*file\s*["']?\s*[:=,]?\s*["'](?P<url>[^"']+)(?:[^}>\]]+)["']?\s*width\s*["']?\s*[:=]\s*["']?(?P<label>[^"',]+)''',
 							stream_link, re.DOTALL)]
@@ -128,7 +131,7 @@ class source:
 			if not url:
 				return []
 			item_id = re.findall('info/(\d+)', url)[0]
-			url = urlparse.urljoin(self.base_link, '/info/%s/list?format=json' % item_id)
+			url = urljoin(self.base_link, '/info/%s/list?format=json' % item_id)
 			r = client.request(url)
 			r = json.loads(r).get('data', [])
 			return [(item_id, episode, i.get('typ')) for i in r if
@@ -138,8 +141,8 @@ class source:
 
 	def __search(self, titles, year, content_type):
 		try:
-			query = self.search_link % (urllib.quote_plus(cleantitle.query(titles[0])), content_type)
-			query = urlparse.urljoin(self.base_link, query)
+			query = self.search_link % (quote_plus(cleantitle.query(titles[0])), content_type)
+			query = urljoin(self.base_link, query)
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 			r = client.request(query)

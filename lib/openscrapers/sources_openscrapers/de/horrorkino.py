@@ -27,7 +27,9 @@
 '''
 
 import re
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -58,7 +60,7 @@ class source:
 		try:
 			if not url:
 				return sources
-			r = client.request(urlparse.urljoin(self.base_link, url))
+			r = client.request(urljoin(self.base_link, url))
 			r = re.findall('''vicode\s*=\s*["'](.*?)["'];''', r)[0].decode('string_escape')
 			r = dom_parser.parse_dom(r, 'iframe', req='src')
 			r = [i.attrs['src'] for i in r]
@@ -79,7 +81,7 @@ class source:
 		try:
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
-			r = client.request(urlparse.urljoin(self.base_link, self.search_link),
+			r = client.request(urljoin(self.base_link, self.search_link),
 			                   post={'query': cleantitle.query(titles[0])})
 			r = dom_parser.parse_dom(r, 'li', attrs={'class': 'entTd'})
 			r = dom_parser.parse_dom(r, 'div', attrs={'class': 've-screen'}, req='title')
