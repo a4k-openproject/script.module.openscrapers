@@ -33,8 +33,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
+try: from urllib import quote
+except ImportError: from urllib.parse import quote
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -57,8 +60,8 @@ class source:
 
 	def do_search(self, title, localtitle, year, is_movie_search):
 		try:
-			url = urlparse.urljoin(self.base_link, self.search_link)
-			url = url % urllib.quote(title)
+			url = urljoin(self.base_link, self.search_link)
+			url = url % quote(title)
 			result = client.request(url)
 			result = result.decode('utf-8')
 
@@ -101,7 +104,7 @@ class source:
 			if url is None:
 				return
 
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 
 			result = client.request(url)
 			result = client.parseDOM(result, 'ul', attrs={'data-season-num': season})[0]
@@ -123,7 +126,7 @@ class source:
 			if url is None:
 				return sources
 
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 
 			result = client.request(url)
 			result = client.parseDOM(result, 'div', attrs={'id': 'links'})
@@ -175,7 +178,7 @@ class source:
 
 	def resolve(self, url):
 		try:
-			url_to_exec = urlparse.urljoin(self.base_link, self.url_transl) % url
+			url_to_exec = urljoin(self.base_link, self.url_transl) % url
 			result = client.request(url_to_exec)
 
 			search_string = "var url = '";

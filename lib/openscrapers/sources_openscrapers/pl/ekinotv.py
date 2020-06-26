@@ -25,10 +25,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-try:
-	import urlparse
-except:
-	import urllib.parse as urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -99,7 +98,7 @@ class source:
 		return self.search(tvshowtitle, localtvshowtitle, year, '/serie/')
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		url = urlparse.urljoin(self.base_link, url)
+		url = urljoin(self.base_link, url)
 		r = client.request(url)
 		r = client.parseDOM(r, 'div', attrs={'id': 'list-series'})[0]
 		p = client.parseDOM(r, 'p')
@@ -131,7 +130,7 @@ class source:
 			if url is None:
 				return sources
 
-			r = client.request(urlparse.urljoin(self.base_link, url), redirect=False)
+			r = client.request(urljoin(self.base_link, url), redirect=False)
 
 			rows = client.parseDOM(r, 'ul', attrs={'class': 'players'})[0]
 			rows = client.parseDOM(rows, 'li')
@@ -162,7 +161,7 @@ class source:
 			splitted = url.split("'")
 			host = splitted[1]
 			video_id = splitted[3]
-			transl_url = urlparse.urljoin(self.base_link, self.resolve_link) % (host, video_id)
+			transl_url = urljoin(self.base_link, self.resolve_link) % (host, video_id)
 			result = client.request(transl_url, redirect=False, cookie="prch=true")
 			scripts = client.parseDOM(result, 'script')
 			for script in scripts:

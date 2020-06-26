@@ -25,12 +25,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import urllib
 
-try:
-	import urlparse
-except:
-	import urllib.parse as urlparse
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
+try: from urllib import quote_plus
+except ImportError: from urllib.parse import quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -53,8 +52,8 @@ class source:
 		try:
 			simply_name = cleantitle.get(localtitle)
 
-			query = self.search_link % urllib.quote_plus(cleantitle.query(localtitle))
-			query = urlparse.urljoin(self.base_link, query)
+			query = self.search_link % quote_plus(cleantitle.query(localtitle))
+			query = urljoin(self.base_link, query)
 			result = client.request(query)
 
 			result = client.parseDOM(result, 'div', attrs={'class': 'result-item'})

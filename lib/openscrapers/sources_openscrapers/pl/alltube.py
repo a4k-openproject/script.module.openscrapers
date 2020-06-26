@@ -28,7 +28,9 @@
 import base64
 import json
 import re
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
@@ -90,7 +92,7 @@ class source:
 			cookies = client.request(self.base_link, output='cookie')
 			cache.cache_insert('alltube_cookie', cookies)
 			for title in titles:
-				r = client.request(urlparse.urljoin(self.base_link, self.search_link),
+				r = client.request(urljoin(self.base_link, self.search_link),
 				                   post={'search': cleantitle.query(title)}, headers={'Cookie': cookies})
 				r = self.get_rows(r, search_type)
 
@@ -182,7 +184,7 @@ class source:
 			if url is None:
 				return sources
 
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			cookies = cache.cache_get('alltube_cookie')['value']
 			result = client.request(url, headers={'Cookie': cookies})
 
@@ -219,7 +221,7 @@ class source:
 			exec _myFun in vGlobals, vLocals
 			myFun1 = vLocals['abc']
 
-			data = client.request(urlparse.urljoin(self.base_link, '/jsverify.php?op=tag'), cookie=mycookie)
+			data = client.request(urljoin(self.base_link, '/jsverify.php?op=tag'), cookie=mycookie)
 			data = byteify(json.loads(data))
 			d = {}
 			for i in range(len(data['key'])):
