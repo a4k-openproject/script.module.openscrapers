@@ -2,16 +2,16 @@
 
 import os.path
 
-import de
-import en
-import en_DebridOnly
-import en_Torrent
-import es
-import fr
-import gr
-import ko
-import pl
-import ru
+from . import de
+from . import en
+from . import en_DebridOnly
+from . import en_Torrent
+from . import es
+from . import fr
+from . import gr
+from . import ko
+from . import pl
+from . import ru
 
 
 scraper_source = os.path.dirname(__file__)
@@ -32,8 +32,12 @@ torrent_providers = en_Torrent.__all__
 ##--Paid Debrid(Debrid and Torrents)--##
 paid_providers = {'en_DebridOnly': debrid_providers, 'en_Torrent': torrent_providers}
 all_paid_providers = []
-for key, value in paid_providers.iteritems():
-	all_paid_providers += value
+try:
+	for key, value in paid_providers.iteritems():
+		all_paid_providers += value
+except:
+	for key, value in paid_providers.items():
+		all_paid_providers += value
 
 ##--Foreign Providers--##
 german_providers = de.__all__
@@ -49,8 +53,12 @@ foreign_providers = {'de': german_providers, 'es': spanish_providers, 'fr': fren
                      'ko': korean_providers,
                      'pl': polish_providers, 'ru': russian_providers}
 all_foreign_providers = []
-for key, value in foreign_providers.iteritems():
-	all_foreign_providers += value
+try:
+	for key, value in foreign_providers.iteritems():
+		all_foreign_providers += value
+except:
+	for key, value in foreign_providers.items():
+		all_foreign_providers += value
 
 ##--All Providers--##
 total_providers = {'en': hoster_providers, 'en_Debrid': debrid_providers, 'en_Torrent': torrent_providers,
@@ -58,5 +66,9 @@ total_providers = {'en': hoster_providers, 'en_Debrid': debrid_providers, 'en_To
                    'ko': korean_providers,
                    'pl': polish_providers, 'ru': russian_providers}
 all_providers = []
-for key, value in total_providers.iteritems():
-	all_providers += value
+try:
+	for key, value in total_providers.iteritems():
+		all_providers += value
+except:
+	for key, value in total_providers.items():
+		all_providers += value
