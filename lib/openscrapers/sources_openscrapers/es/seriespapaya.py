@@ -27,7 +27,9 @@
 '''
 
 import re
-import urllib
+
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import client
 from openscrapers.modules import dom_parser
@@ -45,7 +47,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'tvshowtitle': tvshowtitle}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
