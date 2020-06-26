@@ -29,8 +29,11 @@ import base64
 import json
 import re
 import time
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote, unquote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -50,7 +53,7 @@ class source:
 		try:
 			aliases.append({'country': 'us', 'title': title})
 			url = {'imdb': imdb, 'title': title, 'year': year, 'aliases': aliases}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -60,7 +63,7 @@ class source:
 		try:
 			aliases.append({'country': 'us', 'title': tvshowtitle})
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year, 'aliases': aliases}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -70,10 +73,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -116,7 +119,7 @@ class source:
 			sources = []
 			if url is None:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			imdb = data['imdb']
@@ -145,18 +148,18 @@ class source:
 				auth = re.findall('__utmx=(.+)', cookie)[0].split(';')[0]
 			except:
 				auth = 'false'
-			auth = 'Bearer %s' % urllib.unquote_plus(auth)
+			auth = 'Bearer %s' % unquote_plus(auth)
 			headers['Authorization'] = auth
 			headers['Referer'] = url
 			u = '/ajax/vsozrflxcw.php'
 			self.base_link = client.request(self.base_link, headers=headers, output='geturl')
-			u = urlparse.urljoin(self.base_link, u)
+			u = urljoin(self.base_link, u)
 			action = 'getEpisodeEmb' if '/episode/' in url else 'getMovieEmb'
-			elid = urllib.quote(base64.encodestring(str(int(time.time()))).strip())
+			elid = quote(base64.encodestring(str(int(time.time()))).strip())
 			token = re.findall("var\s+tok\s*=\s*'([^']+)", result)[0]
 			idEl = re.findall('elid\s*=\s*"([^"]+)', result)[0]
 			post = {'action': action, 'idEl': idEl, 'token': token, 'nopop': '', 'elid': elid}
-			post = urllib.urlencode(post)
+			post = urlencode(post)
 			cookie += ';%s=%s' % (idEl, elid)
 			headers['Cookie'] = cookie
 			r = client.request(u, post=post, headers=headers, cookie=cookie, XHR=True)

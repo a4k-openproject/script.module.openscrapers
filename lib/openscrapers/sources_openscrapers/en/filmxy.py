@@ -25,7 +25,9 @@
 '''
 
 import re
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
@@ -44,7 +46,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			title = cleantitle.geturl(title)
-			url = urlparse.urljoin(self.base_link, (self.search_link % (title, year)))
+			url = urljoin(self.base_link, (self.search_link % (title, year)))
 			return url
 		except:
 			source_utils.scraper_error('FILEXY')

@@ -25,8 +25,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -47,7 +50,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			source_utils.scraper_error('WATCH32')
@@ -60,15 +63,15 @@ class source:
 			if url is None:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['title']
 			hdlr = data['year']
 
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', title)
-			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link % quote_plus(query)
+			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			r = client.request(url)
 			if not r:
@@ -99,13 +102,13 @@ class source:
 			for item in items:
 				try:
 					r = client.request(item[0]) if item[0].startswith('http') else client.request(
-						urlparse.urljoin(self.base_link, item[0]))
+						urljoin(self.base_link, item[0]))
 
 					qual = client.parseDOM(r, 'h1')[0]
 					quality = source_utils.get_release_quality(item[1], qual)[0]
 
 					url = re.findall('''frame_url\s*=\s*["']([^']+)['"]\;''', r, re.DOTALL)[0]
-					url = url if url.startswith('http') else urlparse.urljoin('https://', url)
+					url = url if url.startswith('http') else urljoin('https://', url)
 
 					sources.append({'source': 'gvideo', 'quality': quality, 'info': '', 'language': 'en', 'url': url,
 									'direct': False, 'debridonly': False})

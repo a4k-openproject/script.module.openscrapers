@@ -24,8 +24,11 @@
 '''
 
 import json
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs
+except ImportError: from urllib.parse import parse_qs
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 
 from openscrapers.modules import control
@@ -42,7 +45,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			return urllib.urlencode({'imdb': imdb, 'title': title, 'localtitle': localtitle,'year': year})
+			return urlencode({'imdb': imdb, 'title': title, 'localtitle': localtitle,'year': year})
 		except:
 			source_utils.scraper_error('library')
 			return
@@ -50,7 +53,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			return urllib.urlencode({'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'year': year})
+			return urlencode({'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'year': year})
 		except:
 			source_utils.scraper_error('library')
 			return
@@ -60,10 +63,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url.update({'premiered': premiered, 'season': season, 'episode': episode})
-			return urllib.urlencode(url)
+			return urlencode(url)
 		except:
 			source_utils.scraper_error('library')
 			return
@@ -76,7 +79,7 @@ class source:
 			if url is None:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			content_type = 'episode' if 'tvshowtitle' in data else 'movie'
@@ -94,7 +97,11 @@ class source:
 				r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get_simple(i['title']), cleantitle.get_simple(i['originaltitle'])]]
 				if not r:
 					return sources
-				r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')]
+				try:
+					file = i['file'].encode('utf-8')
+				except:
+					file = i['file']
+				r = [i for i in r if not file.endswith('.strm')]
 				if not r:
 					return sources
 				r = r[0]
@@ -117,13 +124,20 @@ class source:
 				r = json.loads(r)['result']['episodes']
 				if not r:
 					return sources
-				r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')][0]
+				try:
+					file = i['file'].encode('utf-8')
+				except:
+					file = i['file']
+				r = [i for i in r if not file.endswith('.strm')][0]
 
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodeDetails", "params": {"properties": ["streamdetails", "file"], "episodeid": %s }, "id": 1}' % str(r['episodeid']))
 				r = unicode(r, 'utf-8', errors='ignore')
 				r = json.loads(r)['result']['episodedetails']
 
-			url = r['file'].encode('utf-8')
+			try:
+				url = r['file'].encode('utf-8')
+			except:
+				url = r['file']
 
 			try:
 				quality = int(r['streamdetails']['video'][0]['width'])
@@ -176,7 +190,10 @@ class source:
 				pass
 
 			info = ' | '.join(info)
-			info = info.encode('utf-8')
+			try:
+				info = info.encode('utf-8')
+			except:
+				pass
 
 			sources.append({'source': '0', 'quality': quality, 'language': 'en', 'url': url,
 							'info': info, 'local': True, 'direct': True, 'debridonly': False, 'size': dsize})

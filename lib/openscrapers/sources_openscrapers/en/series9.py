@@ -27,8 +27,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin, urlparse
+except ImportError: from urllib.parse import parse_qs, urljoin, urlparse
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
@@ -61,7 +64,7 @@ class source:
 		try:
 			aliases.append({'country': 'us', 'title': title})
 			url = {'imdb': imdb, 'title': title, 'year': year, 'aliases': aliases}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			source_utils.scraper_error('SERIES9')
@@ -72,7 +75,7 @@ class source:
 		try:
 			aliases.append({'country': 'us', 'title': tvshowtitle})
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year, 'aliases': aliases}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			source_utils.scraper_error('SERIES9')
@@ -83,10 +86,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			source_utils.scraper_error('SERIES9')
@@ -97,14 +100,14 @@ class source:
 		try:
 			title = cleantitle.normalize(title)
 			search = '%s Season %01d' % (title, int(season))
-			url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(search))
+			url = urljoin(self.base_link, self.search_link % cleantitle.geturl(search))
 			r = self.scraper.get(url).content
 			r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
 			r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='title'))
 			r = [(i[0], i[1], re.findall('(.*?)\s+-\s+Season\s+(\d)', i[1])) for i in r]
 			r = [(i[0], i[1], i[2][0]) for i in r if len(i[2]) > 0]
 			url = [i[0] for i in r if self.matchAlias(i[2][0], aliases) and i[2][1] == season][0]
-			url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
+			url = urljoin(self.base_link, '%s/watching.html' % url)
 			return url
 		except:
 			source_utils.scraper_error('SERIES9')
@@ -114,7 +117,7 @@ class source:
 	def searchMovie(self, title, year, aliases, headers):
 		try:
 			title = cleantitle.normalize(title)
-			url = urlparse.urljoin(self.base_link, self.search_link % cleantitle.geturl(title))
+			url = urljoin(self.base_link, self.search_link % cleantitle.geturl(title))
 			r = self.scraper.get(url).content
 			r = client.parseDOM(r, 'div', attrs={'class': 'ml-item'})
 			r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'a', ret='oldtitle'))
@@ -130,7 +133,7 @@ class source:
 					url = [i[0] for i in results if self.matchAlias(i[1], aliases)][0]
 				except:
 					return
-			url = urlparse.urljoin(self.base_link, '%s/watching.html' % url)
+			url = urljoin(self.base_link, '%s/watching.html' % url)
 			return url
 		except:
 			source_utils.scraper_error('SERIES9')
@@ -142,7 +145,7 @@ class source:
 			sources = []
 			if url is None:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			aliases = eval(data['aliases'])
 			headers = {}
@@ -179,11 +182,14 @@ class source:
 							pass
 				else:
 					try:
-						host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(link.strip().lower()).netloc)[0]
+						host = re.findall('([\w]+[.][\w]+)$', urlparse(link.strip().lower()).netloc)[0]
 						if not host in hostDict:
 							continue
 						host = client.replaceHTMLCodes(host)
-						host = host.encode('utf-8')
+						try:
+							host = host.encode('utf-8')
+						except:
+							pass
 						sources.append({'source': host, 'quality': 'SD', 'info': '', 'language': 'en', 'url': link, 'direct': False,
 						                'debridonly': False})
 					except:

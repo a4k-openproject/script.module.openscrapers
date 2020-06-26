@@ -25,8 +25,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
+try: from urllib import quote_plus
+except ImportError: from urllib.parse import quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -48,9 +51,8 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			query = self.search_link % urllib.quote_plus(title)
-			query = urlparse.urljoin(self.base_link, query.lower())
-			print query
+			query = self.search_link % quote_plus(title)
+			query = urljoin(self.base_link, query.lower())
 			result = client.request(query, referer=self.base_link)
 			result = client.parseDOM(result, 'div', attrs={'class': 'index_item.+?'})
 			result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
@@ -61,7 +63,10 @@ class source:
 				          re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '',
 				                 i.attrs['title'], flags=re.I))][0]
 			url = client.replaceHTMLCodes(result)
-			url = url.encode('utf-8')
+			try:
+				url = url.encode('utf-8')
+			except:
+				pass
 			return url
 		except:
 			source_utils.scraper_error('PRIMEWIRE')
@@ -70,9 +75,9 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			query = self.tvsearch_link % urllib.quote_plus(
+			query = self.tvsearch_link % quote_plus(
 				cleantitle.query(tvshowtitle))
-			query = urlparse.urljoin(self.base_link, query.lower())
+			query = urljoin(self.base_link, query.lower())
 			result = client.request(query, referer=self.base_link)
 			result = client.parseDOM(result, 'div', attrs={'class': 'index_item.+?'})
 			result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
@@ -83,7 +88,10 @@ class source:
 					re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '', i.attrs['title'], flags=re.I))][0]
 
 			url = client.replaceHTMLCodes(result)
-			url = url.encode('utf-8')
+			try:
+				url = url.encode('utf-8')
+			except:
+				pass
 			return url
 		except:
 			source_utils.scraper_error('PRIMEWIRE')
@@ -95,12 +103,15 @@ class source:
 			if url is None:
 				return
 
-			url = urlparse.urljoin(self.base_link, url) if url.startswith('/') else url
+			url = urljoin(self.base_link, url) if url.startswith('/') else url
 			url = url.split('online.html')[0]
 			url = '%s%s-online.html' % (url, 'season-%01d-episode-%01d' % (int(season), int(episode)))
 
 			url = client.replaceHTMLCodes(url)
-			url = url.encode('utf-8')
+			try:
+				url = url.encode('utf-8')
+			except:
+				pass
 			return url
 		except:
 			source_utils.scraper_error('PRIMEWIRE')
@@ -113,7 +124,7 @@ class source:
 			if url is None:
 				return sources
 
-			url = urlparse.urljoin(self.base_link, url) if not url.startswith('http') else url
+			url = urljoin(self.base_link, url) if not url.startswith('http') else url
 
 			result = client.request(url)
 			data = re.findall(r'\s*(eval.+?)\s*</script', result, re.DOTALL)[1]
@@ -131,9 +142,12 @@ class source:
 					data = [
 						(client.parseDOM(i, 'a', ret='href')[0],
 						 client.parseDOM(i, 'span', attrs={'class': 'version_host'})[0])][0]
-					url = urlparse.urljoin(self.base_link, data[0])
+					url = urljoin(self.base_link, data[0])
 					url = client.replaceHTMLCodes(url)
-					url = url.encode('utf-8')
+					try:
+						url = url.encode('utf-8')
+					except:
+						pass
 
 					host = data[1]
 					valid, host = source_utils.is_host_valid(host, hostDict)
@@ -187,7 +201,6 @@ class source:
 				except:
 					source_utils.scraper_error('PRIMEWIRE')
 					link = client.request(url, output='geturl', timeout=10)
-					print link
 					if link == url:
 						return
 					else:

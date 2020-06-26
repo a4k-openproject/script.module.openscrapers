@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote, quote_plus
+except ImportError: from urllib.parse import urlencode, quote, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -47,7 +50,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except BaseException:
 			source_utils.scraper_error('IWAATCH')
@@ -60,7 +63,7 @@ class source:
 			if not url:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			title = data['title']
 			year = data['year']
@@ -69,8 +72,8 @@ class source:
 			query = '%s' % data['title']
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
-			url = self.search_link.format(urllib.quote_plus(query))
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link.format(quote_plus(query))
+			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
@@ -89,7 +92,7 @@ class source:
 
 			for link, label in streams:
 				quality = source_utils.get_release_quality(label, label)[0]
-				link += '|User-Agent=%s&Referer=%s' % (urllib.quote(client.agent()), item)
+				link += '|User-Agent=%s&Referer=%s' % (quote(client.agent()), item)
 				sources.append({'source': 'direct', 'quality': quality, 'info': '', 'language': 'en', 'url': link,
 				                'direct': True, 'debridonly': False})
 

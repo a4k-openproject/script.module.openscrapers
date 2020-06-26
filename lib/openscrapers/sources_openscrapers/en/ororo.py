@@ -25,7 +25,9 @@
 import base64
 import json
 import re
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import cache
 from openscrapers.modules import client
@@ -48,8 +50,20 @@ class source:
 		self.user = control.setting('ororo.user')
 		self.password = control.setting('ororo.pass')
 		self.headers = {
-			'Authorization': 'Basic %s' % base64.b64encode('%s:%s' % (self.user, self.password)),
+			'Authorization': self._get_auth(),
 			'User-Agent': 'Placenta for Kodi'}
+
+	def _get_auth(self):
+		try:
+			# Python 2
+			user_info = '%s:%s' % (self.user, self.password)
+			auth = 'Basic ' + base64.b64encode(user_info)
+		except:
+			# Python 3
+			user_info = '%s:%s' % (self.user, self.password)
+			user_info = user_info.encode('utf-8')
+			auth = 'Basic ' + base64.b64encode(user_info).decode('utf-8')
+		return auth
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -83,7 +97,7 @@ class source:
 				return
 			if url == None:
 				return
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 
 			r = client.request(url, headers=self.headers)
 			r = json.loads(r)['episodes']
@@ -100,7 +114,7 @@ class source:
 
 	def ororo_moviecache(self, user):
 		try:
-			url = urlparse.urljoin(self.base_link, self.moviesearch_link)
+			url = urljoin(self.base_link, self.moviesearch_link)
 			r = client.request(url, headers=self.headers)
 			r = json.loads(r)['movies']
 			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
@@ -112,7 +126,7 @@ class source:
 
 	def ororo_tvcache(self, user):
 		try:
-			url = urlparse.urljoin(self.base_link, self.tvsearch_link)
+			url = urljoin(self.base_link, self.tvsearch_link)
 			r = client.request(url, headers=self.headers)
 			r = json.loads(r)['shows']
 			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
@@ -131,7 +145,7 @@ class source:
 			if (self.user == '' or self.password == ''):
 				raise Exception()
 
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			url = client.request(url, headers=self.headers)
 			url = json.loads(url)['url']
 
