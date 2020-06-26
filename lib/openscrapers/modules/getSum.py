@@ -8,6 +8,7 @@ try:
 except ImportError:
 	from html.parser import HTMLParser
 
+from openscrapers.modules.utils import byteify
 from openscrapers.modules import log_utils
 
 headers = {
@@ -54,7 +55,7 @@ class GetSum(object):
 				links = re.compile(self._magnet_regex).findall(text)
 				if links:
 					for link in links:
-						link = str(replaceHTMLCodes(link).encode('utf-8').split('&tr')[0])
+						link = str(byteify(replaceHTMLCodes(link)).split('&tr')[0])
 						link = "magnet:" + link if not link.startswith('magnet') else link
 						if link in self.links:
 							continue
@@ -177,7 +178,7 @@ def get_video(text):
 	match = re.compile(pattern).findall(text)
 	links = []
 	for url in match:
-		links.append(url.encode('utf-8'))
+		links.append(byteify(url))
 	return links
 
 

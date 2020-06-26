@@ -32,7 +32,11 @@ def get(function, duration, *args):
 		cache_result = cache_get(key)
 		if cache_result:
 			if _is_cache_valid(cache_result['date'], duration):
-				return ast.literal_eval(cache_result['value'].encode('utf-8'))
+				try:
+					result = ast.literal_eval(cache_result['value'].encode('utf-8'))
+				except:
+					result = ast.literal_eval(cache_result['value'])
+				return result
 
 		fresh_result = repr(function(*args))
 		if not fresh_result:
@@ -42,7 +46,11 @@ def get(function, duration, *args):
 			return None
 
 		cache_insert(key, fresh_result)
-		return ast.literal_eval(fresh_result.encode('utf-8'))
+		try:
+			result = ast.literal_eval(fresh_result.encode('utf-8'))
+		except:
+			result = ast.literal_eval(fresh_result)
+		return result
 	except:
 		log_utils.error()
 		return None
