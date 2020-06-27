@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cache
 from openscrapers.modules import client
@@ -59,7 +62,7 @@ class source:
 		try:
 			url = self.__search(imdb)
 			if url:
-				return urllib.urlencode({'url': url})
+				return urlencode({'url': url})
 		except:
 			return
 
@@ -67,7 +70,7 @@ class source:
 		try:
 			url = self.__search(imdb)
 			if url:
-				return urllib.urlencode({'url': url})
+				return urlencode({'url': url})
 		except:
 			return
 
@@ -75,10 +78,10 @@ class source:
 		try:
 			if url is None:
 				return
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			data.update({'season': season, 'episode': episode})
-			return urllib.urlencode(data)
+			return urlencode(data)
 		except:
 			return
 
@@ -88,10 +91,10 @@ class source:
 			if url is None:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
-			url = urlparse.urljoin(self.base_link, data.get('url'))
+			url = urljoin(self.base_link, data.get('url'))
 
 			season = data.get('season')
 
@@ -102,9 +105,9 @@ class source:
 			if season and episode:
 				r = dom_parser.parse_dom(r, 'select', attrs={'id': 'SeasonSelection'}, req='rel')[0]
 				r = client.replaceHTMLCodes(r.attrs['rel'])[1:]
-				r = urlparse.parse_qs(r)
+				r = parse_qs(r)
 				r = dict([(i, r[i][0]) if r[i] else (i, '') for i in r])
-				r = urlparse.urljoin(self.base_link, self.get_links_epi % (r['Addr'], r['SeriesID'], season, episode))
+				r = urljoin(self.base_link, self.get_links_epi % (r['Addr'], r['SeriesID'], season, episode))
 				r = client.request(r)
 			r = dom_parser.parse_dom(r, 'ul', attrs={'id': 'HosterList'})[0]
 			r = dom_parser.parse_dom(r, 'li', attrs={'id': re.compile('Hoster_\d+')}, req='rel')
@@ -115,7 +118,7 @@ class source:
 			for link, hoster, mirrors in r:
 				valid, hoster = source_utils.is_host_valid(hoster, hostDict)
 				if not valid: continue
-				u = urlparse.parse_qs('&id=%s' % link)
+				u = parse_qs('&id=%s' % link)
 				u = dict([(x, u[x][0]) if u[x] else (x, '') for x in u])
 
 				for x in range(0, int(mirrors)):
@@ -133,13 +136,13 @@ class source:
 
 	def resolve(self, url):
 		try:
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			r = client.request(url, referer=self.base_link)
 			r = json.loads(r)['Stream']
 			r = [(dom_parser.parse_dom(r, 'a', req='href'), dom_parser.parse_dom(r, 'iframe', req='src'))]
 			r = [i[0][0].attrs['href'] if i[0] else i[1][0].attrs['src'] for i in r if i[0] or i[1]][0]
 			if not r.startswith('http'):
-				r = urlparse.parse_qs(r)
+				r = parse_qs(r)
 				r = [r[i][0] if r[i] and r[i][0].startswith('http') else (i, '') for i in r][0]
 			return r
 		except:
@@ -148,7 +151,7 @@ class source:
 	def __search(self, imdb):
 		try:
 			l = ['1', '15']
-			r = client.request(urlparse.urljoin(self.base_link, self.search_link % imdb))
+			r = client.request(urljoin(self.base_link, self.search_link % imdb))
 			r = dom_parser.parse_dom(r, 'table', attrs={'id': 'RsltTableStatic'})
 			r = dom_parser.parse_dom(r, 'tr')
 			r = [(dom_parser.parse_dom(i, 'a', req='href'),

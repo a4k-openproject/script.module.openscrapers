@@ -27,8 +27,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -46,7 +49,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -59,7 +62,7 @@ class source:
 			if url is None:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['title']
@@ -69,8 +72,8 @@ class source:
 			query = '%s %s' % (data['title'], data['year'])
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', ' ', query)
 
-			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link % quote_plus(query)
+			url = urljoin(self.base_link, url)
 
 			r = client.request(url)
 			posts = client.parseDOM(r, 'item')

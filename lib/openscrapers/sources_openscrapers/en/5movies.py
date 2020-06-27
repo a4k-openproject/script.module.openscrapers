@@ -11,8 +11,11 @@
 
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -43,7 +46,7 @@ class source:
 		try:
 			aliases.append({'country': 'us', 'title': title})
 			url = {'imdb': imdb, 'title': title, 'year': year, 'aliases': aliases}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -53,7 +56,7 @@ class source:
 		try:
 			aliases.append({'country': 'us', 'title': tvshowtitle})
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year, 'aliases': aliases}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -63,10 +66,10 @@ class source:
 		try:
 			if url == None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -74,7 +77,7 @@ class source:
 
 	def _search(self, title, year, aliases, headers):
 		try:
-			q = urlparse.urljoin(self.base_link, self.search_link % urllib.quote_plus(cleantitle.getsearch(title)))
+			q = urljoin(self.base_link, self.search_link % quote_plus(cleantitle.getsearch(title)))
 			r = client.request(q)
 			r = client.parseDOM(r, 'div', attrs={'class':'ml-img'})
 			r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'img', ret='alt'))
@@ -90,7 +93,7 @@ class source:
 			sources = []
 			if url == None:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			aliases = eval(data['aliases'])
 			headers = {}
@@ -105,7 +108,7 @@ class source:
 				episode = None
 				year = data['year']
 				url = self._search(data['title'], data['year'], aliases, headers)
-			url = url if 'http' in url else urlparse.urljoin(self.base_link, url)
+			url = url if 'http' in url else urljoin(self.base_link, url)
 			result = client.request(url);
 			result = client.parseDOM(result, 'li', attrs={'class':'link-button'})
 			links = client.parseDOM(result, 'a', ret='href')
@@ -115,7 +118,7 @@ class source:
 					#break
 				try:
 					l = l.split('=')[1]
-					l = urlparse.urljoin(self.base_link, self.video_link % l)
+					l = urljoin(self.base_link, self.video_link % l)
 					result = client.request(l, post={}, headers={'Referer':url})
 					u = result if 'http' in result else 'http:' + result
 					if ' href' in u:
@@ -131,7 +134,10 @@ class source:
 						if not valid:
 							continue
 						try:
-							u.decode('utf-8')
+							try:
+								u.decode('utf-8')
+							except:
+								pass
 							sources.append({'source': hoster, 'quality': '720p', 'language': 'en', 'url': u, 'direct': False, 'debridonly': False})
 							i+=1
 						except:

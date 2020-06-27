@@ -27,8 +27,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -50,7 +53,7 @@ class source:
 			url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and title != localtitle:
 				url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
-			return urllib.urlencode({'url': url}) if url else None
+			return urlencode({'url': url}) if url else None
 		except:
 			return
 
@@ -59,7 +62,7 @@ class source:
 			url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and tvshowtitle != localtvshowtitle:
 				url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year)
-			return urllib.urlencode({'url': url}) if url else None
+			return urlencode({'url': url}) if url else None
 		except:
 			return
 
@@ -67,10 +70,10 @@ class source:
 		try:
 			if not url:
 				return
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			data.update({'season': season, 'episode': episode})
-			return urllib.urlencode(data)
+			return urlencode(data)
 		except:
 			return
 
@@ -79,12 +82,12 @@ class source:
 		try:
 			if not url:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			url = data.get('url')
 			season = data.get('season')
 			episode = data.get('episode')
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			r = client.request(url)
 			r = dom_parser.parse_dom(r, 'iframe', req='src')
 			r = [i.attrs['src'] for i in r]
@@ -112,7 +115,7 @@ class source:
 		try:
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
-			r = client.request(urlparse.urljoin(self.base_link, self.search_link), post={'query': titles[0]}, XHR=True)
+			r = client.request(urljoin(self.base_link, self.search_link), post={'query': titles[0]}, XHR=True)
 			r = dom_parser.parse_dom(r, 'a', req='href')
 			r = [(i.attrs['href'], i.content.split('<br')[0]) for i in r]
 			r = [(i[0], re.sub('<.+?>|</.+?>', '', i[1])) for i in r]

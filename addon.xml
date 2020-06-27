@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.006" provider-name="Addons4Kodi">
+<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.007" provider-name="Addons4Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -26,6 +26,8 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
+0.0.2.007
+- More work for Py3 compatibility
 0.0.2.006
 - Small fix to client module for Referer link
 - Added new free hoster WATCHSERIESTV

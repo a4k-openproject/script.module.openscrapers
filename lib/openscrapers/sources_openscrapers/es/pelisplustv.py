@@ -27,7 +27,9 @@
 '''
 
 import re
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -74,7 +76,7 @@ class source:
 	def __search(self, titles, year):
 		try:
 			query = self.search_link % (cleantitle.getsearch(titles[0].replace(' ', '%20')))
-			query = urlparse.urljoin(self.base_link, query)
+			query = urljoin(self.base_link, query)
 			t = [cleantitle.get(i) for i in set(titles) if i][0]
 			r = client.request(query)
 			r = client.parseDOM(r, 'li', attrs={'class': 'item everyone-item over_online haveTooltip'})
@@ -97,7 +99,7 @@ class source:
 		try:
 			if not url:
 				return sources
-			query = urlparse.urljoin(self.base_link, url)
+			query = urljoin(self.base_link, url)
 			r = client.request(query)
 			q = re.findall("'(http://www.elreyxhd.+?)'", r, re.DOTALL)[0]
 			links = client.request(q)

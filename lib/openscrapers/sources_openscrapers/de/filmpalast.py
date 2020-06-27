@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
@@ -59,7 +62,7 @@ class source:
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle,
 			       'aliases': aliases, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -68,7 +71,7 @@ class source:
 		try:
 			if not url:
 				return
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			title = data['localtvshowtitle']
 			title += ' S%02dE%02d' % (int(season), int(episode))
@@ -88,7 +91,7 @@ class source:
 		try:
 			if not url:
 				return sources
-			query = urlparse.urljoin(self.base_link, url)
+			query = urljoin(self.base_link, url)
 			r = self.scraper.get(query).content
 			quality = dom_parser.parse_dom(r, 'span', attrs={'id': 'release_text'})[0].content.split('&nbsp;')[0]
 			quality, info = source_utils.get_release_quality(quality)
@@ -111,8 +114,8 @@ class source:
 		try:
 			h_url = []
 			for id in url:
-				query = urlparse.urljoin(self.base_link, self.stream_link % id)
-				r = self.scraper.get(query, XHR=True, post=urllib.urlencode({'streamID': id})).content
+				query = urljoin(self.base_link, self.stream_link % id)
+				r = self.scraper.get(query, XHR=True, post=urlencode({'streamID': id})).content
 				r = json.loads(r)
 				if 'error' in r and r['error'] == '0' and 'url' in r:
 					h_url.append(r['url'])
@@ -123,8 +126,8 @@ class source:
 
 	def __search(self, titles):
 		try:
-			query = self.search_link % (urllib.quote_plus(titles[0]))
-			query = urlparse.urljoin(self.base_link, query)
+			query = self.search_link % (quote_plus(titles[0]))
+			query = urljoin(self.base_link, query)
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			r = self.scraper.get(query).content
 			r = dom_parser.parse_dom(r, 'article')

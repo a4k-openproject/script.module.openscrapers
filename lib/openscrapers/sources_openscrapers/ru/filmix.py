@@ -28,8 +28,11 @@
 
 import json
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -53,7 +56,7 @@ class source:
 			url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and title != localtitle:
 				url = self.__search([title] + source_utils.aliases_to_array(aliases), year)
-			return urllib.urlencode({'url': url}) if url else None
+			return urlencode({'url': url}) if url else None
 		except:
 			return
 
@@ -62,7 +65,7 @@ class source:
 			url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and tvshowtitle != localtvshowtitle:
 				url = self.__search([tvshowtitle] + source_utils.aliases_to_array(aliases), year)
-			return urllib.urlencode({'url': url, 'tvdb': tvdb}) if url else None
+			return urlencode({'url': url, 'tvdb': tvdb}) if url else None
 		except:
 			return
 
@@ -70,10 +73,10 @@ class source:
 		try:
 			if not url:
 				return
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			data.update({'season': season, 'episode': episode})
-			return urllib.urlencode(data)
+			return urlencode(data)
 		except:
 			return
 
@@ -82,7 +85,7 @@ class source:
 		try:
 			if not url:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			url = data.get('url')
 			season = data.get('season')
@@ -90,7 +93,7 @@ class source:
 			abs_episode = 0
 			if season and episode:
 				abs_episode = str(tvmaze.tvMaze().episodeAbsoluteNumber(data.get('tvdb'), int(season), int(episode)))
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			r = client.request(url)
 			r = r.decode('cp1251').encode('utf-8')
 			r = dom_parser.parse_dom(r, 'div', attrs={'class': 'players'}, req='data-player')
@@ -100,7 +103,7 @@ class source:
 				i = client.request(play_url, referer=url, output='extended')
 				headers = i[3]
 				headers.update({'Cookie': i[2].get('Set-Cookie')})
-				i = client.request(urlparse.urljoin(self.base_link, self.player_link), post={'post_id': post_id},
+				i = client.request(urljoin(self.base_link, self.player_link), post={'post_id': post_id},
 				                   headers=headers, referer=i, XHR=True)
 				i = json.loads(i).get('message', {}).get('translations', {}).get('flash', {})
 				for title, link in i.iteritems():
@@ -130,13 +133,13 @@ class source:
 
 	def __search(self, titles, year):
 		try:
-			url = urlparse.urljoin(self.base_link, self.search_link)
+			url = urljoin(self.base_link, self.search_link)
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 			post = {'story': titles[0], 'years_ot': str(int(year) - 1), 'years_do': str(int(year) + 1)}
 			r = client.request(url, post=post, XHR=True)
 			if len(r) < 1000:
-				url = urlparse.urljoin(self.base_link, self.search_old % urllib.quote_plus(titles[0]))
+				url = urljoin(self.base_link, self.search_old % quote_plus(titles[0]))
 				r = client.request(url)
 			r = r.decode('cp1251').encode('utf-8')
 			r = dom_parser.parse_dom(r, 'article')

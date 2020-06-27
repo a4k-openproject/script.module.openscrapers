@@ -27,8 +27,11 @@
 
 import base64
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin, urlparse
+except ImportError: from urllib.parse import parse_qs, urljoin, urlparse
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import client
 from openscrapers.modules import cleantitle
@@ -48,7 +51,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			clean_title = cleantitle.geturl(title)
-			search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
+			search_url = urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
 			r = cache.get(client.request, 1, search_url)
 			r = client.parseDOM(r, 'div', {'id': 'movie-featured'})
 			r = [(client.parseDOM(i, 'a', ret='href'), re.findall('.+?elease:\s*(\d{4})</', i), re.findall('<b><i>(.+?)</i>', i)) for i in r]
@@ -62,7 +65,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -72,12 +75,12 @@ class source:
 		try:
 			if url == None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['premiered'], url['season'], url['episode'] = premiered, season, episode
 			try:
 				clean_title = cleantitle.geturl(url['tvshowtitle']) + '-season-%d' % int(season)
-				search_url = urlparse.urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
+				search_url = urljoin(self.base_link, self.search_link % clean_title.replace('-', '+'))
 				r = cache.get(client.request, 1, search_url)
 				r = client.parseDOM(r, 'div', {'id': 'movie-featured'})
 				r = [(client.parseDOM(i, 'a', ret='href'), re.findall('<b><i>(.+?)</i>', i)) for i in r]
@@ -105,9 +108,12 @@ class source:
 				b64 = base64.b64decode(v)
 				url = client.parseDOM(b64, 'iframe', ret='src')[0]
 				try:
-					host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+					host = re.findall('([\w]+[.][\w]+)$', urlparse(url.strip().lower()).netloc)[0]
 					host = client.replaceHTMLCodes(host)
-					host = host.encode('utf-8')
+					try:
+						host = host.encode('utf-8')
+					except:
+						pass
 					valid, host = source_utils.is_host_valid(host, hostDict)
 					if valid:
 						sources.append({ 'source': host, 'quality': 'SD', 'language': 'en', 'url': url.replace('\/', '/'), 'direct': False, 'debridonly': False })
@@ -123,7 +129,10 @@ class source:
 						host = re.sub('Server|Link\s*\d+', '', i[1]).lower()
 						url = i[0]
 						host = client.replaceHTMLCodes(host)
-						host = host.encode('utf-8')
+						try:
+							host = host.encode('utf-8')
+						except:
+							pass
 						if 'other'in host:
 							continue
 						if source_utils.limit_hosts() is True and host in str(sources):

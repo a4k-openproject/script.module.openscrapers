@@ -28,8 +28,11 @@
 
 import base64
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin, urlparse
+except ImportError: from urllib.parse import parse_qs, urljoin, urlparse
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -51,7 +54,7 @@ class source:
 			url = self.__search([localtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and title != localtitle: url = self.__search([title] + source_utils.aliases_to_array(aliases),
 			                                                        year)
-			return urllib.urlencode({'url': url, 'imdb': re.sub('[^0-9]', '', imdb)}) if url else None
+			return urlencode({'url': url, 'imdb': re.sub('[^0-9]', '', imdb)}) if url else None
 		except:
 			return
 
@@ -60,7 +63,7 @@ class source:
 			url = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases), year)
 			if not url and tvshowtitle != localtvshowtitle: url = self.__search(
 				[tvshowtitle] + source_utils.aliases_to_array(aliases), year)
-			return urllib.urlencode({'url': url, 'imdb': re.sub('[^0-9]', '', imdb)}) if url else None
+			return urlencode({'url': url, 'imdb': re.sub('[^0-9]', '', imdb)}) if url else None
 		except:
 			return
 
@@ -68,10 +71,10 @@ class source:
 		try:
 			if not url:
 				return
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			data.update({'season': season, 'episode': episode})
-			return urllib.urlencode(data)
+			return urlencode(data)
 		except:
 			return
 
@@ -80,15 +83,15 @@ class source:
 		try:
 			if not url:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-			url = urlparse.urljoin(self.base_link, data.get('url', ''))
+			url = urljoin(self.base_link, data.get('url', ''))
 			imdb = data.get('imdb')
 			season = data.get('season')
 			episode = data.get('episode')
 			if season and episode and imdb:
-				r = urllib.urlencode({'val': 's%se%s' % (season, episode), 'IMDB': imdb})
-				r = client.request(urlparse.urljoin(self.base_link, self.episode_link), XHR=True, post=r)
+				r = urlencode({'val': 's%se%s' % (season, episode), 'IMDB': imdb})
+				r = client.request(urljoin(self.base_link, self.episode_link), XHR=True, post=r)
 			else:
 				r = client.request(url)
 			l = dom_parser.parse_dom(r, 'select', attrs={'id': 'sel_sprache'})
@@ -103,7 +106,7 @@ class source:
 			for quality, urls in r:
 				for link in urls:
 					try:
-						data = urlparse.parse_qs(urlparse.urlparse(link).query, keep_blank_values=True)
+						data = parse_qs(urlparse(link).query, keep_blank_values=True)
 						if 'm' in data:
 							data = data.get('m')[0]
 							link = base64.b64decode(data)
@@ -126,8 +129,8 @@ class source:
 		try:
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
-			r = client.request(urlparse.urljoin(self.base_link, self.search_link),
-			                   post=urllib.urlencode({'val': cleantitle.query(titles[0])}), XHR=True)
+			r = client.request(urljoin(self.base_link, self.search_link),
+			                   post=urlencode({'val': cleantitle.query(titles[0])}), XHR=True)
 			r = dom_parser.parse_dom(r, 'li')
 			r = dom_parser.parse_dom(r, 'a', req='href')
 			r = [(i.attrs['href'], i.content, re.findall('\((\d{4})', i.content)) for i in r]

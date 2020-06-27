@@ -27,8 +27,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
@@ -55,7 +58,7 @@ class source:
 					aliases):
 				if url: break
 				url = self.__search(title)
-			return urllib.urlencode({'url': url}) if url else None
+			return urlencode({'url': url}) if url else None
 		except:
 			return
 
@@ -64,10 +67,10 @@ class source:
 			if not url:
 				return
 			episode = tvmaze.tvMaze().episodeAbsoluteNumber(tvdb, int(season), int(episode))
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			data.update({'episode': episode})
-			return urllib.urlencode(data)
+			return urlencode(data)
 		except:
 			return
 
@@ -76,11 +79,11 @@ class source:
 		try:
 			if not url:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			url = data.get('url')
 			episode = int(data.get('episode', 1))
-			r = self.scraper.get(urlparse.urljoin(self.base_link, url)).content
+			r = self.scraper.get(urljoin(self.base_link, url)).content
 			r = {'': dom_parser.parse_dom(r, 'div', attrs={'id': 'gerdub'}),
 			     'subbed': dom_parser.parse_dom(r, 'div', attrs={'id': 'gersub'})}
 			for info, data in r.iteritems():
@@ -103,7 +106,7 @@ class source:
 
 	def resolve(self, url):
 		try:
-			if not url.startswith('http'): url = urlparse.urljoin(self.base_link, url)
+			if not url.startswith('http'): url = urljoin(self.base_link, url)
 			if self.base_link in url:
 				r = self.scraper.get(url).content
 				r = dom_parser.parse_dom(r, 'meta', req='content')[0]
@@ -118,7 +121,7 @@ class source:
 	def __search(self, title):
 		try:
 			t = cleantitle.get(title)
-			r = self.scraper.get(urlparse.urljoin(self.base_link, self.search_link),
+			r = self.scraper.get(urljoin(self.base_link, self.search_link),
 			                     post={'suchbegriff': title}).content
 			r = dom_parser.parse_dom(r, 'a', attrs={'class': 'ausgabe_1'}, req='href')
 			r = [(i.attrs['href'], i.content) for i in r]

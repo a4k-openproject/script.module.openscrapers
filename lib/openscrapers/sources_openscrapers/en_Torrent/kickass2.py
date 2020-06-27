@@ -10,24 +10,27 @@
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
 '''
-    OpenScrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	OpenScrapers Project
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote, unquote, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote, unquote, unquote_plus
 
 from openscrapers.modules import cache
 from openscrapers.modules import client
@@ -60,7 +63,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except Exception:
 			return
@@ -69,7 +72,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except Exception:
 			return
@@ -79,10 +82,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except Exception:
 			return
@@ -99,7 +102,7 @@ class source:
 			if debrid.status() is False:
 				return self._sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -113,10 +116,10 @@ class source:
 
 			urls = []
 			if 'tvshowtitle' in data:
-				url = self.search2.format(urllib.quote(query))
+				url = self.search2.format(quote(query))
 			else:
-				url = self.search.format(urllib.quote(query))
-			url = urlparse.urljoin(self.base_link, url)
+				url = self.search.format(quote(query))
+			url = urljoin(self.base_link, url)
 			urls.append(url)
 
 			url2 = url + '/2/'
@@ -128,8 +131,8 @@ class source:
 				threads.append(workers.Thread(self._get_items, url))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
-
- 			threads2 = []
+			
+			threads2 = []
 			for i in self.items:
 				threads2.append(workers.Thread(self._get_sources, i))
 			[i.start() for i in threads2]
@@ -149,9 +152,12 @@ class source:
 
 			for post in posts:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
-				link = urllib.unquote(ref).decode('utf8').replace('https://mylink.me.uk/?url=', '').replace('https://mylink.cx/?url=', '')
+				try:
+					link = unquote(ref).decode('utf8').replace('https://mylink.me.uk/?url=', '').replace('https://mylink.cx/?url=', '')
+				except:
+					link = unquote(ref).replace('https://mylink.me.uk/?url=', '').replace('https://mylink.cx/?url=', '')
 
-				name = urllib.unquote_plus(re.search('dn=([^&]+)', link).groups()[0])
+				name = unquote_plus(re.search('dn=([^&]+)', link).groups()[0])
 				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 				if source_utils.remove_lang(name):
 					continue
@@ -186,9 +192,12 @@ class source:
 	def _get_sources(self, item):
 		try:
 			name = item[0]
-			url = urllib.unquote_plus(item[1]).replace('&amp;', '&').replace(' ', '.')
+			url = unquote_plus(item[1]).replace('&amp;', '&').replace(' ', '.')
 			url = url.split('&tr')[0]
-			url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+			try:
+				url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+			except:
+				pass
 
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
 

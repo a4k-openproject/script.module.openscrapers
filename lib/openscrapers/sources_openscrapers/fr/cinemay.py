@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urlparse
+except ImportError: from urllib.parse import parse_qs, urlparse
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -45,7 +48,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'localtitle': localtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -54,7 +57,7 @@ class source:
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle,
 			       'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -64,25 +67,20 @@ class source:
 			if url is None:
 				return
 
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
 
 	def sources(self, url, hostDict, hostprDict):
 		try:
-			print '-------------------------------    -------------------------------'
 			sources = []
 
-			print url
-
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
-			print data
 
 			title = data['title']
 			year = data['year'] if 'year' in data else data['year']
@@ -131,7 +129,7 @@ class source:
 				url = client.parseDOM(url, 'div', attrs={'class': 'wbox2 video dark'})
 				url = client.parseDOM(url, 'iframe', ret='src')[0]
 
-				host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(url.strip().lower()).netloc)[0]
+				host = re.findall('([\w]+[.][\w]+)$', urlparse(url.strip().lower()).netloc)[0]
 				if not host in hostDict: continue
 				host = client.replaceHTMLCodes(host)
 				host = host.encode('utf-8')

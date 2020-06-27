@@ -220,13 +220,19 @@ def cfunfuck(fuckedup):
 	fuck = re.findall(r's,t,o,p,b,r,e,a,k,i,n,g,f,\s*(\w+=).*?:\+?\(?(.*?)\)?\}', fuckedup)
 	fucks = re.findall(r'(\w+)\.\w+([\+\-\*\/]=)\+?\(?(.*?)\)?;', fuckedup)
 	endunfuck = fuck[0][0].split('=')[0]
-	unfuck = JSUnfuck(fuck[0][1]).decode()
+	try:
+		unfuck = JSUnfuck(fuck[0][1]).decode()
+	except:
+		unfuck = JSUnfuck(fuck[0][1])
 	unfuck = re.sub(r'[\(\)]', '', unfuck)
 	unfuck = fuck[0][0] + unfuck
 	exec (unfuck)
 
 	for fucker in fucks:
-		unfucker = JSUnfuck(fucker[2]).decode()
+		try:
+			unfucker = JSUnfuck(fucker[2]).decode()
+		except:
+			unfucker = JSUnfuck(fucker[2])
 		unfucker = re.sub(r'[\(\)]', '', unfucker)
 		unfucker = fucker[0] + fucker[1] + unfucker
 		exec (unfucker)
@@ -238,7 +244,10 @@ def main():
 	with open(sys.argv[1]) as f:
 		start_js = f.read()
 
-	print JSUnfuck(start_js).decode()
+	try:
+		print JSUnfuck(start_js).decode()
+	except:
+		print JSUnfuck(start_js)
 
 
 if __name__ == '__main__':

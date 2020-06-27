@@ -35,8 +35,8 @@ def log(msg, caller=None, level=LOGNOTICE):
 	debug_enabled = control.setting('debug.enabled')
 	debug_log = control.setting('debug.location')
 
-	print DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled)
-	print DEBUGPREFIX + ' Debug Log?: ' + str(debug_log)
+	print( DEBUGPREFIX + ' Debug Enabled?: ' + str(debug_enabled))
+	print( DEBUGPREFIX + ' Debug Log?: ' + str(debug_log))
 
 	if control.setting('debug.enabled') != 'true':
 		return
@@ -50,9 +50,11 @@ def log(msg, caller=None, level=LOGNOTICE):
 
 		if caller is not None and level == LOGERROR:
 			msg = 'From func name: %s.%s() Line # :%s\n                       msg : %s'%(caller[0], caller[1], caller[2], msg)
-
-		if isinstance(msg, unicode):
-			msg = '%s (ENCODED)' % (msg.encode('utf-8'))
+		try:
+			if isinstance(msg, unicode):
+				msg = '%s (ENCODED)' % (msg.encode('utf-8'))
+		except:
+			pass
 
 		if not control.setting('debug.location') == '0':
 			log_file = os.path.join(LOGPATH, 'openscrapers.log')

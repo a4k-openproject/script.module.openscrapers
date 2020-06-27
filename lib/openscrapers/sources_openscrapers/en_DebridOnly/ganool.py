@@ -11,8 +11,11 @@
 
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs
+except ImportError: from urllib.parse import parse_qs
+try: from urllib import urlencode
+except ImportError: from urllib.parse import urlencode
 
 from openscrapers.modules import cfscrape, client
 from openscrapers.modules import cleantitle
@@ -37,7 +40,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -53,7 +56,7 @@ class source:
 			if debrid.status() is False:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			q = '%s' % cleantitle.get_gan_url(data['title'])

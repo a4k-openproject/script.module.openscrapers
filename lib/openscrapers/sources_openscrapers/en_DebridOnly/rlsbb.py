@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin, urlparse
+except ImportError: from urllib.parse import parse_qs, urljoin, urlparse
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import cleantitle
@@ -50,7 +53,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -59,7 +62,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -70,10 +73,10 @@ class source:
 			if url is None:
 				return
 
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -91,7 +94,7 @@ class source:
 
 			hostDict = hostprDict + hostDict
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -105,8 +108,8 @@ class source:
 			query = re.sub('\s', '-', query)
 			# log_utils.log('query = %s' % query, log_utils.LOGDEBUG)
 
-			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link % quote_plus(query)
+			url = urljoin(self.base_link, url)
 			url = "http://rlsbb.ru/" + query
 
 			if 'tvshowtitle' not in data:
@@ -138,7 +141,10 @@ class source:
 
 					for i in u:
 						try:
-							name = i.encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
+							try:
+								name = i.encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
+							except:
+								name = i.replace('&nbsp;', ' ')
 							tit = name.rsplit('/', 1)[1]
 							t = tit.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
 							if cleantitle.get(t) != cleantitle.get(title):
@@ -161,7 +167,10 @@ class source:
 
 					url = str(item)
 					url = client.replaceHTMLCodes(url)
-					url = url.encode('utf-8')
+					try:
+						url = url.encode('utf-8')
+					except:
+						pass
 
 					if url in seen_urls:
 						continue
@@ -171,7 +180,7 @@ class source:
 					host2 = host.strip('"')
 					if url in str(sources):
 						continue
-					host = re.findall('([\w]+[.][\w]+)$', urlparse.urlparse(host2.strip().lower()).netloc)[0]
+					host = re.findall('([\w]+[.][\w]+)$', urlparse(host2.strip().lower()).netloc)[0]
 
 					if not host in hostDict:
 						continue
@@ -193,7 +202,10 @@ class source:
 					info = ' | '.join(info)
 
 					host = client.replaceHTMLCodes(host)
-					host = host.encode('utf-8')
+					try:
+						host = host.encode('utf-8')
+					except:
+						pass
 
 					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': host2, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 

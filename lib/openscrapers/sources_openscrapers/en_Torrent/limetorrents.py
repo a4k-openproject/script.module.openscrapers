@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote, unquote_plus
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import client
@@ -50,7 +53,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -59,7 +62,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -69,10 +72,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -90,7 +93,7 @@ class source:
 			if debrid.status() is False:
 				return self._sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -104,9 +107,9 @@ class source:
 
 			urls = []
 			if 'tvshowtitle' in data:
-				url = self.tvsearch.format(urllib.quote(query))
+				url = self.tvsearch.format(quote(query))
 			else:
-				url = self.moviesearch.format(urllib.quote(query))
+				url = self.moviesearch.format(quote(query))
 			urls.append(url)
 
 			url2 = url.replace('/1/', '/2/')
@@ -150,10 +153,10 @@ class source:
 					pass
 
 				data = re.sub('\s', '', data).strip()
-				link = urlparse.urljoin(self.base_link, data)
+				link = urljoin(self.base_link, data)
 
 				name = client.parseDOM(post, 'a')[1]
-				name = urllib.unquote_plus(name)
+				name = unquote_plus(name)
 				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 				if source_utils.remove_lang(name):
 					continue
@@ -200,7 +203,7 @@ class source:
 
 			try:
 				url = re.search('''href=["'](magnet:\?[^"']+)''', data).groups()[0]
-				url = urllib.unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 				url = url.split('&tr')[0]
 			except:
 				return

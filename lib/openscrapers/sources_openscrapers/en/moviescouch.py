@@ -25,7 +25,9 @@
 '''
 
 import re
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import client
 from openscrapers.modules import cleantitle
@@ -44,7 +46,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			search_id = cleantitle.getsearch(title)
-			url = urlparse.urljoin(self.base_link, self.search_link)
+			url = urljoin(self.base_link, self.search_link)
 			url = url % (search_id.replace(':', ' ').replace(' ', '+'))
 			search_results = client.request(url)
 			match = re.compile('<article id=.+?href="(.+?)" title="(.+?)"',re.DOTALL).findall(search_results)

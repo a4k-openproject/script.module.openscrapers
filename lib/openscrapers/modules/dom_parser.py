@@ -54,8 +54,11 @@ def __get_dom_elements(item, name, attrs):
 		this_list = re.findall(pattern, item, re.M | re.S | re.I)
 	else:
 		last_list = None
-
-		for key, value in attrs.iteritems():
+		try:
+			iter_items = attrs.iteritems()
+		except:
+			iter_items = attrs.items()
+		for key, value in iter_items:
 			value_is_regex = isinstance(value, re_type)
 			value_is_str = isinstance(value, basestring)
 			pattern = '''(<{tag}[^>]*\s{key}=(?P<delim>['"])(.*?)(?P=delim)[^>]*>)'''.format(tag=name, key=key)
@@ -105,10 +108,12 @@ def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 	if attrs is None:
 		attrs = {}
 	name = name.strip()
-
-	if isinstance(html, unicode) or isinstance(html, DomMatch):
+	try:
+		if isinstance(html, unicode):
+			html = [html]
+	except: pass
+	if isinstance(html, DomMatch):
 		html = [html]
-
 	elif isinstance(html, str):
 		try:
 			html = [html.decode("utf-8")]  # Replace with chardet thingy
@@ -117,9 +122,10 @@ def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 				html = [html.decode("utf-8", "replace")]
 			except:
 				html = [html]
+
 	elif not isinstance(html, list):
 		return ''
-
+	
 	if not name:
 		return ''
 

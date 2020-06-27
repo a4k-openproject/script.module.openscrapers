@@ -23,13 +23,14 @@ except ImportError:
 import xbmc
 import xbmcaddon
 
-profile = functions_dir = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile').decode('utf-8'))
+profile = functions_dir = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
 
 try:
 	from sqlite3 import dbapi2 as database
 except:
 	from pysqlite2 import dbapi2 as database
 
+from openscrapers.modules.utils import byteify
 from openscrapers.modules import client
 from openscrapers.modules import control
 
@@ -93,7 +94,7 @@ def resolve(regex):
 
 		url = regex.split('<regex>', 1)[0].strip()
 		url = client.replaceHTMLCodes(url)
-		url = url.encode('utf-8')
+		url = byteify(url)
 
 		r = getRegexParsed(regexs, url)
 

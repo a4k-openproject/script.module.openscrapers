@@ -26,9 +26,12 @@
 '''
 
 import re
-import urllib
-import urlparse
 import json
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import debrid
@@ -48,7 +51,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -64,15 +67,15 @@ class source:
 			if debrid.status() is False:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['title']
 			year = data['year']
 
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\||!)', '', title)
-			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link % quote_plus(query)
+			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			try:
 				r = scraper.get(url).content
@@ -99,7 +102,7 @@ class source:
 
 				for link in links:
 					name = link[0]
-					name = urllib.unquote_plus(name)
+					name = unquote_plus(name)
 					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if source_utils.remove_lang(name):
 						continue
@@ -108,7 +111,10 @@ class source:
 						continue
 
 					url = link[1]
-					url = urllib.unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
+					try:
+						url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
+					except:
+						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 

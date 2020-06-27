@@ -26,8 +26,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -48,7 +51,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -57,7 +60,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -67,10 +70,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -85,7 +88,7 @@ class source:
 			if debrid.status() is False:
 				return self.sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -98,8 +101,8 @@ class source:
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
 			urls = []
-			url = self.search_link % urllib.quote_plus(query)
-			url = urlparse.urljoin(self.base_link, url)
+			url = self.search_link % quote_plus(query)
+			url = urljoin(self.base_link, url)
 			urls.append(url)
 			# urls.append(url.replace('page=0', 'page=40')) # server response time WAY to slow to parse 2 pages deep, site sucks.
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
@@ -127,7 +130,7 @@ class source:
 				links = re.compile('<a href="(/torrent_details/.+?)"><span>(.+?)</span>.*?<td class="size-row">(.+?)</td><td class="sn">([0-9]+)</td>').findall(post)
 
 				for items in links:
-					link = urlparse.urljoin(self.base_link, items[0])
+					link = urljoin(self.base_link, items[0])
 					name = items[1]
 					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 					if source_utils.remove_lang(name):
@@ -147,7 +150,7 @@ class source:
 
 					link = client.request(link, timeout='5')
 					magnet = re.compile('(magnet.+?)"').findall(link)[0]
-					url = urllib.unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.')
+					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 

@@ -273,7 +273,10 @@ def strip_domain(url):
 		if url.lower().startswith('http') or url.startswith('/'):
 			url = re.findall('(?://.+?|)(/.+)', url)[0]
 		url = client.replaceHTMLCodes(url)
-		url = url.encode('utf-8')
+		try:
+			url = url.encode('utf-8')
+		except:
+			pass
 		return url
 	except:
 		log_utils.error()

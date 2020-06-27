@@ -27,8 +27,11 @@
 '''
 
 import re
-import urllib
-import urlparse
+
+try: from urlparse import urlparse, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import quote_plus
+except ImportError: from urllib.parse import quote_plus
 
 from openscrapers.modules import cache
 from openscrapers.modules import cleantitle
@@ -66,7 +69,7 @@ class source:
 		try:
 			if not url:
 				return sources
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			r = client.request(url)
 			r = r.replace('\\"', '"')
 			links = dom_parser.parse_dom(r, 'tr', attrs={'id': 'tablemoviesindex2'})
@@ -79,7 +82,7 @@ class source:
 					if not valid: continue
 					url = dom_parser.parse_dom(i, 'a', req='href')[0].attrs['href']
 					url = client.replaceHTMLCodes(url)
-					url = urlparse.urljoin(self.base_link, url)
+					url = urljoin(self.base_link, url)
 					url = url.encode('utf-8')
 					sources.append({'source': host, 'quality': 'SD', 'language': 'de', 'url': url, 'direct': False,
 					                'debridonly': False})
@@ -91,7 +94,7 @@ class source:
 
 	def resolve(self, url):
 		try:
-			h = urlparse.urlparse(url.strip().lower()).netloc
+			h = urlparse(url.strip().lower()).netloc
 			r = client.request(url)
 			r = r.rsplit('"underplayer"')[0].rsplit("'underplayer'")[0]
 			u = re.findall('\'(.+?)\'', r) + re.findall('\"(.+?)\"', r)
@@ -104,8 +107,8 @@ class source:
 
 	def __search(self, imdb, titles, year):
 		try:
-			q = self.search_link % urllib.quote_plus(cleantitle.query(titles[0]))
-			q = urlparse.urljoin(self.base_link, q)
+			q = self.search_link % quote_plus(cleantitle.query(titles[0]))
+			q = urljoin(self.base_link, q)
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			y = ['%s' % str(year), '%s' % str(int(year) + 1), '%s' % str(int(year) - 1), '0']
 			r = client.request(q)
@@ -135,7 +138,7 @@ class source:
 			for i in match2[:5]:
 				try:
 					if match: url = match[0]; break
-					r = client.request(urlparse.urljoin(self.base_link, i))
+					r = client.request(urljoin(self.base_link, i))
 					r = re.findall('(tt\d+)', r)
 					if imdb in r: url = i; break
 				except:

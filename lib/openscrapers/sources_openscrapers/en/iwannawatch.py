@@ -10,7 +10,9 @@
 
 import re
 import requests
-import urlparse
+
+try: from urlparse import urljoin
+except ImportError: from urllib.parse import urljoin
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import source_utils
@@ -29,7 +31,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			search_id = cleantitle.getsearch(title)
-			url = urlparse.urljoin(self.base_link, self.search_link)
+			url = urljoin(self.base_link, self.search_link)
 			url = url  % (search_id.replace(' ', '+').replace('-', '+').replace('++', '+'), year)
 			headers = {'User-Agent': self.User_Agent}
 			search_results = requests.get(url, headers=headers, timeout=10).content

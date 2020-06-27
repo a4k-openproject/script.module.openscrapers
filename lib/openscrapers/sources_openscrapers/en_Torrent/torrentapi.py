@@ -28,8 +28,11 @@
 import json
 import re
 import time
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs
+except ImportError: from urllib.parse import parse_qs
+try: from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -50,7 +53,7 @@ class source:
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -59,7 +62,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -69,10 +72,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -87,7 +90,7 @@ class source:
 			if debrid.status() is False:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -102,7 +105,7 @@ class source:
 			token = json.loads(token)["token"]
 
 			if 'tvshowtitle' in data:
-				search_link = self.tvsearch.format(token, urllib.quote_plus(query), 'limit=100&format=json_extended')
+				search_link = self.tvsearch.format(token, quote_plus(query), 'limit=100&format=json_extended')
 			else:
 				search_link = self.msearch.format(token, data['imdb'], 'limit=100&format=json_extended')
 			# log_utils.log('search_link = %s' % search_link, log_utils.LOGDEBUG)
@@ -120,7 +123,7 @@ class source:
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 				name = file["title"]
-				name = urllib.unquote_plus(name)
+				name = unquote_plus(name)
 				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
 				if source_utils.remove_lang(name):
 					continue

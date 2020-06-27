@@ -27,8 +27,11 @@
 '''
 
 import json
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -51,7 +54,7 @@ class source:
 		try:
 			id = self.__search([localtitle] + source_utils.aliases_to_array(aliases))
 			if not id and title != localtitle: id = self.__search([title] + source_utils.aliases_to_array(aliases))
-			return urllib.urlencode({'id': id}) if id else None
+			return urlencode({'id': id}) if id else None
 		except:
 			return
 
@@ -60,7 +63,7 @@ class source:
 			id = self.__search([localtvshowtitle] + source_utils.aliases_to_array(aliases))
 			if not id and tvshowtitle != localtvshowtitle: id = self.__search(
 				[tvshowtitle] + source_utils.aliases_to_array(aliases))
-			return urllib.urlencode({'id': id}) if id else None
+			return urlencode({'id': id}) if id else None
 		except:
 			return
 
@@ -68,10 +71,10 @@ class source:
 		try:
 			if not url:
 				return
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			data.update({'season': season, 'episode': episode})
-			return urllib.urlencode(data)
+			return urlencode(data)
 		except:
 			return
 
@@ -80,19 +83,19 @@ class source:
 		try:
 			if not url:
 				return sources
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			id = data.get('id')
 			season = data.get('season')
 			episode = data.get('episode')
 			if season and episode:
-				r = client.request(urlparse.urljoin(self.base_link, self.get_episodes),
+				r = client.request(urljoin(self.base_link, self.get_episodes),
 				                   post={'series_id': id, 'mlang': 'de', 'season': season, 'episode': episode})
 				r = json.loads(r).get('episode_links', [])
 				r = [([i.get('id')], i.get('hostername')) for i in r]
 			else:
 				data.update({'lang': 'de'})
-				r = client.request(urlparse.urljoin(self.base_link, self.get_links), post=data)
+				r = client.request(urljoin(self.base_link, self.get_links), post=data)
 				r = json.loads(r).get('links', [])
 				r = [(i.get('ids'), i.get('hoster')) for i in r]
 			for link_ids, hoster in r:
@@ -108,7 +111,7 @@ class source:
 
 	def resolve(self, url):
 		try:
-			url = urlparse.urljoin(self.base_link, url)
+			url = urljoin(self.base_link, url)
 			if self.base_link in url:
 				url = client.request(url, output='geturl')
 			return url
@@ -117,8 +120,8 @@ class source:
 
 	def __search(self, titles):
 		try:
-			query = self.search_link % urllib.quote_plus(cleantitle.query(titles[0]))
-			query = urlparse.urljoin(self.base_link, query)
+			query = self.search_link % quote_plus(cleantitle.query(titles[0]))
+			query = urljoin(self.base_link, query)
 			t = [cleantitle.get(i) for i in set(titles) if i]
 			r = client.request(query)
 			r = json.loads(r)

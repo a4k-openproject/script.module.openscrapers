@@ -26,8 +26,11 @@
 '''
 
 import json
-import urllib
-import urlparse
+
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
+try: from urllib import urlencode, quote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus
 
 from openscrapers.modules import cleantitle
 from openscrapers.modules import client
@@ -46,7 +49,7 @@ class source:
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			source_utils.scraper_error('WATCHEPISODESERIES1')
@@ -57,10 +60,10 @@ class source:
 		try:
 			if url is None:
 				return
-			url = urlparse.parse_qs(url)
+			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urllib.urlencode(url)
+			url = urlencode(url)
 			return url
 		except:
 			source_utils.scraper_error('WATCHEPISODESERIES1')
@@ -73,13 +76,13 @@ class source:
 			if url is None:
 				return sources
 
-			data = urlparse.parse_qs(url)
+			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle']
 			hdlr = 's%02de%02d' % (int(data['season']), int(data['episode']))
-			query = urllib.quote_plus(cleantitle.getsearch(title))
-			surl = urlparse.urljoin(self.base_link, self.search_link % query)
+			query = quote_plus(cleantitle.getsearch(title))
+			surl = urljoin(self.base_link, self.search_link % query)
 			r = client.request(surl, XHR=True, timeout='10')
 			if not r:
 				return sources
@@ -91,7 +94,7 @@ class source:
 				if cleantitle.get(title) != cleantitle.get(tit):
 					continue
 				slink = '/' + i['seo_name']
-				slink = urlparse.urljoin(self.base_link, slink)
+				slink = urljoin(self.base_link, slink)
 				r = client.request(slink, timeout='10')
 				data = client.parseDOM(r, 'div', attrs={'class': 'el-item\s*'})
 				ep = [i for i in client.parseDOM(data, 'a', ret='href') if hdlr in i.lower()][0]

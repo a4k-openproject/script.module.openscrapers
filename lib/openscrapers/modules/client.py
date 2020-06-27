@@ -43,11 +43,16 @@ try:
 except ImportError:
 	from urllib.parse import urlencode, quote_plus
 
+try:
+    # Python 2 forward compatibility
+    range = xrange
+except NameError:
+    pass
+
 from openscrapers.modules import cache
 from openscrapers.modules import dom_parser
 from openscrapers.modules import log_utils
 from openscrapers.modules import workers
-
 
 def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False,
 			limit=None, referer=None, cookie=None, compression=True, output='', timeout='30', ignoreSsl=False,
@@ -135,7 +140,9 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 
 		if isinstance(post, dict):
 			# Gets rid of the error: 'ascii' codec can't decode byte 0xd0 in position 0: ordinal not in range(128)
-			for key, value in post.iteritems():
+			try: iter_items = post.iteritems()
+			except: iter_items = post.items()
+			for key, value in iter_items:
 				try:
 					post[key] = value.encode('utf-8')
 				except:
@@ -391,7 +398,10 @@ def _get_result(response, limit=None):
 
 def parseDOM(html, name='', attrs=None, ret=False):
 	if attrs:
-		attrs = dict((key, re.compile(value + ('$' if value else ''))) for key, value in attrs.iteritems())
+		try:
+			attrs = dict((key, re.compile(value + ('$' if value else ''))) for key, value in attrs.iteritems())
+		except:
+			attrs = dict((key, re.compile(value + ('$' if value else ''))) for key, value in attrs.items())
 	results = dom_parser.parse_dom(html, name, attrs, ret)
 
 	if ret:
@@ -417,7 +427,7 @@ def _replaceHTMLCodes(txt):
 
 def randomagent():
 	BR_VERS = [
-		['%s.0' % i for i in xrange(18, 50)],
+		['%s.0' % i for i in range(18, 50)],
 		['37.0.2062.103', '37.0.2062.120', '37.0.2062.124', '38.0.2125.101', '38.0.2125.104', '38.0.2125.111',
 		 '39.0.2171.71', '39.0.2171.95', '39.0.2171.99', '40.0.2214.93', '40.0.2214.111', '40.0.2214.115',
 		 '42.0.2311.90', '42.0.2311.135', '42.0.2311.152', '43.0.2357.81', '43.0.2357.124', '44.0.2403.155',
@@ -449,11 +459,11 @@ class cfcookie:
 	def get(self, netloc, ua, timeout):
 		threads = []
 
-		for i in range(0, 15):
+		for i in list(range(0, 15)):
 			threads.append(workers.Thread(self.get_cookie, netloc, ua, timeout))
 		[i.start() for i in threads]
 
-		for i in range(0, 30):
+		for i in list(range(0, 30)):
 			if self.cookie is not None:
 				return self.cookie
 			time.sleep(1)
