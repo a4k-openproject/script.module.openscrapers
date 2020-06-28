@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 6-22-2020)
+# modified by Venom for Openscrapers (updated url 6-27-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -45,8 +45,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['cartoonhd.com']
-		self.base_link = 'https://cartoonhd.com'
+		self.domains = ['cartoonhd.app', 'cartoonhd.com']
+		self.base_link = 'https://cartoonhd.app'
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
@@ -129,6 +129,7 @@ class source:
 				url = self.searchShow(title, int(data['season']), int(data['episode']), aliases, headers)
 			else:
 				url = self.searchMovie(title, data['year'], aliases, headers)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			r = client.request(url, headers=headers, output='extended', timeout='10')
 			if r is None:
 				return sources

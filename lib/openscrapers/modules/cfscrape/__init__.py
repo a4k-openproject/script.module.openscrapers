@@ -13,10 +13,10 @@ from requests.adapters import HTTPAdapter
 from requests.sessions import Session
 
 try:
-	from requests_toolbelt.utils import dump
+    from requests_toolbelt.utils import dump
 except:
-	import dump
-	pass
+    import dump
+    pass
 
 from time import sleep
 
@@ -51,6 +51,7 @@ from .exceptions import (
     CloudflareLoopProtection,
     CloudflareCode1020,
     CloudflareIUAMError,
+    CloudflareSolveError,
     CloudflareChallengeError,
     CloudflareReCaptchaError,
     CloudflareReCaptchaProvider
@@ -644,6 +645,12 @@ class CloudScraper(Session):
                 submit_url['url'],
                 **cloudflare_kwargs
             )
+
+            if challengeSubmitResponse.status_code == 400:
+                self.simpleException(
+                    CloudflareSolveError,
+                    'Invalid challenge answer detected, Cloudflare broken?'
+                )
 
             # ------------------------------------------------------------------------------- #
             # Return response if Cloudflare is doing content pass through instead of 3xx

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated 5-16-2020)
+# modified by Venom for Openscrapers (updated 6-27-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -26,9 +26,9 @@ class source:
 	def __init__(self):
 		self.priority = 22
 		self.language = ['en']
-		self.domains = ['dls.myvideolinks.net', 'get.myvideolinks.net', 'go.myvideolinks.net', 'myvideolinks.69.mu',
+		self.domains = ['mvl.688.org', 'dls.myvideolinks.net', 'get.myvideolinks.net', 'go.myvideolinks.net', 'myvideolinks.69.mu',
 								'sag.myvideolinks.net', 'looka.myvideolinks.net', 'kita.myvideolinks.net']
-		self.base_link = 'https://dls.myvideolinks.net'
+		self.base_link = 'http://mvl.688.org'
 		self.search_link = '/?s=%s'
 
 
@@ -66,9 +66,9 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
 		try:
-			test = client.request(self.base_link)
-			new_search = client.parseDOM(test, 'form', ret='action')[0] # to try to combat their constant search link changes
-
+			# test = client.request(self.base_link)
+			# search form seems down for now with new url
+			# new_search = client.parseDOM(test, 'form', ret='action')[0] # to try to combat their constant search link changes
 
 			if url is None:
 				return sources
@@ -87,8 +87,8 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
-			# url = urljoin(self.base_link, self.search_link)
-			url = urljoin(new_search, self.search_link)
+			url = urljoin(self.base_link, self.search_link)
+			# url = urljoin(new_search, self.search_link)
 			url = url % quote_plus(query)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 			r = client.request(url, timeout='5')

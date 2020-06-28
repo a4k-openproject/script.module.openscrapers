@@ -1,5 +1,13 @@
 0.0.2.007
 - More work for Py3 compatibility
+- changed settings.xml, moved foreign scrapers 
+- fixed and brought back ULTRAHDINDIR
+- fixed MYVIDEOLINK, again
+- fixed encode issue in 5MOVIES
+- changed YOURBITTORENT default to 'false'.  Server timeout issues of late
+- changed MKVHUB default to 'false'.  Cloudflare v2 challenge, may be removed if persists
+- changed YESMOVIESGG default to 'false'.  Cloudflare v2 challenge, may be removed if persists
+- fixed client module redundant error logging
 
 0.0.2.006
 - Small fix to client module for Referer link

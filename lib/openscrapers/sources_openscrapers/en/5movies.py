@@ -109,6 +109,7 @@ class source:
 				year = data['year']
 				url = self._search(data['title'], data['year'], aliases, headers)
 			url = url if 'http' in url else urljoin(self.base_link, url)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			result = client.request(url);
 			result = client.parseDOM(result, 'li', attrs={'class':'link-button'})
 			links = client.parseDOM(result, 'a', ret='href')
@@ -124,6 +125,7 @@ class source:
 					if ' href' in u:
 						u = u.replace('\r', '').replace('\n', '').replace('\t', '')
 						u = 'http:' + re.compile(r" href='(.+?)'").findall(u)[0]
+
 					if 'google' in u:
 						valid, hoster = source_utils.is_host_valid(u, hostDict)
 						urls, host, direct = source_utils.check_directstreams(u, hoster)
@@ -134,10 +136,7 @@ class source:
 						if not valid:
 							continue
 						try:
-							try:
-								u.decode('utf-8')
-							except:
-								pass
+							u.decode('utf-8')
 							sources.append({'source': hoster, 'quality': '720p', 'language': 'en', 'url': u, 'direct': False, 'debridonly': False})
 							i+=1
 						except:
