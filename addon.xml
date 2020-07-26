@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.007" provider-name="Addons4Kodi">
+<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.008" provider-name="Addons4Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -26,14 +26,12 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-0.0.2.007
-- More work for Py3 compatibility
-0.0.2.006
-- Small fix to client module for Referer link
-- Added new free hoster WATCHSERIESTV
-- fixed and brought back CARTOONHD
-- small fix for SHOWBOX vid quality
-- Added new free hoster MYPUTLOCKERS
+0.0.2.008
+- Torrent scrapers updated for pack scraping support.
+    Please read help in settings, requires addon support!!
+- New setting added to Torrent scrapers to filter undesirables
+    Please read help in settings
+- New setting added to filter identified Foreign single audio sources
 		</news>
 	</extension>
 </addon>

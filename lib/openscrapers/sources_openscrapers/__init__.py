@@ -50,8 +50,7 @@ russian_providers = ru.__all__
 
 ##--All Foreign Providers--##
 foreign_providers = {'de': german_providers, 'es': spanish_providers, 'fr': french_providers, 'gr': greek_providers,
-                     'ko': korean_providers,
-                     'pl': polish_providers, 'ru': russian_providers}
+                     'ko': korean_providers, 'pl': polish_providers, 'ru': russian_providers}
 all_foreign_providers = []
 try:
 	for key, value in foreign_providers.iteritems():
@@ -63,8 +62,7 @@ except:
 ##--All Providers--##
 total_providers = {'en': hoster_providers, 'en_Debrid': debrid_providers, 'en_Torrent': torrent_providers,
                    'de': german_providers, 'es': spanish_providers, 'fr': french_providers, 'gr': greek_providers,
-                   'ko': korean_providers,
-                   'pl': polish_providers, 'ru': russian_providers}
+                   'ko': korean_providers, 'pl': polish_providers, 'ru': russian_providers}
 all_providers = []
 try:
 	for key, value in total_providers.iteritems():

@@ -131,8 +131,7 @@ class source:
 				if source_utils.remove_lang(name):
 					continue
 
-				match = source_utils.check_title(self.title, name, self.hdlr, self.year)
-				if not match:
+				if not source_utils.check_title(self.title, name, self.hdlr, self.year):
 					continue
 
 				url = item['file_link']

@@ -50,7 +50,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -59,7 +59,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -93,6 +93,7 @@ class source:
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			aliases = data['aliases']
 
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			hdlr2 = 'S%d - %d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
@@ -129,19 +130,9 @@ class source:
 						for link in links:
 							url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.')
 							url = url.split('&tr')[0]
-							try:
-								url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
-							except:
-								pass
 							hash = re.compile('btih:(.*?)&').findall(url)[0]
-
 							name = url.split('&dn=')[1]
-							name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-							# if name.startswith('www'):
-								# try:
-									# name = re.sub(r'www(.*?)\W{2,10}', '', name)
-								# except:
-									# name = name.split('-.', 1)[1].lstrip()
+							name = source_utils.clean_name(title, name)
 
 							if hdlr not in name and hdlr2 not in name:
 								continue

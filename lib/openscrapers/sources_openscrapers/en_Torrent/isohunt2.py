@@ -42,15 +42,15 @@ class source:
 	def __init__(self):
 		self.priority = 10
 		self.language = ['en']
-		self.domains = ['isohunt2.net']
-		self.base_link = 'https://isohunt2.net'
+		self.domains = ['isohunt.nz']
+		self.base_link = 'https://isohunt.nz'
 		self.search_link = '/torrent/?ihq=%s&fiht=2&age=0&Torrent_sort=seeders&Torrent_page=0'
-		self.min_seeders = 1
+		self.min_seeders = 0
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -59,7 +59,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -93,12 +93,13 @@ class source:
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
+			self.aliases = data['aliases']
+			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			urls = []
 			url = self.search_link % quote_plus(query)
@@ -109,7 +110,7 @@ class source:
 
 			threads = []
 			for url in urls:
-				threads.append(workers.Thread(self._get_sources, url))
+				threads.append(workers.Thread(self.get_sources, url))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -118,9 +119,11 @@ class source:
 			return self.sources
 
 
-	def _get_sources(self, url):
+	def get_sources(self, url):
 		try:
-			r = client.request(url, timeout='5')
+			r = client.request(url, timeout='10')
+			if not r:
+				return
 			posts = client.parseDOM(r, 'tbody')[0]
 			posts = client.parseDOM(posts, 'tr')
 
@@ -128,17 +131,30 @@ class source:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
 				links = re.compile('<a href="(/torrent_details/.+?)"><span>(.+?)</span>.*?<td class="size-row">(.+?)</td><td class="sn">([0-9]+)</td>').findall(post)
-
 				for items in links:
+					# item[1] does not contain full info like the &dn= portion of magnet
 					link = urljoin(self.base_link, items[0])
-					name = items[1]
-					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-					if source_utils.remove_lang(name):
+					link = client.request(link, timeout='10')
+					if not link:
 						continue
 
-					match = source_utils.check_title(self.title, name, self.hdlr, self.year)
-					if not match:
+					magnet = re.compile('(magnet.+?)"').findall(link)[0]
+					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.')
+					url = url.split('&tr')[0]
+					name = unquote_plus(url.split('&dn=')[1])
+					name = source_utils.clean_name(self.title, name)
+					if source_utils.remove_lang(name, self.episode_title):
 						continue
+
+					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
+						continue
+
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
+
+					# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
+					if self.episode_title:
+						if not source_utils.filter_single_episodes(self.hdlr, name):
+							continue
 
 					try:
 						seeders = int(items[3].replace(',', ''))
@@ -147,12 +163,6 @@ class source:
 					except:
 						seeders = 0
 						pass
-
-					link = client.request(link, timeout='5')
-					magnet = re.compile('(magnet.+?)"').findall(link)[0]
-					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.')
-					url = url.split('&tr')[0]
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					quality, info = source_utils.get_release_quality(name, url)
 					try:

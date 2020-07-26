@@ -1,0 +1,1 @@
+This will filter out source links for known groups that put up garbage like incomplete pack files, and some hard coded subs!

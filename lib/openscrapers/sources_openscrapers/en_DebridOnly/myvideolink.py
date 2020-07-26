@@ -161,8 +161,7 @@ class source:
 
 					name = item[0]
 					name = client.replaceHTMLCodes(name).replace(' ', '.')
-					match = source_utils.check_title(title.replace('!', ''), name, hdlr, data['year'])
-					if not match:
+					if not source_utils.check_title(title.replace('!', ''), name, hdlr, data['year']):
 						continue
 
 					quality, info = source_utils.get_release_quality(name, url)

@@ -1,3 +1,10 @@
+0.0.2.008
+- Torrent scrapers updated for pack scraping support.
+    Please read help in settings, requires addon support!!
+- New setting added to Torrent scrapers to filter undesirables
+    Please read help in settings
+- New setting added to filter identified Foreign single audio sources
+
 0.0.2.007
 - More work for Py3 compatibility
 - changed settings.xml, moved foreign scrapers 

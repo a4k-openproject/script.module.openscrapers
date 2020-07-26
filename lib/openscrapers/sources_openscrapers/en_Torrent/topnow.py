@@ -31,6 +31,7 @@ try: from urlparse import parse_qs, urljoin
 except ImportError: from urllib.parse import parse_qs, urljoin
 try: from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
+
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
@@ -48,7 +49,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -57,7 +58,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -92,11 +93,13 @@ class source:
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			aliases = data['aliases']
+			episode_title = data['title'] if 'tvshowtitle' in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ('(' + data['year'] + ')')
 
-			# query = '%s %s' % (title, hdlr)
+			# query = '%s %s' % (title, hdlr) #site now  fails with year in query
 			query = title
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			if 'tvshowtitle' in data:
 				url = self.show_link % query.replace(' ', '-')
@@ -123,12 +126,11 @@ class source:
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 				name = url.split('&dn=')[1]
-				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-				if source_utils.remove_lang(name):
+				name = source_utils.clean_name(title, name)
+				if source_utils.remove_lang(name, episode_title):
 					continue
 
-				match = source_utils.check_title(title, name, hdlr.replace('(', '').replace(')', ''), data['year'])
-				if not match:
+				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), data['year']):
 					continue
 
 				seeders = 0 # seeders not available on topnow

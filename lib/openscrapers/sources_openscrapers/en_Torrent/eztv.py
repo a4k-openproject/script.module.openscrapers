@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-20-2020)
+# modified by Venom for Openscrapers (updated url 7-07-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -35,6 +35,7 @@ except ImportError: from urllib.parse import urlencode, quote_plus, unquote, unq
 from openscrapers.modules import client
 from openscrapers.modules import debrid
 from openscrapers.modules import source_utils
+from openscrapers.modules import workers
 
 
 class source:
@@ -49,7 +50,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -74,7 +75,6 @@ class source:
 		try:
 			if url is None:
 				return sources
-
 			if debrid.status() is False:
 				return sources
 
@@ -82,11 +82,12 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
+			aliases = data['aliases']
+			episode_title = data['title'] if 'tvshowtitle' in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			url = self.search_link % (quote_plus(query).replace('+', '-'))
 			url = urljoin(self.base_link, url)
@@ -122,13 +123,17 @@ class source:
 
 					magnet_title = derka[1]
 					name = unquote_plus(magnet_title)
-					name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-					if source_utils.remove_lang(name):
+					name = source_utils.clean_name(title, name)
+					if source_utils.remove_lang(name, episode_title):
 						continue
 
-					match = source_utils.check_title(title, name, hdlr, data['year'])
-					if not match:
+					if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
 						continue
+
+					# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
+					if episode_title:
+						if not source_utils.filter_single_episodes(hdlr, name):
+							continue
 
 					try:
 						seeders = int(re.findall('<font color=".+?">([0-9]+|[0-9]+,[0-9]+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))

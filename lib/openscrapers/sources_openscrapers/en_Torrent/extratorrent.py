@@ -51,7 +51,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -61,7 +61,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -99,12 +99,13 @@ class source:
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
+			self.aliases = data['aliases']
+			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			urls = []
 			url = self.search_link % quote_plus(query)
@@ -140,24 +141,22 @@ class source:
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', link, re.DOTALL)[0])
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 			url = url.split('&tr')[0]
-			try:
-				url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
-			except:
-				pass
-
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
-
 			name = url.split('&dn=')[1]
-			name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-			if source_utils.remove_lang(name):
+			name = source_utils.clean_name(self.title, name)
+			if source_utils.remove_lang(name, self.episode_title):
 				return
 
-			match = source_utils.check_title(self.title, name, self.hdlr, self.year)
-			if not match:
+			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 				return
 
 			if url in str(self.sources):
 				return
+
+			# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
+			if self.episode_title:
+				if not source_utils.filter_single_episodes(self.hdlr, name):
+					return
 
 			try:
 				seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sy'})[0].replace(',', ''))

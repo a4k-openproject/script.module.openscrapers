@@ -78,8 +78,8 @@ def error(message=None, exception=True):
 		import sys
 		if exception:
 			type, value, traceback = sys.exc_info()
-			addon = 'script.module.openscrapers.'
-			filename = (traceback.tb_frame.f_code.co_filename).replace('\\', '.').replace('.py', '')
+			addon = 'script.module.openscrapers'
+			filename = (traceback.tb_frame.f_code.co_filename)
 			filename = filename.split(addon)[1]
 			name = traceback.tb_frame.f_code.co_name
 			linenumber = traceback.tb_lineno
@@ -95,7 +95,7 @@ def error(message=None, exception=True):
 			caller = [filename, name, linenumber]
 		else:
 			caller = None
-		log(msg=message, caller=caller, level = LOGERROR)
+		log(msg=message, caller=caller, level=LOGERROR)
 		del(type, value, traceback) # So we don't leave our local labels/objects dangling
 	except:
 		import traceback

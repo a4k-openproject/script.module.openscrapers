@@ -13,6 +13,7 @@ params = dict(parse_qsl(sys.argv[2].replace('?', '')))
 action = params.get('action')
 mode = params.get('mode')
 query = params.get('query')
+name = params.get('name')
 
 
 if action == "OpenscrapersSettings":
@@ -21,6 +22,19 @@ if action == "OpenscrapersSettings":
 
 elif mode == "OpenscrapersSettings":
 	control.openSettings('0.0', 'script.module.openscrapers')
+
+
+elif action == 'ShowChangelog':
+	from openscrapers.modules import changelog
+	changelog.get()
+	control.sleep(200)
+	control.openSettings(query, "script.module.openscrapers")
+
+
+elif action == 'ShowHelp':
+	from openscrapers.help import help
+	help.get(name)
+	control.openSettings(query, "script.module.openscrapers")
 
 
 elif action == "Defaults":
@@ -57,13 +71,6 @@ elif action == "toggleAllPaid":
 	control.openSettings(query, "script.module.openscrapers")
 
 
-elif action == 'ShowChangelog':
-	from openscrapers.modules import changelog
-	changelog.get()
-	control.sleep(200)
-	control.openSettings(query, "script.module.openscrapers")
-
-
 elif action == "toggleAllHosters":
 	sourceList = []
 	sourceList = sources_openscrapers.hoster_providers
@@ -71,6 +78,40 @@ elif action == "toggleAllHosters":
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
 	# xbmc.log('All Hoster providers = %s' % sourceList,2)
+	control.sleep(200)
+	control.openSettings(query, "script.module.openscrapers")
+
+
+elif action == "toggleAllDebrid":
+	sourceList = []
+	sourceList = sources_openscrapers.debrid_providers
+	for i in sourceList:
+		source_setting = 'provider.' + i
+		control.setSetting(source_setting, params['setting'])
+	# xbmc.log('All Debrid providers = %s' % sourceList,2)
+	control.sleep(200)
+	control.openSettings(query, "script.module.openscrapers")
+
+
+elif action == "toggleAllTorrent":
+	sourceList = []
+	sourceList = sources_openscrapers.torrent_providers
+	for i in sourceList:
+		source_setting = 'provider.' + i
+		control.setSetting(source_setting, params['setting'])
+	# xbmc.log('All Torrent providers = %s' % sourceList,2)
+	control.sleep(200)
+	control.openSettings(query, "script.module.openscrapers")
+
+
+elif action == "toggleAllPackTorrent":
+	sourceList = []
+	from openscrapers import pack_sources
+	sourceList = pack_sources()
+	for i in sourceList:
+		source_setting = 'provider.' + i
+		control.setSetting(source_setting, params['setting'])
+	# xbmc.log('All Pack Torrent providers = %s' % sourceList,2)
 	control.sleep(200)
 	control.openSettings(query, "script.module.openscrapers")
 
@@ -114,7 +155,7 @@ elif action == "toggleAllFrench":
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
-	# xbmc.log('All Spanish providers = %s' % sourceList,2)
+	# xbmc.log('All French providers = %s' % sourceList,2)
 	control.sleep(200)
 	control.openSettings(query, "script.module.openscrapers")
 
@@ -136,7 +177,7 @@ elif action == "toggleAllKorean":
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
-	# xbmc.log('All Spanish providers = %s' % sourceList,2)
+	# xbmc.log('All Korean providers = %s' % sourceList,2)
 	control.sleep(200)
 	control.openSettings(query, "script.module.openscrapers")
 
@@ -158,28 +199,6 @@ elif action == "toggleAllRussian":
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
-	# xbmc.log('All Polish providers = %s' % sourceList,2)
-	control.sleep(200)
-	control.openSettings(query, "script.module.openscrapers")
-
-
-elif action == "toggleAllDebrid":
-	sourceList = []
-	sourceList = sources_openscrapers.debrid_providers
-	for i in sourceList:
-		source_setting = 'provider.' + i
-		control.setSetting(source_setting, params['setting'])
-	# xbmc.log('All Debrid providers = %s' % sourceList,2)
-	control.sleep(200)
-	control.openSettings(query, "script.module.openscrapers")
-
-
-elif action == "toggleAllTorrent":
-	sourceList = []
-	sourceList = sources_openscrapers.torrent_providers
-	for i in sourceList:
-		source_setting = 'provider.' + i
-		control.setSetting(source_setting, params['setting'])
-	# xbmc.log('All Torrent providers = %s' % sourceList,2)
+	# xbmc.log('All Russian providers = %s' % sourceList,2)
 	control.sleep(200)
 	control.openSettings(query, "script.module.openscrapers")

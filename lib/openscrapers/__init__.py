@@ -52,6 +52,12 @@ def enabledCheck(module_name):
 	return True
 
 
+def pack_sources():
+	return ['7torrents', 'bitlord', 'btscene', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay',
+				'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy',
+				'yourbittorrent', 'zoogle']
+
+
 def providerSources():
 	sourceSubFolders = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
 	return getModuleName(sourceSubFolders)

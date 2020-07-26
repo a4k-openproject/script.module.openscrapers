@@ -50,7 +50,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -59,7 +59,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -94,12 +94,13 @@ class source:
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
+			self.aliases = data['aliases']
+			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			if 'tvshowtitle' in data:
 				url = self.tvsearch.format(quote_plus(query))
@@ -108,7 +109,7 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			items = self._get_items(url)
+			items = self.get_sources(url)
 
 			for item in items:
 				try:
@@ -136,7 +137,7 @@ class source:
 			return sources
 
 
-	def _get_items(self, url):
+	def get_sources(self, url):
 		items = []
 		try:
 			headers = {'User-Agent': client.agent()}
@@ -150,13 +151,17 @@ class source:
 
 				name = client.parseDOM(post, 'a', ret='title')[0]
 				name = unquote_plus(name)
-				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-				if source_utils.remove_lang(name):
+				name = source_utils.clean_name(self.title, name)
+				if source_utils.remove_lang(name, self.episode_title):
 					continue
 
-				match = source_utils.check_title(self.title, name, self.hdlr, self.year)
-				if not match:
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 					continue
+
+				# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
+				if self.episode_title:
+					if not source_utils.filter_single_episodes(self.hdlr, name):
+						continue
 
 				try:
 					seeders = int(re.findall("<td.*?<font color='green'><b>([0-9]+|[0-9]+,[0-9]+)</b>", post)[0].replace(',', ''))

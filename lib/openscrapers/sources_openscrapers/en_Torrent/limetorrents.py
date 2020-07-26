@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 4-20-2020)
+# modified by Venom for Openscrapers (updated url 7-12-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -29,8 +29,8 @@ import re
 
 try: from urlparse import parse_qs, urljoin
 except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote, unquote_plus
+try: from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
 from openscrapers.modules import cfscrape
 from openscrapers.modules import client
@@ -45,14 +45,16 @@ class source:
 		self.language = ['en']
 		self.domains = ['limetorrents.info', 'limetorrents.asia']
 		self.base_link = 'https://www.limetorrents.info'
-		self.tvsearch = 'https://www.limetorrents.info/search/tv/{0}/1/'
-		self.moviesearch = 'https://www.limetorrents.info/search/movies/{0}/1/'
+		self.tvsearch = '/search/tv/{0}/1/'
+		self.moviesearch = '/search/movies/{0}/1/'
+		self.scraper = cfscrape.create_scraper()
 		self.min_seeders = 0
+		self.pack_capable = True
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -61,7 +63,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -82,88 +84,87 @@ class source:
 
 
 	def sources(self, url, hostDict, hostprDict):
-		self.scraper = cfscrape.create_scraper()
-		self._sources = []
+		self.sources = []
 		try:
-			self.items = []
-
 			if url is None:
-				return self._sources
-
+				return self.sources
 			if debrid.status() is False:
-				return self._sources
+				return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
+			self.aliases = data['aliases']
+			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			urls = []
 			if 'tvshowtitle' in data:
-				url = self.tvsearch.format(quote(query))
+				url = self.tvsearch.format(quote_plus(query))
 			else:
-				url = self.moviesearch.format(quote(query))
+				url = self.moviesearch.format(quote_plus(query))
 			urls.append(url)
 
 			url2 = url.replace('/1/', '/2/')
 			urls.append(url2)
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			threads = []
 			for url in urls:
-				threads.append(workers.Thread(self._get_items, url))
+				link = urljoin(self.base_link, url).replace('+', '-')
+				threads.append(workers.Thread(self.get_sources, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
-
-			threads2 = []
-			for i in self.items:
-				threads2.append(workers.Thread(self._get_sources, i))
-			[i.start() for i in threads2]
-			[i.join() for i in threads2]
-			return self._sources
+			return self.sources
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
-			return self._sources
+			return self.sources
 
 
-	def _get_items(self, url):
+	def get_sources(self, link):
+		# log_utils.log('link = %s' % link, log_utils.LOGDEBUG)
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = self.scraper.get(url,headers=headers).content
-			if not r:
+			r = self.scraper.get(link, headers=headers).content
+			if not r or r == '':
 				return
 			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			posts = client.parseDOM(posts, 'tr')
+		except:
+			source_utils.scraper_error('LIMETORRENTS')
+			return
 
-			for post in posts:
-				data = client.parseDOM(post, 'a', ret='href')[1]
+		for post in posts:
+			try:
+				data = client.parseDOM(post, 'a', ret='href')[0]
 				if '/search/' in data:
 					continue
+				data = re.sub(r'\s', '', data).strip()
+				hash = re.compile(r'/torrent/(.+?).torrent').findall(data)[0]
 
-				try:
-					data = data.encode('ascii', 'ignore')
-				except:
-					pass
+				name = re.findall(r'title=(.+?)$', data, re.DOTALL)[0]
+				name = source_utils.clean_name(self.title, name)
 
-				data = re.sub('\s', '', data).strip()
-				link = urljoin(self.base_link, data)
-
-				name = client.parseDOM(post, 'a')[1]
-				name = unquote_plus(name)
-				name = re.sub('[^A-Za-z0-9]+', '.', name).lstrip('.')
-				if source_utils.remove_lang(name):
+				# name = client.parseDOM(post, 'a')[1]
+				# name = unquote_plus(name)
+				# name = source_utils.clean_name(self.title, name)
+				if source_utils.remove_lang(name, self.episode_title ):
 					continue
 
-				match = source_utils.check_title(self.title, name, self.hdlr, self.year)
-				if not match:
+				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 					continue
+
+				# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
+				if self.episode_title:
+					if not source_utils.filter_single_episodes(self.hdlr, name):
+						continue
 
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
@@ -173,48 +174,145 @@ class source:
 					seeders = 0
 					pass
 
+				quality, info = source_utils.get_release_quality(name, url)
+
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
 					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
 				except:
-					isize = '0'
 					dsize = 0
 					pass
 
-				self.items.append((name, link, isize, dsize, seeders))
-			return self.items
-		except:
-			source_utils.scraper_error('LIMETORRENTS')
-			return self.items
+				info = ' | '.join(info)
 
-
-	def _get_sources(self, item):
-		try:
-			name = item[0]
-			quality, info = source_utils.get_release_quality(name, name)
-
-			if item[2] != '0':
-				info.insert(0, item[2])
-			info = ' | '.join(info)
-
-			data = self.scraper.get(item[1]).content
-			if data is None:
-				return
-
-			try:
-				url = re.search('''href=["'](magnet:\?[^"']+)''', data).groups()[0]
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-				url = url.split('&tr')[0]
+				self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
-				return
+				source_utils.scraper_error('LIMETORRENTS')
+				pass
 
-			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
-			self._sources.append({'source': 'torrent', 'seeders': item[4], 'hash': hash, 'name': name, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
+	def sources_packs(self, url, hostDict, hostprDict, search_series=False, total_seasons=None, bypass_filter=False):
+		self.sources = []
+		try:
+			self.search_series = search_series
+			self.total_seasons = total_seasons
+			self.bypass_filter = bypass_filter
+
+			if url is None:
+				return self.sources
+			if debrid.status() is False:
+				return self.sources
+
+			data = parse_qs(url)
+			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.aliases = data['aliases']
+			self.imdb = data['imdb']
+			self.year = data['year']
+			self.season_x = data['season']
+			self.season_xx = self.season_x.zfill(2)
+
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			queries = [
+						self.tvsearch.format(quote_plus(query + ' S%s' % self.season_xx)),
+						self.tvsearch.format(quote_plus(query + ' Season %s' % self.season_x))
+							]
+			if self.search_series:
+				queries = [
+						self.tvsearch.format(quote_plus(query + ' Season')),
+						self.tvsearch.format(quote_plus(query + ' Complete'))
+								]
+
+			threads = []
+			for url in queries:
+				link = urljoin(self.base_link, url).replace('+', '-')
+				threads.append(workers.Thread(self.get_sources_packs, link))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
+			return self.sources
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
-			pass
+			return self.sources
+
+
+	def get_sources_packs(self, link):
+		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		try:
+			headers = {'User-Agent': client.agent()}
+			r = self.scraper.get(link,headers=headers).content
+			if not r or r == '':
+				return
+			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
+			posts = client.parseDOM(posts, 'tr')
+		except:
+			source_utils.scraper_error('LIMETORRENTS')
+			return
+
+		for post in posts:
+			try:
+				data = client.parseDOM(post, 'a', ret='href')[0]
+				if '/search/' in data:
+					continue
+				data = re.sub(r'\s', '', data).strip()
+				hash = re.compile(r'/torrent/(.+?).torrent').findall(data)[0]
+
+				name = re.findall(r'title=(.+?)$', data, re.DOTALL)[0]
+				name = source_utils.clean_name(self.title, name)
+
+				# name = client.parseDOM(post, 'a')[1]
+				# name = unquote_plus(name)
+				# name = source_utils.clean_name(self.title, name)
+				if source_utils.remove_lang(name):
+					continue
+
+				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+
+				if not self.search_series:
+					if not self.bypass_filter:
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
+							continue
+					package = 'season'
+
+				elif self.search_series:
+					if not self.bypass_filter:
+						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
+						if not valid:
+							continue
+					else:
+						last_season = self.total_seasons
+					package = 'show'
+
+				try:
+					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
+					if self.min_seeders > seeders:
+						continue
+				except:
+					seeders = 0
+					pass
+
+				quality, info = source_utils.get_release_quality(name, url)
+
+				try:
+					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except:
+					dsize = 0
+					pass
+
+				info = ' | '.join(info)
+
+				item = {'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
+				if self.search_series:
+					item.update({'last_season': last_season})
+				self.sources.append(item)
+			except:
+				source_utils.scraper_error('LIMETORRENTS')
+				pass
 
 
 	def resolve(self, url):
