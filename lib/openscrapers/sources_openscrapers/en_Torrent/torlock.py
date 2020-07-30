@@ -140,6 +140,7 @@ class source:
 			except:
 				url = unquote_plus(url).replace('&amp;', '&')
 			url = url.split('&tr=')[0].replace(' ', '.')
+
 			if url in str(self.sources):
 				return
 			hash = re.compile('btih:(.*?)&').findall(url)[0]

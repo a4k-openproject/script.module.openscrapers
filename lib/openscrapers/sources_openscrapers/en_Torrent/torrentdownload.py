@@ -27,10 +27,12 @@
 
 import re
 
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus
+try:
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote_plus
+except:
+	from urllib.parse import parse_qs, urljoin
+	from urllib.parse import urlencode, quote_plus, unquote_plus
 
 from openscrapers.modules import client
 from openscrapers.modules import debrid
@@ -136,7 +138,9 @@ class source:
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
+
 					name = link[2].replace('+MB+', '')
+					name = unquote_plus(name).decode('utf8').replace('&amp;', '&')
 					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name, self.episode_title):
 						continue
@@ -244,7 +248,9 @@ class source:
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
+
 					name = link[2].replace('+MB+', '')
+					name = unquote_plus(name).decode('utf8').replace('&amp;', '&')
 					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name):
 						continue

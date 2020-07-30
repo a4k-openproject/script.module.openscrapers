@@ -337,6 +337,7 @@ def remove_lang(release_title, episode_title=None):
 		fmt = release_title_strip(release_title)
 		if fmt is None:
 			return False
+		# log_utils.log('fmt = %s for release_title = %s' % (str(fmt), str(release_title)), __name__, log_utils.LOGDEBUG)
 
 		if episode_title:
 			episode_title = episode_title.lower().replace("'", "")
@@ -407,13 +408,18 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		season_check = '.s%s.' % season
 		season_fill_check = '.s%s.' % season_fill
 		season_full_check = '.season.%s.' % season
+		season_full_check_ns = '.season%s.' % season
 		season_full_fill_check = '.season.%s.' % season_fill
-		string_list = [season_check, season_fill_check, season_full_check, season_full_fill_check]
+		season_full_fill_check_ns = '.season%s.' % season_fill
+
+		string_list = [season_check, season_fill_check, season_full_check, season_full_check_ns, season_full_fill_check, season_full_fill_check_ns]
 
 		split_list = [season_check, season_fill_check, '.' + season + '.season', 'total.season', 'season', 'the.complete', 'complete', year]
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
+
+		# log_utils.log('t = %s for release_title = %s' % (str(t), str(release_title)), __name__, log_utils.LOGDEBUG)
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False
 
@@ -429,7 +435,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 			if bool(re.search(item, release_title)):
 				return False
 
-# remove season ranges - returned in showPack scrape, plus specific crap
+# remove season ranges - returned in showPack scrape, plus non conforming season and specific crap
 		rt = release_title.replace('-', '.')
 		if any(i in rt for i in string_list):
 			for item in [
@@ -447,6 +453,8 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 					]:
 				if bool(re.search(item, release_title)):
 					return False
+
+
 			return True
 
 		return False
@@ -456,7 +464,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
-	# log_utils.log('year = %s' % str(year), __name__, log_utils.LOGDEBUG)
+	# log_utils.log('release_title = %s' % str(release_title), __name__, log_utils.LOGDEBUG)
 	try:
 		try:
 			aliases = json.loads(aliases)
@@ -480,6 +488,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
+		# log_utils.log('t = %s for release_title = %s' % (str(t), str(release_title)), __name__, log_utils.LOGDEBUG)
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False, 0
 
@@ -508,17 +517,17 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 # remove single seasons - returned in seasonPack scrape
 		season_regex = [
-				r'season(?:\.{0,1}|-{0,1})([2-9]{1}).(?:0{1})\1.complete',  # "season.2.02.complete" when first number is >1 matches 2nd after a zero
+				r'season(?:\.{0,1}|-{0,1})([2-9]{1}).(?:0{1})\1.complete',	# "season.2.02.complete" when first number is >1 matches 2nd after a zero
 				r'season(?:\.{0,1}|-{0,1})([2-9]{1}).(?:[0-9]+).complete', # "season.9.10.complete" when first number is >1 followed by 2 digit number
-				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)s\d{1,2}',        # season.02.s02
-				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)complete',      # season.02.complete
-				r'season(?:\.|-)\d{1,2}(?:\.|-)\d{3,4}p{0,1}',        # season.02.1080p
+				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)s\d{1,2}',		   # season.02.s02
+				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)complete',		 # season.02.complete
+				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)\d{3,4}p{0,1}',		  # "season.02.1080p" and no seperator "season02.1080p"
 				r'season(?:\.|-)\d{1,2}(?:\.|-)(?!thru|to|\d+)', # not followed by "to", "thru", or another number(which would be a range)
-				r'season(?:\.|-)\d{1,2}(?:\.)(?:$)',                 # end of line ex."season.1"
-				r'season(?:\.|-)\d{1,2}(?:\.|-)(?:19|20)[0-9]{2}',          # single season followed by 4 digit year ex."season.1.1971" or "season.01.1971
-				r'season(?:\.|-)\d{1,2}(?:\.|-)\d{3}(?:\.{1,2}|-{1,2})(?:19|20)[0-9]{2}',          # single season followed by 4 digit year ex."season.1.004.1971" or "season.01.004.1971"
-				r'(?:\.|-)s\d{2}(?:\.|-)complete',      # s02.complete
-
+				r'season(?:\.|-)\d{1,2}(?:\.)(?:$)',				 # end of line ex."season.1" or "season.01"
+				r'season(?:\.|-)\d{1,2}(?:\.|-)(?:19|20)[0-9]{2}',			# single season followed by 4 digit year ex."season.1.1971" or "season.01.1971
+				r'season(?:\.|-)\d{1,2}(?:\.|-)\d{3}(?:\.{1,2}|-{1,2})(?:19|20)[0-9]{2}',		   # single season followed by 4 digit year ex."season.1.004.1971" or "season.01.004.1971"
+				r'(?<!thru)(?<!to)(?<!\d{2})(?:\.|-)s\d{2}(?:\.|-)complete',				# ".s02.complete" not proceeded by "thru", "to", or 2 digit number
+				r'(?<!thru)(?<!to)(?<!s\d{2})(?:\.|-)s\d{2}(?:\.|-)(?!thru|to|s|\d+)'		# .s02. not followed or proceeded by "thru", "to" 
 				]
 		for item in season_regex:
 			if bool(re.search(item, release_title)):
@@ -608,6 +617,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 
 
+
 # "s1.to.s9" single digit range filte (dots or dashes)
 		to_season_ranges = []
 		start_season = 's1'
@@ -661,6 +671,14 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			keys = [i for i in dash_ranges if i in release_title]
 			last_season = int(keys[0].split('-s')[1])
 			return True, last_season
+
+# 2 digit "s01.s09" range filtering (dots)
+		dot_ranges = [i.replace('.to.', '.') for i in to_season_ranges]
+		if any(i in release_title for i in dot_ranges):
+			keys = [i for i in dot_ranges if i in release_title]
+			last_season = int(keys[0].split('.s')[1])
+			return True, last_season
+
 
 		return True, total_seasons
 	except:
@@ -726,23 +744,37 @@ def url_strip(url):
 
 
 def clean_name(title, release_title):
-	if release_title.lower().startswith('rifftrax'):
-		return release_title
-	release_title = strip_non_ascii_and_unprintable(release_title)
-	release_title = release_title.lstrip()
-	title_startswith = title[0:3]
-	release_title_startswith = release_title[0:3]
-	if release_title_startswith.lower() != title_startswith.lower():
-		if title_startswith not in release_title:
+	try:
+		unwanted = ['[zooqle.com]', '[horriblesubs]', '[.www.cpasbien.cm.]', '[.www.cpasbien.pw.]', '[auratorrent.pl].nastoletni.wilkoak', '[auratorrent.pl]', 'tamilrockers.com',
+					'www.tamilrockers.com', '[.oxtorrent.com.]', '[.www.torrenting.com.]', '[.Www.nextorrent.site.]', '[.oxtorrent.com.]', '[gktorrent.com]', 'www.torrenting.com',
+					'www.torrenting.org', 'www.torrent9.nz', '[.www.omgtorrent.com.]', '[.www.torrent9.uno.]', '[agusiq.torrents.pl]', '[katmoviehd.to]', '[3d.hentai]', '[dark.media]',
+					'[filetracker.pl]', 'www-torrenting-com', 'www-torrenting-org', '[katmoviehd.eu]', 'www.scenetime.com', 'www.tamilrockerrs.pl', '[.torrent9.tv.]', '[nextorrent.net]',
+					'+katmoviehd.pw+', 'www.movcr.tv', 'www.bludv.tv', '[www.torrent9.ph.]','[acesse.]', '[acesse-hd-elite-me]', '[torrentcouch.net]', 'ramin.djawadi', '[prof]', '[reup]',
+					'[ah]', '[ul]', '+13.+', 'taht.oyunlar', '[agusiq-torrents.pl]', 'agusiq-torrents-pl', 'crazy4tv.com', '[tv]']
+
+		unwanted2 = ['.', '..', '...', '{', '}', '[.]', '[.]', '[.', '+-+-', '-', '-.', '.-.']
+
+		if release_title.lower().startswith('rifftrax'):
 			return release_title
-		try:
-			release_title = release_title.split(title_startswith)[1]
-			release_title = title_startswith + release_title
-			# log_utils.log('revised release_title = %s' % str(release_title), log_utils.LOGDEBUG)
-		except:
-			log_utils.error()
-			pass
-	return release_title
+
+		release_title = strip_non_ascii_and_unprintable(release_title)
+
+		release_title = release_title.lstrip('/ ')
+		release_title = release_title.lower()
+		release_title = release_title.replace(' ', '.')
+
+		for i in unwanted:
+			if release_title.startswith(i):
+				release_title = release_title.replace(i, '')
+				break
+
+		for i in unwanted2:
+			release_title = release_title.lstrip(i)
+		# log_utils.log('final release_title: ' + str(release_title), log_utils.LOGDEBUG)
+		return release_title
+
+	except:
+		log_utils.error()
 
 
 def strip_non_ascii_and_unprintable(text):

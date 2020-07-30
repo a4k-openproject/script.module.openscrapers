@@ -25,6 +25,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 import re
 
 try: from urlparse import parse_qs, urljoin
@@ -32,9 +33,11 @@ except ImportError: from urllib.parse import parse_qs, urljoin
 try: from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
+
+from openscrapers.modules import cache
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import source_utils
+from openscrapers.modules import source_utils, log_utils
 from openscrapers.modules import workers
 
 
@@ -45,8 +48,7 @@ class source:
 		self.domain = ['bitlordsearch.com']
 		self.base_link = 'http://www.bitlordsearch.com'
 		self.search_link = '/search?q=%s'
-		# bitlords api-possible future switch
-		# self.search_link = '/get_list'
+		self.api_search_link = '/get_list'
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -104,29 +106,48 @@ class source:
 
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			api_url = urljoin(self.base_link, self.api_search_link)
 
-			r = client.request(url)
-			if not r:
+			# headers = cache.get(self._get_token_and_cookies, 672)
+			headers = cache.get(self._get_token_and_cookies, 24)
+			headers.update({'Referer': url})
+			log_utils.log('headers = %s' % headers, log_utils.LOGDEBUG)
+
+			query_data = {
+				'query': query,
+				'offset': 0,
+				'limit': 99,
+				'filters[field]': 'seeds',
+				'filters[sort]': 'desc',
+				'filters[time]': 4,
+				'filters[category]': 3 if 'tvshowtitle' not in data else 4,
+				'filters[adult]': False,
+				'filters[risky]': False}
+
+			rjson = client.request(api_url, post=query_data, headers=headers)
+			log_utils.log('rjson = %s' % rjson, log_utils.LOGDEBUG)
+			files = json.loads(rjson)
+			error = files.get('error')
+			if error:
 				return sources
-			links = zip(client.parseDOM(r, 'a', attrs={'class': 'btn btn-default magnet-button stats-action banner-button'}, ret='href'), client.parseDOM(r, 'td', attrs={'class': 'size'}), client.parseDOM(r, 'td', attrs={'class': 'seeds rescrap'}))
 
-			for link in links:
+			for file in files.get('content'):
 				try:
-					url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.')
-					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
-					url = url.split('&tr=')[0]
-					url = url.split('&xl=')[0]
-					if 'magnet' not in url:
-						continue
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
-					name = url.split('&dn=')[1]
+					name = file.get('name')
 					name = source_utils.clean_name(title, name)
 					if source_utils.remove_lang(name, episode_title):
 						continue
-
 					if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
 						continue
+
+					url = file.get('magnet').encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
+					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
+					url = url.split('&tr=')[0]
+					url = url.split('&xl=')[0]
+
+					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
 					if episode_title:
@@ -134,7 +155,7 @@ class source:
 							continue
 
 					try:
-						seeders = int(link[2].replace(',', ''))
+						seeders = file.get('seeds')
 						if self.min_seeders > seeders:
 							continue
 					except:
@@ -144,7 +165,7 @@ class source:
 					quality, info = source_utils.get_release_quality(name, url)
 
 					try:
-						size = int(link[1])
+						size = file.get('size')
 						size = str(size) + ' GB' if len(str(size)) == 1 else str(size) + ' MB'
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
@@ -187,22 +208,24 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
+			# self.headers = cache.get(self._get_token_and_cookies, 672)
+			self.headers = cache.get(self._get_token_and_cookies, 24)
 
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
-						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
+						quote_plus(query + ' S%s' % self.season_xx),
+						quote_plus(query + ' Season %s' % self.season_x)
 							]
 			if search_series:
 				queries = [
-						self.search_link % quote_plus(query + ' Season'),
-						self.search_link % quote_plus(query + ' Complete')
+						quote_plus(query + ' Season'),
+						quote_plus(query + ' Complete')
 								]
 
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url).replace('+', '-')
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				link = urljoin(self.base_link, self.search_link % url).replace('+', '-')
+				threads.append(workers.Thread(self.get_sources_packs, link, url.replace('+', '-')))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -211,25 +234,42 @@ class source:
 			return self.sources
 
 
-	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+	def get_sources_packs(self, link, url):
 		try:
-			r = client.request(link)
-			if not r:
-				return
-			links = zip(client.parseDOM(r, 'a', attrs={'class': 'btn btn-default magnet-button stats-action banner-button'}, ret='href'), client.parseDOM(r, 'td', attrs={'class': 'size'}), client.parseDOM(r, 'td', attrs={'class': 'seeds rescrap'}))
+			# log_utils.log('link = %s' % str(link), log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			self.headers.update({'Referer': link})
+			query_data = {
+				'query': url,
+				'offset': 0,
+				'limit': 99,
+				'filters[field]': 'seeds',
+				'filters[sort]': 'desc',
+				'filters[time]': 4,
+				'filters[category]': 4,
+				'filters[adult]': False,
+				'filters[risky]': False}
 
-			for link in links:
+			api_url = urljoin(self.base_link, self.api_search_link)
+			rjson = client.request(api_url, post=query_data, headers=self.headers)
+
+			files = json.loads(rjson)
+			error = files.get('error')
+			if error:
+				return sources
+
+			for file in files.get('content'):
 				try:
-					url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.')
+					name = file.get('name')
+					name = source_utils.clean_name(self.title, name)
+
+					url = file.get('magnet').encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
+					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 					url = url.split('&tr=')[0]
 					url = url.split('&xl=')[0]
-					if 'magnet' not in url:
-						continue
+
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
-					name = url.split('&dn=')[1]
-					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name):
 						continue
 
@@ -249,7 +289,7 @@ class source:
 						package = 'show'
 
 					try:
-						seeders = int(link[2].replace(',', ''))
+						seeders = file.get('seeds')
 						if self.min_seeders > seeders:
 							continue
 					except:
@@ -259,7 +299,7 @@ class source:
 					quality, info = source_utils.get_release_quality(name, url)
 
 					try:
-						size = int(link[1])
+						size = file.get('size')
 						size = str(size) + ' GB' if len(str(size)) == 1 else str(size) + ' MB'
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
@@ -281,6 +321,20 @@ class source:
 		except:
 			source_utils.scraper_error('BITLORD')
 			pass
+
+
+	def _get_token_and_cookies(self):
+		headers = None
+		try:
+			post = client.request(self.base_link, output='extended', timeout='10')
+			token_id = re.findall(r'token\: (.*)\n', post[0])[0]
+			token = ''.join(re.findall(token_id + r" ?\+?\= ?'(.*)'", post[0]))
+			headers = post[3]
+			headers.update({'Cookie': post[2].get('Set-Cookie').replace('SameSite=Lax, ', ''), 'X-Request-Token': token})
+			return headers
+		except:
+			source_utils.scraper_error('BITLORD')
+			return headers
 
 
 	def resolve(self, url):

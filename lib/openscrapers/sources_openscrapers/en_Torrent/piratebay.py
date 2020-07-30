@@ -207,8 +207,8 @@ class source:
 
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
+			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 			rjson = client.request(link, error=True)
 			if not rjson or 'No results returned' in str(rjson):
 				return
