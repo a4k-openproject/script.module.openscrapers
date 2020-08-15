@@ -37,7 +37,7 @@ except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 from openscrapers.modules import cache
 from openscrapers.modules import client
 from openscrapers.modules import debrid
-from openscrapers.modules import source_utils, log_utils
+from openscrapers.modules import source_utils
 from openscrapers.modules import workers
 
 
@@ -106,13 +106,11 @@ class source:
 
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			api_url = urljoin(self.base_link, self.api_search_link)
 
-			# headers = cache.get(self._get_token_and_cookies, 672)
 			headers = cache.get(self._get_token_and_cookies, 24)
 			headers.update({'Referer': url})
-			log_utils.log('headers = %s' % headers, log_utils.LOGDEBUG)
 
 			query_data = {
 				'query': query,
@@ -126,7 +124,6 @@ class source:
 				'filters[risky]': False}
 
 			rjson = client.request(api_url, post=query_data, headers=headers)
-			log_utils.log('rjson = %s' % rjson, log_utils.LOGDEBUG)
 			files = json.loads(rjson)
 			error = files.get('error')
 			if error:
@@ -208,7 +205,6 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
-			# self.headers = cache.get(self._get_token_and_cookies, 672)
 			self.headers = cache.get(self._get_token_and_cookies, 24)
 
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)

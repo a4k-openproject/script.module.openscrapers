@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Openscrapers (updated url 6-27-2020)
+# modified by Venom for Openscrapers (updated url 8-03-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -51,6 +51,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
+			aliases = json.loads(aliases)
 			aliases.append({'country': 'us', 'title': title})
 			url = {'imdb': imdb, 'title': title, 'year': year, 'aliases': aliases}
 			url = urlencode(url)
@@ -61,6 +62,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
+			aliases = json.loads(aliases)
 			aliases.append({'country': 'us', 'title': tvshowtitle})
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year, 'aliases': aliases}
 			url = urlencode(url)

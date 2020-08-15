@@ -139,6 +139,8 @@ class source:
 			except:
 				url = r['file']
 
+
+
 			try:
 				quality = int(r['streamdetails']['video'][0]['width'])
 			except:
@@ -195,7 +197,7 @@ class source:
 			except:
 				pass
 
-			sources.append({'source': '0', 'quality': quality, 'language': 'en', 'url': url,
+			sources.append({'source': 'local', 'quality': quality, 'language': 'en', 'url': url,
 							'info': info, 'local': True, 'direct': True, 'debridonly': False, 'size': dsize})
 			return sources
 		except:

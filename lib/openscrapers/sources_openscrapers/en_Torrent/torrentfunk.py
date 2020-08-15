@@ -102,6 +102,7 @@ class source:
 
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url, timeout='5')
 			if not r:

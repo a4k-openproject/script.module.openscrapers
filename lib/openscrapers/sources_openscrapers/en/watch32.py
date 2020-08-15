@@ -83,7 +83,7 @@ class source:
 				try:
 					data = dom_parser.parse_dom(post, 'a', req=['href', 'title'])[0]
 					t = data.content
-					y = re.findall('\((\d{4})\)', data.attrs['title'])[0]
+					y = re.findall('\({0,1}(\d{4})\){0,1}', data.attrs['title'])[0]
 					qual = data.attrs['title']
 					if '-' in qual:
 						qual = qual.split('-')[1]

@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 # -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
+# modified by Venom for Openscrapers (updated url 8-03-2020)
 
 #  ..#######.########.#######.##....#..######..######.########....###...########.#######.########..######.
 #  .##.....#.##.....#.##......###...#.##....#.##....#.##.....#...##.##..##.....#.##......##.....#.##....##
@@ -9,7 +10,7 @@
 #  .##.....#.##.......##......##...##.##....#.##....#.##....##.##.....#.##.......##......##....##.##....##
 #  ..#######.##.......#######.##....#..######..######.##.....#.##.....#.##.......#######.##.....#..######.
 
-
+import json
 import re
 
 try: from urlparse import parse_qs, urljoin
@@ -44,6 +45,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
+			aliases = json.loads(aliases)
 			aliases.append({'country': 'us', 'title': title})
 			url = {'imdb': imdb, 'title': title, 'year': year, 'aliases': aliases}
 			url = urlencode(url)
@@ -54,6 +56,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
+			aliases = json.loads(aliases)
 			aliases.append({'country': 'us', 'title': tvshowtitle})
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year, 'aliases': aliases}
 			url = urlencode(url)

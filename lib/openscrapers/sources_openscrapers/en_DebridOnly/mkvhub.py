@@ -51,7 +51,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -60,7 +60,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -93,6 +93,7 @@ class source:
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			aliases = data['aliases']
 
 			hdlr = 'S%02d' % (int(data['season'])) if 'tvshowtitle' in data else data['year']
 
@@ -116,8 +117,12 @@ class source:
 
 					if source_utils.remove_lang(name):
 						continue
-					if not source_utils.check_title(title, name, hdlr, data['year']):
+					# if not source_utils.check_title(title, name, hdlr, data['year']):
+						# continue
+
+					if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
 						continue
+
 					items.append((url, name))
 				except:
 					source_utils.scraper_error('MKVHUB')

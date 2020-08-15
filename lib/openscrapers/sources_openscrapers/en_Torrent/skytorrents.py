@@ -234,7 +234,11 @@ class source:
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
+
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					if hash in str(self.sources):
+						continue
+
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name):

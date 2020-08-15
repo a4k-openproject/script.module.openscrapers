@@ -25,6 +25,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 import re
 import time
 
@@ -51,6 +52,7 @@ class source:
 
 
 	def movie(self, imdb, title, localtitle, aliases, year):
+		aliases = json.loads(aliases)
 		self.aliases = [cleantitle.get(i['title']) for i in aliases]
 		try:
 			url = {'imdb': imdb, 'title': title, 'year': year}
@@ -61,6 +63,7 @@ class source:
 
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+		aliases = json.loads(aliases)
 		self.aliases = [cleantitle.get(i['title']) for i in aliases]
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
