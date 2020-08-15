@@ -1,3 +1,12 @@
+0.0.2.010
+- Fixed some hosters broken by previous pack file support inclusion.
+- Few pack file filter tweaks.
+- Removed a few new cloudflare v2 challenge scrapers
+
+0.0.2.009
+- Pack scraper filter tweaks.
+- Removed a few new cloudflare v2 challenge scrapers
+
 0.0.2.008
 - Torrent scrapers updated for pack scraping support.
     Please read help in settings, requires addon support!!

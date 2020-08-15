@@ -50,7 +50,7 @@ class source:
 
 	def movie(self, imdb, title, localtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -60,7 +60,7 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
 		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year}
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
 		except:
@@ -99,7 +99,7 @@ class source:
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
+			self.aliases = data['aliases']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
 
@@ -131,7 +131,7 @@ class source:
 				if source_utils.remove_lang(name):
 					continue
 
-				if not source_utils.check_title(self.title, name, self.hdlr, self.year):
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 					continue
 
 				url = item['file_link']

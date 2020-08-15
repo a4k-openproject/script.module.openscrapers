@@ -37,10 +37,10 @@
         <setting id="provider.animetoon" type="bool" label="ANIMETOON" default="false"/>
         <setting id="provider.bnwmovies" type="bool" label="BNWMOVIES" default="false"/>
         <setting id="provider.cartoonhd" type="bool" label="CARTOONHD" default="true"/>
-        <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="false"/><!--random v2 challenge-->
-        <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/>
+<!--         <setting id="provider.cmovieshd" type="bool" label="CMOVIESHD" default="false"/> --><!--v2 challenge-->
+<!--         <setting id="provider.coolmoviezone" type="bool" label="COOLMOVIEZONE" default="true"/> --><!--v2 challenge-->
         <setting id="provider.easynews" type="bool" label="EASYNEWS" default="false"/>
-        <setting id="provider.extramovies" type="bool" label="EXTRAMOVIES" default="true"/>
+<!--         <setting id="provider.extramovies" type="bool" label="EXTRAMOVIES" default="true"/> --><!--v2 challenge-->
         <setting id="provider.filepursuit" type="bool" label="FILEPURSUIT" default="false"/>
         <setting id="provider.filmxy" type="bool" label="FILMXY" default="true"/>
 <!--         <setting id="provider.fmoviesag" type="bool" label="FMOVIES" default="true"/> --><!-- v2 challenge -->
@@ -55,14 +55,14 @@
         <setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
 <!--         <setting id="provider.megashare9" type="bool" label="MEGASHARE$NUMBER[9]" default="false"/> --><!-- needs fixing -->
         <setting id="provider.moviescouch" type="bool" label="MOVIESCOUCH" default="true"/>
-        <setting id="provider.myputlockers" type="bool" label="MYPUTLOCKERS" default="true"/>
+<!--         <setting id="provider.myputlockers" type="bool" label="MYPUTLOCKERS" default="true"/> --><!--v2 challenge-->
         <setting id="provider.ororo" type="bool" label="ORORO" default="false"/>
         <setting id="provider.primewire" type="bool" label="PRIMEWIRE" default="true"/>
 <!--         <setting id="provider.projectfreetv" type="bool" label="PROJECTFREETV" default="true"/> --><!-- needs fixing -->
-        <setting id="provider.putlockeronl" type="bool" label="PUTLOCKERONL" default="true"/>
+<!--         <setting id="provider.putlockeronl" type="bool" label="PUTLOCKERONL" default="true"/> --><!--v2 challenge-->
 <!--         <setting id="provider.putlockersonline" type="bool" label="PUTLOCKERSONLINE" default="false"/> --><!-- needs fixing -->
 <!--         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/> --><!--v2 challenge-->
-        <setting id="provider.series9" type="bool" label="SERIES9" default="false"/>
+<!--         <setting id="provider.series9" type="bool" label="SERIES9" default="false"/> --><!--v2 challenge-->
 <!--         <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/> --><!--hCaptcha-->
         <setting id="provider.showbox" type="bool" label="SHOWBOX" default="true"/>
 <!--         <setting id="provider.timewatch" type="bool" label="TIMEWATCH" default="true"/> --><!--v2 challenge-->
@@ -74,7 +74,7 @@
         <setting id="provider.watchserieshd" type="bool" label="WATCHSERIESHD" default="true"/>
         <setting id="provider.watchseriestv" type="bool" label="WATCHSERIESTV" default="true"/>
         <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="false"/>
-        <setting id="provider.yesmoviesgg" type="bool" label="YESMOVIESGG" default="false"/>
+<!--         <setting id="provider.yesmoviesgg" type="bool" label="YESMOVIESGG" default="false"/> --><!--v2 challenge-->
         <setting id="provider.zmovies" type="bool" label="ZMOVIES" default="false"/>
     </category>
 

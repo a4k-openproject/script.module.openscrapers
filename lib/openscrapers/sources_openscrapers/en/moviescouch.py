@@ -52,7 +52,7 @@ class source:
 			match = re.compile('<article id=.+?href="(.+?)" title="(.+?)"',re.DOTALL).findall(search_results)
 			for row_url, row_title in match:
 				if cleantitle.get(title) in cleantitle.get(row_title):
-					if year in str(row_title):
+					if str(year) in str(row_title):
 						return row_url
 			return
 		except:

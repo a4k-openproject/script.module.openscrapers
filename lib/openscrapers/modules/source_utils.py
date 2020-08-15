@@ -49,7 +49,6 @@ CODEC_MKV = ['mkv', '.mkv', 'matroska']
 AUDIO_8CH = ['ch8.', '8ch.', '.7.1.']
 AUDIO_7CH = ['ch7.', '7ch.', '.6.1.']
 AUDIO_6CH = ['ch6.', '6ch.', '.5.1.']
-
 AUDIO_2CH = ['ch2', '2ch', '2.0', 'audio.2.0.', 'stereo']
 
 VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom',
@@ -61,7 +60,7 @@ MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng'
 			  'lat.eng', 'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
 			  'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual.audio', 'multi']
 
-LANG = ['arabic', 'bgaudio', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
+LANG = ['arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
 			  'russian', 'spanish', 'tamil', 'telugu', 'truefrench', 'truespanish', 'turkish', 'hebrew']
 
 ABV_LANG = ['.chi.', '.chs.', '.dut.', '.fin.', '.fre.', '.ger.', '.gre.', '.heb.', '.ita.', '.jpn.', '.pol.', '.por.', '.rus.', '.spa.', '.tur.', '.ukr.']
@@ -281,6 +280,19 @@ def label_to_quality(label):
 		return 'SD'
 
 
+# # old method
+# def aliases_to_array(aliases, filter=None):
+	# try:
+		# if not filter:
+			# filter = []
+		# if isinstance(filter, str):
+			# filter = [filter]
+		# return [x.get('title') for x in aliases if not filter or x.get('country') in filter]
+	# except:
+		# log_utils.error()
+		# return []
+
+
 def aliases_to_array(aliases, filter=None):
 	try:
 		if all(isinstance(x, str) for x in aliases):
@@ -290,7 +302,6 @@ def aliases_to_array(aliases, filter=None):
 		if isinstance(filter, str):
 			filter = [filter]
 		return [x.get('title') for x in aliases if not filter or x.get('country') in filter]
-
 	except:
 		log_utils.error()
 		return []
@@ -302,6 +313,9 @@ def check_title(title, aliases, release_title, hdlr, year):
 		aliases = aliases_to_array(aliases)
 	except:
 		aliases = None
+
+	# log_utils.log('aliases = %s' % str(aliases), __name__, log_utils.LOGDEBUG)
+	# log_utils.log('aliases type = %s' % type(aliases), __name__, log_utils.LOGDEBUG)
 
 	title_list = []
 	if aliases:
@@ -338,7 +352,6 @@ def remove_lang(release_title, episode_title=None):
 		if fmt is None:
 			return False
 		# log_utils.log('fmt = %s for release_title = %s' % (str(fmt), str(release_title)), __name__, log_utils.LOGDEBUG)
-
 		if episode_title:
 			episode_title = episode_title.lower().replace("'", "")
 			episode_title = re.sub('[^a-z0-9]+', '.', episode_title)
@@ -453,10 +466,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 					]:
 				if bool(re.search(item, release_title)):
 					return False
-
-
 			return True
-
 		return False
 	except:
 		# return True
@@ -697,9 +707,11 @@ def release_title_strip(release_title):
 		fmt = '.%s.' % fmt
 		fmt = re.sub(r'(.+)((?:19|20)[0-9]{2}|season.\d+|s[0-3]{1}[0-9]{1}|e\d+|complete)(.complete\.|.episode\.\d+\.|.episodes\.\d+\.\d+\.|.series|.extras|.ep\.\d+\.|.\d{1,2}\.|-|\.|\s)', '', fmt) # new for pack files
 
-# Fails this case
+# Fails for these cases
 # release_title = Game.of.Thrones.S01.1080p.BluRay.10bit.HEVC-MkvCage.Season.1.One (ENCODED)
 # fmt = .one.
+# .yelowstone.season.03.hamsterstudio.2019.
+# fmt = ''
 # may be best to pass "tvshowtitle" and "ep_title" and strip that off, as well as strip seaon/s01 type info off
 
 		if fmt == '':
