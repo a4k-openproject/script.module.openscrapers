@@ -136,6 +136,7 @@ class source:
 				try:
 					url = unquote_plus(item['magnet']).replace(' ', '.')
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
+					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = item['infohash'].lower()
 
 					name = item['title']
@@ -242,6 +243,7 @@ class source:
 				try:
 					url = unquote_plus(item['magnet']).replace(' ', '.')
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
+					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = item['infohash'].lower()
 
 					name = item['title']

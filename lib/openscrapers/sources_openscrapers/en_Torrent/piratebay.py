@@ -73,7 +73,7 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if url is None:
+			if not url:
 				return
 			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
@@ -87,7 +87,7 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		sources = []
 		try:
-			if url is None:
+			if not url:
 				return sources
 			if debrid.status() is False:
 				return sources
@@ -109,10 +109,10 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			rjson = client.request(url, error=True)
-			if not rjson or 'No results returned' in str(rjson):
+			if not rjson or 'No results returned' in str(rjson) or 'Connection Time-out' in str(rjson):
 				return sources
-			files = json.loads(rjson)
 
+			files = json.loads(rjson)
 			for file in files:
 				try:
 					hash = file['info_hash']
@@ -140,7 +140,6 @@ class source:
 						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
-
 					try:
 						dsize, isize = source_utils.convert_size(float(file["size"]), to='GB')
 						info.insert(0, isize)
@@ -168,7 +167,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			if url is None:
+			if not url:
 				return self.sources
 			if debrid.status() is False:
 				return self.sources
@@ -210,12 +209,12 @@ class source:
 		try:
 			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 			rjson = client.request(link, error=True)
-			if not rjson or 'No results returned' in str(rjson):
+			if not rjson or 'No results returned' in str(rjson) or 'Connection Time-out' in str(rjson):
 				return
 			files = json.loads(rjson)
 		except:
 			source_utils.scraper_error('PIRATEBAY')
-			pass
+			return
 
 		for file in files:
 			try:
@@ -251,7 +250,6 @@ class source:
 					pass
 
 				quality, info = source_utils.get_release_quality(name, url)
-
 				try:
 					dsize, isize = source_utils.convert_size(float(file["size"]), to='GB')
 					info.insert(0, isize)

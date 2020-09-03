@@ -139,18 +139,19 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', link, re.DOTALL)[0])
-			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-			url = url.split('&tr')[0]
+			url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+			url = source_utils.strip_non_ascii_and_unprintable(url)
+			if url in str(self.sources):
+				return
+
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
+
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(self.title, name)
 			if source_utils.remove_lang(name, self.episode_title):
 				return
 
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
-				return
-
-			if url in str(self.sources):
 				return
 
 			# filter for episode multi packs (ex. S01E01-E17 is also returned in query)

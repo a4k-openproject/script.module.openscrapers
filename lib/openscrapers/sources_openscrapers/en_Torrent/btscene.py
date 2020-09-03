@@ -133,8 +133,8 @@ class source:
 					continue
 
 				for url in link:
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-					url = url.split('&tr')[0]
+					url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(self.title, name)
@@ -235,8 +235,9 @@ class source:
 					continue
 
 				for url in link:
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-					url = url.split('&tr')[0]
+					url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+					url = source_utils.strip_non_ascii_and_unprintable(url)
+
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(self.title, name)

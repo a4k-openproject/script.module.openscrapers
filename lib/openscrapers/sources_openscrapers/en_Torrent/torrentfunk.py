@@ -128,6 +128,7 @@ class source:
 				url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
 			except:
 				url = link[0].replace('&nbsp;', ' ')
+
 			if '/torrent/' not in url:
 				return
 

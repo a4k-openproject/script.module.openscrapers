@@ -138,8 +138,9 @@ class source:
 				if 'magnet' not in row:
 					continue
 				url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-				url = url.split('&tr')[0]
+				url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+				url = source_utils.strip_non_ascii_and_unprintable(url)
+
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 				name = url.split('&dn=')[1]
@@ -245,8 +246,9 @@ class source:
 				if 'magnet' not in row:
 					continue
 				url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-				url = url.split('&tr')[0]
+				url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+				url = source_utils.strip_non_ascii_and_unprintable(url)
+
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 				name = url.split('&dn=')[1]

@@ -121,10 +121,11 @@ class source:
 
 			time.sleep(2.1)
 			rjson = client.request(search_link, error=True)
-			if not rjson or 'No results found' in str(rjson):
+			if not rjson or not 'torrent_results' in str(rjson):
 				return sources
 
 			files = json.loads(rjson)['torrent_results']
+
 			for file in files:
 				url = file["download"]
 				url = url.split('&tr')[0]
@@ -198,7 +199,7 @@ class source:
 
 			time.sleep(2.1)
 			rjson = client.request(search_link, error=True)
-			if not rjson or 'No results found' in str(rjson):
+			if not rjson or not 'torrent_results' in str(rjson):
 				return sources
 
 			files = json.loads(rjson)['torrent_results']

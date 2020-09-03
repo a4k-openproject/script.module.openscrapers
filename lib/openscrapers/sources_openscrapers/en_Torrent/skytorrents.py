@@ -122,9 +122,13 @@ class source:
 				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
 
 				for url, seeders, in link:
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-					url = url.split('&tr')[0]
+					url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+					url = source_utils.strip_non_ascii_and_unprintable(url)
+					if url in str(self.sources):
+						return
+
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
+
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(title, name)
 					if source_utils.remove_lang(name, episode_title):
@@ -232,12 +236,12 @@ class source:
 				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
 
 				for url, seeders, in link:
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-					url = url.split('&tr')[0]
+					url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+					url = source_utils.strip_non_ascii_and_unprintable(url)
+					if url in str(self.sources):
+						return
 
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
-					if hash in str(self.sources):
-						continue
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(self.title, name)

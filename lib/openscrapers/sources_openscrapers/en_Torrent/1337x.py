@@ -186,6 +186,7 @@ class source:
 	def _get_sources(self, item):
 		try:
 			name = item[0]
+
 			quality, info = source_utils.get_release_quality(name, item[1])
 
 			if item[2] != '0':
@@ -196,8 +197,9 @@ class source:
 			data = client.parseDOM(data, 'a', ret='href')
 
 			url = [i for i in data if 'magnet:' in i][0]
-			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-			url = url.split('&tr')[0]
+			url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+			url = source_utils.strip_non_ascii_and_unprintable(url)
+
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			self._sources.append({'source': 'torrent', 'seeders': item[4], 'hash': hash, 'name': name, 'quality': quality,

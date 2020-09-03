@@ -140,7 +140,7 @@ class source:
 					hash = link[1].lower()
 
 					name = link[2].replace('+MB+', '')
-					name = unquote_plus(name).decode('utf8').replace('&amp;', '&')
+					name = unquote_plus(name).replace('&amp;', '&')
 					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name, self.episode_title):
 						continue
@@ -250,7 +250,7 @@ class source:
 					hash = link[1].lower()
 
 					name = link[2].replace('+MB+', '')
-					name = unquote_plus(name).decode('utf8').replace('&amp;', '&')
+					name = unquote_plus(name).replace('&amp;', '&')
 					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name):
 						continue

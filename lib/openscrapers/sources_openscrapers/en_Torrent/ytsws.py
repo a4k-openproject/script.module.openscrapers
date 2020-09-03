@@ -42,7 +42,7 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domains = ['yts.ws', 'yts.mx', 'yts.pm']
-		self.base_link = 'https://yts.ws'
+		self.base_link = 'https://yifyddl.co'
 		self.search_link = '/movie/%s'
 
 
@@ -97,8 +97,7 @@ class source:
 				link = re.findall('a data-torrent-id=".+?" href="(magnet:.+?)" class=".+?" title="(.+?)"', torrent, re.DOTALL)
 
 				for url, ref in link:
-					url = str(client.replaceHTMLCodes(url).split('&tr')[0])
-					url = url.replace(' ', '')
+					url = str(client.replaceHTMLCodes(url).split('&tr')[0].replace(' ', ''))
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]

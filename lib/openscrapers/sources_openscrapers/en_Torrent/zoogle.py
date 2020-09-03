@@ -145,12 +145,8 @@ class source:
 						if 'magnet:' not in entry:
 							continue
 						url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
-						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-						try:
-							url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
-						except:
-							pass
-						url = url.split('&tr')[0]
+						url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+						url = source_utils.strip_non_ascii_and_unprintable(url)
 						if url in str(self.sources):
 							continue
 					except:
@@ -287,12 +283,8 @@ class source:
 						if 'magnet:' not in entry:
 							continue
 						url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
-						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
-						try:
-							url = url.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
-						except:
-							pass
-						url = url.split('&tr')[0]
+						url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+						url = source_utils.strip_non_ascii_and_unprintable(url)
 						if url in str(self.sources):
 							continue
 					except:

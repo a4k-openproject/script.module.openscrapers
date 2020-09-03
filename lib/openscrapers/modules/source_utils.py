@@ -5,9 +5,7 @@
 
 import base64
 import hashlib
-
 import json
-
 import re
 import string
 
@@ -70,7 +68,7 @@ UNDESIREABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'b
 			  '.exe', 'extras.only', 'gears.media', 'gearsmedia', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'idea.film', 'ideafilm',
 			  'jaskier', 'kb.1080p', 'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm',
 			  'megapeer', 'minutemen.empire', 'omskbird', 'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample',
-			  'soundtrack', 'subtitle.only', 'teaser', 'tumbler.studio', 'tvshows', 'vostfr', 'webdlrip', 'webhdrip', 'wish666']
+			  'soundtrack', 'subtitle.only', 'teaser', 'trailer', 'tumbler.studio', 'tvshows', 'vostfr', 'webdlrip', 'webhdrip', 'wish666']
 
 DUBBED = ['dublado', 'dubbed']
 SUBS = ['subita', 'subfrench', 'subs', 'subspanish', 'subtitula', 'swesub']
@@ -278,19 +276,6 @@ def label_to_quality(label):
 	except:
 		log_utils.error()
 		return 'SD'
-
-
-# # old method
-# def aliases_to_array(aliases, filter=None):
-	# try:
-		# if not filter:
-			# filter = []
-		# if isinstance(filter, str):
-			# filter = [filter]
-		# return [x.get('title') for x in aliases if not filter or x.get('country') in filter]
-	# except:
-		# log_utils.error()
-		# return []
 
 
 def aliases_to_array(aliases, filter=None):
@@ -770,7 +755,6 @@ def clean_name(title, release_title):
 			return release_title
 
 		release_title = strip_non_ascii_and_unprintable(release_title)
-
 		release_title = release_title.lstrip('/ ')
 		release_title = release_title.lower()
 		release_title = release_title.replace(' ', '.')

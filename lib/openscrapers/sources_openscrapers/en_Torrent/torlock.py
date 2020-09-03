@@ -135,14 +135,11 @@ class source:
 				return
 
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
-			try:
-				url = unquote_plus(url).decode('utf8').replace('&amp;', '&')
-			except:
-				url = unquote_plus(url).replace('&amp;', '&')
-			url = url.split('&tr=')[0].replace(' ', '.')
-
+			url = unquote_plus(url).split('&tr=')[0].replace('&amp;', '&').replace(' ', '.')
+			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources):
 				return
+
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]

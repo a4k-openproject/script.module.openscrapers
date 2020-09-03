@@ -138,11 +138,10 @@ class source:
 					if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
 						continue
 
-					url = file.get('magnet').encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+					url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
-					url = url.split('&tr=')[0]
-					url = url.split('&xl=')[0]
+					url = url.split('&tr=')[0].split('&xl=')[0]
+					url = source_utils.strip_non_ascii_and_unprintable(url)
 
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
@@ -259,11 +258,10 @@ class source:
 					name = file.get('name')
 					name = source_utils.clean_name(self.title, name)
 
-					url = file.get('magnet').encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+					url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
-					url = url.split('&tr=')[0]
-					url = url.split('&xl=')[0]
+					url = url.split('&tr=')[0].split('&xl=')[0]
+					url = source_utils.strip_non_ascii_and_unprintable(url)
 
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 					if source_utils.remove_lang(name):

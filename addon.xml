@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.010" provider-name="Addons4Kodi">
+<addon id="script.module.openscrapers" name="OpenScrapers Module" version="0.0.2.011" provider-name="Addons4Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -11,6 +11,7 @@
 	<extension point="xbmc.service" library="lib/service.py" start="startup" />
 	<extension point="xbmc.python.module" library="lib" />
 	<extension point="xbmc.addon.metadata">
+		<reuselanguageinvoker>false</reuselanguageinvoker> 
 		<platform>all</platform>
 		<summary lang="en">OpenScrapers Module</summary>
 		<description>Scrape common video host for URL's to be playable in Kodi, simplifying addon development of video plugins requiring multi video hosts.</description>
@@ -26,9 +27,8 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-- Fixed some hosters broken by previous pack file support inclusion.
-- Few pack file filter tweaks.
-- Removed a few new cloudflare v2 challenge scrapers
+0.0.2.011
+- Torrent scraper fixes.
 		</news>
 	</extension>
 </addon>

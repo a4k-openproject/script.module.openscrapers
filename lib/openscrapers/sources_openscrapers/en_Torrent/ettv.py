@@ -133,11 +133,8 @@ class source:
 				return
 
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
-			try:
-				url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
-			except:
-				pass
-			url = url.split('&xl=')[0]
+			url = unquote_plus(url).split('&xl=')[0].replace('&amp;', '&').replace(' ', '.')
+			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources):
 				return
 

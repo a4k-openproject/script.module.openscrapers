@@ -149,10 +149,6 @@ class source:
 
 				name = re.findall(r'title=(.+?)$', data, re.DOTALL)[0]
 				name = source_utils.clean_name(self.title, name)
-
-				# name = client.parseDOM(post, 'a')[1]
-				# name = unquote_plus(name)
-				# name = source_utils.clean_name(self.title, name)
 				if source_utils.remove_lang(name, self.episode_title ):
 					continue
 
@@ -261,10 +257,6 @@ class source:
 
 				name = re.findall(r'title=(.+?)$', data, re.DOTALL)[0]
 				name = source_utils.clean_name(self.title, name)
-
-				# name = client.parseDOM(post, 'a')[1]
-				# name = unquote_plus(name)
-				# name = source_utils.clean_name(self.title, name)
 				if source_utils.remove_lang(name):
 					continue
 

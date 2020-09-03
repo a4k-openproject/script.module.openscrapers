@@ -117,6 +117,7 @@ class source:
 
 				for link in links:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
+					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
@@ -223,6 +224,7 @@ class source:
 							re.findall(r"<span title='Seeders/Leechers'>\[<font color='green'><b>(.*?)<", post, re.DOTALL))
 				for link in links:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
+					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]

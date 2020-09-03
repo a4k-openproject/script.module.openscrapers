@@ -14,11 +14,11 @@ addonObject = addon('script.module.openscrapers')
 addonInfo = addonObject.getAddonInfo
 setting = addonObject.getSetting
 setSetting = addonObject.setSetting
-
 condVisibility = xbmc.getCondVisibility
-jsonrpc = xbmc.executeJSONRPC
-dialog = xbmcgui.Dialog()
 execute = xbmc.executebuiltin
+jsonrpc = xbmc.executeJSONRPC
+monitor = xbmc.Monitor()
+dialog = xbmcgui.Dialog()
 openFile = xbmcvfs.File
 makeFile = xbmcvfs.mkdir
 
@@ -33,14 +33,13 @@ cacheFile = os.path.join(dataPath, 'cache.db')
 
 
 def sleep(time):  # Modified `sleep` command that honors a user exit request
-	while time > 0 and not xbmc.abortRequested:
+	while time > 0 and not monitor.abortRequested():
 		xbmc.sleep(min(100, time))
 		time = time - 100
 
 
 def getKodiVersion():
-	return xbmc.getInfoLabel("System.BuildVersion").split(".")[0]
-
+	return int(xbmc.getInfoLabel("System.BuildVersion")[:2])
 
 def check_version_numbers(current, new):
 	# Compares version numbers and return True if new version is newer
@@ -79,7 +78,7 @@ def openSettings(query=None, id=addonInfo('id')):
 		if query is None:
 			raise Exception()
 		c, f = query.split('.')
-		if int(getKodiVersion()) >= 18:
+		if getKodiVersion() >= 18:
 			execute('SetFocus(%i)' % (int(c) - 100))
 			execute('SetFocus(%i)' % (int(f) - 80))
 		else:
@@ -103,7 +102,7 @@ def getSettingDefault(id):
 
 
 def idle():
-	if int(getKodiVersion()) >= 18:
+	if getKodiVersion() >= 18 and condVisibility('Window.IsActive(busydialognocancel)'):
 		return execute('Dialog.Close(busydialognocancel)')
 	else:
 		return execute('Dialog.Close(busydialog)')

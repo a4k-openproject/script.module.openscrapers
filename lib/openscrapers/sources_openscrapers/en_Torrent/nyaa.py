@@ -128,8 +128,8 @@ class source:
 						links = zip(re.findall('href="(magnet:.+?)"', row, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL), [re.findall('<td class="text-center">([0-9]+)</td>', row, re.DOTALL)])
 
 						for link in links:
-							url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.')
-							url = url.split('&tr')[0]
+							url = unquote_plus(link[0]).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+							url = source_utils.strip_non_ascii_and_unprintable(url)
 							hash = re.compile('btih:(.*?)&').findall(url)[0]
 							name = url.split('&dn=')[1]
 							name = source_utils.clean_name(title, name)
