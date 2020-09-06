@@ -58,10 +58,10 @@ class source:
 			result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
 			if not result:
 				return
-			result = [(i.attrs['href']) for i in result if
-			          cleantitle.get(title) == cleantitle.get(
-				          re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '',
-				                 i.attrs['title'], flags=re.I))][0]
+			result = [(i.attrs['href']) for i in result if cleantitle.get(title) == cleantitle.get(
+					re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '', i.attrs['title'], flags=re.I))]
+			if not result: return
+			else: result = result[0]
 			url = client.replaceHTMLCodes(result)
 			try:
 				url = url.encode('utf-8')
@@ -83,10 +83,10 @@ class source:
 			result = [(dom.parse_dom(i, 'a', req=['href', 'title'])[0]) for i in result if i]
 			if not result:
 				return
-			result = [
-				(i.attrs['href']) for i in result if cleantitle.get(tvshowtitle) == cleantitle.get(
-					re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '', i.attrs['title'], flags=re.I))][0]
-
+			result = [(i.attrs['href']) for i in result if cleantitle.get(tvshowtitle) == cleantitle.get(
+					re.sub('(\.|\(|\[|\s)(\d{4}|S\d+E\d+|S\d+|3D)(\.|\)|\]|\s|)(.+|)', '', i.attrs['title'], flags=re.I))]
+			if not result: return
+			else: result = result[0]
 			url = client.replaceHTMLCodes(result)
 			try:
 				url = url.encode('utf-8')
@@ -102,11 +102,9 @@ class source:
 		try:
 			if url is None:
 				return
-
 			url = urljoin(self.base_link, url) if url.startswith('/') else url
 			url = url.split('online.html')[0]
 			url = '%s%s-online.html' % (url, 'season-%01d-episode-%01d' % (int(season), int(episode)))
-
 			url = client.replaceHTMLCodes(url)
 			try:
 				url = url.encode('utf-8')

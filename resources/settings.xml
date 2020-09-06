@@ -47,7 +47,7 @@
 <!--         <setting id="provider.fmoviesto" type="bool" label="FMOVIESTO" default="true"/> --><!-- v2 challenge -->
         <setting id="provider.furk" type="bool" label="FURK" default="false"/>
 <!--         <setting id="provider.gomoviesonl" type="bool" label="GOMOVIESONL" default="true"/> --><!--v2 challenge-->
-        <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true"/>
+<!--         <setting id="provider.gowatchseries" type="bool" label="GOWATCHSERIES" default="true"/> --><!--v2 challenge-->
         <setting id="provider.hdmto" type="bool" label="HDMTO" default="false"/>
 <!--         <setting id="provider.hdpopcorneu" type="bool" label="HDPOPCORNEU" default="false"/> --><!-- needs fixing -->
         <setting id="provider.iwaatch" type="bool" label="IWAATCH" default="true"/>
@@ -64,7 +64,7 @@
 <!--         <setting id="provider.seehd" type="bool" label="SEEHD" default="true"/> --><!--v2 challenge-->
 <!--         <setting id="provider.series9" type="bool" label="SERIES9" default="false"/> --><!--v2 challenge-->
 <!--         <setting id="provider.seriesonline" type="bool" label="SERIESONLINE" default="true"/> --><!--hCaptcha-->
-        <setting id="provider.showbox" type="bool" label="SHOWBOX" default="true"/>
+<!--         <setting id="provider.showbox" type="bool" label="SHOWBOX" default="true"/> --><!--v2 challenge-->
 <!--         <setting id="provider.timewatch" type="bool" label="TIMEWATCH" default="true"/> --><!--v2 challenge-->
         <setting id="provider.toonget" type="bool" label="TOONGET" default="false"/>
         <setting id="provider.watch32" type="bool" label="WATCH$NUMBER[32]" default="false"/>
@@ -73,7 +73,7 @@
         <setting id="provider.watchseries" type="bool" label="WATCHSERIES" default="true"/>
         <setting id="provider.watchserieshd" type="bool" label="WATCHSERIESHD" default="true"/>
         <setting id="provider.watchseriestv" type="bool" label="WATCHSERIESTV" default="true"/>
-        <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="false"/>
+<!--         <setting id="provider.xwatchseries" type="bool" label="XWATCHSERIES" default="false"/> --><!-- needs fixing -->
 <!--         <setting id="provider.yesmoviesgg" type="bool" label="YESMOVIESGG" default="false"/> --><!--v2 challenge-->
         <setting id="provider.zmovies" type="bool" label="ZMOVIES" default="false"/>
     </category>
@@ -98,7 +98,7 @@
         <setting id="provider.rlsbb" type="bool" label="RLSBB" default="true"/>
         <setting id="provider.scenerls" type="bool" label="SCENERLS" default="true"/>
 <!--         <setting id="provider.tvdownload" type="bool" label="TVDOWNLOAD" default="true"/> --><!--v2 challenge-->
-        <setting id="provider.ultrahdindir" type="bool" label="ULTRAHDINDIR" default="true"/>
+<!--         <setting id="provider.ultrahdindir" type="bool" label="ULTRAHDINDIR" default="true"/> --><!--hCaptcha-->
     </category>
 
     <!-- Torrents-3 -->
@@ -122,7 +122,7 @@
         <setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="false"/>
         <setting id="provider.7torrents" type="bool" label="$NUMBER[7]TORRENTS (Pack capable)" default="false"/>
         <setting id="provider.bitlord" type="bool" label="BITLORD (Pack capable)" default="true"/>
-        <setting id="provider.btdb" type="bool" label="BTDB" default="true"/>
+<!--         <setting id="provider.btdb" type="bool" label="BTDB" default="true"/> --><!--v2 challenge-->
         <setting id="provider.btscene" type="bool" label="BTSCENE (Pack capable)" default="false"/>
         <setting id="provider.ettv" type="bool" label="ETTV" default="true"/>
         <setting id="provider.extratorrent" type="bool" label="EXTRATORRENT" default="true"/>
@@ -134,7 +134,7 @@
         <setting id="provider.limetorrents" type="bool" label="LIMETORRENTS (Pack capable)" default="true"/>
         <setting id="provider.magnet4you" type="bool" label="MAGNET$NUMBER[4]YOU" default="true"/>
         <setting id="provider.magnetdl" type="bool" label="MAGNETDL (Pack capable)" default="true"/>
-        <setting id="provider.moviemagnet" type="bool" label="MOVIEMAGNET" default="true"/>
+        <setting id="provider.moviemagnet" type="bool" label="MOVIEMAGNET" default="false"/>
         <setting id="provider.nyaa" type="bool" label="NYAA" default="false"/>
         <setting id="provider.piratebay" type="bool" label="PIRATEBAY (Pack capable)" default="true"/>
         <setting id="provider.skytorrents" type="bool" label="SKYTORRENTS (Pack capable)" default="true"/>

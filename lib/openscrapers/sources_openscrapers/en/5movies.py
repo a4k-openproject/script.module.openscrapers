@@ -80,11 +80,12 @@ class source:
 
 	def _search(self, title, year, aliases, headers):
 		try:
+			years = [str(year), str(int(year)+1), str(int(year)-1)]
 			q = urljoin(self.base_link, self.search_link % quote_plus(cleantitle.getsearch(title)))
 			r = client.request(q)
 			r = client.parseDOM(r, 'div', attrs={'class':'ml-img'})
 			r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'img', ret='alt'))
-			url = [i for i in r if cleantitle.get(title) == cleantitle.get(i[1]) and year in i[1]][0][0]
+			url = [i for i in r if cleantitle.get(title) == cleantitle.get(i[1]) and (any(x in str(i[1]) for x in years))][0][0]
 			return url
 		except:
 			source_utils.scraper_error('5MOVIES')
@@ -94,7 +95,7 @@ class source:
 	def sources(self, url, hostDict, hostprDict):
 		try:
 			sources = []
-			if url == None:
+			if not url:
 				return sources
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -102,24 +103,25 @@ class source:
 			headers = {}
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			year = data['year']
-			if 'tvshowtitle' in data:	 
+			if 'tvshowtitle' in data:
 				episode = data['episode']
 				season = data['season']
 				url = self._search(title, year, aliases, headers)
-				url = url.replace('online-free', 'season-%s-episode-%s-online-free' % (season, episode))
+				# url = url.replace('online-free', 'season-%s-episode-%s-online-free' % (season, episode))
+				url = url.rstrip('/') + '-s%se%s' % (season, episode)
 			else:
 				episode = None
 				year = data['year']
 				url = self._search(data['title'], data['year'], aliases, headers)
 			url = url if 'http' in url else urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 			result = client.request(url);
 			result = client.parseDOM(result, 'li', attrs={'class':'link-button'})
 			links = client.parseDOM(result, 'a', ret='href')
 			i = 0
 			for l in links:
-				#if i == 15:
-					#break
+				if i == 15:
+					break
 				try:
 					l = l.split('=')[1]
 					l = urljoin(self.base_link, self.video_link % l)
@@ -128,7 +130,6 @@ class source:
 					if ' href' in u:
 						u = u.replace('\r', '').replace('\n', '').replace('\t', '')
 						u = 'http:' + re.compile(r" href='(.+?)'").findall(u)[0]
-
 					if 'google' in u:
 						valid, hoster = source_utils.is_host_valid(u, hostDict)
 						urls, host, direct = source_utils.check_directstreams(u, hoster)
@@ -138,12 +139,10 @@ class source:
 						valid, hoster = source_utils.is_host_valid(u, hostDict)
 						if not valid:
 							continue
-						try:
-							u.decode('utf-8')
-							sources.append({'source': hoster, 'quality': '720p', 'language': 'en', 'url': u, 'direct': False, 'debridonly': False})
-							i+=1
-						except:
-							pass
+						try: u = u.decode('utf-8')
+						except: u = source_utils.strip_non_ascii_and_unprintable(u)
+						sources.append({'source': hoster, 'quality': '720p', 'language': 'en', 'url': u, 'direct': False, 'debridonly': False})
+						i += 1
 				except:
 					source_utils.scraper_error('5MOVIES')
 					pass

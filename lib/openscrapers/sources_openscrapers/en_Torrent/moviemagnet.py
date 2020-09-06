@@ -84,10 +84,9 @@ class source:
 				r = scraper.get(url).content
 				if not r:
 					return sources
-				if any(value in str(r) for value in ['No movies found', 'something went wrong']):
+				if any(value in str(r) for value in ['No movies found', 'something went wrong', 'Connection timed out']):
 					return sources
 				r = json.loads(r)
-
 				id = ''
 				for i in r:
 					if i['original_title'] == title and i['release_date'] == year:

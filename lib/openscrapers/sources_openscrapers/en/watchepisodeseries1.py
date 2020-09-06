@@ -83,6 +83,7 @@ class source:
 			hdlr = 's%02de%02d' % (int(data['season']), int(data['episode']))
 			query = quote_plus(cleantitle.getsearch(title))
 			surl = urljoin(self.base_link, self.search_link % query)
+			# log_utils.log('surl = %s' % surl, log_utils.LOGDEBUG)
 			r = client.request(surl, XHR=True, timeout='10')
 			if not r:
 				return sources
